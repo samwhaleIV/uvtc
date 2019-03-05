@@ -100,7 +100,6 @@ const ImageManager = {
                                         const dotSplit = sourcePath[sourcePath.length-1].split(".");
                                         sourcePath[sourcePath.length-1] = dotSplit[0];
                                         name = sourcePath.slice(startIndex+1).join("/");
-                                        console.log(name);
                                         break;
                                     }
                                 }

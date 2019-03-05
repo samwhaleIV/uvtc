@@ -26,9 +26,6 @@ function setSizeConstants() {
 
 const internalWidth = 800;
 const internalHeight = 600;
-canvas.width = internalWidth;
-canvas.height = internalHeight;
-setSizeConstants();
 
 const heightByWidth = internalHeight / internalWidth;
 let widthByHeight = internalWidth / internalHeight;
