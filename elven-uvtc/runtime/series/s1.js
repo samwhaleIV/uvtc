@@ -26,4 +26,4 @@ addCardSeries([
     {
         name: "solar power"
     }
-],"cards/s1.png");
+],"cards/s1");

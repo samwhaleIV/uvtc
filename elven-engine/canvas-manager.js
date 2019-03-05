@@ -33,8 +33,6 @@ let widthByHeight = internalWidth / internalHeight;
 const backgroundCanvas = document.getElementById("background-canvas");
 const context = canvas.getContext("2d");
 const backgroundContext = backgroundCanvas.getContext("2d");
-context.imageSmoothingEnabled = false;
-
 
 let electron = null;
 let electronWindow = null;
@@ -276,6 +274,7 @@ function applySizeMode() {
     if(rendererState && rendererState.updateSize) {
         rendererState.updateSize();
     }
+    context.imageSmoothingEnabled = false;
 }
 function cycleSizeMode() {
     let newMode = defaultSizeMode;

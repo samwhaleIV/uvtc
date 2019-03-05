@@ -393,5 +393,6 @@ function CardScreenRenderer() {
         renderStatic();
         renderButtonRows(this.sequencer,hoverType === hoverTypes.moveButtons,hoverIndex,showHoverSpecialEffect);
 
+        renderCard(allCardSeries[0][0],innerLeftArea.x+10,innerLeftArea.y+10,48*4,(64*4)/2,true);
     }
 }
