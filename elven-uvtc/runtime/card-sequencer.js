@@ -1,4 +1,12 @@
-function CardSequencer() {
+const cardPageTypes = {
+    field: Symbol("field"),
+    active: Symbol("active"),
+    hand: Symbol("hand"),
+    status: Symbol("status")
+}
+function CardSequencer(renderer) {
+
+    this.renderer = renderer;
 
     this.playerState = {
         health: 6,
@@ -9,7 +17,6 @@ function CardSequencer() {
         health: 6,
         energy: 0
     };
-
 
     this.buttonRows = [
         [
@@ -69,13 +76,13 @@ function CardSequencer() {
             }
         ]
     ];
-    const buttonLookup = [];
+    this.buttonLookup = [];
     let buttonRowIndex = 0
     for(let i = 0;i<this.buttonRows.length;i++) {
         const row = this.buttonRows[i];
         for(let i2 = 0;i2<row.length;i2++) {
             row[i2].index = buttonRowIndex++;
-            buttonLookup.push(row);
+            this.buttonLookup.push(row[i2]);
         }
     }
 
@@ -87,6 +94,8 @@ function CardSequencer() {
 
     };
 
+    this.cardPageRenderData = [];
+    this.cardPageType = cardPageTypes.field;
     this.cardPageText;
     this.cardPageTextScale = 2;
     this.cardPageTextXOffset = 0;
@@ -102,18 +111,80 @@ function CardSequencer() {
 
 
     this.activateNextPage = function() {
-        //Todo
+        //TODO
     }
     this.activatePreviousPage = function() {
-        //Todo
+        //TODO
     }
 
-    this.leftCycleEnabled = true;
-    this.rightCycleEnabled = true;
+    this.switchedPains = function() {
+        //TODO
+        //Should set to first page on switch because player and oppon. can have varying numbers of pages
+    }
+
+    this.activateActionButton = function(index) {
+        //TODO
+    }
+
+    this.cardClicked = function(index) {
+        //TODO
+    }
+
+    const setButtonStates = enabled => {
+        for(let i = 0;i<this.buttonLookup.length;i++) {
+            this.buttonLookup[i].enabled = enabled;
+        }
+    }
+
+    this.disableButtons = function() {
+        setButtonStates(false);
+    }
+    this.enableButtons = function() {
+        //TODO: This method must make sure to allow the correct buttons only
+        setButtonStates(true);
+    }
+
+    this.lockInterface = function() {
+        this.renderer.lockViewTab();
+        this.renderer.lockTextFeedToggle();
+        this.renderer.lockPageCycle();
+        this.renderer.lockFullScreenCardEscape();
+        this.disableButtons();
+        //this.renderer.showTextFeed();
+    }
+
+    this.unlockInterface = function() {
+        this.renderer.unlockViewTab();
+        this.renderer.unlockTextFeedToggle();
+        this.renderer.unlockPageCycle();
+        this.renderer.unlockFullScreenCardEscape();
+        this.enableButtons();
+        //this.renderer.hideTextFeed();
+    }
+
+    this.showFullScreenCard = function(card,withUIAdjustments) {
+        if(withUIAdjustments) {
+            this.renderer.lockViewTab();
+            this.renderer.lockPageCycle();
+            this.disableButtons();
+        }
+        this.fullScreenCard = card;
+    }
+    this.hideFullScreenCard = function(withUIAdjustments) {
+        //TODO: If this is from a [draw action] or something, advance the event stack if there is one
+        if(withUIAdjustments) {
+            this.renderer.unlockViewTab();
+            this.renderer.unlockPageCycle();
+            this.enableButtons();
+        }
+        this.fullScreenCard = null;
+    }
 
     this.getButtonNavigationIndex = function(currentIndex) {
+        //TODO: Implement this can call this when are are ready for keyboard support.
         //return null if we go to the right, return the same if no movement.
         return currentIndex;
     }
+
 
 }

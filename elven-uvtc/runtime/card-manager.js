@@ -5,6 +5,8 @@ const allCardSeries = [];
 const internalCardWidth = 48;
 const internalCardHeight = 64;
 const halfInternalCardHeight = internalCardHeight / 2;
+const internalCardWidthRatio = internalCardWidth / internalCardHeight;
+const internalCardHeightRatio = internalCardHeight / internalCardWidth;
 
 const addCardSeries = function(cardSeries,imagePath) {
     for(let i = 0;i<cardSeries.length;i++) {

@@ -27,3 +27,11 @@ function renderCard(card,x,y,width,height,partial=false) {
     drawTextWhite(card.name,x+cardTitlePadding,y+cardTitlePadding,cardTitleTextScale);
 
 }
+function renderCardPartial(card,x,y,width,height) {
+    renderCard(card,x,y,width,height,true);
+}
+
+function renderCardFullScreen(card,x,y,width,height) {
+    //TODO: Render more card shit because we have more space wooooo
+    renderCard(card,x,y,width,height,false);
+}
