@@ -102,23 +102,8 @@ const moveButtonSpecialHoverDisabled = "rgb(100,100,100)";
 
 const rightBarWidthPercent = 0.35;
 
-let cardColumnCount;
-let cardWidth;
-let cardHeight;
-let cardShortHeight;
 
-let cardColumnMargin;
-let cardRowMargin;
-
-let cardFullScreenWidth;
-let cardFullScreenHeight;
-let cardFullScreenX;
-let cardFullSreenYStart;
-
-let maxCardRows;
-let alwaysCompactCards;
-
-const innerLeftAreaPercent = 0.65;
+const innerLeftAreaPercent = 0.25;
 const inverseLeftAreaPercent = 1 - innerLeftAreaPercent;
 
 const textFeed = {};
@@ -138,6 +123,13 @@ leftTableCycleButton.width = tableCycleButtonWidth;
 rightTableCycleButton.height = tableCycleButtonHeight;
 leftTableCycleButton.height = tableCycleButtonHeight;
 
+
+const textFeedToggleButton = {};
+textFeedToggleButton.text = "text feed";
+textFeedToggleButton.enabled = true;
+textFeedToggleButton.width = leftTableCycleButton.width;
+textFeedToggleButton.height = leftTableCycleButton.height;
+
 (function(){
     let textTestResult = drawTextTest(rightTableCycleButton.text,tableCycleButtonTextScale);
     rightTableCycleButton.textXOffset = Math.floor((tableCycleButtonWidth / 2) - (textTestResult.width / 2));
@@ -146,6 +138,10 @@ leftTableCycleButton.height = tableCycleButtonHeight;
     textTestResult = drawTextTest(leftTableCycleButton.text,tableCycleButtonTextScale);
     leftTableCycleButton.textXOffset = Math.floor((tableCycleButtonWidth / 2) - (textTestResult.width / 2));
     leftTableCycleButton.textYOffset = Math.floor((tableCycleButtonHeight / 2) - (textTestResult.height / 2));
+
+    textTestResult = drawTextTest(textFeedToggleButton.text,tableCycleButtonTextScale);
+    textFeedToggleButton.textXOffset = Math.floor((textFeedToggleButton.width / 2) - (textTestResult.width / 2));
+    textFeedToggleButton.textYOffset = Math.floor((textFeedToggleButton.height / 2) - (textTestResult.height / 2));
 })();
 
 rightTableCycleButton.color = "black";
@@ -181,6 +177,7 @@ function updateRenderElements() {
     innerLeftArea.y = leftArea.y + innerLeftAreaMargin + innerAreaVerticalSpace;
     innerLeftArea.width = leftArea.width - innerLeftAreaMargin - innerLeftAreaMargin;
     innerLeftArea.height = (leftArea.height*innerLeftAreaPercent) - innerLeftAreaMargin - innerLeftAreaMargin - innerAreaVerticalSpace;
+    innerLeftArea.fullHeight = leftArea.height - innerLeftAreaMargin - innerLeftAreaMargin - innerAreaVerticalSpace;
 
     textFeed.height = Math.ceil(inverseLeftAreaPercent*leftArea.height);
     textFeed.width = innerLeftArea.width;
@@ -204,6 +201,14 @@ function updateRenderElements() {
     
     rightTableCycleButton.textX = rightTableCycleButton.x + rightTableCycleButton.textXOffset;
     rightTableCycleButton.textY = rightTableCycleButton.y + rightTableCycleButton.textYOffset;
+
+    textFeedToggleButton.x = innerLeftArea.x;
+    textFeedToggleButton.textX = textFeedToggleButton.x + textFeedToggleButton.textXOffset;
+    textFeedToggleButton.y = innerLeftArea.y + innerLeftArea.height - textFeedToggleButton.height;
+    textFeedToggleButton.textY = textFeedToggleButton.y + textFeedToggleButton.textYOffset;
+
+    textFeedToggleButton.collapsedY = innerLeftArea.y + innerLeftArea.fullHeight - textFeedToggleButton.height;
+    textFeedToggleButton.collapsedTextY = textFeedToggleButton.collapsedY + textFeedToggleButton.textYOffset;
 
     pageTitleBlock.y = leftTableCycleButton.y;
     pageTitleBlock.x = leftTableCycleButton.x + leftTableCycleButton.width + innerRightBarMargin;
@@ -248,7 +253,6 @@ function updateRenderElements() {
     s1.hoverWidth = s1.width + doubleHoverPadding;
     s1.textX = s1.x + moveButtonTextPadding;
 
-    //Todo s2
     const s2StartX = s1.x;
     const s2Width = Math.floor((s1.width-moveButtonMargin) / 2);
     let runningX = s2StartX;
@@ -262,7 +266,6 @@ function updateRenderElements() {
         runningX += s2.width + moveButtonMargin;
     }
 
-    //Todo s3
     const s3StartX = s1.x;
     const s3Width = Math.floor((s1.width-moveButtonMargin*2) / 3);
     runningX = s3StartX;
@@ -311,6 +314,9 @@ function drawColoredRectangle(rectangle) {
 
 function contains(x,y,r) {
     return x >= r.x && x <= r.x + r.width && y >= r.y && y <= r.y + r.height;
+}
+function areaContains(x,y,rx,ry,rw,rh) {
+    return x >= rx && x <= rx + rw && y >= ry && y <= ry + rh;
 }
 
 function renderButtonRow(buttonRow,index,withHover,hoverIndex,specialHover) {
@@ -379,7 +385,8 @@ const hoverTypes = {
     none: Symbol(),
     moveButtons: Symbol(),
     bubbleSelector: Symbol(),
-    cycleButtons: Symbol()
+    cycleButtons: Symbol(),
+    textFeedToggleButton: Symbol()
 }
 
 const defaultHoverIndex = -1;
@@ -395,6 +402,10 @@ function CardScreenRenderer() {
     let hoverType = hoverTypes.none;
     let hoverIndex = defaultHoverIndex;
     let showHoverSpecialEffect = false;
+
+    this.textFeedShown = false;
+
+    textFeedToggleButton.enabled = true;
 
     updateRenderElements();
 
@@ -428,6 +439,11 @@ function CardScreenRenderer() {
             viewingSelfCards = !viewingSelfCards;
         }
         showHoverSpecialEffect = false;
+        if(textFeedToggleButton.enabled && hoverType == hoverTypes.textFeedToggleButton) {
+            this.textFeedShown = !this.textFeedShown;
+            hoverType = hoverTypes.none;
+            hoverIndex = defaultHoverIndex;
+        }
     }
 
     this.processMove = function(mouseX,mouseY) {
@@ -460,6 +476,15 @@ function CardScreenRenderer() {
                 hoverType = hoverTypes.cycleButtons;
                 hoverIndex = 1;
                 return;
+            } else if(areaContains(mouseX,mouseY,
+                textFeedToggleButton.x,
+                this.textFeedShown ? textFeedToggleButton.y : textFeedToggleButton.collapsedY,
+                textFeedToggleButton.width,
+                textFeedToggleButton.height
+            )) {
+                hoverType = hoverTypes.textFeedToggleButton;
+                hoverIndex = 0;
+                return;
             }
         }
         hoverType = hoverTypes.none;
@@ -473,10 +498,38 @@ function CardScreenRenderer() {
 
         drawColoredRectangle(rightBar);
         drawColoredRectangle(innerRightBar);
-        drawColoredRectangle(innerLeftArea);
-        drawColoredRectangle(textFeed);
 
-        //drawColoredRectangle(pageTitleBlock);
+        if(this.textFeedShown) {
+            drawColoredRectangle(innerLeftArea);
+            drawColoredRectangle(textFeed);
+            drawRectangle(
+                textFeedToggleButton,
+                getButtonForegroundColor(
+                    hoverType===hoverTypes.textFeedToggleButton,
+                    showHoverSpecialEffect,
+                    textFeedToggleButton.enabled
+                )
+            );
+            drawTextWhite(textFeedToggleButton.text,textFeedToggleButton.textX,textFeedToggleButton.textY,moveButtonTextScale);
+        } else {
+            context.fillStyle = innerLeftArea.color;
+            context.fillRect(
+                innerLeftArea.x,innerLeftArea.y,
+                innerLeftArea.width,innerLeftArea.fullHeight
+            );
+            context.fillStyle = getButtonForegroundColor(
+                hoverType===hoverTypes.textFeedToggleButton,
+                showHoverSpecialEffect,
+                textFeedToggleButton.enabled
+            );
+            context.fillRect(
+                textFeedToggleButton.x,
+                textFeedToggleButton.collapsedY,
+                textFeedToggleButton.width,
+                textFeedToggleButton.height
+            );
+            drawTextWhite(textFeedToggleButton.text,textFeedToggleButton.textX,textFeedToggleButton.collapsedTextY,moveButtonTextScale);
+        }
 
         drawTextBlack(
             this.sequencer.cardPageText,
@@ -487,7 +540,6 @@ function CardScreenRenderer() {
 
         if(hoverType === hoverTypes.cycleButtons) {
             if(hoverIndex === 0) {
-                //todo draw background
                 context.fillStyle = hoverColor;
                 context.fillRect(
                     leftTableCycleButton.hoverX,leftTableCycleButton.hoverY,
@@ -525,7 +577,7 @@ function CardScreenRenderer() {
         drawTextWhite(rightTableCycleButton.text,rightTableCycleButton.textX,rightTableCycleButton.textY,tableCycleButtonTextScale);
 
         if(hoverType === hoverTypes.bubbleSelector) {
-            //drawColoredRectangle(bubbleSelectorHover);
+            //Todo this maybe?
         }
 
         if(viewingSelfCards) {
