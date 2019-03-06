@@ -12,7 +12,7 @@ leftArea.y = 0;
 leftArea.color = "rgba(128,128,128,0.7)";
 
 const innerLeftAreaMargin = 15;
-const innerAreaVerticalSpace = innerLeftAreaMargin * 3;
+const innerAreaVerticalSpace = 105;
 const innerLeftArea = {};
 innerLeftArea.color = "rgb(242,242,242)";
 
@@ -27,17 +27,6 @@ leftBubbleSelector.y = bubbleSelectorY;
 const rightBubbleSelector = {};
 rightBubbleSelector.height = bubbleSelectorHeight;
 rightBubbleSelector.y = bubbleSelectorY;
-
-const halfBubbleExtensionWidth = 10;
-const bubbleExtensionHeight = innerLeftAreaMargin;
-
-const leftBubbleExtension = {};
-leftBubbleExtension.height = bubbleExtensionHeight;
-leftBubbleExtension.color = "white";
-
-const rightBubbleExtension = {};
-rightBubbleExtension.height = bubbleExtensionHeight;
-rightBubbleExtension.color = "white";
 
 const bubbleTextScale = SmallTextScale;
 const bubbleTextMargin = 5;
@@ -60,7 +49,7 @@ const bubbleSelectorHitTest = {};
 bubbleSelectorHitTest.y = bubbleSelectorY;
 bubbleSelectorHitTest.height = bubbleSelectorHeight;
 
-const moveButtonHeight = 37;
+const moveButtonHeight = 40;
 const moveButtonMargin = 10;
 const moveButtonColor = "black";
 const moveButtonDisabledColor = "rgba(40,40,40,0.75)";
@@ -103,9 +92,7 @@ const moveButtonSpecialHoverDisabled = "rgb(100,100,100)";
 const rightBarWidthPercent = 0.35;
 
 
-const innerLeftAreaPercent = 0.25;
-const inverseLeftAreaPercent = 1 - innerLeftAreaPercent;
-
+const collapsedInnerLeftAreaWidth = 70;
 const textFeed = {};
 textFeed.color = "rgba(0,0,0,0.85)";
 
@@ -164,9 +151,17 @@ const fullScreenCard = {};
 const fullScreenCardArea = {};
 
 const buttonRowImage = {};
-const buttonRowImageMargin = 3;
+const buttonRowImageMargin = 2;
 buttonRowImage.width = moveButtonHeight - buttonRowImageMargin - buttonRowImageMargin;
 buttonRowImage.height = buttonRowImage.width;
+
+leftBubbleSelector.x = innerLeftAreaMargin;
+
+const leftStatusX = innerLeftAreaMargin;
+let rightStatusX;
+const statusWidth = 64;
+const statusHeight = 64;
+const statusY = innerLeftAreaMargin + bubbleSelectorHeight;
 
 function updateRenderElements() {
     rightBar.x = fullWidth - Math.floor(fullWidth * rightBarWidthPercent);
@@ -183,15 +178,21 @@ function updateRenderElements() {
     leftArea.width = rightBar.x;
 
     innerLeftArea.x = leftArea.x + innerLeftAreaMargin;
-    innerLeftArea.y = leftArea.y + innerLeftAreaMargin + innerAreaVerticalSpace;
     innerLeftArea.width = leftArea.width - innerLeftAreaMargin - innerLeftAreaMargin;
-    innerLeftArea.height = (leftArea.height*innerLeftAreaPercent) - innerLeftAreaMargin - innerLeftAreaMargin - innerAreaVerticalSpace;
-    innerLeftArea.fullHeight = leftArea.height - innerLeftAreaMargin - innerLeftAreaMargin - innerAreaVerticalSpace;
 
-    textFeed.height = Math.ceil(inverseLeftAreaPercent*leftArea.height);
+    innerLeftArea.y = leftArea.y + innerLeftAreaMargin + innerAreaVerticalSpace;
+
+    innerLeftArea.fullHeight = (leftArea.y + leftArea.height - innerLeftAreaMargin) - innerLeftArea.y;
+
+    innerLeftArea.height = collapsedInnerLeftAreaWidth;
+    textFeed.height = innerLeftArea.fullHeight - innerLeftArea.height;
+    textFeed.y = innerLeftArea.y + innerLeftArea.height;
+
+    textFeedToggleButton.y = textFeed.y - textFeedToggleButton.height;
+    textFeedToggleButton.collapsedY = innerLeftArea.y + innerLeftArea.fullHeight - textFeedToggleButton.height;
+
     textFeed.width = innerLeftArea.width;
     textFeed.x = innerLeftArea.x;
-    textFeed.y = Math.floor(innerLeftArea.y + innerLeftArea.height);
 
     leftTableCycleButton.x = innerLeftArea.x + innerRightBarMargin;
     leftTableCycleButton.y = innerLeftArea.y + innerRightBarMargin;
@@ -213,10 +214,9 @@ function updateRenderElements() {
 
     textFeedToggleButton.x = innerLeftArea.x;
     textFeedToggleButton.textX = textFeedToggleButton.x + textFeedToggleButton.textXOffset;
-    textFeedToggleButton.y = Math.floor(innerLeftArea.y + innerLeftArea.height - textFeedToggleButton.height);
+
     textFeedToggleButton.textY = textFeedToggleButton.y + textFeedToggleButton.textYOffset;
 
-    textFeedToggleButton.collapsedY = innerLeftArea.y + innerLeftArea.fullHeight - textFeedToggleButton.height;
     textFeedToggleButton.collapsedTextY = textFeedToggleButton.collapsedY + textFeedToggleButton.textYOffset;
 
     pageTitleBlock.y = leftTableCycleButton.y;
@@ -230,17 +230,9 @@ function updateRenderElements() {
     leftBubbleSelector.width = bubbleSelectorWidth;
     rightBubbleSelector.width = bubbleSelectorWidth;
 
-    leftBubbleSelector.x = leftArea.x + Math.floor(leftArea.width / 2) - bubbleSelectorWidth;
     rightBubbleSelector.x = leftBubbleSelector.x + leftBubbleSelector.width;
 
-    leftBubbleExtension.x = Math.round(leftBubbleSelector.x + (leftBubbleSelector.width / 2) - halfBubbleExtensionWidth);
-    leftBubbleExtension.y = rightBubbleSelector.y + rightBubbleSelector.height;
-
-    leftBubbleExtension.width = halfBubbleExtensionWidth + halfBubbleExtensionWidth;
-
-    rightBubbleExtension.x = Math.round(rightBubbleSelector.x + (rightBubbleSelector.width / 2) - halfBubbleExtensionWidth);
-    rightBubbleExtension.y = rightBubbleSelector.y + rightBubbleSelector.height;
-    rightBubbleExtension.width = halfBubbleExtensionWidth + halfBubbleExtensionWidth;
+    rightStatusX = rightBubbleSelector.x;
 
     leftBubbleText.x = leftBubbleSelector.x + bubbleTextMargin;
     leftBubbleText.y = leftBubbleSelector.y + bubbleTextMargin;
@@ -309,9 +301,6 @@ function updateRenderElements() {
     bubbleSelectorHover.width = bubbleSelectorHitTest.width + doubleHoverPadding;
     bubbleSelectorHover.height = bubbleSelectorHitTest.height + doubleHoverPadding;
 
-
-
-    //TODO: (box fit full screen card within the confines of the bottom text feed and back and next buttons)
 
     fullScreenCardArea.x = leftTableCycleButton.x + fullScreenCardMargin;
     fullScreenCardArea.y = leftTableCycleButton.y + leftTableCycleButton.height + fullScreenCardMargin;
@@ -388,7 +377,8 @@ function renderButtonRow(buttonRow,index,withHover,hoverIndex,specialHover) {
 
         if(button.image) {
             context.drawImage(
-                button.image,
+                imageDictionary["ui/card-icons"],
+                (button.image-1)*32,0,32,32,
                 buttonRowImage.x,
                 yPosition + buttonRowImage.yOffset,
                 buttonRowImage.width,
@@ -518,6 +508,7 @@ function CardScreenRenderer() {
     }
 
     this.processClick = function(x,y) {
+        this.processMove(x,y);
         if(hoverIndex >= 0) {
             showHoverSpecialEffect = true;
         }
@@ -565,14 +556,6 @@ function CardScreenRenderer() {
     this.processClickEnd = function(x,y) {
         showHoverSpecialEffect = false;
         switch(hoverType) {
-            default:
-                if(this.textFeedToggleIsHitRegistered(x,y)) {
-                    hoverType = hoverTypes.textFeedToggleButton;
-                    hoverIndex = 0;
-                    this.processClickEnd(x,y);
-                    return;
-                }
-                break;
             case hoverTypes.fullScreenCard:
                 if(!fullScreenCardLocked) {
                     this.sequencer.hideFullScreenCard(true);
@@ -666,7 +649,43 @@ function CardScreenRenderer() {
     let playerNameText = "you";
     let opponentNameText = "opponent";
 
-    this.renderStatic = function() {
+    this.renderStatusIcons = function() {
+        context.drawImage(
+            imageDictionary["ui/status-roll"],
+            this.sequencer.playerState.health*32,0,32,32,
+            leftStatusX,
+            statusY,
+            statusWidth,
+            statusHeight
+        );
+        context.drawImage(
+            imageDictionary["ui/status-roll"],
+            this.sequencer.playerState.energy*32,32,32,32,
+            leftStatusX+statusWidth,
+            statusY,
+            statusWidth,
+            statusHeight
+        );
+        context.drawImage(
+            imageDictionary["ui/status-roll"],
+            this.sequencer.opponentState.health*32,0,32,32,
+            rightStatusX,
+            statusY,
+            statusWidth,
+            statusHeight
+        );
+        context.drawImage(
+            imageDictionary["ui/status-roll"],
+            this.sequencer.opponentState.energy*32,32,32,32,
+            rightStatusX+statusWidth,
+            statusY,
+            statusWidth,
+            statusHeight
+        );
+    }
+
+    this.render = function(timestamp) {
+        background.render(timestamp);
 
         drawColoredRectangle(rightBar);
         drawColoredRectangle(innerRightBar);
@@ -777,23 +796,17 @@ function CardScreenRenderer() {
         if(viewingSelfCards) {
             drawRectangle(leftBubbleSelector,"white");
             drawRectangle(rightBubbleSelector,"black");
-            drawColoredRectangle(leftBubbleExtension);
             drawTextBlack(playerNameText,leftBubbleText.x,leftBubbleText.y,leftBubbleText.scale);
             drawTextWhite(opponentNameText,rightBubbleText.x,rightBubbleText.y,rightBubbleText.scale);
         } else {
             drawRectangle(leftBubbleSelector,"black");
             drawRectangle(rightBubbleSelector,"white");
-            drawColoredRectangle(rightBubbleExtension);
             drawTextWhite(playerNameText,leftBubbleText.x,leftBubbleText.y,leftBubbleText.scale);
             drawTextBlack(opponentNameText,rightBubbleText.x,rightBubbleText.y,rightBubbleText.scale);
         }
 
+        this.renderStatusIcons();
 
-    }
-
-    this.render = function(timestamp) {
-        background.render(timestamp);
-        this.renderStatic();
         renderButtonRows(this.sequencer,hoverType === hoverTypes.moveButtons,hoverIndex,showHoverSpecialEffect);
     }
 }

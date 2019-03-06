@@ -30,7 +30,7 @@ function CardSequencer(renderer) {
             {
                 text: "draw",
                 enabled: true,
-                image: imageDictionary["ui/draw"]
+                image: 4
             },
         ],
         [
@@ -90,10 +90,8 @@ function CardSequencer(renderer) {
 
     this.fullScreenCard = null;
     this.playerTable = {
-        
     };
     this.opponentTable = {
-
     };
 
     this.cardPageRenderData = [];
@@ -109,7 +107,7 @@ function CardSequencer(renderer) {
         this.cardPageTextXOffset = -Math.floor(textTestResult.width / 2);
         this.cardPageTextYOffset = -Math.floor(textTestResult.height / 2);
     }
-    this.updateCardPageTextOffset("page (1 of 3) - active cards");
+    this.updateCardPageTextOffset("1234567890");
 
 
     this.activateNextPage = function() {
