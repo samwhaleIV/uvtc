@@ -6,15 +6,9 @@ const innerRightBarMargin = 5;
 const innerRightBar = {};
 innerRightBar.color = "rgba(0,0,0,0.5)";
 
-const topBar = {};
-topBar.x = 0;
-topBar.y = 0;
-topBar.height = 40;
-topBar.color = "white";
-
 const leftArea = {};
 leftArea.x = 0;
-leftArea.y = topBar.height;
+leftArea.y = 0;
 leftArea.color = "rgba(128,128,128,0.7)";
 
 const innerLeftAreaMargin = 15;
@@ -57,10 +51,10 @@ const rightBubbleText = {
 const hoverPadding = 2.5;
 const doubleHoverPadding = hoverPadding + hoverPadding; 
 
-const flatHoverPadding = 2;
+const flatHoverPadding = Math.floor(hoverPadding);
 const flatDoubleHoverPadding = flatHoverPadding + flatHoverPadding;
 
-const hoverColor = "white";
+const hoverColor = "darkorange";
 
 const bubbleSelectorHitTest = {};
 bubbleSelectorHitTest.y = bubbleSelectorY;
@@ -108,6 +102,67 @@ const moveButtonSpecialHoverDisabled = "rgb(100,100,100)";
 
 const rightBarWidthPercent = 0.35;
 
+let cardColumnCount;
+let cardWidth;
+let cardHeight;
+let cardShortHeight;
+
+let cardColumnMargin;
+let cardRowMargin;
+
+let cardFullScreenWidth;
+let cardFullScreenHeight;
+let cardFullScreenX;
+let cardFullSreenYStart;
+
+let maxCardRows;
+let alwaysCompactCards;
+
+const innerLeftAreaPercent = 0.65;
+const inverseLeftAreaPercent = 1 - innerLeftAreaPercent;
+
+const textFeed = {};
+textFeed.color = "rgba(0,0,0,0.85)";
+
+const rightTableCycleButton = {};
+const leftTableCycleButton = {};
+rightTableCycleButton.text = "next";
+leftTableCycleButton.text = "back";
+const tableCycleButtonTextScale = 2;
+
+const tableCycleButtonWidth = 100;
+const tableCycleButtonHeight = 30;
+const doubleTableCycleButtonWidth = tableCycleButtonWidth + tableCycleButtonWidth;
+rightTableCycleButton.width = tableCycleButtonWidth;
+leftTableCycleButton.width = tableCycleButtonWidth;
+rightTableCycleButton.height = tableCycleButtonHeight;
+leftTableCycleButton.height = tableCycleButtonHeight;
+
+(function(){
+    let textTestResult = drawTextTest(rightTableCycleButton.text,tableCycleButtonTextScale);
+    rightTableCycleButton.textXOffset = Math.floor((tableCycleButtonWidth / 2) - (textTestResult.width / 2));
+    rightTableCycleButton.textYOffset = Math.floor((tableCycleButtonHeight / 2) - (textTestResult.height / 2));
+
+    textTestResult = drawTextTest(leftTableCycleButton.text,tableCycleButtonTextScale);
+    leftTableCycleButton.textXOffset = Math.floor((tableCycleButtonWidth / 2) - (textTestResult.width / 2));
+    leftTableCycleButton.textYOffset = Math.floor((tableCycleButtonHeight / 2) - (textTestResult.height / 2));
+})();
+
+rightTableCycleButton.color = "black";
+leftTableCycleButton.color = "black";
+
+leftTableCycleButton.hoverWidth = leftTableCycleButton.width + doubleHoverPadding;
+leftTableCycleButton.hoverHeight = leftTableCycleButton.height + doubleHoverPadding;
+
+rightTableCycleButton.hoverWidth = rightTableCycleButton.width + doubleHoverPadding;
+rightTableCycleButton.hoverHeight = rightTableCycleButton.height + doubleHoverPadding;
+
+
+const pageTitleBlock = {};
+pageTitleBlock.color = "black";
+pageTitleBlock.height = leftTableCycleButton.height;
+pageTitleBlock.textScale = moveButtonTextScale;
+
 function updateRenderElements() {
     rightBar.x = fullWidth - Math.floor(fullWidth * rightBarWidthPercent);
     rightBar.width = fullWidth - rightBar.x;
@@ -119,16 +174,43 @@ function updateRenderElements() {
     innerRightBar.width = rightBar.width - innerRightBarMargin - innerRightBarMargin;
     innerRightBar.height = rightBar.height - innerRightBarMargin - innerRightBarMargin;
 
-    topBar.width = rightBar.x;
-
-    leftArea.height = fullHeight - leftArea.y;
-    leftArea.width = topBar.width;
-
+    leftArea.height = fullHeight;
+    leftArea.width = rightBar.x;
 
     innerLeftArea.x = leftArea.x + innerLeftAreaMargin;
     innerLeftArea.y = leftArea.y + innerLeftAreaMargin + innerAreaVerticalSpace;
     innerLeftArea.width = leftArea.width - innerLeftAreaMargin - innerLeftAreaMargin;
-    innerLeftArea.height = leftArea.height - innerLeftAreaMargin - innerLeftAreaMargin - innerAreaVerticalSpace;
+    innerLeftArea.height = (leftArea.height*innerLeftAreaPercent) - innerLeftAreaMargin - innerLeftAreaMargin - innerAreaVerticalSpace;
+
+    textFeed.height = Math.ceil(inverseLeftAreaPercent*leftArea.height);
+    textFeed.width = innerLeftArea.width;
+    textFeed.x = innerLeftArea.x;
+    textFeed.y = Math.floor(innerLeftArea.y + innerLeftArea.height);
+
+    leftTableCycleButton.x = innerLeftArea.x + innerRightBarMargin;
+    leftTableCycleButton.y = innerLeftArea.y + innerRightBarMargin;
+
+    leftTableCycleButton.textX = leftTableCycleButton.x + leftTableCycleButton.textXOffset;
+    leftTableCycleButton.textY = leftTableCycleButton.y + leftTableCycleButton.textYOffset;
+
+    rightTableCycleButton.x = ((innerLeftArea.x + innerLeftArea.width) - rightTableCycleButton.width)-innerRightBarMargin;
+    rightTableCycleButton.y = leftTableCycleButton.y
+
+    leftTableCycleButton.hoverX = leftTableCycleButton.x - hoverPadding;
+    leftTableCycleButton.hoverY = leftTableCycleButton.y - hoverPadding;
+
+    rightTableCycleButton.hoverX = rightTableCycleButton.x - hoverPadding;
+    rightTableCycleButton.hoverY = rightTableCycleButton.y - hoverPadding;
+    
+    rightTableCycleButton.textX = rightTableCycleButton.x + rightTableCycleButton.textXOffset;
+    rightTableCycleButton.textY = rightTableCycleButton.y + rightTableCycleButton.textYOffset;
+
+    pageTitleBlock.y = leftTableCycleButton.y;
+    pageTitleBlock.x = leftTableCycleButton.x + leftTableCycleButton.width + innerRightBarMargin;
+    pageTitleBlock.width = rightTableCycleButton.x - innerRightBarMargin - pageTitleBlock.x;
+
+    pageTitleBlock.textX = pageTitleBlock.x + Math.floor(pageTitleBlock.width/2);
+    pageTitleBlock.textY = pageTitleBlock.y + Math.floor(pageTitleBlock.height/2);
 
     const bubbleSelectorWidth = Math.round(innerLeftArea.width / 2);
     leftBubbleSelector.width = bubbleSelectorWidth;
@@ -251,9 +333,7 @@ function renderButtonRow(buttonRow,index,withHover,hoverIndex,specialHover) {
             context.fillRect(buttonSchema.hoverX,moveButtonHoverY+yPosition,buttonSchema.hoverWidth,moveButtonHoverHeight);
         }
     
-        context.fillStyle =
-            button.enabled ? isHover && specialHover ? moveButtonSpecialHover : moveButtonColor :
-            isHover && specialHover ? moveButtonSpecialHoverDisabled : moveButtonDisabledColor;
+        context.fillStyle = getButtonForegroundColor(isHover,specialHover,button.enabled);
     
         context.fillRect(
             buttonSchema.x,moveButtonStartY+yPosition,buttonSchema.width,moveButtonHeight
@@ -271,10 +351,35 @@ function renderButtonRows(sequencer,withHover,hoverIndex,specialHover) {
     }
 }
 
+function getButtonForegroundColor(hover,specialHover,enabled) {
+    if(hover) {
+        if(enabled) {
+            if(specialHover) {
+                return moveButtonSpecialHover;
+            } else {
+                return moveButtonColor;
+            }
+        } else {
+            if(specialHover) {
+                return moveButtonSpecialHoverDisabled;
+            } else {
+                return moveButtonDisabledColor;
+            }
+        }
+    } else {
+        if(enabled) {
+            return moveButtonColor;
+        } else {
+            return moveButtonDisabledColor;
+        }
+    }
+}
+
 const hoverTypes = {
     none: Symbol(),
     moveButtons: Symbol(),
-    bubbleSelector: Symbol()
+    bubbleSelector: Symbol(),
+    cycleButtons: Symbol()
 }
 
 const defaultHoverIndex = -1;
@@ -286,9 +391,6 @@ function CardScreenRenderer() {
     this.sequencer = new CardSequencer();
     let viewingSelfCards = true;
     let viewTabLocked = false;
-
-    this.verticalRenderMargin = 0;
-    this.horizontalRenderMargin = 150;
 
     let hoverType = hoverTypes.none;
     let hoverIndex = defaultHoverIndex;
@@ -350,6 +452,14 @@ function CardScreenRenderer() {
                 hoverType = hoverTypes.bubbleSelector;
                 hoverIndex = 0;
                 return;
+            } else if(contains(mouseX,mouseY,leftTableCycleButton)) {
+                hoverType = hoverTypes.cycleButtons;
+                hoverIndex = 0;
+                return;
+            } else if(contains(mouseX,mouseY,rightTableCycleButton)) {
+                hoverType = hoverTypes.cycleButtons;
+                hoverIndex = 1;
+                return;
             }
         }
         hoverType = hoverTypes.none;
@@ -359,12 +469,60 @@ function CardScreenRenderer() {
     let playerNameText = "you";
     let opponentNameText = "opponent";
 
-    function renderStatic() {
+    this.renderStatic = function() {
 
         drawColoredRectangle(rightBar);
         drawColoredRectangle(innerRightBar);
-        drawColoredRectangle(topBar);
         drawColoredRectangle(innerLeftArea);
+        drawColoredRectangle(textFeed);
+
+        //drawColoredRectangle(pageTitleBlock);
+
+        drawTextBlack(
+            this.sequencer.cardPageText,
+            pageTitleBlock.textX+this.sequencer.cardPageTextXOffset,
+            pageTitleBlock.textY+this.sequencer.cardPageTextYOffset,
+            this.sequencer.cardPageTextScale
+        );
+
+        if(hoverType === hoverTypes.cycleButtons) {
+            if(hoverIndex === 0) {
+                //todo draw background
+                context.fillStyle = hoverColor;
+                context.fillRect(
+                    leftTableCycleButton.hoverX,leftTableCycleButton.hoverY,
+                    leftTableCycleButton.hoverWidth,leftTableCycleButton.hoverHeight
+                );
+                drawRectangle(leftTableCycleButton,getButtonForegroundColor(
+                    true,showHoverSpecialEffect,this.sequencer.rightCycleEnabled
+                ));
+                drawRectangle(rightTableCycleButton,getButtonForegroundColor(
+                    false,showHoverSpecialEffect,this.sequencer.rightCycleEnabled
+                ));
+            } else {
+                context.fillStyle = hoverColor;
+                context.fillRect(
+                    rightTableCycleButton.hoverX,rightTableCycleButton.hoverY,
+                    rightTableCycleButton.hoverWidth,rightTableCycleButton.hoverHeight
+                );
+                drawRectangle(rightTableCycleButton,getButtonForegroundColor(
+                    true,showHoverSpecialEffect,this.sequencer.leftCycleEnabled
+                ));
+                drawRectangle(leftTableCycleButton,getButtonForegroundColor(
+                    false,showHoverSpecialEffect,this.sequencer.leftCycleEnabled
+                ));
+            }
+        } else {
+            drawRectangle(leftTableCycleButton,getButtonForegroundColor(
+                false,showHoverSpecialEffect,this.sequencer.leftCycleEnabled
+            ));
+            drawRectangle(rightTableCycleButton,getButtonForegroundColor(
+                false,showHoverSpecialEffect,this.sequencer.rightCycleEnabled
+            ));
+        }
+
+        drawTextWhite(leftTableCycleButton.text,leftTableCycleButton.textX,leftTableCycleButton.textY,tableCycleButtonTextScale);
+        drawTextWhite(rightTableCycleButton.text,rightTableCycleButton.textX,rightTableCycleButton.textY,tableCycleButtonTextScale);
 
         if(hoverType === hoverTypes.bubbleSelector) {
             //drawColoredRectangle(bubbleSelectorHover);
@@ -390,9 +548,8 @@ function CardScreenRenderer() {
     this.render = function(timestamp) {
         background.render(timestamp);
 
-        renderStatic();
+        this.renderStatic();
         renderButtonRows(this.sequencer,hoverType === hoverTypes.moveButtons,hoverIndex,showHoverSpecialEffect);
 
-        renderCard(allCardSeries[0][0],innerLeftArea.x+10,innerLeftArea.y+10,48*4,(64*4)/2,true);
     }
 }

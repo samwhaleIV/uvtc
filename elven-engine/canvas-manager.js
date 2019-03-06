@@ -10,8 +10,7 @@ let doubleHeight;
 let verticalSizeRatio;
 let horizontalSizeRatio;
 
-const defaultHorizontalRenderMargin = 150;
-const defaultVerticalRenderMargin = 0;
+const defaultFullScreenZoom = 1.56;
 
 function setSizeConstants() {
     fullWidth = canvas.width;
@@ -67,7 +66,7 @@ let keyEventMode = pointerEventModes.none;
 
 const pictureModeElement = document.getElementById("picture-mode-element");
 
-const defaultSizeMode = "fit";
+const defaultSizeMode = "stretch";
 
 let canvasSizeMode = localStorage.getItem("canvasSizeMode") || defaultSizeMode;
 
@@ -241,25 +240,21 @@ function applySizeMode() {
             break;
         case "stretch":
 
-        const horizontalMargin =
-            window.innerWidth <= internalWidth + defaultHorizontalRenderMargin ? 0 :
-            !rendererState ? defaultHorizontalRenderMargin :
-            rendererState.horizontalRenderMargin ? rendererState.horizontalRenderMargin :
-            rendererState.renderMargin ? rendererState.renderMargin : defaultHorizontalRenderMargin;
+            let zoomDivider = rendererState ? rendererState.zoomDivider || defaultFullScreenZoom : defaultFullScreenZoom;
 
-            const verticalMargin =
-                window.innerWidth <= internalHeight + defaultVerticalRenderMargin ? 0 :
-                !rendererState ? defaultVerticalRenderMargin:
-                rendererState.verticalRenderMargin ? rendererState.verticalRenderMargin :
-                rendererState.renderMargin ? rendererState.renderMargin : defaultVerticalRenderMargin;
+            if(window.innerWidth < internalWidth) {
+                zoomDivider = 0.9;
+            } else if(window.innerWidth < 1075) {
+                zoomDivider = 1.0;
+            }
 
+            canvas.width = (window.innerWidth/zoomDivider)
+            canvas.height = (window.innerHeight/zoomDivider);
 
-            canvas.width = window.innerWidth - horizontalMargin - horizontalMargin;
-            canvas.height = window.innerHeight - verticalMargin - verticalMargin;
-            canvas.style.width = canvas.width + "px";
-            canvas.style.height = canvas.height + "px";
-            canvas.style.left = horizontalMargin + "px";
-            canvas.style.top = verticalMargin + "px";
+            canvas.style.width = window.innerWidth + "px";
+            canvas.style.height = window.innerHeight + "px";
+            canvas.style.left = "0px";
+            canvas.style.top = "0px";
             break;
         case "center":
             canvas.width = internalWidth;

@@ -56,6 +56,17 @@ function CardSequencer() {
                 text: "attack",
                 enabled: false
             }
+        ],
+        [],
+        [
+            {
+                text: "view my deck",
+                enabled: true
+            },
+            {
+                text: "forfeit",
+                enabled: true
+            }
         ]
     ];
     const buttonLookup = [];
@@ -67,6 +78,38 @@ function CardSequencer() {
             buttonLookup.push(row);
         }
     }
+
+    this.fullScreenCard = null;
+    this.playerTable = {
+        
+    };
+    this.opponentTable = {
+
+    };
+
+    this.cardPageText;
+    this.cardPageTextScale = 2;
+    this.cardPageTextXOffset = 0;
+    this.cardPageTextYOffset = 0;
+
+    this.updateCardPageTextOffset = function(text) {
+        this.cardPageText = text;
+        const textTestResult = drawTextTest(text,this.cardPageTextScale);
+        this.cardPageTextXOffset = -Math.floor(textTestResult.width / 2);
+        this.cardPageTextYOffset = -Math.floor(textTestResult.height / 2);
+    }
+    this.updateCardPageTextOffset("page (1 of 3) - active cards");
+
+
+    this.activateNextPage = function() {
+        //Todo
+    }
+    this.activatePreviousPage = function() {
+        //Todo
+    }
+
+    this.leftCycleEnabled = true;
+    this.rightCycleEnabled = true;
 
     this.getButtonNavigationIndex = function(currentIndex) {
         //return null if we go to the right, return the same if no movement.
