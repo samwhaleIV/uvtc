@@ -3,7 +3,8 @@ const cardPageTypes = {
     active: Symbol("active"),
     hand: Symbol("hand"),
     status: Symbol("status")
-}
+};
+const defaultCardPageType = cardPageTypes.active;
 function CardSequencer(renderer) {
 
     this.renderer = renderer;
@@ -22,18 +23,19 @@ function CardSequencer(renderer) {
         [
             {
                 text: "action 1 of 3",
-                isNotAButton: true
+                isNotAButton: true,
             }
         ],
         [
             {
                 text: "draw",
-                enabled: true
+                enabled: true,
+                image: imageDictionary["ui/draw"]
             },
         ],
         [
             {
-                text: "draw energy",
+                text: "energy",
                 enabled: true
             },
             {
@@ -95,7 +97,7 @@ function CardSequencer(renderer) {
     };
 
     this.cardPageRenderData = [];
-    this.cardPageType = cardPageTypes.field;
+    this.cardPageType = defaultCardPageType;
     this.cardPageText;
     this.cardPageTextScale = 2;
     this.cardPageTextXOffset = 0;

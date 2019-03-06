@@ -60,7 +60,7 @@ const bubbleSelectorHitTest = {};
 bubbleSelectorHitTest.y = bubbleSelectorY;
 bubbleSelectorHitTest.height = bubbleSelectorHeight;
 
-const moveButtonHeight = 40;
+const moveButtonHeight = 37;
 const moveButtonMargin = 10;
 const moveButtonColor = "black";
 const moveButtonDisabledColor = "rgba(40,40,40,0.75)";
@@ -163,6 +163,11 @@ pageTitleBlock.textScale = moveButtonTextScale;
 const fullScreenCard = {};
 const fullScreenCardArea = {};
 
+const buttonRowImage = {};
+const buttonRowImageMargin = 3;
+buttonRowImage.width = moveButtonHeight - buttonRowImageMargin - buttonRowImageMargin;
+buttonRowImage.height = buttonRowImage.width;
+
 function updateRenderElements() {
     rightBar.x = fullWidth - Math.floor(fullWidth * rightBarWidthPercent);
     rightBar.width = fullWidth - rightBar.x;
@@ -256,6 +261,9 @@ function updateRenderElements() {
     s1.hoverX = s1.x - hoverPadding;
     s1.hoverWidth = s1.width + doubleHoverPadding;
     s1.textX = s1.x + moveButtonTextPadding;
+
+    buttonRowImage.x = s1.x + s1.width - buttonRowImage.width - buttonRowImageMargin;
+    buttonRowImage.yOffset = moveButtonStartY + buttonRowImageMargin;
 
     const s2StartX = s1.x;
     const s2Width = Math.floor((s1.width-moveButtonMargin) / 2);
@@ -374,9 +382,19 @@ function renderButtonRow(buttonRow,index,withHover,hoverIndex,specialHover) {
         context.fillRect(
             buttonSchema.x,moveButtonStartY+yPosition,buttonSchema.width,moveButtonHeight
         );
+
+
         drawTextWhite(button.text,buttonSchema.textX,moveButtonTextY+yPosition,moveButtonTextScale);
 
-
+        if(button.image) {
+            context.drawImage(
+                button.image,
+                buttonRowImage.x,
+                yPosition + buttonRowImage.yOffset,
+                buttonRowImage.width,
+                buttonRowImage.height
+            );
+        }
     }
 }
 function renderButtonRows(sequencer,withHover,hoverIndex,specialHover) {
@@ -434,7 +452,7 @@ function CardScreenRenderer() {
     let hoverIndex = defaultHoverIndex;
     let showHoverSpecialEffect = false;
 
-    this.textFeedShown = false;
+    let textFeedShown = false;
 
     textFeedToggleButton.enabled = true;
 
@@ -447,15 +465,27 @@ function CardScreenRenderer() {
         updateRenderElements();
     }
 
+    let toggleTextFeedTimeout = 150;
+    let lastToggleTextSwap = 0;
+
     this.processKey = function(key) {
         switch(key) {
-            case "Escape":
-                if(this.textFeedShown && textFeedToggleButton.enabled) {
-                    this.hideTextFeed();
-                    if(hoverType === hoverTypes.textFeedToggleButton) {
-                        hoverType = hoverTypes.none;
-                        hoverIndex = defaultHoverIndex;
+            case "Space":
+                if(textFeedToggleButton.enabled) {
+                    const now = performance.now()
+                    if(now >= lastToggleTextSwap) {
+                        if(textFeedShown) {
+                            this.hideTextFeed();
+                        } else {
+                            this.showTextFeed();
+                        }
+                        lastToggleTextSwap = now + toggleTextFeedTimeout;
                     }
+                }
+                break;
+            case "Escape":
+                if(textFeedShown && textFeedToggleButton.enabled) {
+                    this.hideTextFeed();
                 } else if(this.sequencer.fullScreenCard && !fullScreenCardLocked) {
                     this.sequencer.hideFullScreenCard(true);
                     if(hoverType === hoverTypes.fullScreenCard) {
@@ -465,6 +495,13 @@ function CardScreenRenderer() {
                 } else {
                     //TODO: Open escape menu
                 }
+                break;
+        }
+    }
+    this.processKeyUp = function(key) {
+        switch(key) {
+            case "Space":
+                lastToggleTextSwap = performance.now();
                 break;
         }
     }
@@ -494,11 +531,11 @@ function CardScreenRenderer() {
     }
 
     this.showTextFeed = function() {
-        this.textFeedShown = true;
+        textFeedShown = true;
 
     }
     this.hideTextFeed = function() {
-        this.textFeedShown = false;
+        textFeedShown = false;
     }
 
     this.lockPageCycle = function() {
@@ -516,11 +553,26 @@ function CardScreenRenderer() {
         fullScreenCardLocked = false;
     }
 
+    this.textFeedToggleIsHitRegistered = function(x,y) {
+        return areaContains(x,y,
+            textFeedToggleButton.x,
+            textFeedShown ? textFeedToggleButton.y : textFeedToggleButton.collapsedY,
+            textFeedToggleButton.width,
+            textFeedToggleButton.height
+        ) || textFeedShown && contains(x,y,textFeed);
+    }
+
     this.processClickEnd = function(x,y) {
         showHoverSpecialEffect = false;
         switch(hoverType) {
             default:
-                return;
+                if(this.textFeedToggleIsHitRegistered(x,y)) {
+                    hoverType = hoverTypes.textFeedToggleButton;
+                    hoverIndex = 0;
+                    this.processClickEnd(x,y);
+                    return;
+                }
+                break;
             case hoverTypes.fullScreenCard:
                 if(!fullScreenCardLocked) {
                     this.sequencer.hideFullScreenCard(true);
@@ -530,14 +582,19 @@ function CardScreenRenderer() {
                 break;
             case hoverTypes.textFeedToggleButton:
                 if(textFeedToggleButton.enabled) {
-                    if(this.textFeedShown) {
+                    if(textFeedShown) {
                         this.hideTextFeed();
-                        hoverType = hoverTypes.none;
-                        hoverIndex = defaultHoverIndex;
+                        if(!areaContains(x,y,
+                            textFeedToggleButton.x,
+                            textFeedShown ? textFeedToggleButton.y : textFeedToggleButton.collapsedY,
+                            textFeedToggleButton.width,
+                            textFeedToggleButton.height
+                        )) {
+                            hoverType = hoverTypes.none;
+                            hoverIndex = defaultHoverIndex;
+                        }
                     } else {
                         this.showTextFeed();
-                        hoverType = hoverTypes.none;
-                        hoverIndex = defaultHoverIndex;
                     }
                 }
                 break;
@@ -580,7 +637,7 @@ function CardScreenRenderer() {
                 }
             }
         } else {
-            if(!this.textFeedShown && this.sequencer.fullScreenCard && contains(mouseX,mouseY,fullScreenCard)) {
+            if(!textFeedShown && this.sequencer.fullScreenCard && contains(mouseX,mouseY,fullScreenCard)) {
                 hoverType = hoverTypes.fullScreenCard;
                 hoverIndex = 0;
                 return;
@@ -596,12 +653,7 @@ function CardScreenRenderer() {
                 hoverType = hoverTypes.cycleButtons;
                 hoverIndex = 1;
                 return;
-            } else if(areaContains(mouseX,mouseY,
-                textFeedToggleButton.x,
-                this.textFeedShown ? textFeedToggleButton.y : textFeedToggleButton.collapsedY,
-                textFeedToggleButton.width,
-                textFeedToggleButton.height
-            )) {
+            } else if(this.textFeedToggleIsHitRegistered(mouseX,mouseY)) {
                 hoverType = hoverTypes.textFeedToggleButton;
                 hoverIndex = 0;
                 return;
@@ -619,7 +671,7 @@ function CardScreenRenderer() {
         drawColoredRectangle(rightBar);
         drawColoredRectangle(innerRightBar);
 
-        if(this.textFeedShown) {
+        if(textFeedShown) {
             drawColoredRectangle(innerLeftArea);
             drawColoredRectangle(textFeed);
             drawRectangle(
