@@ -1,10 +1,22 @@
 const cardPageTypes = {
-    field: Symbol("field"),
-    active: Symbol("active"),
+    slots: Symbol("slots"),
     hand: Symbol("hand"),
-    status: Symbol("status")
+    field: Symbol("field")
 };
-const defaultCardPageType = cardPageTypes.active;
+const getCardPageName = function(cardPageType,isPlayer) {
+    switch(cardPageType) {
+        default:
+            return "unknown page";
+        case cardPageTypes.slots:
+            return `${isPlayer?"your":"their"} slots`;
+        case cardPageTypes.hand:
+            return `${isPlayer?"your":"their"} hand`;
+        case cardPageTypes.field:
+            return "conditions and field";//This is a global page
+    }
+}
+const defaultCardPageType = cardPageTypes.hand;
+const defaultOpponentCardPageType = cardPagesTypes.slots;
 function CardSequencer(renderer) {
 
     this.renderer = renderer;
@@ -102,12 +114,16 @@ function CardSequencer(renderer) {
     this.cardPageTextYOffset = 0;
 
     this.updateCardPageTextOffset = function(text) {
+        //This can and probably should be refactored into the renderer but the benefits aren't that great
         this.cardPageText = text;
         const textTestResult = drawTextTest(text,this.cardPageTextScale);
         this.cardPageTextXOffset = -Math.floor(textTestResult.width / 2);
         this.cardPageTextYOffset = -Math.floor(textTestResult.height / 2);
     }
-    this.updateCardPageTextOffset("1234567890");
+
+    this.viewingSelfCards = true;
+
+    this.updateCardPageTextOffset(`page 1 of 3 - ${getCardPageName(this.cardPageType,true)}`);
 
 
     this.activateNextPage = function() {
@@ -117,9 +133,10 @@ function CardSequencer(renderer) {
         //TODO
     }
 
-    this.switchedPains = function() {
+    this.switchedPanes = function() {
+        this.viewingSelfCards = !this.viewingSelfCards;
         //TODO
-        //Should set to first page on switch because player and oppon. can have varying numbers of pages
+        //Should set to first page on switch because player and oppon. can(? might not do that) have varying numbers of pages
     }
 
     this.activateActionButton = function(index) {
@@ -185,6 +202,5 @@ function CardSequencer(renderer) {
         //return null if we go to the right, return the same if no movement.
         return currentIndex;
     }
-
 
 }

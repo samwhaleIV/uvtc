@@ -496,10 +496,6 @@ function CardScreenRenderer() {
         }
     }
 
-    this.setCardView = function(toPlayer) {
-        viewingSelfCards = toPlayer;
-    }
-
     this.lockViewTab = function() {
         viewTabLocked = true;
     }
@@ -583,7 +579,6 @@ function CardScreenRenderer() {
                 break;
             case hoverTypes.bubbleSelector:
                 if(!viewTabLocked) {
-                    viewingSelfCards = !viewingSelfCards;
                     this.sequencer.switchedPanes();
                 }
                 break;
@@ -727,21 +722,19 @@ function CardScreenRenderer() {
                     fullScreenCard.x,fullScreenCard.y,
                     fullScreenCard.width,fullScreenCard.height,
                 );
-                //TODO: Render full screen card
             } else {
                 switch(this.sequencer.cardPageType) {
                     case cardPageTypes.field:
+                        //TODO
                         break;
-                    case cardPageTypes.active:
+                    case cardPageTypes.slots:
+                        //TODO
                         break;
                     case cardPageTypes.hand:
-                        break;
-                    case cardPageTypes.status:
+                        //TODO
                         break;
                 }
             }
-            
-            //TODO: Render the cards from the table for the specific page - or check the page and call the appropriate sub-renderer?
         }
 
         drawTextBlack(
@@ -793,7 +786,7 @@ function CardScreenRenderer() {
             //Todo this maybe?
         }
 
-        if(viewingSelfCards) {
+        if(this.sequencer.viewingSelfCards) {
             drawRectangle(leftBubbleSelector,"white");
             drawRectangle(rightBubbleSelector,"black");
             drawTextBlack(playerNameText,leftBubbleText.x,leftBubbleText.y,leftBubbleText.scale);
