@@ -74,6 +74,10 @@ function CardSequencer(renderer) {
         ],
         [
             {
+                text: "use card",
+                enabled: true
+            },
+            {
                 text: "attack",
                 enabled: false
             }

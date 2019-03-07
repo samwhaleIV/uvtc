@@ -243,9 +243,9 @@ function applySizeMode() {
             let zoomDivider = rendererState ? rendererState.zoomDivider || defaultFullScreenZoom : defaultFullScreenZoom;
 
             if(window.innerWidth < internalWidth) {
-                zoomDivider = 0.9;
+                zoomDivider = 1;
             } else if(window.innerWidth < 1075) {
-                zoomDivider = 1.0;
+                zoomDivider = 1.25;
             }
 
             canvas.width = (window.innerWidth/zoomDivider)

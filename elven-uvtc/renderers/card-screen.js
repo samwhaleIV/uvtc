@@ -314,12 +314,12 @@ function updateRenderElements() {
 
     if(fullScreenCardArea.width / fullScreenCardArea.height > internalCardWidthRatio) {
         fullScreenCard.y = fullScreenCardArea.y;
-        fullScreenCard.width = fullScreenCardArea.height * internalCardWidthRatio;
+        fullScreenCard.width = Math.floor(fullScreenCardArea.height * internalCardWidthRatio);
         fullScreenCard.height = fullScreenCardArea.height;
         fullScreenCard.x = fullScreenCardArea.x + Math.floor((fullScreenCardArea.width / 2) - (fullScreenCard.width / 2));
     } else {
         fullScreenCard.x = fullScreenCardArea.x;
-        fullScreenCard.height = fullScreenCardArea.width * internalCardHeightRatio;
+        fullScreenCard.height = Math.floor(fullScreenCardArea.width * internalCardHeightRatio);
         fullScreenCard.width = fullScreenCardArea.width;
         fullScreenCard.y = fullScreenCardArea.y + Math.floor((fullScreenCardArea.height / 2) - (fullScreenCard.height / 2));
     }

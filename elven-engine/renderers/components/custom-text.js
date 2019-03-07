@@ -462,7 +462,7 @@ function compileComplexScaleMatrices() {
         });
 
         ScaleMatrices[scaleFactor] = characterMatrices;
-    })
+    });
 }
 compileComplexScaleMatrices();
 const allScales = {};
@@ -501,6 +501,74 @@ function drawTextColor(color,text,x,y,scale) {
         height: 5 * scale
     }
 }
+
+function drawTextWrapping(words,x,y,maxWidth,verticalSpace,horizontalSpace,scale,color) {
+    let xOffset = 0;
+    let yOffset = 0;
+    const scaleMatrix = ScaleMatrices[scale];
+    const drawHeight = scale * 5; //This is hard-coded - might fuck me over later
+    let i = 0;
+    context.fillStyle = color;
+    context.beginPath();
+    while(i < words.length) {
+
+        const word = words[i];
+
+        if(word === "\n") {
+            xOffset = 0;
+            yOffset += verticalSpace + drawHeight;
+        } else {
+            let wordTestWidth = 0;
+            let i2 = 0;
+
+            while(i2 < word.length) {
+                wordTestWidth += fontDictionary[word[i2]].width;
+                i2++;
+            }
+            wordTestWidth *= scale;
+
+            if(xOffset + wordTestWidth >= maxWidth) {
+                xOffset = 0;
+                yOffset += verticalSpace + drawHeight;
+            }
+    
+            i2 = 0;
+            while(i2 < word.length) {
+                const character = fontDictionary[word[i2]];
+                const drawWidth = character.width * scale;
+                const characterMatrix = scaleMatrix[character.width];
+                let i3 = 0;
+                while(i3 < character.glyph.length) {
+                    if(character.glyph[i3]) {
+                        const characterRegion = characterMatrix[i3];
+                        context.rect(
+                            x+xOffset + characterRegion.x,
+                            y+yOffset + characterRegion.y,
+                            characterRegion.w,
+                            characterRegion.h
+                        );
+                    }
+                    i3++;
+                }
+                xOffset += drawWidth;
+                if(i2 < word.length-1) {
+                    xOffset += scale;
+                }
+                i2++;
+            }
+        }
+        xOffset += horizontalSpace;
+        i++;
+    }
+    context.fill();
+}
+function drawTextWrappingWhite(words,x,y,maxWidth,verticalSpace,horizontalSpace,scale) {
+    drawTextWrapping(words,x,y,maxWidth,verticalSpace,horizontalSpace,scale,"white");
+}
+function drawTextWrappingBlack(words,x,y,maxWidth,verticalSpace,horizontalSpace,scale) {
+    drawTextWrapping(words,x,y,maxWidth,verticalSpace,horizontalSpace,scale,"black");
+}
+
 function drawTextWhite(text,x,y,scale) {
     return drawTextColor("white",text,x,y,scale);
 }

@@ -1,29 +1,56 @@
 addCardSeries([
     {
-        name: "bear necessities"
+        name: "bear necessities",
+        type: "attack",
+        description: "allows you to attack at the bare minimum",
+        energyCost: 0
     },
     {
-        name: "closer look"
+        name: "closer look",
+        type: "generic",
+        description: "take a peak at your opponent's hand",
+        energyCost: 3
     },
     {
-        name: "dimensional shift"
+        name: "dimensional shift",
+        type: "generic",
+        description: "can be used to leave or enter the alternate dimension\n(lasts 3 turns)",
+        energyCost: 3,
     },
     {
-        name: "endergonic"
+        name: "endergonic",
+        type: "generic",
+        description: "remaining actions for this turn cost 0 energy",
+        energyCost: 4
     },
     {
-        name: "hibernate"
+        name: "hibernate",
+        type: "generic",
+        description: "generate 1 health for 3 turns\ndisables card use and attacks",
+        energyCost: 1
     },
     {
-        name: "honey pot"
+        name: "honey pot",
+        type: "special",
+        description: "allows for double damage in combination with [bear necessities]",
+        energyCost: 2,
     },
     {
-        name: "red apple"
+        name: "red apple",
+        description: "an apple a day keeps the doctor away\none health gained per apple",
+        type: "generic",
+        energyCost: 2
     },
     {
-        name: "security blanket"
+        name: "security blanket",
+        description: "1 damage is taken off all incoming attacks",
+        type: "defense",
+        energyCost: 1
     },
     {
-        name: "solar power"
+        name: "solar power",
+        description: "generates 1 energy at the beginning of every turn",
+        type: "special",
+        energyCost: 0
     }
 ],"cards/s1");
