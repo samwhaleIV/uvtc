@@ -502,7 +502,7 @@ function drawTextColor(color,text,x,y,scale) {
     }
 }
 
-function drawTextWrapping(words,x,y,maxWidth,verticalSpace,horizontalSpace,scale,color) {
+function drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,color) {
     let xOffset = 0;
     let yOffset = 0;
     const scaleMatrix = ScaleMatrices[scale];
@@ -557,16 +557,18 @@ function drawTextWrapping(words,x,y,maxWidth,verticalSpace,horizontalSpace,scale
                 i2++;
             }
         }
-        xOffset += horizontalSpace;
+        if(xOffset) {
+            xOffset += 7;
+        }
         i++;
     }
     context.fill();
 }
-function drawTextWrappingWhite(words,x,y,maxWidth,verticalSpace,horizontalSpace,scale) {
-    drawTextWrapping(words,x,y,maxWidth,verticalSpace,horizontalSpace,scale,"white");
+function drawTextWrappingWhite(words,x,y,maxWidth,verticalSpace,scale) {
+    drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,"white");
 }
-function drawTextWrappingBlack(words,x,y,maxWidth,verticalSpace,horizontalSpace,scale) {
-    drawTextWrapping(words,x,y,maxWidth,verticalSpace,horizontalSpace,scale,"black");
+function drawTextWrappingBlack(words,x,y,maxWidth,verticalSpace,scale) {
+    drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,"black");
 }
 
 function drawTextWhite(text,x,y,scale) {

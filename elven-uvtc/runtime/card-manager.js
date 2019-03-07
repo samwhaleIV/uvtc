@@ -26,6 +26,16 @@ const addCardSeries = function(cardSeries,imagePath) {
     for(let i = 0;i<cardSeries.length;i++) {
         cardSeries[i].sourceX = i * internalCardWidth;
         cardSeries[i].imagePath = imagePath;
+
+        const lineBreakName = [];
+
+        const splitName = cardSeries[i].name.split(" ");
+        lineBreakName.push(splitName.slice(0,splitName.length-1).join(" "));
+        lineBreakName.push(splitName[splitName.length-1]);
+
+        cardSeries[i].lineBreakName = lineBreakName;
+
+
         if(cardSeries[i].description) {
             let descriptionPrefix = [];
             switch(cardSeries[i].type) {

@@ -15,17 +15,43 @@ function renderCard(card,x,y,width,height,partial=false) {
         x,y,width,height
     );
     const textTestResult = drawTextTest(card.name,cardTitleTextScale);
-    context.fillStyle = "black";
+    if(textTestResult.width + doubleCardTitlePadding > width) {
 
-    context.fillRect(
-        x,y,
-        textTestResult.width+doubleCardTitlePadding,
-        textTestResult.height+doubleCardTitlePadding
-    );
+        const ttr1 = drawTextTest(card.lineBreakName[0],cardTitleTextScale);
+        const ttr2 = drawTextTest(card.lineBreakName[1],cardTitleTextScale);
+
+        context.fillStyle = "black";
+        context.beginPath();
+        context.rect(
+            x,y,ttr1.width+doubleCardTitlePadding,
+            ttr1.height+doubleCardTitlePadding
+        );
+        context.rect(
+            x,y+ttr2.height+doubleCardTitlePadding,
+            ttr2.width+doubleCardTitlePadding,ttr2.height+doubleCardTitlePadding
+        );
+        context.fill();
+
+        const cardTextX = x+cardTitlePadding;
+        const cardTextY = y+cardTitlePadding;
+
+        drawTextWhite(card.lineBreakName[0],cardTextX,cardTextY,cardTitleTextScale);
+        drawTextWhite(card.lineBreakName[1],cardTextX,cardTextY+ttr1.height+doubleCardTitlePadding,cardTitleTextScale);
+
+    } else {
+        context.fillStyle = "black";
+        context.fillRect(
+            x,y,
+            textTestResult.width+doubleCardTitlePadding,
+            textTestResult.height+doubleCardTitlePadding
+        );
+        drawTextWhite(card.name,x+cardTitlePadding,y+cardTitlePadding,cardTitleTextScale);
+    }
+
 
     //render card energy cost?
 
-    drawTextWhite(card.name,x+cardTitlePadding,y+cardTitlePadding,cardTitleTextScale);
+
 
 }
 function renderCardPartial(card,x,y,width,height) {
@@ -59,7 +85,8 @@ function renderCardFullScreen(card,x,y,width,height) {
             width,
             height - yTop
         );
-        drawTextWrappingBlack(card.description,x + 5,y+yTop+5,width - 20,7,1,TinyTextScale);
+
+        drawTextWrappingBlack(card.description,x + 6,y+yTop+6,width - (smallestTextScale*15),7,smallestTextScale);
     }
 
 }

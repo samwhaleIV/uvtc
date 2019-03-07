@@ -16,7 +16,7 @@ const getCardPageName = function(cardPageType,isPlayer) {
     }
 }
 const defaultCardPageType = cardPageTypes.hand;
-const defaultOpponentCardPageType = cardPagesTypes.slots;
+const defaultOpponentCardPageType = cardPageTypes.slots;
 function CardSequencer(renderer) {
 
     this.renderer = renderer;
@@ -41,56 +41,63 @@ function CardSequencer(renderer) {
         [
             {
                 text: "draw",
-                enabled: true,
+                enabled: false,
                 image: 4
             },
         ],
         [
             {
-                text: "energy",
-                enabled: true
-            },
-            {
-                text: "discard",
-                enabled: true
-            },
-        ],
-        [],
-        [
-            {
-                text: "set attack",
-                enabled: false,
-            },
-            {
-                text: "set defense",
-                enabled: false,
-            },
+                text: "draw energy",
+                enabled: true,
+                image: 1
+            }
         ],
         [
             {
-                text: "set special",
-                enabled: false,
-            },
-        ],
-        [
-            {
-                text: "use card",
+                text: "deck check",
                 enabled: true
-            },
-            {
-                text: "attack",
-                enabled: false
             }
         ],
         [],
         [
             {
-                text: "view my deck",
-                enabled: true
+                text: "card actions",
+                isNotAButton: true,  
+            }
+        ],
+        [
+            {
+                text: "use",
+                enabled: false
             },
             {
-                text: "forfeit",
-                enabled: true
+                text: "discard",
+                enabled: false
+            },
+        ],
+        [],
+        [
+            {
+                text: "set slot cards",
+                isNotAButton: true,
+            }
+        ],
+        [
+            {
+                text: "attack",
+                enabled: false
+            }
+        ],
+        [
+            {
+                text: "defense",
+                enabled: false
+            }
+        ],
+        [
+            {
+                text: "special",
+                enabled: false
             }
         ]
     ];
@@ -110,7 +117,8 @@ function CardSequencer(renderer) {
     this.opponentTable = {
     };
 
-    this.cardPageRenderData = [];
+    this.cardPageRenderData = allCardsList.slice(0,6);//DEBUG
+
     this.cardPageType = defaultCardPageType;
     this.cardPageText;
     this.cardPageTextScale = 2;
@@ -145,6 +153,10 @@ function CardSequencer(renderer) {
 
     this.activateActionButton = function(index) {
         //TODO
+    }
+
+    this.handCardClicked = function(index) {
+        this.showFullScreenCard(this.cardPageRenderData[index],true);
     }
 
     this.cardClicked = function(index) {

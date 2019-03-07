@@ -49,7 +49,7 @@ const bubbleSelectorHitTest = {};
 bubbleSelectorHitTest.y = bubbleSelectorY;
 bubbleSelectorHitTest.height = bubbleSelectorHeight;
 
-const moveButtonHeight = 40;
+const moveButtonHeight = 36;
 const moveButtonMargin = 10;
 const moveButtonColor = "black";
 const moveButtonDisabledColor = "rgba(40,40,40,0.75)";
@@ -62,7 +62,7 @@ let moveButtonHoverY;
 let moveButtonHoverHeight;
 
 const maxMoveButtonRowButtons = 3;
-const maxMoveButtonHitTests = 10;
+const maxMoveButtonHitTests = 11;
 const moveButtonHitTests = [];
 const moveButtonRowSchemas = [];
 (function(){
@@ -89,8 +89,7 @@ bubbleSelectorHover.color = "white";
 const moveButtonSpecialHover = "rgb(30,30,30,30)";
 const moveButtonSpecialHoverDisabled = "rgb(100,100,100)";
 
-const rightBarWidthPercent = 0.35;
-
+const rightBarWidthPercent = 0.25;
 
 const collapsedInnerLeftAreaWidth = 70;
 const textFeed = {};
@@ -152,8 +151,8 @@ const fullScreenCardArea = {};
 
 const buttonRowImage = {};
 const buttonRowImageMargin = 2;
-buttonRowImage.width = moveButtonHeight - buttonRowImageMargin - buttonRowImageMargin;
-buttonRowImage.height = buttonRowImage.width;
+buttonRowImage.width = 32;
+buttonRowImage.height = 32;
 
 leftBubbleSelector.x = innerLeftAreaMargin;
 
@@ -162,6 +161,12 @@ let rightStatusX;
 const statusWidth = 64;
 const statusHeight = 64;
 const statusY = innerLeftAreaMargin + bubbleSelectorHeight;
+
+const handDisplayHeightRatio = 144 / 128 - 0.1;
+const handDisplayWidthRatio = 128 / 144 + 0.1;
+const handDisplaySlots = [];
+
+const handPageHitTest = {};
 
 function updateRenderElements() {
     rightBar.x = fullWidth - Math.floor(fullWidth * rightBarWidthPercent);
@@ -254,7 +259,7 @@ function updateRenderElements() {
     s1.hoverWidth = s1.width + doubleHoverPadding;
     s1.textX = s1.x + moveButtonTextPadding;
 
-    buttonRowImage.x = s1.x + s1.width - buttonRowImage.width - buttonRowImageMargin;
+    buttonRowImage.x = Math.floor(s1.x + s1.width - buttonRowImage.width - 0.5) - buttonRowImageMargin;
     buttonRowImage.yOffset = moveButtonStartY + buttonRowImageMargin;
 
     const s2StartX = s1.x;
@@ -323,6 +328,56 @@ function updateRenderElements() {
         fullScreenCard.width = fullScreenCardArea.width;
         fullScreenCard.y = fullScreenCardArea.y + Math.floor((fullScreenCardArea.height / 2) - (fullScreenCard.height / 2));
     }
+
+    let handCardHeight, handCardWidth, xStart, yStart;
+
+    if(fullScreenCardArea.width / fullScreenCardArea.height > handDisplayWidthRatio) {//height is smallest
+        const fullHandCardHeight = fullScreenCardArea.height;
+        const fullHandCardWidth = fullScreenCardArea.height * handDisplayHeightRatio;
+
+        xStart = fullScreenCardArea.x + Math.floor((fullScreenCardArea.width / 2) - (fullHandCardWidth / 2));
+        yStart = fullScreenCardArea.y;
+
+        
+        handCardHeight = fullHandCardHeight / 2;
+        handCardWidth = fullHandCardWidth / 3;
+
+        handPageHitTest.width = fullHandCardWidth;
+        handPageHitTest.height = fullHandCardHeight;
+
+    } else {
+        const fullHandCardWidth = fullScreenCardArea.width;
+        const fullHandCardHeight = fullScreenCardArea.width * handDisplayWidthRatio;
+
+        yStart = fullScreenCardArea.y + Math.floor((fullScreenCardArea.height / 2) - (fullHandCardHeight / 2));
+        xStart = fullScreenCardArea.x;
+
+        
+        handCardHeight = fullHandCardHeight / 2;
+        handCardWidth = fullHandCardWidth / 3;
+
+        handPageHitTest.width = fullHandCardWidth;
+        handPageHitTest.height = fullHandCardHeight;
+
+    }
+
+    handPageHitTest.x = xStart;
+    handPageHitTest.y = yStart;
+
+    handCardHeight = Math.floor(handCardHeight - fullScreenCardMargin);
+    handCardWidth = Math.floor(handCardWidth - 10);
+
+    for(let x = 0;x<3;x++) {
+        for(let y = 0;y<2;y++) {
+            handDisplaySlots[x+(y*3)] = {
+                width: handCardWidth,
+                height: handCardHeight,
+                x: xStart + x * (handCardWidth + fullScreenCardMargin),
+                y: yStart + y * (handCardHeight + fullScreenCardMargin)
+            }
+        }
+    }
+
 }
 
 function drawRectangle(rectangle,color) {
@@ -425,7 +480,8 @@ const hoverTypes = {
     bubbleSelector: Symbol("bubbleSelector"),
     cycleButtons: Symbol("cycleButtons"),
     textFeedToggleButton: Symbol("textFeedToggleButton"),
-    fullScreenCard: Symbol("fullScreenCard")
+    fullScreenCard: Symbol("fullScreenCard"),
+    handPageCard: Symbol("handPageCard")
 }
 
 const defaultHoverIndex = -1;
@@ -458,7 +514,7 @@ function CardScreenRenderer() {
     let toggleTextFeedTimeout = 150;
     let lastToggleTextSwap = 0;
 
-    this.processKey = function(key) {
+    this.processKey = function(key) {//todo add player-opn. pane toggling
         switch(key) {
             case "Space":
                 if(textFeedToggleButton.enabled) {
@@ -594,6 +650,11 @@ function CardScreenRenderer() {
                     this.sequencer.activateActionButton(hoverIndex);
                 }
                 break;
+            case hoverTypes.handPageCard:
+                this.sequencer.handCardClicked(hoverIndex);
+                //hoverType = hoverTypes.none;
+                //hoverIndex = defaultHoverIndex;
+                break;
         }
     }
 
@@ -635,6 +696,14 @@ function CardScreenRenderer() {
                 hoverType = hoverTypes.textFeedToggleButton;
                 hoverIndex = 0;
                 return;
+            } else if(this.sequencer.cardPageType === cardPageTypes.hand && contains(mouseX,mouseY,handPageHitTest)) {
+                for(let i = 0;i<handDisplaySlots.length;i++) {
+                    if(contains(mouseX,mouseY,handDisplaySlots[i])) {
+                        hoverType = hoverTypes.handPageCard;
+                        hoverIndex = i;
+                        return;
+                    }
+                }
             }
         }
         hoverType = hoverTypes.none;
@@ -731,6 +800,18 @@ function CardScreenRenderer() {
                         //TODO
                         break;
                     case cardPageTypes.hand:
+                        let handCardIndex = 0;
+                        while(handCardIndex < this.sequencer.cardPageRenderData.length) {
+                            const handCard = handDisplaySlots[handCardIndex]
+                            renderCard(
+                                this.sequencer.cardPageRenderData[handCardIndex],
+                                handCard.x,
+                                handCard.y,
+                                handCard.width,
+                                handCard.height
+                            );
+                            handCardIndex++;
+                        }
                         //TODO
                         break;
                 }

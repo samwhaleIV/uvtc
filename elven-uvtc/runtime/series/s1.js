@@ -32,7 +32,7 @@ addCardSeries([
     {
         name: "honey pot",
         type: "special",
-        description: "allows for double damage in combination with [bear necessities]",
+        description: "allows for double damage with bear necessities",
         energyCost: 2,
     },
     {

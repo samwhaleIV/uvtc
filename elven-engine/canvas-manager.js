@@ -10,7 +10,12 @@ let doubleHeight;
 let verticalSizeRatio;
 let horizontalSizeRatio;
 
-const defaultFullScreenZoom = 1.56;
+const defaultFullScreenZoom = 1.25;
+const mediumFullScreenZoom = 1.125;
+const smallFullScreenZoom = 1;
+const mediumScaleSnapPoint = 1075;
+
+let smallestTextScale;
 
 function setSizeConstants() {
     fullWidth = canvas.width;
@@ -216,8 +221,8 @@ window.onkeyup = event => {
 }
 function applySizeMode() {
     switch(canvasSizeMode) {
-        default:
         case "fit":
+            smallestTextScale = 2;
             canvas.width = internalWidth;
             canvas.height = internalHeight;
             if(window.innerWidth / window.innerHeight > widthByHeight) {
@@ -238,14 +243,16 @@ function applySizeMode() {
                 canvas.style.left = "0px";
             }
             break;
+        default:
         case "stretch":
+            smallestTextScale = 3;
 
             let zoomDivider = rendererState ? rendererState.zoomDivider || defaultFullScreenZoom : defaultFullScreenZoom;
 
             if(window.innerWidth < internalWidth) {
-                zoomDivider = 1;
-            } else if(window.innerWidth < 1075) {
-                zoomDivider = 1.25;
+                zoomDivider = smallFullScreenZoom;
+            } else if(window.innerWidth < mediumScaleSnapPoint) {
+                zoomDivider = mediumFullScreenZoom;
             }
 
             canvas.width = (window.innerWidth/zoomDivider)
