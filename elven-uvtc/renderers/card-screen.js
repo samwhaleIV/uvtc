@@ -463,12 +463,13 @@ function updateRenderElements() {
             slotSlot.iconTextX = slotSlot.icon.x + Math.floor((slotDisplayIconSize/2) - (slotSlot.iconTextWidth / 2)) + 1;
         }
         if(slotSlot.icon.y % 2 == 0) {
-
-            slotSlot.iconTextY = slotSlot.icon.y - slotSlot.iconTextHeight - 5;
+            slotSlot.iconTextY = slotSlot.icon.y - slotSlot.iconTextHeight - 8;
         } else {
-
-            slotSlot.iconTextY = slotSlot.icon.y - slotSlot.iconTextHeight - 4;
+            slotSlot.iconTextY = slotSlot.icon.y - slotSlot.iconTextHeight - 7;
         }
+
+        slotSlot.iconTextY = Math.floor(slotSlot.iconTextY);
+        slotSlot.iconTextX = Math.floor(slotSlot.iconTextX);
 
     }
 
