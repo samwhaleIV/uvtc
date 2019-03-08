@@ -1,4 +1,14 @@
-function CardBackground(backgroundName) {
+function CardBackground(backgroundName,color) {
+
+    if(!color) {
+        switch(backgroundName.split("/")[1]) {
+            case "card-test":
+                this.color = "#008DFF";
+                break;
+        }
+    } else {
+        this.color = color;
+    }
 
     const image = imageDictionary[backgroundName];
     this.cycleTime = 30000;
