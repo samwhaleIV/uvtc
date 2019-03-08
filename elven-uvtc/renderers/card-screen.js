@@ -14,7 +14,7 @@ leftArea.color = "rgba(128,128,128,0.7)";
 const innerLeftAreaMargin = 15;
 const innerAreaVerticalSpace = 105;
 const innerLeftArea = {};
-innerLeftArea.color = "rgb(242,242,242)";
+innerLeftArea.color = "rgba(30,30,30,0.8)";
 
 const bubbleSelectorY = leftArea.y + innerLeftAreaMargin;
 
@@ -84,7 +84,7 @@ const moveButtonRowSchemas = [];
 const bubbleSelectorHover = {};
 bubbleSelectorHover.color = "white";
 
-const moveButtonSpecialHover = "rgb(40,40,40,0.7)";
+const moveButtonSpecialHover = "rgb(80,80,80,0.5)";
 const moveButtonSpecialHoverDisabled = "rgb(100,100,100)";
 const moveButtonHoverColor = "rgb(80,80,80,0.7)";
 
@@ -92,7 +92,7 @@ const rightBarWidthPercent = 0.25;
 
 const collapsedInnerLeftAreaWidth = 70;
 const textFeed = {};
-textFeed.color = "rgba(0,0,0,0.85)";
+textFeed.color = "white";
 
 const rightTableCycleButton = {};
 const leftTableCycleButton = {};
@@ -100,7 +100,7 @@ rightTableCycleButton.text = "next";
 leftTableCycleButton.text = "back";
 const tableCycleButtonTextScale = 2;
 
-const tableCycleButtonWidth = 100;
+const tableCycleButtonWidth = 120;
 const tableCycleButtonHeight = 30;
 const doubleTableCycleButtonWidth = tableCycleButtonWidth + tableCycleButtonWidth;
 rightTableCycleButton.width = tableCycleButtonWidth;
@@ -115,6 +115,19 @@ textFeedToggleButton.enabled = true;
 textFeedToggleButton.width = leftTableCycleButton.width;
 textFeedToggleButton.height = leftTableCycleButton.height;
 const fullScreenCardMargin = 15;
+
+const fieldBackgroundColor = "rgba(81,81,81,0.78)";
+
+let innerLeftAreaFirstRowHeight;
+let innerLeftAreaSecondRowHeight;
+let innerLeftAreaThirdRowHeight;
+
+let innerLeftAreaFirstRowY
+let innerLeftAreaSecondRowY;
+let innerLeftAreaThirdRowY;
+
+const textFeedWidth = 400;
+const textFeedTextXOffset = 0;
 
 (function(){
     let textTestResult = drawTextTest(rightTableCycleButton.text,tableCycleButtonTextScale);
@@ -173,8 +186,6 @@ const handDisplaySlots = [];
 })();
 
 const handPageHitTest = {};
-
-
 const slotsDisplaySlots = [];
 (function(){
     for(let i = 0;i<3;i++) {
@@ -236,9 +247,12 @@ function updateRenderElements() {
     textFeed.width = innerLeftArea.width;
     textFeed.x = innerLeftArea.x;
 
-    textFeed.textX = textFeed.x + 20;
+    const maxWidth = textFeed.width - 100;
+    const innerTextWidth = textFeedWidth > maxWidth ? maxWidth : textFeedWidth;
+
+    textFeed.textX = textFeed.x + Math.floor((textFeed.width/2) - (innerTextWidth / 2));//come here
     textFeed.textY = textFeed.y + 20;
-    textFeed.maxTextWidth = textFeed.width / 2;
+    textFeed.maxTextWidth = innerTextWidth;
 
     leftTableCycleButton.x = innerLeftArea.x + innerRightBarMargin;
     leftTableCycleButton.y = innerLeftArea.y + innerRightBarMargin;
@@ -357,6 +371,14 @@ function updateRenderElements() {
     fullScreenCardArea.width = fullScreenCardArea.right - fullScreenCardArea.x;
     fullScreenCardArea.height = fullScreenCardArea.bottom - fullScreenCardArea.y;
 
+
+    innerLeftAreaFirstRowHeight = fullScreenCardArea.y - innerLeftArea.y;
+    innerLeftAreaSecondRowHeight = innerLeftArea.fullHeight - innerLeftAreaFirstRowHeight - innerLeftAreaFirstRowHeight;
+    innerLeftAreaThirdRowHeight = innerLeftAreaFirstRowHeight;
+
+    innerLeftAreaFirstRowY = innerLeftArea.y;
+    innerLeftAreaSecondRowY = innerLeftAreaFirstRowY + innerLeftAreaFirstRowHeight;
+    innerLeftAreaThirdRowY = innerLeftAreaSecondRowY + innerLeftAreaSecondRowHeight;
 
     if(fullScreenCardArea.width / fullScreenCardArea.height > internalCardWidthRatio) {
         fullScreenCard.y = fullScreenCardArea.y;
@@ -591,7 +613,6 @@ function CardScreenRenderer() {
     const background = new CardBackground("backgrounds/card-test");
 
     this.sequencer = new CardSequencer(this);
-    let viewingSelfCards = true;
     let viewTabLocked = false;
 
     let hoverType = hoverTypes.none;
@@ -697,12 +718,12 @@ function CardScreenRenderer() {
     }
 
     this.textFeedToggleIsHitRegistered = function(x,y) {
-        return areaContains(x,y,
+        return (areaContains(x,y,
             textFeedToggleButton.x,
             textFeedShown ? textFeedToggleButton.y : textFeedToggleButton.collapsedY,
             textFeedToggleButton.width,
             textFeedToggleButton.height
-        ) || textFeedShown && contains(x,y,textFeed);
+        ) || areaContains(x,y,innerLeftArea.x,innerLeftAreaThirdRowY,innerLeftArea.width,innerLeftAreaThirdRowHeight)) || textFeedShown && contains(x,y,textFeed);
     }
 
     this.processClickEnd = function(x,y) {
@@ -792,18 +813,20 @@ function CardScreenRenderer() {
                     hoverIndex = 1;
                     return;
                 } else {
-                    switch(this.sequencer.cardPageType) {
-                        case cardPageTypes.hand:
-                            if(contains(mouseX,mouseY,handPageHitTest)) {
-                                for(let i = 0;i<handDisplaySlots.length;i++) {
-                                    if(contains(mouseX,mouseY,handDisplaySlots[i])) {
-                                        hoverType = hoverTypes.handPageCard;
-                                        hoverIndex = i;
-                                        return;
+                    if(!textFeedShown) {
+                        switch(this.sequencer.cardPageType) {
+                            case cardPageTypes.hand:
+                                if(contains(mouseX,mouseY,handPageHitTest)) {
+                                    for(let i = 0;i<handDisplaySlots.length;i++) {
+                                        if(contains(mouseX,mouseY,handDisplaySlots[i])) {
+                                            hoverType = hoverTypes.handPageCard;
+                                            hoverIndex = i;
+                                            return;
+                                        }
                                     }
                                 }
-                            }
-                            break;
+                                break;
+                        }                  
                     }
                 }
             }
@@ -866,15 +889,27 @@ function CardScreenRenderer() {
             );
             drawTextWhite(textFeedToggleButton.text,textFeedToggleButton.textX,textFeedToggleButton.textY,moveButtonTextScale);
             if(this.sequencer.textFeed) {
-                drawTextWrappingWhite(this.sequencer.textFeed,textFeed.textX,textFeed.textY,textFeed.maxTextWidth,10,smallestTextScale);
+                drawTextWrappingBlack(this.sequencer.textFeed,textFeed.textX,textFeed.textY,textFeed.maxTextWidth,10,smallestTextScale);
             }
 
         } else {
             context.fillStyle = innerLeftArea.color;
-            context.fillRect(
-                innerLeftArea.x,innerLeftArea.y,
-                innerLeftArea.width,innerLeftArea.fullHeight
-            );
+            if(this.sequencer.cardPageType === cardPageTypes.field) {
+                context.fillStyle = innerLeftArea.color;
+                context.fillRect(innerLeftArea.x,innerLeftAreaFirstRowY,innerLeftArea.width,innerLeftAreaFirstRowHeight);
+
+                context.fillStyle = fieldBackgroundColor;
+                context.fillRect(innerLeftArea.x,innerLeftAreaSecondRowY,innerLeftArea.width,innerLeftAreaSecondRowHeight);
+
+                context.fillStyle = innerLeftArea.color;
+                context.fillRect(innerLeftArea.x,innerLeftAreaThirdRowY,innerLeftArea.width,innerLeftAreaThirdRowHeight);
+            } else {
+                context.fillRect(
+                    innerLeftArea.x,innerLeftArea.y,
+                    innerLeftArea.width,innerLeftArea.fullHeight
+                );
+            }
+
             context.fillStyle = showHoverSpecialEffect && hoverType === hoverTypes.textFeedToggleButton ? "rgb(30,30,30)" : "black";
             context.fillRect(
                 textFeedToggleButton.x,
@@ -918,7 +953,7 @@ function CardScreenRenderer() {
                                     displaySlot.icon.width,
                                     displaySlot.icon.height
                                 );
-                                drawTextBlack(displaySlot.text,displaySlot.iconTextX,displaySlot.iconTextY,displaySlot.iconTextScale);
+                                drawTextWhite(displaySlot.text,displaySlot.iconTextX,displaySlot.iconTextY,displaySlot.iconTextScale);
                             }
                             slotDisplayIndex++;
                         }
@@ -944,7 +979,7 @@ function CardScreenRenderer() {
             }
         }
 
-        drawTextBlack(
+        drawTextWhite(
             this.sequencer.cardPageText,
             pageTitleBlock.textX+this.sequencer.cardPageTextXOffset,
             pageTitleBlock.textY+this.sequencer.cardPageTextYOffset,

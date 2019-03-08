@@ -21,7 +21,7 @@ function CardSequencer(renderer) {
 
     this.renderer = renderer;
 
-    this.textFeed = processTextForWrapping( "this is a test yeeeeeeeeeeeeeeeeeet\n\nhere's some new lines... fuck my ass.\n\nif the word is too long for one line we have no way of breaking it into it's own lines. woops" );
+    this.textFeed = processTextForWrapping( "this is a test yeeeeeeeeeeeeeeeeeet here's some new lines... fuck my ass.\n\nif the word is too long for one line we have no way of breaking it into it's own lines. woops" );
 
     this.playerState = {
         health: 6,
