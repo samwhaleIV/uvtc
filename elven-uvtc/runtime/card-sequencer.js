@@ -23,7 +23,7 @@ function CardSequencer(renderer) {
 
     this.playerState = {
         health: 6,
-        energy: 0
+        energy: 99
     };
 
     this.opponentState = {
