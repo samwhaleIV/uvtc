@@ -502,6 +502,16 @@ function drawTextColor(color,text,x,y,scale) {
     }
 }
 
+const processTextForWrapping = function(description) {
+    description = description.replace(/\n/g," \n ").split(" ");
+    for(let i = 0;i<description.length-1;i++) {
+        if(description[i] !== "\n") {
+            description[i] = description[i] + " ";
+        }
+    }
+    return description;
+}
+
 function drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,color) {
     let xOffset = 0;
     let yOffset = 0;

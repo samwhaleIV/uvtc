@@ -236,6 +236,10 @@ function updateRenderElements() {
     textFeed.width = innerLeftArea.width;
     textFeed.x = innerLeftArea.x;
 
+    textFeed.textX = textFeed.x + 20;
+    textFeed.textY = textFeed.y + 20;
+    textFeed.maxTextWidth = textFeed.width / 2;
+
     leftTableCycleButton.x = innerLeftArea.x + innerRightBarMargin;
     leftTableCycleButton.y = innerLeftArea.y + innerRightBarMargin;
 
@@ -861,6 +865,10 @@ function CardScreenRenderer() {
                 color
             );
             drawTextWhite(textFeedToggleButton.text,textFeedToggleButton.textX,textFeedToggleButton.textY,moveButtonTextScale);
+            if(this.sequencer.textFeed) {
+                drawTextWrappingWhite(this.sequencer.textFeed,textFeed.textX,textFeed.textY,textFeed.maxTextWidth,10,smallestTextScale);
+            }
+
         } else {
             context.fillStyle = innerLeftArea.color;
             context.fillRect(
