@@ -178,9 +178,26 @@ const handPageHitTest = {};
 const slotsDisplaySlots = [];
 (function(){
     for(let i = 0;i<3;i++) {
+        let text;
+        switch(i) {
+            case 0:
+                text = "defense";
+                break;
+            case 1:
+                text = "attack";
+                break;
+            case 2:
+                text = "special";
+                break;
+        }
+        const textDrawTestResult = drawTextTest(text,2);
+
         slotsDisplaySlots[i] = {
             icon: {},
             card: {},
+            text: text,
+            iconTextWidth: textDrawTestResult.width,
+            iconTextHeight: textDrawTestResult.height,
             iconTextX: undefined,
             iconTextY: undefined,
             iconTextScale: 2
@@ -439,6 +456,20 @@ function updateRenderElements() {
         slotSlot.card.y = baseSlot.y;
         slotSlot.card.width = baseSlot.width;
         slotSlot.card.height = baseSlot.height;
+
+        if(slotSlot.icon.x % 2 == 0) {
+            slotSlot.iconTextX = slotSlot.icon.x + Math.floor((slotDisplayIconSize/2) - (slotSlot.iconTextWidth / 2));
+        } else {
+            slotSlot.iconTextX = slotSlot.icon.x + Math.floor((slotDisplayIconSize/2) - (slotSlot.iconTextWidth / 2)) + 1;
+        }
+        if(slotSlot.icon.y % 2 == 0) {
+
+            slotSlot.iconTextY = slotSlot.icon.y - slotSlot.iconTextHeight - 5;
+        } else {
+
+            slotSlot.iconTextY = slotSlot.icon.y - slotSlot.iconTextHeight - 4;
+        }
+
     }
 
 
@@ -823,7 +854,7 @@ function CardScreenRenderer() {
         if(textFeedShown) {
             drawColoredRectangle(innerLeftArea);
             drawColoredRectangle(textFeed);
-            const color = showHoverSpecialEffect ? "rgb(30,30,30)" : "black";
+            const color = showHoverSpecialEffect && hoverType === hoverTypes.textFeedToggleButton ? "rgb(30,30,30)" : "black";
             drawRectangle(
                 textFeedToggleButton,
                 color
@@ -835,7 +866,7 @@ function CardScreenRenderer() {
                 innerLeftArea.x,innerLeftArea.y,
                 innerLeftArea.width,innerLeftArea.fullHeight
             );
-            context.fillStyle = showHoverSpecialEffect ? "rgb(30,30,30)" : "black";
+            context.fillStyle = showHoverSpecialEffect && hoverType === hoverTypes.textFeedToggleButton ? "rgb(30,30,30)" : "black";
             context.fillRect(
                 textFeedToggleButton.x,
                 textFeedToggleButton.collapsedY,
@@ -859,7 +890,29 @@ function CardScreenRenderer() {
                         //TODO
                         break;
                     case cardPageTypes.slots:
-                        //TODO
+                        let slotDisplayIndex = 0;
+                        while(slotDisplayIndex < 3) {
+                            const displaySlot = slotsDisplaySlots[slotDisplayIndex];
+                            if(this.sequencer.cardPageRenderData[slotDisplayIndex]) {
+                                renderCard(
+                                    this.sequencer.cardPageRenderData[slotDisplayIndex],
+                                    displaySlot.card.x,
+                                    displaySlot.card.y,
+                                    displaySlot.card.width,
+                                    displaySlot.card.height
+                                );
+                            } else {
+                                context.drawImage(
+                                    imageDictionary["ui/card-icons"],64,0,32,32,
+                                    displaySlot.icon.x,
+                                    displaySlot.icon.y,
+                                    displaySlot.icon.width,
+                                    displaySlot.icon.height
+                                );
+                                drawTextBlack(displaySlot.text,displaySlot.iconTextX,displaySlot.iconTextY,displaySlot.iconTextScale);
+                            }
+                            slotDisplayIndex++;
+                        }
                         break;
                     case cardPageTypes.hand:
                         let handCardIndex = 0;
