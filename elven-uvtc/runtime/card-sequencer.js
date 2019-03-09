@@ -33,6 +33,9 @@ function CardSequencer(renderer) {
         energy: 0
     };
 
+    this.fieldLeftIconText = "deck - 40";
+    this.fieldRightIconText = "discarded - 40";
+
     this.buttonRows = [
         [
             {
@@ -56,8 +59,9 @@ function CardSequencer(renderer) {
         ],
         [
             {
-                text: "deck check",
-                enabled: true
+                text: "shuffle ",
+                enabled: true,
+                //image: 6
             }
         ],
         [],
@@ -113,6 +117,7 @@ function CardSequencer(renderer) {
         }
     }
 
+    this.fullScreenStatus = null;
     this.fullScreenCard = null;
     this.playerTable = {
     };
@@ -197,22 +202,39 @@ function CardSequencer(renderer) {
         //this.renderer.hideTextFeed();
     }
 
-    this.showFullScreenCard = function(card,withUIAdjustments) {
-        if(withUIAdjustments) {
-            this.renderer.lockViewTab();
-            this.renderer.lockPageCycle();
-            this.disableButtons();
-        }
+    this.showFullScreenCard = function(card) {
+
+        this.renderer.lockViewTab();
+        this.renderer.lockPageCycle();
+        this.disableButtons();
+
         this.fullScreenCard = card;
     }
-    this.hideFullScreenCard = function(withUIAdjustments) {
+    this.hideFullScreenCard = function() {
         //TODO: If this is from a [draw action] or something, advance the event stack if there is one
-        if(withUIAdjustments) {
-            this.renderer.unlockViewTab();
-            this.renderer.unlockPageCycle();
-            this.enableButtons();
-        }
+        this.renderer.unlockViewTab();
+        this.renderer.unlockPageCycle();
+        this.enableButtons();
+
         this.fullScreenCard = null;
+    }
+
+    this.showFullScreenStatus = function(status) {
+        this.fullScreenStatus = status;
+        //todo
+    }
+    this.hideFullScreenStatus = function() {
+        this.fullScreenStatus = null;
+        //todo
+    }
+    this.statusClicked = function() {
+        this.showFullScreenStatus(
+            {
+                imagePath: "cards/s1-status",
+                imageX: 0,
+                imageY: 0
+            }
+        );
     }
 
     this.getButtonNavigationIndex = function(currentIndex) {

@@ -4,6 +4,29 @@ const doubleCardTitlePadding = cardTitlePadding + cardTitlePadding;
 
 const fullScreenCardEnergyWidth = 64;
 
+function renderStatus(status,x,y,width,height) {
+    //todo: Render the name
+    if(status) {
+        context.drawImage(imageDictionary[status.imagePath],status.imageX,status.imageY,64,64,x,y,width,height)
+    } else {
+        context.drawImage(imageDictionary["ui/card-icons"],64,0,32,32,x,y,width,height);
+    }
+}
+function renderStatusFullscreen(status,x,y,width,height) {
+    renderStatus(status,x,y,width,height);
+    if(status.description) {
+        const yTop = Math.floor(height*0.5);
+        context.fillStyle = "rgba(255,255,255,1)";
+        context.fillRect(
+            x,
+            y+yTop,
+            width,
+            height - yTop
+        );
+        drawTextWrappingBlack(card.description,x + 6,y+yTop+6,width - (smallestTextScale*15),7,smallestTextScale);
+    }
+}
+
 function renderCard(card,x,y,width,height,partial=false) {
 
     context.drawImage(
@@ -47,12 +70,7 @@ function renderCard(card,x,y,width,height,partial=false) {
         );
         drawTextWhite(card.name,x+cardTitlePadding,y+cardTitlePadding,cardTitleTextScale);
     }
-
-
     //render card energy cost?
-
-
-
 }
 function renderCardPartial(card,x,y,width,height) {
     renderCard(card,x,y,width,height,true);

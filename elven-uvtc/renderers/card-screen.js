@@ -216,6 +216,22 @@ const slotsDisplaySlots = [];
     }
 })();
 
+const fullScreenStatusIcon = {hover:{}};
+const statusIconFullArea = {};
+const statusIcons = [];
+let fieldIconTextY;
+let conditionsTextY;
+let conditionsTextX;
+const statusIconWidthRatio = 2 / 5;//TODO
+const statusIconHeightRatio = 5 / 2;//TODO
+(function() {
+    for(let i = 0;i<10;i++) {
+        statusIcons[i] = {
+            hover: {}
+        };
+    }
+})();
+
 function updateRenderElements() {
     rightBar.x = fullWidth - Math.floor(fullWidth * rightBarWidthPercent);
     rightBar.width = fullWidth - rightBar.x;
@@ -315,7 +331,7 @@ function updateRenderElements() {
     s1.textX = s1.x + moveButtonTextPadding;
 
     buttonRowImage.x = Math.floor(s1.x + s1.width - buttonRowImage.width - 0.5) - buttonRowImageMargin;
-    buttonRowImage.yOffset = moveButtonStartY + buttonRowImageMargin;
+    buttonRowImage.yOffset = Math.floor(moveButtonStartY + buttonRowImageMargin);
 
     const s2StartX = s1.x;
     const s2Width = Math.floor((s1.width-moveButtonMargin) / 2);
@@ -399,7 +415,7 @@ function updateRenderElements() {
 
     let handCardHeight, handCardWidth, xStart, yStart;
 
-    if(fullScreenCardArea.width / fullScreenCardArea.height > handDisplayWidthRatio) {//height is smallest
+    if(fullScreenCardArea.width / fullScreenCardArea.height > handDisplayWidthRatio) {
         const fullHandCardHeight = fullScreenCardArea.height;
         const fullHandCardWidth = fullScreenCardArea.height * handDisplayHeightRatio;
 
@@ -494,12 +510,66 @@ function updateRenderElements() {
             slotSlot.iconTextY = slotSlot.icon.y - slotSlot.iconTextHeight - 7;
         }
 
+        const yStart = slotSlot.icon.y - 15;
+
         slotSlot.iconTextY = Math.floor(slotSlot.iconTextY);
         slotSlot.iconTextX = Math.floor(slotSlot.iconTextX);
+
+        slotSlot.icon.fieldTextX = slotSlot.icon.x + 4;
+        slotSlot.icon.fieldTextY = yStart + 4;
+        slotSlot.icon.fieldIconY = yStart + 20;
+
+        slotSlot.icon.fieldTextBlockY = yStart;
+        slotSlot.icon.fieldTextBlockHeight = 20;
 
     }
 
 
+    if(fullScreenCardArea.width > fullScreenCardArea.height) {
+        fullScreenStatusIcon.height = fullScreenCardArea.height - 30;
+        fullScreenStatusIcon.width = fullScreenStatusIcon.height - 30;
+    } else {
+        fullScreenStatusIcon.width = fullScreenCardArea.width;
+        fullScreenStatusIcon.height = fullScreenStatusIcon.width;
+    }
+    fullScreenStatusIcon.x = fullScreenCardArea.x + Math.floor((fullScreenCardArea.width/2)-(fullScreenStatusIcon.width/2));
+    fullScreenStatusIcon.y = fullScreenCardArea.y + Math.floor((fullScreenCardArea.height/2)-(fullScreenStatusIcon.height/2)) - 5;
+
+    fullScreenStatusIcon.hover.x = fullScreenStatusIcon.x - hoverPadding;
+    fullScreenStatusIcon.hover.y = fullScreenStatusIcon.y - hoverPadding;
+    fullScreenStatusIcon.hover.width = fullScreenStatusIcon.width + doubleHoverPadding;
+    fullScreenStatusIcon.hover.height = fullScreenStatusIcon.height + doubleHoverPadding;
+
+    let statusIconHeight, statusIconWidth;
+
+    statusIconFullArea.x = handDisplaySlots[0].x,
+    statusIconFullArea.y = handDisplaySlots[0].y + 15,
+    statusIconFullArea.height = (handDisplaySlots[2].y + handDisplaySlots[2].height) - handDisplaySlots[0].y,
+    statusIconFullArea.width = (handDisplaySlots[2].x + handDisplaySlots[2].width) - handDisplaySlots[0].x,
+
+    statusIconWidth = statusIconFullArea.width / 5;
+    statusIconHeight = statusIconWidth;
+
+    xStart = statusIconFullArea.x - 20;
+    yStart = statusIconFullArea.y + 5;
+
+    for(let x = 0;x<5;x++) {
+        for(let y = 0;y<2;y++) {
+            const index = x+(y*5);
+            const statusIcon = statusIcons[index];
+
+            statusIcon.x = xStart + x * (statusIconWidth + 10);
+            statusIcon.y = yStart + y * (statusIconHeight + 10);
+
+            statusIcon.width = statusIconWidth;
+            statusIcon.height = statusIconHeight;
+
+            statusIcon.hover.x = statusIcon.x - hoverPadding;
+            statusIcon.hover.y = statusIcon.y - hoverPadding;
+            statusIcon.hover.width = statusIcon.width + doubleHoverPadding;
+            statusIcon.hover.height = statusIcon.height + doubleHoverPadding;
+        }
+    }
 }
 
 function drawRectangle(rectangle,color) {
@@ -603,7 +673,9 @@ const hoverTypes = {
     cycleButtons: Symbol("cycleButtons"),
     textFeedToggleButton: Symbol("textFeedToggleButton"),
     fullScreenCard: Symbol("fullScreenCard"),
-    handPageCard: Symbol("handPageCard")
+    handPageCard: Symbol("handPageCard"),
+    fullScreenStatus: Symbol("fullScreenStatus"),
+    statusIcon: Symbol("statusIcon")
 }
 
 const defaultHoverIndex = -1;
@@ -654,10 +726,16 @@ function CardScreenRenderer() {
                 if(textFeedShown && textFeedToggleButton.enabled) {
                     this.hideTextFeed();
                 } else if(this.sequencer.fullScreenCard && !fullScreenCardLocked) {
-                    this.sequencer.hideFullScreenCard(true);
+                    this.sequencer.hideFullScreenCard();
                     if(hoverType === hoverTypes.fullScreenCard) {
                         hoverType = hoverTypes.none;
                         hoverIndex = defaultHoverIndex;
+                    }
+                } else if(this.sequencer.fullScreenStatus && !fullScreenCardLocked) {
+                    this.sequencer.hideFullScreenStatus();
+                    if(hoverType === hoverTypes.fullScreenStatus) {
+                        hoverType = hoverTypes.none;
+                        hoverIndex = defaultHoverIndex;   
                     }
                 } else {
                     //TODO: Open escape menu
@@ -729,9 +807,17 @@ function CardScreenRenderer() {
     this.processClickEnd = function(x,y) {
         showHoverSpecialEffect = false;
         switch(hoverType) {
+            case hoverTypes.statusIcon:
+                this.sequencer.statusClicked(hoverIndex);
+                break;
             case hoverTypes.fullScreenCard:
                 if(!fullScreenCardLocked) {
                     this.sequencer.hideFullScreenCard(true);
+                }
+                break;
+            case hoverTypes.fullScreenStatus:
+                if(!fullScreenCardLocked) {
+                    this.sequencer.hideFullScreenStatus(true);
                 }
                 break;
             case hoverTypes.textFeedToggleButton:
@@ -785,7 +871,17 @@ function CardScreenRenderer() {
                 }
             }
         } else {
-            if(this.sequencer.fullScreenCard) {
+            if(this.sequencer.fullScreenStatus) {
+                if(this.textFeedToggleIsHitRegistered(mouseX,mouseY)) {
+                    hoverType = hoverTypes.textFeedToggleButton;
+                    hoverIndex = 0;
+                    return;
+                } else if(contains(mouseX,mouseY,fullScreenStatusIcon)) {
+                    hoverType = hoverTypes.fullScreenStatus;
+                    hoverIndex = 0;
+                    return;
+                }
+            } else if(this.sequencer.fullScreenCard) {
                 if(this.textFeedToggleIsHitRegistered(mouseX,mouseY)) {
                     hoverType = hoverTypes.textFeedToggleButton;
                     hoverIndex = 0;
@@ -820,6 +916,17 @@ function CardScreenRenderer() {
                                     for(let i = 0;i<handDisplaySlots.length;i++) {
                                         if(contains(mouseX,mouseY,handDisplaySlots[i])) {
                                             hoverType = hoverTypes.handPageCard;
+                                            hoverIndex = i;
+                                            return;
+                                        }
+                                    }
+                                }
+                                break;
+                            case cardPageTypes.field:
+                                if(contains(mouseX,mouseY,statusIconFullArea)) {
+                                    for(let i = 0;i<statusIcons.length;i++) {
+                                        if(contains(mouseX,mouseY,statusIcons[i])) {
+                                            hoverType = hoverTypes.statusIcon;
                                             hoverIndex = i;
                                             return;
                                         }
@@ -920,6 +1027,7 @@ function CardScreenRenderer() {
             drawTextWhite(textFeedToggleButton.text,textFeedToggleButton.textX,textFeedToggleButton.collapsedTextY,moveButtonTextScale);
 
             if(this.sequencer.fullScreenCard) {
+//TODO MERGE FULLSCREEN LOGICISTICS
                 if(hoverType === hoverTypes.fullScreenCard) {
                     drawRectangle(fullScreenCard.hoverEffect,background.color);
                 }
@@ -928,10 +1036,57 @@ function CardScreenRenderer() {
                     fullScreenCard.x,fullScreenCard.y,
                     fullScreenCard.width,fullScreenCard.height,
                 );
+            } else if(this.sequencer.fullScreenStatus) {
+                if(hoverType === hoverTypes.fullScreenStatus) {
+                    drawRectangle(fullScreenStatusIcon.hover,background.color);
+                }
+                renderStatusFullscreen(
+                    this.sequencer.fullScreenStatus,
+                    fullScreenStatusIcon.x,fullScreenStatusIcon.y,
+                    fullScreenStatusIcon.width,fullScreenStatusIcon.height
+                );
             } else {
                 switch(this.sequencer.cardPageType) {
                     case cardPageTypes.field:
-                        //TODO
+                        let statusIconIndex = 0;
+                        while(statusIconIndex < statusIcons.length) {
+                            const statusIcon = this.sequencer.cardPageRenderData[statusIconIndex];
+                            const statusIconRenderData = statusIcons[statusIconIndex];
+                            if(hoverType === hoverTypes.statusIcon && hoverIndex === statusIconIndex) {
+                                drawRectangle(statusIconRenderData.hover,background.color);
+                            }
+                            renderStatus(
+                                statusIcon,
+                                statusIconRenderData.x,
+                                statusIconRenderData.y,
+                                statusIconRenderData.width,
+                                statusIconRenderData.height
+                            );
+                            statusIconIndex++;
+                        }
+                        const fieldLeftIcon = slotsDisplaySlots[0].icon;
+                        const fieldRightIcon = slotsDisplaySlots[2].icon;
+                        context.drawImage(
+                            imageDictionary["ui/card-icons"],
+                            160,0,32,32,
+                            fieldLeftIcon.x,fieldLeftIcon.fieldIconY,fieldLeftIcon.width,fieldLeftIcon.height
+                        );
+                        context.drawImage(imageDictionary["ui/card-icons"],
+                            128,0,32,32,
+                            fieldRightIcon.x,fieldRightIcon.fieldIconY,fieldRightIcon.width,fieldRightIcon.height
+                        );
+                        context.beginPath();
+                        context.fillStyle = "black";
+                        context.rect(
+                            fieldLeftIcon.x,fieldLeftIcon.fieldTextBlockY,fieldLeftIcon.width,fieldLeftIcon.fieldTextBlockHeight
+                        );
+                        context.rect(
+                            fieldRightIcon.x,fieldRightIcon.fieldTextBlockY,fieldRightIcon.width,fieldRightIcon.fieldTextBlockHeight
+                        );
+                        context.fill();
+
+                        drawTextWhite(this.sequencer.fieldLeftIconText,fieldLeftIcon.fieldTextX,fieldLeftIcon.fieldTextY,2);
+                        drawTextWhite(this.sequencer.fieldRightIconText,fieldRightIcon.fieldTextX,fieldRightIcon.fieldTextY,2);
                         break;
                     case cardPageTypes.slots:
                         let slotDisplayIndex = 0;
