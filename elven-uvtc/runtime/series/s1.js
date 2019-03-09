@@ -60,4 +60,10 @@ addCardSeries([
     {
         name: "out of phase"
     }
-],"cards/s1","cards/s1-status","cards/s2-backface");
+],{//imagePath,statusImagePath,backFacePath
+    imagePath: "cards/s1",
+    statusImagePath: "cards/s1-status",
+    backFacePath: "cards/s1-backface",
+    name: "series 1",
+    description: "a tumble woods speciality"
+});

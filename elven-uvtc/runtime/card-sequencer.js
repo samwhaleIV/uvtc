@@ -17,7 +17,7 @@ const getCardPageName = function(cardPageType,isPlayer) {
 }
 const defaultCardPageType = cardPageTypes.hand;
 const defaultOpponentCardPageType = cardPageTypes.slots;
-function CardSequencer(renderer) {
+function CardSequencer(renderer,playerDeck,opponentDeck,opponentSequencer) {
 
     this.renderer = renderer;
 

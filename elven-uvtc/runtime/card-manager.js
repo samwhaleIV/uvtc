@@ -31,13 +31,13 @@ const getLineBreakName = function(name) {
     return lineBreakName;
 }
 
-const addCardSeries = function(cardSeries,statuses,imagePath,statusImagePath,backFacePath) {
+const addCardSeries = function(cardSeries,statuses,manifest) {
     for(let i = 0;i<cardSeries.length;i++) {
 
         cardSeries[i].sourceX = i * internalCardWidth;
-        cardSeries[i].imagePath = imagePath;
+        cardSeries[i].imagePath = manifest.imagePath;
         cardSeries[i].lineBreakName = getLineBreakName(cardSeries[i].name);
-        cardSeries[i].backFacePath = backFacePath;
+        cardSeries[i].backFacePath = manifest.backFacePath;
 
         if(cardSeries[i].description) {
             let descriptionPrefix = [];
@@ -63,9 +63,12 @@ const addCardSeries = function(cardSeries,statuses,imagePath,statusImagePath,bac
         if(statuses[i].description) {
             statuses[i].description = [...statusPrefix,...processTextForWrapping(statuses[i].description)];
         }
-        statuses[i].imagePath = statusImagePath;
+        statuses[i].imagePath = manifest.statusImagePath;
         statusLookup[statuses[i].name] = statuses[i];
         allStatuses.push(statuses[i]);
     }
-    allCardSeries.push(cardSeries);
+    allCardSeries.push({
+        cards: cardSeries,
+        manifest: manifest
+    });
 }
