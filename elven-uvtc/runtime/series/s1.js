@@ -53,4 +53,11 @@ addCardSeries([
         type: "special",
         energyCost: 0
     }
-],"cards/s1");
+],[
+    {
+        name: "hibernating"
+    },
+    {
+        name: "out of phase"
+    }
+],"cards/s1","cards/s1-status");

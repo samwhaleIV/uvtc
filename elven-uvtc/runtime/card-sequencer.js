@@ -229,11 +229,7 @@ function CardSequencer(renderer) {
     }
     this.statusClicked = function(index) {
         this.showFullScreenStatus(
-            {
-                imagePath: "cards/s1-status",
-                imageX: 0,
-                imageY: 0
-            }
+            allStatuses[0]
         );
     }
 

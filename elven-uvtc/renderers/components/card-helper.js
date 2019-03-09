@@ -7,7 +7,7 @@ const fullScreenCardEnergyWidth = 64;
 function renderStatus(status,x,y,width,height) {
     //todo: Render the name?
     if(status) {
-        context.drawImage(imageDictionary[status.imagePath],status.imageX,status.imageY,64,64,x,y,width,height)
+        context.drawImage(imageDictionary[status.imagePath],status.sourceX,0,internalStatusWidth,internalStatusHeight,x,y,width,height)
     } else {
         context.fillStyle = "rgba(255,255,255,1)";
         context.fillRect(Math.floor(x),Math.floor(y),Math.floor(width),Math.floor(height));
@@ -16,6 +16,8 @@ function renderStatus(status,x,y,width,height) {
 }
 function renderStatusFullscreen(status,x,y,width,height) {
     renderStatus(status,x,y,width,height);
+    renderFullScreenName(status.name,status.lineBreakName,x,y,width,cardTitleTextScale);
+
     if(status.description) {
         const yTop = Math.floor(height*0.5);
         context.fillStyle = "rgba(255,255,255,1)";
@@ -29,21 +31,12 @@ function renderStatusFullscreen(status,x,y,width,height) {
     }
 }
 
-function renderCard(card,x,y,width,height,partial=false) {
-
-    context.drawImage(
-        imageDictionary[card.imagePath],
-        card.sourceX,
-        0,
-        internalCardWidth,
-        partial ? halfInternalCardHeight : internalCardHeight,
-        x,y,width,height
-    );
-    const textTestResult = drawTextTest(card.name,cardTitleTextScale);
+function renderFullScreenName(name,lineBreakName,x,y,width,scale) {
+    const textTestResult = drawTextTest(name,scale);
     if(textTestResult.width + doubleCardTitlePadding > width) {
 
-        const ttr1 = drawTextTest(card.lineBreakName[0],cardTitleTextScale);
-        const ttr2 = drawTextTest(card.lineBreakName[1],cardTitleTextScale);
+        const ttr1 = drawTextTest(lineBreakName[0],scale);
+        const ttr2 = drawTextTest(lineBreakName[1],scale);
 
         context.fillStyle = "black";
         context.beginPath();
@@ -60,8 +53,8 @@ function renderCard(card,x,y,width,height,partial=false) {
         const cardTextX = x+cardTitlePadding;
         const cardTextY = y+cardTitlePadding;
 
-        drawTextWhite(card.lineBreakName[0],cardTextX,cardTextY,cardTitleTextScale);
-        drawTextWhite(card.lineBreakName[1],cardTextX,cardTextY+ttr1.height+doubleCardTitlePadding,cardTitleTextScale);
+        drawTextWhite(lineBreakName[0],cardTextX,cardTextY,scale);
+        drawTextWhite(lineBreakName[1],cardTextX,cardTextY+ttr1.height+doubleCardTitlePadding,scale);
 
     } else {
         context.fillStyle = "black";
@@ -70,8 +63,23 @@ function renderCard(card,x,y,width,height,partial=false) {
             textTestResult.width+doubleCardTitlePadding,
             textTestResult.height+doubleCardTitlePadding
         );
-        drawTextWhite(card.name,x+cardTitlePadding,y+cardTitlePadding,cardTitleTextScale);
+        drawTextWhite(name,x+cardTitlePadding,y+cardTitlePadding,scale);
     }
+}
+
+function renderCard(card,x,y,width,height,partial=false) {
+
+    context.drawImage(
+        imageDictionary[card.imagePath],
+        card.sourceX,
+        0,
+        internalCardWidth,
+        partial ? halfInternalCardHeight : internalCardHeight,
+        x,y,width,height
+    );
+
+    renderFullScreenName(card.name,card.lineBreakName,x,y,width,cardTitleTextScale);
+
     //render card energy cost?
 }
 function renderCardPartial(card,x,y,width,height) {
