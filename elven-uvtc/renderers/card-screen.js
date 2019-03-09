@@ -206,6 +206,7 @@ const slotsDisplaySlots = [];
         slotsDisplaySlots[i] = {
             icon: {},
             card: {},
+            hover: {},
             text: text,
             iconTextWidth: textDrawTestResult.width,
             iconTextHeight: textDrawTestResult.height,
@@ -489,6 +490,7 @@ function updateRenderElements() {
         }
         const baseSlot = handDisplaySlots[slotIndex];
         const slotSlot = slotsDisplaySlots[i];
+        slotSlot.hover = baseSlot.hoverEffect;
         slotSlot.icon.x = baseSlot.x + slotDisplayIconXOffset;
         slotSlot.icon.y = baseSlot.y + slotDisplayIconYOffset;
         slotSlot.icon.width = slotDisplayIconSize;
@@ -675,7 +677,8 @@ const hoverTypes = {
     fullScreenCard: Symbol("fullScreenCard"),
     handPageCard: Symbol("handPageCard"),
     fullScreenStatus: Symbol("fullScreenStatus"),
-    statusIcon: Symbol("statusIcon")
+    statusIcon: Symbol("statusIcon"),
+    slotCard: Symbol("slotCard")
 }
 
 const defaultHoverIndex = -1;
@@ -849,6 +852,9 @@ function CardScreenRenderer() {
             case hoverTypes.handPageCard:
                 this.sequencer.handCardClicked(hoverIndex);
                 break;
+            case hoverTypes.slotCard:
+                this.sequencer.slotCardClicked(hoverIndex);
+                break;
         }
         this.processMove(x,y);
     }
@@ -919,6 +925,23 @@ function CardScreenRenderer() {
                                             hoverIndex = i;
                                             return;
                                         }
+                                    }
+                                }
+                                break;
+                            case cardPageTypes.slots:
+                                if(contains(mouseX,mouseY,handPageHitTest)) {
+                                    if(contains(mouseX,mouseY,handDisplaySlots[1])) {
+                                        hoverType = hoverTypes.slotCard;
+                                        hoverIndex = 1;
+                                        return;
+                                    } else if(contains(mouseX,mouseY,handDisplaySlots[3])) {
+                                        hoverType = hoverTypes.slotCard;
+                                        hoverIndex = 0;
+                                        return;
+                                    } else if(contains(mouseX,mouseY,handDisplaySlots[5])) {
+                                        hoverType = hoverTypes.slotCard;
+                                        hoverIndex = 2;
+                                        return;
                                     }
                                 }
                                 break;
@@ -1093,6 +1116,9 @@ function CardScreenRenderer() {
                         while(slotDisplayIndex < 3) {
                             const displaySlot = slotsDisplaySlots[slotDisplayIndex];
                             if(this.sequencer.cardPageRenderData[slotDisplayIndex]) {
+                                if(hoverType === hoverTypes.slotCard && slotDisplayIndex === hoverIndex) {
+                                    drawRectangle(displaySlot.hover,background.color);
+                                }
                                 renderCard(
                                     this.sequencer.cardPageRenderData[slotDisplayIndex],
                                     displaySlot.card.x,

@@ -227,7 +227,7 @@ function CardSequencer(renderer) {
         this.fullScreenStatus = null;
         //todo
     }
-    this.statusClicked = function() {
+    this.statusClicked = function(index) {
         this.showFullScreenStatus(
             {
                 imagePath: "cards/s1-status",
@@ -235,6 +235,10 @@ function CardSequencer(renderer) {
                 imageY: 0
             }
         );
+    }
+
+    this.slotCardClicked = function(index) {
+        this.showFullScreenCard(this.cardPageRenderData[index]);
     }
 
     this.getButtonNavigationIndex = function(currentIndex) {
