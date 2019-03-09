@@ -529,9 +529,9 @@ function updateRenderElements() {
 
     if(fullScreenCardArea.width > fullScreenCardArea.height) {
         fullScreenStatusIcon.height = fullScreenCardArea.height - 30;
-        fullScreenStatusIcon.width = fullScreenStatusIcon.height - 30;
+        fullScreenStatusIcon.width = fullScreenStatusIcon.height;
     } else {
-        fullScreenStatusIcon.width = fullScreenCardArea.width;
+        fullScreenStatusIcon.width = fullScreenCardArea.width - 30;
         fullScreenStatusIcon.height = fullScreenStatusIcon.width;
     }
     fullScreenStatusIcon.x = fullScreenCardArea.x + Math.floor((fullScreenCardArea.width/2)-(fullScreenStatusIcon.width/2));
@@ -1075,7 +1075,7 @@ function CardScreenRenderer() {
                         while(statusIconIndex < statusIcons.length) {
                             const statusIcon = this.sequencer.cardPageRenderData[statusIconIndex];
                             const statusIconRenderData = statusIcons[statusIconIndex];
-                            if(hoverType === hoverTypes.statusIcon && hoverIndex === statusIconIndex) {
+                            if(hoverType === hoverTypes.statusIcon && hoverIndex === statusIconIndex && statusIcon) {
                                 drawRectangle(statusIconRenderData.hover,background.color);
                             }
                             renderStatus(
