@@ -31,12 +31,13 @@ const getLineBreakName = function(name) {
     return lineBreakName;
 }
 
-const addCardSeries = function(cardSeries,statuses,imagePath,statusImagePath) {
+const addCardSeries = function(cardSeries,statuses,imagePath,statusImagePath,backFacePath) {
     for(let i = 0;i<cardSeries.length;i++) {
+
         cardSeries[i].sourceX = i * internalCardWidth;
         cardSeries[i].imagePath = imagePath;
-
         cardSeries[i].lineBreakName = getLineBreakName(cardSeries[i].name);
+        cardSeries[i].backFacePath = backFacePath;
 
         if(cardSeries[i].description) {
             let descriptionPrefix = [];

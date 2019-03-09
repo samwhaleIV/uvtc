@@ -31,6 +31,10 @@ function renderStatusFullscreen(status,x,y,width,height) {
     }
 }
 
+function renderCardBack(card,x,y,width,height) {
+    context.drawImage(imageDictionary[card.backFacePath],x,y,width,height);
+}
+
 function renderFullScreenName(name,lineBreakName,x,y,width,scale) {
     const textTestResult = drawTextTest(name,scale);
     if(textTestResult.width + doubleCardTitlePadding > width) {

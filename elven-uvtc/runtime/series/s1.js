@@ -60,4 +60,4 @@ addCardSeries([
     {
         name: "out of phase"
     }
-],"cards/s1","cards/s1-status");
+],"cards/s1","cards/s1-status","cards/s2-backface");

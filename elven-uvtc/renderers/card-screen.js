@@ -174,8 +174,8 @@ const statusWidth = 64;
 const statusHeight = 64;
 const statusY = innerLeftAreaMargin + bubbleSelectorHeight;
 
-const handDisplayHeightRatio = 144 / 128 - 0.1;
-const handDisplayWidthRatio = 128 / 144 + 0.1;
+const handDisplayHeightRatio = 144 / 128;
+const handDisplayWidthRatio = 128 / 144;
 const handDisplaySlots = [];
 (function(){
     for(let i = 0;i<6;i++) {
@@ -223,14 +223,26 @@ const statusIcons = [];
 let fieldIconTextY;
 let conditionsTextY;
 let conditionsTextX;
-const statusIconWidthRatio = 2 / 5;//TODO
-const statusIconHeightRatio = 5 / 2;//TODO
+const statusIconWidthRatio = 2 / 5;
+const statusIconHeightRatio = 5 / 2;
 (function() {
     for(let i = 0;i<10;i++) {
         statusIcons[i] = {
             hover: {}
         };
     }
+})();
+
+const noCardsText = "no cards in hand :(";
+const noCardsTextScale = 5;
+let noCardsTextXOffset;
+let noCardsTextYOffset;
+let noCardsTextX;
+let noCardsTextY;
+(function(){
+    const t1 = drawTextTest(noCardsText,noCardsTextScale);
+    noCardsTextXOffset = Math.floor(t1.width/2);
+    noCardsTextYOffset = Math.floor(t1.height/2);
 })();
 
 function updateRenderElements() {
@@ -267,7 +279,7 @@ function updateRenderElements() {
     const maxWidth = textFeed.width - 100;
     const innerTextWidth = textFeedWidth > maxWidth ? maxWidth : textFeedWidth;
 
-    textFeed.textX = textFeed.x + Math.floor((textFeed.width/2) - (innerTextWidth / 2));//come here
+    textFeed.textX = textFeed.x + Math.floor((textFeed.width/2) - (innerTextWidth / 2));
     textFeed.textY = textFeed.y + 20;
     textFeed.maxTextWidth = innerTextWidth;
 
@@ -416,12 +428,12 @@ function updateRenderElements() {
 
     let handCardHeight, handCardWidth, xStart, yStart;
 
-    if(fullScreenCardArea.width / fullScreenCardArea.height > handDisplayWidthRatio) {
-        const fullHandCardHeight = fullScreenCardArea.height;
-        const fullHandCardWidth = fullScreenCardArea.height * handDisplayHeightRatio;
+    if(fullScreenCardArea.width / fullScreenCardArea.height > handDisplayHeightRatio) {
+        const fullHandCardHeight = fullScreenCardArea.height - 20;
+        const fullHandCardWidth = fullHandCardHeight * handDisplayHeightRatio;
 
         xStart = fullScreenCardArea.x + Math.floor((fullScreenCardArea.width / 2) - (fullHandCardWidth / 2));
-        yStart = fullScreenCardArea.y;
+        yStart = fullScreenCardArea.y - 5;
 
         
         handCardHeight = fullHandCardHeight / 2;
@@ -431,11 +443,11 @@ function updateRenderElements() {
         handPageHitTest.height = fullHandCardHeight;
 
     } else {
-        const fullHandCardWidth = fullScreenCardArea.width;
-        const fullHandCardHeight = fullScreenCardArea.width * handDisplayWidthRatio;
+        const fullHandCardWidth = fullScreenCardArea.width - 20;
+        const fullHandCardHeight = fullHandCardWidth * handDisplayWidthRatio;
 
         yStart = fullScreenCardArea.y + Math.floor((fullScreenCardArea.height / 2) - (fullHandCardHeight / 2));
-        xStart = fullScreenCardArea.x;
+        xStart = fullScreenCardArea.x + Math.floor((fullScreenCardArea.width/2)-(fullHandCardWidth/2));
 
         
         handCardHeight = fullHandCardHeight / 2;
@@ -446,11 +458,13 @@ function updateRenderElements() {
 
     }
 
+    xStart -= Math.floor(fullScreenCardMargin);
+
     handPageHitTest.x = xStart;
     handPageHitTest.y = yStart;
 
-    handCardHeight = Math.floor(handCardHeight - fullScreenCardMargin);
-    handCardWidth = Math.floor(handCardWidth - 10);
+    handCardHeight = Math.floor(handCardHeight);
+    handCardWidth = Math.floor(handCardWidth);
 
 
     for(let x = 0;x<3;x++) {
@@ -572,6 +586,9 @@ function updateRenderElements() {
             statusIcon.hover.height = statusIcon.height + doubleHoverPadding;
         }
     }
+
+    noCardsTextX = innerLeftArea.x + Math.floor((innerLeftArea.width/2)-noCardsTextXOffset);
+    noCardsTextY = innerLeftArea.y + Math.floor((innerLeftArea.fullHeight/2)-noCardsTextYOffset);
 }
 
 function drawRectangle(rectangle,color) {
@@ -710,7 +727,7 @@ function CardScreenRenderer() {
     let toggleTextFeedTimeout = 150;
     let lastToggleTextSwap = 0;
 
-    this.processKey = function(key) {//todo add player-opn. pane toggling
+    this.processKey = function(key) {//todo add player/opponent pane toggling
         switch(key) {
             case "Space":
                 if(textFeedToggleButton.enabled) {
@@ -1050,7 +1067,6 @@ function CardScreenRenderer() {
             drawTextWhite(textFeedToggleButton.text,textFeedToggleButton.textX,textFeedToggleButton.collapsedTextY,moveButtonTextScale);
 
             if(this.sequencer.fullScreenCard) {
-//TODO MERGE FULLSCREEN LOGICISTICS
                 if(hoverType === hoverTypes.fullScreenCard) {
                     drawRectangle(fullScreenCard.hoverEffect,background.color);
                 }
@@ -1140,21 +1156,48 @@ function CardScreenRenderer() {
                         }
                         break;
                     case cardPageTypes.hand:
-                        let handCardIndex = 0;
-                        while(handCardIndex < this.sequencer.cardPageRenderData.length) {
-                            const handCard = handDisplaySlots[handCardIndex]
-                            if(hoverType === hoverTypes.handPageCard && handCardIndex === hoverIndex) {
-                                drawRectangle(handCard.hoverEffect,background.color);
+
+                        if(this.sequencer.viewingSelfCards || this.sequencer.opponentCardsVisible) {
+                            
+                            if(this.sequencer.cardPageRenderData.length === 0) {
+                                drawTextWhite(noCardsText,noCardsTextX,noCardsTextY,noCardsTextScale);
+                            } else {
+                                let handCardIndex = 0;
+                                while(handCardIndex < this.sequencer.cardPageRenderData.length) {
+                                    const handCard = handDisplaySlots[handCardIndex];
+                                    if(hoverType === hoverTypes.handPageCard && handCardIndex === hoverIndex) {
+                                        drawRectangle(handCard.hoverEffect,background.color);
+                                    }
+                                    renderCard(
+                                        this.sequencer.cardPageRenderData[handCardIndex],
+                                        handCard.x,
+                                        handCard.y,
+                                        handCard.width,
+                                        handCard.height
+                                    );
+                                    handCardIndex++;
+                                }
                             }
-                            renderCard(
-                                this.sequencer.cardPageRenderData[handCardIndex],
-                                handCard.x,
-                                handCard.y,
-                                handCard.width,
-                                handCard.height
-                            );
-                            handCardIndex++;
+
+                        } else {
+                            if(this.sequencer.cardPageRenderData.length === 0) {
+                                drawTextWhite(noCardsText,noCardsTextX,noCardsTextY,noCardsTextScale);
+                            } else {
+                                let handCardIndex = 0;
+                                while(handCardIndex < this.sequencer.cardPageRenderData.length) {
+                                    const handCard = handDisplaySlots[handCardIndex];
+                                    renderCardBack(
+                                        this.sequencer.cardPageRenderData[handCardIndex],
+                                        handCard.x,
+                                        handCard.y,
+                                        handCard.width,
+                                        handCard.height
+                                    );
+                                    handCardIndex++;
+                                }
+                            }
                         }
+
                         break;
                 }
             }
@@ -1205,9 +1248,10 @@ function CardScreenRenderer() {
         drawTextWhite(leftTableCycleButton.text,leftTableCycleButton.textX,leftTableCycleButton.textY,tableCycleButtonTextScale);
         drawTextWhite(rightTableCycleButton.text,rightTableCycleButton.textX,rightTableCycleButton.textY,tableCycleButtonTextScale);
 
+        /*
         if(hoverType === hoverTypes.bubbleSelector) {
-            //Todo this maybe?
         }
+        */
 
         if(this.sequencer.viewingSelfCards) {
             drawRectangle(leftBubbleSelector,"white");

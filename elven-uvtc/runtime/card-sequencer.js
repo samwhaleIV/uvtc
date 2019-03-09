@@ -140,10 +140,49 @@ function CardSequencer(renderer) {
         this.cardPageTextYOffset = -Math.floor(textTestResult.height / 2);
     }
 
-    this.viewingSelfCards = true;
+    this.opponentCardsVisible = false;
 
+    this.viewingSelfCards = true;
     this.updateCardPageTextOffset(`page 1 of 3 - ${getCardPageName(this.cardPageType,true)}`);
 
+/*
+    this.renderer.showTextFeed();
+    this.renderer.hideTextFeed();
+
+    this.lockInterface = function() {
+        this.renderer.lockViewTab();
+        this.renderer.lockTextFeedToggle();
+        this.renderer.lockPageCycle();
+        this.renderer.lockFullScreenCardEscape();
+    }
+
+    this.unlockInterface = function() {
+        this.renderer.unlockViewTab();
+        this.renderer.unlockTextFeedToggle();
+        this.renderer.unlockPageCycle();
+        this.renderer.unlockFullScreenCardEscape();
+    }
+*/
+    this.showFullScreenCard = function(card) {
+        this.fullScreenCard = card;
+    }
+    this.hideFullScreenCard = function() {
+        this.fullScreenCard = null;
+    }
+
+    this.showFullScreenStatus = function(status) {
+        this.fullScreenStatus = status;
+    }
+    this.hideFullScreenStatus = function() {
+        this.fullScreenStatus = null;
+    }
+    this.statusClicked = function(index) {
+
+    }
+
+    this.slotCardClicked = function(index) {
+
+    }
 
     this.activateNextPage = function() {
         //TODO
@@ -163,84 +202,11 @@ function CardSequencer(renderer) {
     }
 
     this.handCardClicked = function(index) {
-        this.showFullScreenCard(this.cardPageRenderData[index],true);
+        //TODO
     }
 
     this.cardClicked = function(index) {
         //TODO
-    }
-
-    const setButtonStates = enabled => {
-        for(let i = 0;i<this.buttonLookup.length;i++) {
-            this.buttonLookup[i].enabled = enabled;
-        }
-    }
-
-    this.disableButtons = function() {
-        setButtonStates(false);
-    }
-    this.enableButtons = function() {
-        //TODO: This method must make sure to allow the correct buttons only
-        setButtonStates(true);
-    }
-
-    this.lockInterface = function() {
-        this.renderer.lockViewTab();
-        this.renderer.lockTextFeedToggle();
-        this.renderer.lockPageCycle();
-        this.renderer.lockFullScreenCardEscape();
-        this.disableButtons();
-        //this.renderer.showTextFeed();
-    }
-
-    this.unlockInterface = function() {
-        this.renderer.unlockViewTab();
-        this.renderer.unlockTextFeedToggle();
-        this.renderer.unlockPageCycle();
-        this.renderer.unlockFullScreenCardEscape();
-        this.enableButtons();
-        //this.renderer.hideTextFeed();
-    }
-
-    this.showFullScreenCard = function(card) {
-
-        this.renderer.lockViewTab();
-        this.renderer.lockPageCycle();
-        this.disableButtons();
-
-        this.fullScreenCard = card;
-    }
-    this.hideFullScreenCard = function() {
-        //TODO: If this is from a [draw action] or something, advance the event stack if there is one
-        this.renderer.unlockViewTab();
-        this.renderer.unlockPageCycle();
-        this.enableButtons();
-
-        this.fullScreenCard = null;
-    }
-
-    this.showFullScreenStatus = function(status) {
-        this.fullScreenStatus = status;
-        //todo
-    }
-    this.hideFullScreenStatus = function() {
-        this.fullScreenStatus = null;
-        //todo
-    }
-    this.statusClicked = function(index) {
-        this.showFullScreenStatus(
-            allStatuses[0]
-        );
-    }
-
-    this.slotCardClicked = function(index) {
-        this.showFullScreenCard(this.cardPageRenderData[index]);
-    }
-
-    this.getButtonNavigationIndex = function(currentIndex) {
-        //TODO: Implement this can call this when are are ready for keyboard support.
-        //return null if we go to the right, return the same if no movement.
-        return currentIndex;
     }
 
 }
