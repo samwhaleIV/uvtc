@@ -5,11 +5,13 @@ const doubleCardTitlePadding = cardTitlePadding + cardTitlePadding;
 const fullScreenCardEnergyWidth = 64;
 
 function renderStatus(status,x,y,width,height) {
-    //todo: Render the name
+    //todo: Render the name?
     if(status) {
         context.drawImage(imageDictionary[status.imagePath],status.imageX,status.imageY,64,64,x,y,width,height)
     } else {
-        context.drawImage(imageDictionary["ui/card-icons"],64,0,32,32,x,y,width,height);
+        context.fillStyle = "rgba(255,255,255,1)";
+        context.fillRect(Math.floor(x),Math.floor(y),Math.floor(width),Math.floor(height));
+        //context.drawImage(imageDictionary["ui/card-icons"],64,0,32,32,x,y,width,height);
     }
 }
 function renderStatusFullscreen(status,x,y,width,height) {
