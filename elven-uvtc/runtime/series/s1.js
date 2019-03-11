@@ -2,7 +2,7 @@ addCardSeries([
     {
         name: "bear necessities",
         type: "attack",
-        description: "allows you to attack at the bare minimum",
+        description: "allows you to attack at the bare minimum: 1 damage",
         energyCost: 0
     },
     {

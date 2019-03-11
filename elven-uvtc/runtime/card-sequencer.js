@@ -12,9 +12,23 @@ const getCardPageName = function(cardPageType,isPlayer) {
         case cardPageTypes.hand:
             return `${isPlayer?"your":"their"} hand`;
         case cardPageTypes.field:
-            return "conditions and field";//This is a global page
+            return `${isPlayer?"your":"their"} conditions`;
     }
 }
+const getPageTypeFromIndex = function(index) {
+    switch(index) {
+        default:
+            console.error("Invalid index for card page types!");
+            return cardPageTypes.hand;
+        case 0:
+            return cardPageTypes.hand;
+        case 1:
+            return cardPageTypes.slots;
+        case 2:
+            return cardPageTypes.field;
+    }
+}
+
 const defaultCardPageType = cardPageTypes.hand;
 const defaultOpponentCardPageType = cardPageTypes.slots;
 function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
@@ -24,22 +38,40 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
 
     this.playerState = {
         health: 6,
-        energy: 99,
-        fullDeck: playerDeck
+        energy: 6,
+        fullDeck: playerDeck,
+        discardDeck: [],
+        usableDeck: [...playerDeck],
+        hand: [],
+        slots: {
+            defense: null,
+            attack: null,
+            special: null
+        },
+        conditions: []
     };
 
     this.opponentState = {
         health: 6,
-        energy: 0,
-        fullDeck: opponentDeck
+        energy: 6,
+        fullDeck: opponentDeck,
+        discardDeck: [],
+        usableDeck: [...opponentDeck],
+        hand: [],
+        slots: {
+            defense: null,
+            attack: null,
+            special: null
+        },
+        conditions: []
     };
     this.opponentSequencer = opponentSequencer;
 
     this.nextButtonShown = false;
     this.nextButtonEnabled = false;
 
-    this.fieldLeftIconText = "deck - 40";
-    this.fieldRightIconText = "discarded - 40";
+    this.fieldLeftIconText = undefined;
+    this.fieldRightIconText = undefined;
 
     this.buttonRows = [
         [
@@ -124,12 +156,6 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
 
     this.fullScreenStatus = null;
     this.fullScreenCard = null;
-    this.playerTable = {
-    };
-    this.opponentTable = {
-    };
-
-    this.cardPageRenderData = allCardsList.slice(0,6);//DEBUG
 
     this.cardPageType = defaultCardPageType;
     this.cardPageText;
@@ -137,8 +163,12 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     this.cardPageTextXOffset = 0;
     this.cardPageTextYOffset = 0;
 
-    this.updateCardPageTextOffset = function(text) {
-        //This can and probably should be refactored into the renderer but the benefits aren't that great
+    this.pageIndex = 0;
+
+    this.updateCardPageText = function(customText=null) {
+        const text = customText !== null ? customText : `page ${this.pageIndex+1} of 3 - ${
+            getCardPageName(this.cardPageType,this.viewingSelfCards)
+        }`;
         this.cardPageText = text;
         const textTestResult = drawTextTest(text,this.cardPageTextScale);
         this.cardPageTextXOffset = -Math.floor(textTestResult.width / 2);
@@ -146,13 +176,11 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     }
 
     this.opponentCardsVisible = false;
-
     this.viewingSelfCards = true;
-    this.updateCardPageTextOffset(`page 1 of 3 - ${getCardPageName(this.cardPageType,true)}`);
 
-/*
-    this.renderer.showTextFeed();
-    this.renderer.hideTextFeed();
+
+    //this.renderer.showTextFeed();
+    //this.renderer.hideTextFeed();
 
     this.lockInterface = function() {
         this.renderer.lockViewTab();
@@ -167,37 +195,70 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         this.renderer.unlockPageCycle();
         this.renderer.unlockFullScreenCardEscape();
     }
-*/
-    this.showFullScreenCard = function(card) {
-        this.fullScreenCard = card;
-    }
-    this.hideFullScreenCard = function() {
-        this.fullScreenCard = null;
-    }
 
-    this.showFullScreenStatus = function(status) {
-        this.fullScreenStatus = status;
-    }
-    this.hideFullScreenStatus = function() {
-        this.fullScreenStatus = null;
-    }
-    this.statusClicked = function(index) {
 
-    }
-
-    this.slotCardClicked = function(index) {
-
+    this.updateRendererData = function() {
+        const state = this.viewingSelfCards ? this.playerState : this.opponentState;
+        switch(this.cardPageType) {
+            case cardPageTypes.hand:
+                this.cardPageRenderData = state.hand;
+                break;
+            case cardPageTypes.slots:
+                this.cardPageRenderData = [
+                    state.slots.defense,
+                    state.slots.attack,
+                    state.slots.special
+                ];
+                break;
+            case cardPageTypes.field:
+                this.fieldLeftIconText = `deck - ${state.usableDeck.length}`;
+                this.fieldRightIconText = `discarded - ${state.discardDeck.length}`;
+                this.cardPageRenderData = state.conditions;
+                break;
+        }
     }
 
     this.activateNextPage = function() {
+        switch(this.pageIndex) {
+            case 0:
+                this.pageIndex = 1;
+                break;
+            case 1:
+                this.pageIndex = 2;
+                break;
+            case 2:
+                this.pageIndex = 0;
+                break;
+        }
+        this.cardPageType = getPageTypeFromIndex(this.pageIndex);
+        this.updateRendererData();
+        this.updateCardPageText();
         //TODO
     }
     this.activatePreviousPage = function() {
+        switch(this.pageIndex) {
+            case 0:
+                this.pageIndex = 2;
+                break;
+            case 1:
+                this.pageIndex = 0;
+                break;
+            case 2:
+                this.pageIndex = 1;
+                break;
+        }
+        this.cardPageType = getPageTypeFromIndex(this.pageIndex);
+        this.updateRendererData();
+        this.updateCardPageText();
         //TODO
     }
 
+
+
     this.switchedPanes = function() {
         this.viewingSelfCards = !this.viewingSelfCards;
+        this.updateRendererData();
+        this.updateCardPageText();
         //TODO
         //Should set to first page on switch because player and oppon. can(? might not do that) have varying numbers of pages
     }
@@ -207,15 +268,65 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     }
 
     this.handCardClicked = function(index) {
-        //TODO
-    }
-
-    this.cardClicked = function(index) {
-        //TODO
+        if(this.viewingSelfCards) {
+            this.fullScreenCard = this.cardPageRenderData[index];
+            this.renderer.lockPageCycle();
+            this.renderer.lockViewTab();
+            this.updateButtonStates(true);
+        }
     }
 
     this.nextButtonClicked = function() {
         //TODO
     }
+
+    this.updateButtonStates = function(disableAll) {
+        if(disableAll) {
+            for(let i = 0;i<this.buttonLookup.length;i++) {
+                this.buttonLookup[i].enabled = false;
+            }
+        } else {
+            //TODO
+        }
+    }
+
+    
+    this.hideFullScreenCard = function() {
+        //Only called through the renderer
+        this.fullScreenCard = null;
+        this.renderer.unlockPageCycle();
+        this.renderer.unlockViewTab();
+        this.updateButtonStates(false);
+    }
+
+    this.hideFullScreenStatus = function() {
+        //Only called through the renderer
+        this.fullScreenStatus = null;
+    }
+    
+    this.statusClicked = function(index) {
+
+    }
+
+    this.slotCardClicked = function(index) {
+
+    }
+
+    for(let i = 0;i<6;i++) {
+        if(this.playerState.usableDeck.length>0) {
+            const cardIndex = Math.floor(this.playerState.usableDeck.length*Math.random());
+            this.playerState.hand.push(this.playerState.usableDeck[cardIndex]);
+            this.playerState.usableDeck.splice(cardIndex,1);
+        }
+        if(this.opponentState.usableDeck.length>0) {
+            const cardIndex = Math.floor(this.opponentState.usableDeck.length*Math.random());
+            this.opponentState.hand.push(this.opponentState.usableDeck[cardIndex]);
+            this.opponentState.usableDeck.splice(cardIndex,1);
+        }
+    }
+
+
+    this.updateCardPageText();
+    this.updateRendererData();
 
 }

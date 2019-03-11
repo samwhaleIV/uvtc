@@ -745,9 +745,9 @@ function CardScreenRenderer(sequencer,callbacks,background) {
     this.loseCallback = callbacks.lose;
     this.quitCallback = callbacks.quit;
 
-    this.background = new CardBackground("backgrounds/card-test");
+    this.background = background;
+    this.sequencer = sequencer;
 
-    this.sequencer = new CardSequencer(this);
     let viewTabLocked = false;
 
     let hoverType = hoverTypes.none;
@@ -950,7 +950,7 @@ function CardScreenRenderer(sequencer,callbacks,background) {
                 }
                 break;
             case hoverTypes.cycleButtons:
-                if(hoverIndex) {
+                if(hoverIndex === 0) {
                     this.sequencer.activatePreviousPage();
                 } else {
                     this.sequencer.activateNextPage();

@@ -5,13 +5,13 @@ drawLoadingText();
 function loadCallback() {
     setRendererState(
         new CardScreenRenderer(
-            new CardSequencer([],[],null),
+            new CardSequencer([allCardsList[0]],[],null),
             {
                 win: ()=>{},
                 lose: ()=>{},
                 quit: ()=>{}
             },
-            new CardBackground("card-test")
+            new CardBackground("backgrounds/card-test")
         )
     );
     startRenderer();
