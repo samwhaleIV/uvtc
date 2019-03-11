@@ -447,9 +447,6 @@ function updateRenderElements() {
         handCardHeight = fullHandCardHeight / 2;
         handCardWidth = fullHandCardWidth / 3;
 
-        handPageHitTest.width = fullHandCardWidth;
-        handPageHitTest.height = fullHandCardHeight;
-
     } else {
         const fullHandCardWidth = fullScreenCardArea.width - 20;
         const fullHandCardHeight = fullHandCardWidth * handDisplayWidthRatio;
@@ -461,15 +458,9 @@ function updateRenderElements() {
         handCardHeight = fullHandCardHeight / 2;
         handCardWidth = fullHandCardWidth / 3;
 
-        handPageHitTest.width = fullHandCardWidth;
-        handPageHitTest.height = fullHandCardHeight;
-
     }
 
     xStart -= Math.floor(fullScreenCardMargin);
-
-    handPageHitTest.x = xStart;
-    handPageHitTest.y = yStart;
 
     handCardHeight = Math.floor(handCardHeight);
     handCardWidth = Math.floor(handCardWidth);
@@ -492,6 +483,12 @@ function updateRenderElements() {
             displaySlot.hoverEffect.height = displaySlot.height + doubleHoverPadding;
         }
     }
+
+    handPageHitTest.x = handDisplaySlots[0].x;
+    handPageHitTest.y = handDisplaySlots[0].y;
+
+    handPageHitTest.width = (handDisplaySlots[2].x + handDisplaySlots[2].width) - handDisplaySlots[0].x;
+    handPageHitTest.height = (handDisplaySlots[3].y + handDisplaySlots[3].height) - handDisplaySlots[0].y;
 
     const slotDisplayIconSize = handDisplaySlots[0].width;
     const slotDisplayIconXOffset = Math.floor((handDisplaySlots[0].width/2)-(slotDisplayIconSize/2));
@@ -570,10 +567,10 @@ function updateRenderElements() {
     statusIconFullArea.height = (handDisplaySlots[2].y + handDisplaySlots[2].height) - handDisplaySlots[0].y,
     statusIconFullArea.width = ((handDisplaySlots[2].x + handDisplaySlots[2].width) - handDisplaySlots[0].x)-40,
 
-    statusIconWidth = statusIconFullArea.width / 5;
+    statusIconWidth = Math.ceil(statusIconFullArea.width / 5);
     statusIconHeight = statusIconWidth;
 
-    xStart = statusIconFullArea.x;
+    xStart = statusIconFullArea.x - 1;
     yStart = statusIconFullArea.y + 5;
 
     for(let x = 0;x<5;x++) {
@@ -721,6 +718,23 @@ const hoverTypes = {
 }
 
 const defaultHoverIndex = -1;
+const barPulseTime = 200;
+
+const getBarColorForShade = function(whiteBackground,shade,isRed) {
+    if(whiteBackground) {
+        if(isRed) {
+            return `rgb(255,${shade},${shade})`;
+        } else {
+            return `rgb(${shade},255,${shade})`;
+        }
+    } else {
+        if(isRed) {
+            return `rgb(${255-shade},0,0)`;
+        } else {
+            return `rgb(0,${255-shade},0)`;
+        }
+    }
+}
 
 function CardScreenRenderer(sequencer,callbacks,background) {
 
@@ -749,12 +763,61 @@ function CardScreenRenderer(sequencer,callbacks,background) {
 
     updateRenderElements();
 
-    this.updateSize = function() {
-        updateRenderElements();
-    }
+    this.updateSize = updateRenderElements;
 
     let toggleTextFeedTimeout = 150;
     let lastToggleTextSwap = 0;
+
+    this.playerPulseStart = -barPulseTime;
+    this.playerPulseType = -1;
+
+    this.opponentPulseStart = -barPulseTime;
+    this.opponentPulseType = -1;
+
+    this.playerHealthPulse = function() {
+        this.playerPulseStart = performance.now();
+        this.playerPulseType = 0;
+    }
+    this.playerEnergyPulse = function() {
+        this.playerPulseStart = performance.now();
+        this.playerPulseType = 1;
+    }
+    this.opponentHealthPulse = function() {
+        this.opponentPulseStart = performance.now();
+        this.opponentPulseType = 0;
+    }
+    this.opponentEnergyPulse = function() {
+        this.opponentPulseStart = performance.now();
+        this.opponentPulseType = 1;
+    }
+
+    this.getPlayerBarColor = function(timestamp) {
+        if(this.playerPulseType === -1) {
+            return this.sequencer.viewingSelfCards ? "white" : "black";
+        } else {
+            let shade = (timestamp - this.playerPulseStart) / barPulseTime;
+            if(shade > 1) {
+                this.playerPulseType = -1;
+                shade = 1;
+            }
+            shade = Math.floor(shade * 256);
+
+            return getBarColorForShade(this.sequencer.viewingSelfCards,shade,this.playerPulseType === 0);
+        }
+    }
+    this.getOpponentBarColor = function(timestamp) {
+        if(this.opponentPulseType === -1) {
+            return this.sequencer.viewingSelfCards ? "black" : "white";
+        } else {
+            let shade = (timestamp - this.opponentPulseStart) / barPulseTime;
+            if(shade > 1) {
+                this.opponentPulseType = -1;
+                shade = 1;
+            }
+            shade = Math.floor(shade * 256);
+            return getBarColorForShade(!this.sequencer.viewingSelfCards,shade,this.opponentPulseType === 0);
+        }
+    }
 
     this.processKey = function(key) {//todo add player/opponent pane toggling
         switch(key) {
@@ -1297,14 +1360,12 @@ function CardScreenRenderer(sequencer,callbacks,background) {
             drawTextWhite(rightTableCycleButton.text,rightTableCycleButton.textX,rightTableCycleButton.textY,tableCycleButtonTextScale);
         }
 
+        drawRectangle(leftBubbleSelector,this.getPlayerBarColor(timestamp));
+        drawRectangle(rightBubbleSelector,this.getOpponentBarColor(timestamp));
         if(this.sequencer.viewingSelfCards) {
-            drawRectangle(leftBubbleSelector,"white");
-            drawRectangle(rightBubbleSelector,"black");
             drawTextBlack(playerNameText,leftBubbleText.x,leftBubbleText.y,leftBubbleText.scale);
             drawTextWhite(opponentNameText,rightBubbleText.x,rightBubbleText.y,rightBubbleText.scale);
         } else {
-            drawRectangle(leftBubbleSelector,"black");
-            drawRectangle(rightBubbleSelector,"white");
             drawTextWhite(playerNameText,leftBubbleText.x,leftBubbleText.y,leftBubbleText.scale);
             drawTextBlack(opponentNameText,rightBubbleText.x,rightBubbleText.y,rightBubbleText.scale);
         }

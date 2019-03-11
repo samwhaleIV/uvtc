@@ -9,7 +9,7 @@ function renderStatus(status,x,y,width,height) {
     if(status) {
         context.drawImage(imageDictionary[status.imagePath],status.sourceX,0,internalStatusWidth,internalStatusHeight,x,y,width,height)
     } else {
-        context.fillStyle = "rgba(255,255,255,1)";
+        context.fillStyle = "white";
         context.fillRect(Math.floor(x),Math.floor(y),Math.floor(width),Math.floor(height));
         //context.drawImage(imageDictionary["ui/card-icons"],64,0,32,32,x,y,width,height);
     }
