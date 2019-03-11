@@ -4,7 +4,15 @@ drawLoadingText();
 
 function loadCallback() {
     setRendererState(
-        new CardScreenRenderer()
+        new CardScreenRenderer(
+            new CardSequencer([],[],null),
+            {
+                win: ()=>{},
+                lose: ()=>{},
+                quit: ()=>{}
+            },
+            new CardBackground("card-test")
+        )
     );
     startRenderer();
 }

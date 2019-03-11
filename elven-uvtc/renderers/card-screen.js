@@ -185,6 +185,14 @@ const handDisplaySlots = [];
     }
 })();
 
+const nextButton = {
+    area: {},
+    hover: {},
+    text: "continue",
+    textXOffset: undefined
+}
+nextButton.textXOffset = Math.floor(drawTextTest(nextButton.text,tableCycleButtonTextScale).width/2);
+
 const handPageHitTest = {};
 const slotsDisplaySlots = [];
 (function(){
@@ -526,8 +534,7 @@ function updateRenderElements() {
             slotSlot.iconTextY = slotSlot.icon.y - slotSlot.iconTextHeight - 7;
         }
 
-        const yStart = slotSlot.icon.y - 15;
-
+        const yStart = handDisplaySlots[0].y + handDisplaySlots[0].height + 20;
         slotSlot.iconTextY = Math.floor(slotSlot.iconTextY);
         slotSlot.iconTextX = Math.floor(slotSlot.iconTextX);
 
@@ -561,12 +568,12 @@ function updateRenderElements() {
     statusIconFullArea.x = handDisplaySlots[0].x,
     statusIconFullArea.y = handDisplaySlots[0].y + 15,
     statusIconFullArea.height = (handDisplaySlots[2].y + handDisplaySlots[2].height) - handDisplaySlots[0].y,
-    statusIconFullArea.width = (handDisplaySlots[2].x + handDisplaySlots[2].width) - handDisplaySlots[0].x,
+    statusIconFullArea.width = ((handDisplaySlots[2].x + handDisplaySlots[2].width) - handDisplaySlots[0].x)-40,
 
     statusIconWidth = statusIconFullArea.width / 5;
     statusIconHeight = statusIconWidth;
 
-    xStart = statusIconFullArea.x - 20;
+    xStart = statusIconFullArea.x;
     yStart = statusIconFullArea.y + 5;
 
     for(let x = 0;x<5;x++) {
@@ -589,6 +596,20 @@ function updateRenderElements() {
 
     noCardsTextX = innerLeftArea.x + Math.floor((innerLeftArea.width/2)-noCardsTextXOffset);
     noCardsTextY = innerLeftArea.y + Math.floor((innerLeftArea.fullHeight/2)-noCardsTextYOffset);
+
+    nextButton.area.x = leftTableCycleButton.x;
+    nextButton.area.y = leftTableCycleButton.y;
+
+    nextButton.area.width = (rightTableCycleButton.x + leftTableCycleButton.width) - leftTableCycleButton.x;
+    nextButton.area.height = leftTableCycleButton.height;
+
+    nextButton.hover.x = nextButton.area.x - hoverPadding;
+    nextButton.hover.y = nextButton.area.y - hoverPadding;
+    nextButton.hover.width = nextButton.area.width + doubleHoverPadding;
+    nextButton.hover.height = nextButton.area.height + doubleHoverPadding;
+
+    nextButton.textX = nextButton.area.x + Math.floor((nextButton.area.width/2)-nextButton.textXOffset);
+
 }
 
 function drawRectangle(rectangle,color) {
@@ -695,14 +716,22 @@ const hoverTypes = {
     handPageCard: Symbol("handPageCard"),
     fullScreenStatus: Symbol("fullScreenStatus"),
     statusIcon: Symbol("statusIcon"),
-    slotCard: Symbol("slotCard")
+    slotCard: Symbol("slotCard"),
+    nextButton: Symbol("nextButton")
 }
 
 const defaultHoverIndex = -1;
 
-function CardScreenRenderer() {
+function CardScreenRenderer(sequencer,callbacks,background) {
 
-    const background = new CardBackground("backgrounds/card-test");
+    this.sequencer = sequencer;
+    this.sequencer.renderer = this;
+
+    this.winCallback = callbacks.win;
+    this.loseCallback = callbacks.lose;
+    this.quitCallback = callbacks.quit;
+
+    this.background = new CardBackground("backgrounds/card-test");
 
     this.sequencer = new CardSequencer(this);
     let viewTabLocked = false;
@@ -827,6 +856,9 @@ function CardScreenRenderer() {
     this.processClickEnd = function(x,y) {
         showHoverSpecialEffect = false;
         switch(hoverType) {
+            case hoverTypes.nextButton:
+                this.sequencer.nextButtonClicked();
+                break;
             case hoverTypes.statusIcon:
                 this.sequencer.statusClicked(hoverIndex);
                 break;
@@ -921,6 +953,10 @@ function CardScreenRenderer() {
                     return;
                 } else if(contains(mouseX,mouseY,bubbleSelectorHitTest)) {
                     hoverType = hoverTypes.bubbleSelector;
+                    hoverIndex = 0;
+                    return;
+                } else if(this.sequencer.nextButtonShown && contains(mouseX,mouseY,nextButton.area)) {
+                    hoverType = hoverTypes.nextButton;
                     hoverIndex = 0;
                     return;
                 } else if(contains(mouseX,mouseY,leftTableCycleButton)) {
@@ -1021,7 +1057,7 @@ function CardScreenRenderer() {
     }
 
     this.render = function(timestamp) {
-        background.render(timestamp);
+        this.background.render(timestamp);
 
         drawColoredRectangle(rightBar);
         drawColoredRectangle(innerRightBar);
@@ -1068,7 +1104,7 @@ function CardScreenRenderer() {
 
             if(this.sequencer.fullScreenCard) {
                 if(hoverType === hoverTypes.fullScreenCard) {
-                    drawRectangle(fullScreenCard.hoverEffect,background.color);
+                    drawRectangle(fullScreenCard.hoverEffect,this.background.color);
                 }
                 renderCardFullScreen(
                     this.sequencer.fullScreenCard,
@@ -1077,7 +1113,7 @@ function CardScreenRenderer() {
                 );
             } else if(this.sequencer.fullScreenStatus) {
                 if(hoverType === hoverTypes.fullScreenStatus) {
-                    drawRectangle(fullScreenStatusIcon.hover,background.color);
+                    drawRectangle(fullScreenStatusIcon.hover,this.background.color);
                 }
                 renderStatusFullscreen(
                     this.sequencer.fullScreenStatus,
@@ -1092,7 +1128,7 @@ function CardScreenRenderer() {
                             const statusIcon = this.sequencer.cardPageRenderData[statusIconIndex];
                             const statusIconRenderData = statusIcons[statusIconIndex];
                             if(hoverType === hoverTypes.statusIcon && hoverIndex === statusIconIndex && statusIcon) {
-                                drawRectangle(statusIconRenderData.hover,background.color);
+                                drawRectangle(statusIconRenderData.hover,this.background.color);
                             }
                             renderStatus(
                                 statusIcon,
@@ -1133,7 +1169,7 @@ function CardScreenRenderer() {
                             const displaySlot = slotsDisplaySlots[slotDisplayIndex];
                             if(this.sequencer.cardPageRenderData[slotDisplayIndex]) {
                                 if(hoverType === hoverTypes.slotCard && slotDisplayIndex === hoverIndex) {
-                                    drawRectangle(displaySlot.hover,background.color);
+                                    drawRectangle(displaySlot.hover,this.background.color);
                                 }
                                 renderCard(
                                     this.sequencer.cardPageRenderData[slotDisplayIndex],
@@ -1166,7 +1202,7 @@ function CardScreenRenderer() {
                                 while(handCardIndex < this.sequencer.cardPageRenderData.length) {
                                     const handCard = handDisplaySlots[handCardIndex];
                                     if(hoverType === hoverTypes.handPageCard && handCardIndex === hoverIndex) {
-                                        drawRectangle(handCard.hoverEffect,background.color);
+                                        drawRectangle(handCard.hoverEffect,this.background.color);
                                     }
                                     renderCard(
                                         this.sequencer.cardPageRenderData[handCardIndex],
@@ -1210,48 +1246,56 @@ function CardScreenRenderer() {
             this.sequencer.cardPageTextScale
         );
 
-        if(hoverType === hoverTypes.cycleButtons) {
-            if(hoverIndex === 0) {
-                context.fillStyle = context.fillStyle = pageCycleEnabled ? background.color : "gray";
-                context.fillRect(
-                    leftTableCycleButton.hoverX,leftTableCycleButton.hoverY,
-                    leftTableCycleButton.hoverWidth,leftTableCycleButton.hoverHeight
-                );
+        if(this.sequencer.nextButtonShown) {
+            if(hoverType === hoverTypes.nextButton) {
+                drawRectangle(nextButton.hover,this.sequencer.nextButtonEnabled ? this.background.color : "gray");
+            }
+            drawRectangle(
+                nextButton.area,getButtonForegroundColor(
+                    hoverType === hoverTypes.nextButton,
+                    showHoverSpecialEffect,
+                    this.sequencer.nextButtonEnabled
+                )
+            );
+            drawTextWhite(nextButton.text,nextButton.textX,leftTableCycleButton.textY,tableCycleButtonTextScale);
+        } else {
+            if(hoverType === hoverTypes.cycleButtons) {
+                if(hoverIndex === 0) {
+                    context.fillStyle = context.fillStyle = pageCycleEnabled ? this.background.color : "gray";
+                    context.fillRect(
+                        leftTableCycleButton.hoverX,leftTableCycleButton.hoverY,
+                        leftTableCycleButton.hoverWidth,leftTableCycleButton.hoverHeight
+                    );
+                    drawRectangle(leftTableCycleButton,getButtonForegroundColor(
+                        true,showHoverSpecialEffect,pageCycleEnabled
+                    ));
+                    drawRectangle(rightTableCycleButton,getButtonForegroundColor(
+                        false,showHoverSpecialEffect,pageCycleEnabled
+                    ));
+                } else {
+                    context.fillStyle = context.fillStyle = pageCycleEnabled ? this.background.color : "gray";
+                    context.fillRect(
+                        rightTableCycleButton.hoverX,rightTableCycleButton.hoverY,
+                        rightTableCycleButton.hoverWidth,rightTableCycleButton.hoverHeight
+                    );
+                    drawRectangle(rightTableCycleButton,getButtonForegroundColor(
+                        true,showHoverSpecialEffect,pageCycleEnabled
+                    ));
+                    drawRectangle(leftTableCycleButton,getButtonForegroundColor(
+                        false,showHoverSpecialEffect,pageCycleEnabled
+                    ));
+                }
+            } else {
                 drawRectangle(leftTableCycleButton,getButtonForegroundColor(
-                    true,showHoverSpecialEffect,pageCycleEnabled
-                ));
-                drawRectangle(rightTableCycleButton,getButtonForegroundColor(
                     false,showHoverSpecialEffect,pageCycleEnabled
                 ));
-            } else {
-                context.fillStyle = context.fillStyle = pageCycleEnabled ? background.color : "gray";
-                context.fillRect(
-                    rightTableCycleButton.hoverX,rightTableCycleButton.hoverY,
-                    rightTableCycleButton.hoverWidth,rightTableCycleButton.hoverHeight
-                );
                 drawRectangle(rightTableCycleButton,getButtonForegroundColor(
-                    true,showHoverSpecialEffect,pageCycleEnabled
-                ));
-                drawRectangle(leftTableCycleButton,getButtonForegroundColor(
                     false,showHoverSpecialEffect,pageCycleEnabled
                 ));
             }
-        } else {
-            drawRectangle(leftTableCycleButton,getButtonForegroundColor(
-                false,showHoverSpecialEffect,pageCycleEnabled
-            ));
-            drawRectangle(rightTableCycleButton,getButtonForegroundColor(
-                false,showHoverSpecialEffect,pageCycleEnabled
-            ));
+            drawTextWhite(leftTableCycleButton.text,leftTableCycleButton.textX,leftTableCycleButton.textY,tableCycleButtonTextScale);
+            drawTextWhite(rightTableCycleButton.text,rightTableCycleButton.textX,rightTableCycleButton.textY,tableCycleButtonTextScale);
         }
-
-        drawTextWhite(leftTableCycleButton.text,leftTableCycleButton.textX,leftTableCycleButton.textY,tableCycleButtonTextScale);
-        drawTextWhite(rightTableCycleButton.text,rightTableCycleButton.textX,rightTableCycleButton.textY,tableCycleButtonTextScale);
-
-        /*
-        if(hoverType === hoverTypes.bubbleSelector) {
-        }
-        */
 
         if(this.sequencer.viewingSelfCards) {
             drawRectangle(leftBubbleSelector,"white");
@@ -1267,6 +1311,6 @@ function CardScreenRenderer() {
 
         this.renderStatusIcons();
 
-        renderButtonRows(this.sequencer,hoverType === hoverTypes.moveButtons,hoverIndex,showHoverSpecialEffect,background.color);
+        renderButtonRows(this.sequencer,hoverType === hoverTypes.moveButtons,hoverIndex,showHoverSpecialEffect,this.background.color);
     }
 }

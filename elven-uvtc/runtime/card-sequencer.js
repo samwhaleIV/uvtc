@@ -17,21 +17,26 @@ const getCardPageName = function(cardPageType,isPlayer) {
 }
 const defaultCardPageType = cardPageTypes.hand;
 const defaultOpponentCardPageType = cardPageTypes.slots;
-function CardSequencer(renderer,playerDeck,opponentDeck,opponentSequencer) {
+function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
 
-    this.renderer = renderer;
-
+    this.renderer = null;
     this.textFeed = processTextForWrapping( "this is a test yeeeeeeeeeeeeeeeeeet here's some new lines... fuck my ass.\n\nif the word is too long for one line we have no way of breaking it into it's own lines. woops" );
 
     this.playerState = {
         health: 6,
-        energy: 99
+        energy: 99,
+        fullDeck: playerDeck
     };
 
     this.opponentState = {
         health: 6,
-        energy: 0
+        energy: 0,
+        fullDeck: opponentDeck
     };
+    this.opponentSequencer = opponentSequencer;
+
+    this.nextButtonShown = false;
+    this.nextButtonEnabled = false;
 
     this.fieldLeftIconText = "deck - 40";
     this.fieldRightIconText = "discarded - 40";
@@ -206,6 +211,10 @@ function CardSequencer(renderer,playerDeck,opponentDeck,opponentSequencer) {
     }
 
     this.cardClicked = function(index) {
+        //TODO
+    }
+
+    this.nextButtonClicked = function() {
         //TODO
     }
 
