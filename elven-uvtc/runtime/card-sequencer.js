@@ -359,9 +359,12 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         }
         this.playerState.slots[name] = this.playerState.hand[this.fullScreenCardIndex];
         this.playerState.hand.splice(this.fullScreenCardIndex,1);
-        this.playerState.energy -= this.playerState.slots[name].energyCost;//TODO: put through energy modifier
-        this.renderer.playerEnergyPulse();
-        playSound("energy-reverse");
+        const energyCost = this.playerState.slots[name].energyCost;//TODO: put through energy modifier
+        if(energyCost) {
+            this.playerState.energy -= energyCost;
+            this.renderer.playerEnergyPulse();
+            playSound("energy-reverse");
+        }
         this.fullScreenCard = null;
         this.renderer.unlockPageCycle();
         this.renderer.unlockViewTab();
@@ -379,7 +382,12 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
 
         this.opponentState.slots[name] = this.opponentState.hand[index];
         this.opponentState.hand.splice(index,1);
-        this.opponentState.energy -= this.opponentState.slots[name].energyCost;//TODO: put through energy modifier
+        const energyCost = this.opponentState.slots[name].energyCost//TODO: put through energy modifier
+        if(energyCost) {
+            this.opponentState.energy -= energyCost;
+            this.renderer.opponentEnergyPulse();
+            playSound("energy-reverse");
+        }
         return actionResultText;     
     }
 
@@ -390,9 +398,12 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         switch(this.buttonLookup[index].text) {
             case useButtonText:
                 const usedCard = this.playerState.hand[this.fullScreenCardIndex];
-                this.playerState.energy -= usedCard.energyCost;//TODO: put through energy modifier
-                this.renderer.playerEnergyPulse();
-                playSound("energy-reverse");
+                const energyCost = usedCard.energyCost;//TODO: put through energy modifier
+                if(energyCost) {
+                    this.playerState.energy -= energyCost;
+                    this.renderer.playerEnergyPulse();
+                    playSound("energy-reverse");
+                }
                 this.playerState.hand.splice(this.fullScreenCardIndex,1);
                 actionResultText = `used '${usedCard.name}'`;
                 const actionResult = usedCard.action(this,this.playerState);
@@ -543,9 +554,13 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                     const usedCard = this.opponentState.hand[actionDataResult.cardIndex];
                     this.nextNextButtonCard = usedCard;
 
-                    this.opponentState.energy -= usedCard.energyCost;//TODO: put through energy modifier
-                    this.renderer.opponentEnergyPulse();
-                    playSound("energy-reverse");
+                    const energyCost = usedCard.energyCost;//TODO: put through energy modifier
+                    if(energyCost) {
+                        this.opponentState.energy -= energyCost;
+                        this.renderer.opponentEnergyPulse();
+                        playSound("energy-reverse");
+                    }
+                    
                     this.opponentState.hand.splice(actionDataResult.cardIndex,1);
                     textResult = `opponent used '${usedCard.name}'`;
                     const actionResult = usedCard.action(this,this.opponentState);
