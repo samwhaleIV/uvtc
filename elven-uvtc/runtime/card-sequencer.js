@@ -59,7 +59,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             attack: null,
             special: null
         },
-        conditions: []
+        conditions: [allStatuses[0]]
     };
 
     this.opponentState = {
@@ -123,10 +123,10 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         this.updateCardPageText();
 
         if(this.fullScreenStatus) {
-            this.hideFullScreenStatus();
+            this.hideFullScreenStatus(true);
         }
         if(this.fullScreenCard) {
-            this.hideFullScreenCard();
+            this.hideFullScreenCard(true);
         }
         //TODO: turn start actions - append to the current text feed, but do not overwrite
     }
@@ -150,10 +150,10 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         this.updateRendererData();
         this.updateCardPageText();
         if(this.fullScreenStatus) {
-            this.hideFullScreenStatus();
+            this.hideFullScreenStatus(true);
         }
         if(this.fullScreenCard) {
-            this.hideFullScreenCard();
+            this.hideFullScreenCard(true);
         }
         //TODO: turn start actions - append to the current text feed, but do not overwrite
     }
@@ -305,6 +305,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     }
 
     this.activateNextPage = function() {
+        playSound("click");
         switch(this.pageIndex) {
             case 0:
                 this.pageIndex = 1;
@@ -321,6 +322,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         this.updateCardPageText();
     }
     this.activatePreviousPage = function() {
+        playSound("click");
         switch(this.pageIndex) {
             case 0:
                 this.pageIndex = 2;
@@ -340,6 +342,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
 
 
     this.switchedPanes = function() {
+        playSound("click");
         this.viewingSelfCards = !this.viewingSelfCards;
         this.updateRendererData();
         this.updateCardPageText();
@@ -358,6 +361,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         this.playerState.hand.splice(this.fullScreenCardIndex,1);
         this.playerState.energy -= this.playerState.slots[name].energyCost;//TODO: put through energy modifier
         this.renderer.playerEnergyPulse();
+        playSound("energy-reverse");
         this.fullScreenCard = null;
         this.renderer.unlockPageCycle();
         this.renderer.unlockViewTab();
@@ -380,6 +384,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     }
 
     this.activateActionButton = function(index) {
+        playSound("click");
         let didAction = false;
         let actionResultText = "";
         switch(this.buttonLookup[index].text) {
@@ -387,6 +392,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                 const usedCard = this.playerState.hand[this.fullScreenCardIndex];
                 this.playerState.energy -= usedCard.energyCost;//TODO: put through energy modifier
                 this.renderer.playerEnergyPulse();
+                playSound("energy-reverse");
                 this.playerState.hand.splice(this.fullScreenCardIndex,1);
                 actionResultText = `used '${usedCard.name}'`;
                 const actionResult = usedCard.action(this,this.playerState);
@@ -436,6 +442,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             case drawEnergyButtonText:
                 this.playerState.energy++;
                 this.renderer.playerEnergyPulse();
+                playSound("energy");
                 actionResultText = "you drew 1 energy.";
                 didAction = true;
                 break;
@@ -465,6 +472,10 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     this.fullScreenCardIndex = -1;
 
     this.handCardClicked = function(index) {
+        if(!this.cardPageRenderData[index]) {
+            return;
+        }
+        playSound("click");
         if(this.viewingSelfCards) {
             this.fullScreenCard = this.cardPageRenderData[index];
             if(this.viewingSelfCards) {
@@ -481,7 +492,9 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     this.nextNextButtonCard = null;
 
     this.nextButtonClicked = function() {
+        playSound("click");
         if(this.isOpponentTurn) {
+            const actionDataResult = opponentSequencer.getActionData(this,this.opponentState);
             if(this.nextNextButtonCard) {
                 this.fullScreenCard = this.nextNextButtonCard;
                 this.nextNextButtonCard = null;
@@ -499,11 +512,8 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                     return;
                 }
             }
-
             this.nextNextButtonCard = null;
-
             let textResult = "";
-            const actionDataResult = opponentSequencer.getActionData(this,this.opponentState);
             switch(actionDataResult.type) {
                 default:
                     textResult = "opponent did nothing";
@@ -524,6 +534,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                     textResult = "opponent drew 1 energy";
                     this.opponentState.energy++;
                     this.renderer.opponentEnergyPulse();
+                    playSound("energy");
                     break;
                 case "attack":
                     //TODO - Implement attack logic
@@ -534,6 +545,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
 
                     this.opponentState.energy -= usedCard.energyCost;//TODO: put through energy modifier
                     this.renderer.opponentEnergyPulse();
+                    playSound("energy-reverse");
                     this.opponentState.hand.splice(actionDataResult.cardIndex,1);
                     textResult = `opponent used '${usedCard.name}'`;
                     const actionResult = usedCard.action(this,this.opponentState);
@@ -648,7 +660,10 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     }
 
     
-    this.hideFullScreenCard = function() {
+    this.hideFullScreenCard = function(internal) {
+        if(!internal) {
+            playSound("reverse-click");
+        }
         this.fullScreenCard = null;
         this.renderer.unlockPageCycle();
         this.renderer.unlockViewTab();
@@ -656,6 +671,10 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     }
 
     this.slotCardClicked = function(index) {
+        if(!this.cardPageRenderData[index]) {
+            return;
+        }
+        playSound("click");
         this.fullScreenCard = this.cardPageRenderData[index];
         this.renderer.lockPageCycle();
         this.renderer.lockViewTab();
@@ -663,6 +682,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     }
     
     this.statusClicked = function(index) {
+        playSound("click");
         const condition = this.viewingSelfCards ? this.playerState.conditions[index] : this.opponentState.conditions[index];
         if(condition) {
             this.fullScreenStatus = condition;
@@ -671,7 +691,10 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             this.updateButtonStates(false);
         }
     }
-    this.hideFullScreenStatus = function() {
+    this.hideFullScreenStatus = function(internal) {
+        if(!internal) {
+            playSound("reverse-click");
+        }
         this.fullScreenStatus = null;
         this.renderer.unlockViewTab();
         this.renderer.unlockPageCycle();

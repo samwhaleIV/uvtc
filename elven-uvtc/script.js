@@ -10,7 +10,7 @@ function loadCallback() {
                     return {
                         type: "discard",
                         cardIndex: 0
-                    };
+                    }
                 }
             }),
             {

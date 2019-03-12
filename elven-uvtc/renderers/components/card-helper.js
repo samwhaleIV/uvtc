@@ -48,18 +48,21 @@ function renderFullScreenName(name,lineBreakName,x,y,width,scale) {
             x,y,ttr1.width+doubleCardTitlePadding,
             ttr1.height+doubleCardTitlePadding
         );
-        context.rect(
-            x,y+ttr2.height+doubleCardTitlePadding,
-            ttr2.width+doubleCardTitlePadding,ttr2.height+doubleCardTitlePadding
-        );
+        if(lineBreakName[1]) {
+            context.rect(
+                x,y+ttr2.height+doubleCardTitlePadding,
+                ttr2.width+doubleCardTitlePadding,ttr2.height+doubleCardTitlePadding
+            );
+        }
         context.fill();
 
         const cardTextX = x+cardTitlePadding;
         const cardTextY = y+cardTitlePadding;
 
         drawTextWhite(lineBreakName[0],cardTextX,cardTextY,scale);
-        drawTextWhite(lineBreakName[1],cardTextX,cardTextY+ttr1.height+doubleCardTitlePadding,scale);
-
+        if(lineBreakName[1]) {
+            drawTextWhite(lineBreakName[1],cardTextX,cardTextY+ttr1.height+doubleCardTitlePadding,scale);
+        }
     } else {
         context.fillStyle = "black";
         context.fillRect(

@@ -1,6 +1,10 @@
 "use strict";
 setCustomFileSector("elven-uvtc");
-EssentialSounds.push();
+EssentialSounds.push(
+    getFile("energy.mp3",FileTypes.Sound),
+    getFile("energy-reverse.mp3",FileTypes.Sound),
+    getFile("reverse-click.mp3",FileTypes.Sound)
+);
 NonEssentialSounds.push();
 ImagePaths.push(
     getFile("card-test.png",FileTypes.BackgroundImage),

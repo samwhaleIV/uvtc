@@ -829,8 +829,10 @@ function CardScreenRenderer(sequencer,callbacks,background) {
                     if(now >= lastToggleTextSwap) {
                         if(textFeedShown) {
                             this.hideTextFeed();
+                            playSound("reverse-click");
                         } else {
                             this.showTextFeed();
+                            playSound("click");
                         }
                         lastToggleTextSwap = now + toggleTextFeedTimeout;
                     }
@@ -839,14 +841,15 @@ function CardScreenRenderer(sequencer,callbacks,background) {
             case "Escape":
                 if(textFeedShown && textFeedToggleButton.enabled) {
                     this.hideTextFeed();
+                    playSound("reverse-click");
                 } else if(this.sequencer.fullScreenCard && !fullScreenCardLocked) {
-                    this.sequencer.hideFullScreenCard();
+                    this.sequencer.hideFullScreenCard(false);
                     if(hoverType === hoverTypes.fullScreenCard) {
                         hoverType = hoverTypes.none;
                         hoverIndex = defaultHoverIndex;
                     }
                 } else if(this.sequencer.fullScreenStatus && !fullScreenCardLocked) {
-                    this.sequencer.hideFullScreenStatus();
+                    this.sequencer.hideFullScreenStatus(false);
                     if(hoverType === hoverTypes.fullScreenStatus) {
                         hoverType = hoverTypes.none;
                         hoverIndex = defaultHoverIndex;   
@@ -929,20 +932,22 @@ function CardScreenRenderer(sequencer,callbacks,background) {
                 break;
             case hoverTypes.fullScreenCard:
                 if(!fullScreenCardLocked) {
-                    this.sequencer.hideFullScreenCard(true);
+                    this.sequencer.hideFullScreenCard(false);
                 }
                 break;
             case hoverTypes.fullScreenStatus:
                 if(!fullScreenCardLocked) {
-                    this.sequencer.hideFullScreenStatus(true);
+                    this.sequencer.hideFullScreenStatus(false);
                 }
                 break;
             case hoverTypes.textFeedToggleButton:
                 if(textFeedToggleButton.enabled) {
                     if(textFeedShown) {
                         this.hideTextFeed();
+                        playSound("reverse-click");
                     } else {
                         this.showTextFeed();
+                        playSound("click");
                     }
                 }
                 break;
