@@ -9,7 +9,12 @@ addCardSeries([
         name: "closer look",
         type: "generic",
         description: "take a peak at your opponent's hand",
-        energyCost: 3
+        energyCost: 3,
+        action: (sequencer,user) => {
+            if(user.isPlayer) {
+                //sequencer.viewOpponentHand();
+            }
+        }
     },
     {
         name: "dimensional shift",
@@ -55,7 +60,8 @@ addCardSeries([
     }
 ],[
     {
-        name: "hibernating"
+        name: "hibernating",
+        description: "generating 1 health at the beginning of every turn"
     },
     {
         name: "out of phase"

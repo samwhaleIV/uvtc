@@ -819,10 +819,12 @@ function CardScreenRenderer(sequencer,callbacks,background) {
         }
     }
 
-    this.processKey = function(key) {//todo add player/opponent pane toggling
+    this.processKey = function(key) {
         switch(key) {
             case "Space":
-                if(textFeedToggleButton.enabled) {
+                if(this.sequencer.nextButtonEnabled && this.sequencer.nextButtonShown) {
+                    this.sequencer.nextButtonClicked();
+                } else if(textFeedToggleButton.enabled) {
                     const now = performance.now()
                     if(now >= lastToggleTextSwap) {
                         if(textFeedShown) {
@@ -998,6 +1000,10 @@ function CardScreenRenderer(sequencer,callbacks,background) {
                     hoverType = hoverTypes.fullScreenStatus;
                     hoverIndex = 0;
                     return;
+                } else if(this.sequencer.nextButtonShown && contains(mouseX,mouseY,nextButton.area)) {
+                    hoverType = hoverTypes.nextButton;
+                    hoverIndex = 0;
+                    return;
                 }
             } else if(this.sequencer.fullScreenCard) {
                 if(this.textFeedToggleIsHitRegistered(mouseX,mouseY)) {
@@ -1006,6 +1012,10 @@ function CardScreenRenderer(sequencer,callbacks,background) {
                     return;
                 } else if(contains(mouseX,mouseY,fullScreenCard)) {
                     hoverType = hoverTypes.fullScreenCard;
+                    hoverIndex = 0;
+                    return;
+                } else if(this.sequencer.nextButtonShown && contains(mouseX,mouseY,nextButton.area)) {
+                    hoverType = hoverTypes.nextButton;
                     hoverIndex = 0;
                     return;
                 }
@@ -1140,21 +1150,10 @@ function CardScreenRenderer(sequencer,callbacks,background) {
 
         } else {
             context.fillStyle = innerLeftArea.color;
-            if(this.sequencer.cardPageType === cardPageTypes.field) {
-                context.fillStyle = innerLeftArea.color;
-                context.fillRect(innerLeftArea.x,innerLeftAreaFirstRowY,innerLeftArea.width,innerLeftAreaFirstRowHeight);
-
-                context.fillStyle = fieldBackgroundColor;
-                context.fillRect(innerLeftArea.x,innerLeftAreaSecondRowY,innerLeftArea.width,innerLeftAreaSecondRowHeight);
-
-                context.fillStyle = innerLeftArea.color;
-                context.fillRect(innerLeftArea.x,innerLeftAreaThirdRowY,innerLeftArea.width,innerLeftAreaThirdRowHeight);
-            } else {
-                context.fillRect(
-                    innerLeftArea.x,innerLeftArea.y,
-                    innerLeftArea.width,innerLeftArea.fullHeight
-                );
-            }
+            context.fillRect(
+                innerLeftArea.x,innerLeftArea.y,
+                innerLeftArea.width,innerLeftArea.fullHeight
+            );
 
             context.fillStyle = showHoverSpecialEffect && hoverType === hoverTypes.textFeedToggleButton ? "rgb(30,30,30)" : "black";
             context.fillRect(

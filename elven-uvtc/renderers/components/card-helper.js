@@ -27,7 +27,7 @@ function renderStatusFullscreen(status,x,y,width,height) {
             width,
             height - yTop
         );
-        drawTextWrappingBlack(card.description,x + 6,y+yTop+6,width - (smallestTextScale*15),7,smallestTextScale);
+        drawTextWrappingBlack(status.description,x + 6,y+yTop+6,width - (smallestTextScale*15),7,smallestTextScale);
     }
 }
 
@@ -37,7 +37,7 @@ function renderCardBack(card,x,y,width,height) {
 
 function renderFullScreenName(name,lineBreakName,x,y,width,scale) {
     const textTestResult = drawTextTest(name,scale);
-    if(textTestResult.width + doubleCardTitlePadding > width) {
+    if(textTestResult.width + doubleCardTitlePadding > width - 10) {
 
         const ttr1 = drawTextTest(lineBreakName[0],scale);
         const ttr2 = drawTextTest(lineBreakName[1],scale);

@@ -5,7 +5,7 @@ drawLoadingText();
 function loadCallback() {
     setRendererState(
         new CardScreenRenderer(
-            new CardSequencer([allCardsList[0]],[],null),
+            new CardSequencer([...allCardsList.slice(0,6),...allCardsList.slice(0,6)],allCardsList.slice(0,6),null),
             {
                 win: ()=>{},
                 lose: ()=>{},
