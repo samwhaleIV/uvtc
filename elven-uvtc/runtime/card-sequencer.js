@@ -109,6 +109,8 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         this.maxPlayerActions = 3;//TODO: put through the future pre-processor
         this.isOpponentTurn = false;
         this.renderer.unlockPageCycle();
+        this.renderer.unlockViewTab();
+        this.renderer.unlockTextFeedToggle();
         this.updateButtonStates(false);
         this.updateActionText(true);
         this.nextButtonEnabled = false;
@@ -133,6 +135,8 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         this.updateActionText(false);
         this.updateButtonStates(true);
         this.renderer.lockPageCycle();
+        this.renderer.lockViewTab();
+        this.renderer.lockTextFeedToggle();
         this.maxOpponentActions = 3;//todo
         this.opponentActionIndex = 0;
         this.isOpponentTurn = true;
@@ -467,6 +471,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                 this.fullScreenCard = this.nextNextButtonCard;
                 this.nextNextButtonCard = null;
                 this.renderer.hideTextFeed();
+                this.renderer.lockFullScreenCardEscape();
                 return;
             } else if(this.fullScreenCard) {
                 this.fullScreenCard = null;
@@ -474,6 +479,8 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                     this.setToPlayerTurn();
                     this.textFeed = processTextForWrapping("opponent turn over");
                     this.renderer.showTextFeed();
+                    this.renderer.unlockTextFeedToggle();
+                    this.renderer.unlockFullScreenCardEscape();
                     return;
                 }
             }
@@ -501,6 +508,8 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                         ...this.textFeed,...processTextForWrapping("\n\nopponent turn over")
                     ];
                 }
+            } else {
+                this.renderer.lockTextFeedToggle();
             }
 
             this.renderer.showTextFeed();
