@@ -364,6 +364,21 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         return actionResultText;
     }
 
+    this.updateOpponentSlot = function(name,index) {
+        let actionResultText = "";
+        if(this.opponentState.slots[name]) {
+            actionResultText = `opponent replaced '${this.opponentState.slots[name].name}' with '${this.opponentState.hand[index].name}'`;
+            this.opponentState.discardDeck.push(this.opponentState.slots[name]);
+        } else {
+            actionResultText = `opponent set ${name} slot to '${this.opponentState.hand[index].name}'`;
+        }
+
+        this.opponentState.slots[name] = this.opponentState.hand[index];
+        this.opponentState.hand.splice(index,1);
+        this.opponentState.energy -= this.opponentState.slots[name].energyCost;//TODO: put through energy modifier
+        return actionResultText;     
+    }
+
     this.activateActionButton = function(index) {
         let didAction = false;
         let actionResultText = "";
@@ -485,7 +500,68 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                 }
             }
 
-            //TODO - Implement all the same player interfaces with the opponent intelligence
+            this.nextNextButtonCard = null;
+
+            let textResult = "";
+            const actionDataResult = opponentSequencer.getActionData(this,this.opponentState);
+            switch(actionDataResult.type) {
+                default:
+                    textResult = "opponent did nothing";
+                    break;
+                case "draw":
+                    if(this.opponentState.usableDeck.length <= 0) {
+                        textResult = "deck empty. discard pile shuffled.\n";
+                        this.opponentState.usableDeck = this.opponentState.discardDeck;
+                        this.opponentState.discardDeck = [];
+                    }
+                    const index = Math.floor(this.opponentState.usableDeck.length*Math.random());
+                    const newCard = this.opponentState.usableDeck[index];
+                    this.opponentState.hand.push(newCard);
+                    this.opponentState.usableDeck.splice(index,1);
+                    textResult += `opponent drew a card from the deck.`;
+                    break;
+                case "drawEnergy":
+                    textResult = "opponent drew 1 energy";
+                    this.opponentState.energy++;
+                    this.renderer.opponentEnergyPulse();
+                    break;
+                case "attack":
+                    //TODO - Implement attack logic
+                    break;
+                case "use":
+                    const usedCard = this.opponentState.hand[actionDataResult.cardIndex];
+                    this.nextNextButtonCard = usedCard;
+
+                    this.opponentState.energy -= usedCard.energyCost;//TODO: put through energy modifier
+                    this.renderer.opponentEnergyPulse();
+                    this.opponentState.hand.splice(actionDataResult.cardIndex,1);
+                    textResult = `opponent used '${usedCard.name}'`;
+                    const actionResult = usedCard.action(this,this.opponentState);
+                    if(actionResult) {
+                        textResult += "\n" + actionResult;
+                    }
+                    break;
+                case "discard":
+                    const discardedCard = this.opponentState.hand[actionDataResult.cardIndex];
+                    this.nextNextButtonCard = discardedCard;
+
+                    this.opponentState.hand.splice(actionDataResult.card,1);
+                    this.opponentState.discardDeck.push(discardedCard);
+                    textResult = `opponent discarded '${discardedCard.name}'`;
+                    break;
+                case "setAttack":
+                    this.nextNextButtonCard = this.opponentState.hand[actionDataResult.cardIndex];
+                    textResult = this.updateOpponentSlot("attack",actionDataResult.cardIndex);
+                    break;
+                case "setDefense":
+                    this.nextNextButtonCard = this.opponentState.hand[actionDataResult.cardIndex];
+                    textResult = this.updateOpponentSlot("defense",actionDataResult.cardIndex);
+                    break;
+                case "setSpecial":
+                    this.nextNextButtonCard = this.opponentState.hand[actionDataResult.cardIndex];
+                    textResult = this.updateOpponentSlot("special",actionDataResult.cardIndex);
+                    break;
+            }
 
             this.textFeed = processTextForWrapping(
                 `action ${
@@ -493,11 +569,9 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                 } of ${
                     this.maxOpponentActions
                 }\n${
-                    "[insert action result text here]"
+                    textResult
                 }`
             );
-
-            this.nextNextButtonCard = allCardsList[0]; //Make this based on the type of action the opponent did
 
             this.opponentActionIndex++;
 
@@ -547,7 +621,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
 
                     this.buttonNameLookup[useButtonText].enabled = false;
 
-                    const playerHasEnoughEnergy = this.playerState.energy >= this.fullScreenCard.energyCost;
+                    const playerHasEnoughEnergy = this.playerState.energy >= this.fullScreenCard.energyCost; //TODO: put through card use preprocessor
 
                     switch(this.fullScreenCard.type) {
                         case "attack":
@@ -560,7 +634,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                             this.buttonNameLookup[setSpecialText].enabled = playerHasEnoughEnergy;
                             break;
                         default:
-                            this.buttonNameLookup[useButtonText].enabled = playerHasEnoughEnergy; //TODO: put through card use preprocessor
+                            this.buttonNameLookup[useButtonText].enabled = playerHasEnoughEnergy;
                             break;
                     }
                     this.buttonNameLookup[discardButtonText].enabled = true;

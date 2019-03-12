@@ -5,7 +5,14 @@ drawLoadingText();
 function loadCallback() {
     setRendererState(
         new CardScreenRenderer(
-            new CardSequencer([...allCardsList.slice(0,6),...allCardsList.slice(0,6)],allCardsList.slice(0,6),null),
+            new CardSequencer([...allCardsList.slice(0,6),...allCardsList.slice(0,6)],allCardsList.slice(0,6),{
+                getActionData: (sequencer,me) => {
+                    return {
+                        type: "discard",
+                        cardIndex: 0
+                    };
+                }
+            }),
             {
                 win: ()=>{},
                 lose: ()=>{},
