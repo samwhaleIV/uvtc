@@ -59,7 +59,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             attack: null,
             special: null
         },
-        conditions: [allStatuses[0]]
+        conditions: []
     };
 
     this.opponentState = {
@@ -76,7 +76,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             attack: null,
             special: null
         },
-        conditions: [allStatuses[0]]
+        conditions: []
     };
     this.opponentSequencer = opponentSequencer;
 
@@ -99,7 +99,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         if(!this.isOpponentTurn) {
             text = `action ${this.playerActionIndex+1} of ${this.maxPlayerActions}`;
         } else {
-            text = "opponent's turn";
+            text = "opponent turn";
         }
         this.buttonLookup[0].text = text;
     }
@@ -126,6 +126,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         if(this.fullScreenCard) {
             this.hideFullScreenCard();
         }
+        //TODO: turn start actions - append to the current text feed, but do not overwrite
     }
 
     this.setToOpponentTurn = function() {
@@ -150,6 +151,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         if(this.fullScreenCard) {
             this.hideFullScreenCard();
         }
+        //TODO: turn start actions - append to the current text feed, but do not overwrite
     }
 
     this.buttonRows = [
@@ -380,6 +382,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             case discardButtonText:
                 const discardedCard = this.playerState.hand[this.fullScreenCardIndex];
                 this.playerState.hand.splice(this.fullScreenCardIndex,1);
+                this.playerState.discardDeck.push(discardedCard);
                 actionResultText = `discarded '${discardedCard.name}'`;
                 this.fullScreenCard = null;
                 this.renderer.unlockPageCycle();
@@ -443,7 +446,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     this.fullScreenCardIndex = -1;
 
     this.handCardClicked = function(index) {
-        if(this.viewingSelfCards || this.viewingOpponentHand) {
+        if(this.viewingSelfCards) {
             this.fullScreenCard = this.cardPageRenderData[index];
             if(this.viewingSelfCards) {
                 this.fullScreenCardIndex = index;
@@ -456,40 +459,10 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         this.fullScreenCardIndex = -1;
     }
 
-    this.viewingOpponentHand = false;
-    this.viewOpponentHand = function() {
-        this.renderer.lockViewTab();
-        this.renderer.lockPageCycle();
-        this.updateButtonStates(true);
-        this.viewingSelfCards = false;
-
-        this.viewingOpponentHand = true;
-        this.opponentCardsVisible = true;
-        this.pageIndex = 0;
-        this.cardPageType = cardPageTypes.hand;
-        this.updateRendererData();
-        this.updateCardPageText();
-
-        this.nextButtonEnabled = true;
-        this.nextButtonShown = true;
-    }
-
     this.nextNextButtonCard = null;
 
     this.nextButtonClicked = function() {
-        if(this.viewingOpponentHand) {
-            if(this.fullScreenCard) {
-                this.fullScreenCard = null;
-            }
-            this.opponentCardsVisible = false;
-            this.viewingOpponentHand = false;
-            this.renderer.unlockViewTab();
-            this.renderer.unlockPageCycle();
-            this.updateButtonStates(false);
-
-            this.nextButtonEnabled = false;
-            this.nextButtonShown = false;
-        } else if(this.isOpponentTurn) {
+        if(this.isOpponentTurn) {
             if(this.nextNextButtonCard) {
                 this.fullScreenCard = this.nextNextButtonCard;
                 this.nextNextButtonCard = null;
@@ -578,7 +551,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                             this.buttonNameLookup[setSpecialText].enabled = playerHasEnoughEnergy;
                             break;
                         default:
-                            this.buttonNameLookup[useButtonText].enabled = playerHasEnoughEnergy;
+                            this.buttonNameLookup[useButtonText].enabled = playerHasEnoughEnergy; //TODO: put through card use preprocessor
                             break;
                     }
                     this.buttonNameLookup[discardButtonText].enabled = true;
@@ -594,11 +567,9 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     
     this.hideFullScreenCard = function() {
         this.fullScreenCard = null;
-        if(!this.viewingOpponentHand) {
-            this.renderer.unlockPageCycle();
-            this.renderer.unlockViewTab();
-            this.updateButtonStates(false);
-        }
+        this.renderer.unlockPageCycle();
+        this.renderer.unlockViewTab();
+        this.updateButtonStates(false);
     }
 
     this.slotCardClicked = function(index) {

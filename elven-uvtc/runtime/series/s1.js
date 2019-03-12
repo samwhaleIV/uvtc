@@ -8,11 +8,12 @@ addCardSeries([
     {
         name: "closer look",
         type: "generic",
-        description: "take a peak at your opponent's hand",
+        description: "get a list of your opponent's current cards",
         energyCost: 3,
         action: (sequencer,user) => {
             if(user.isPlayer) {
-                //sequencer.viewOpponentHand();
+                sequencer.renderer.showTextFeed();
+                return `\nopponent cards:\n${sequencer.opponentState.hand.map(card=>card.name).join("\n")}`;
             }
         }
     },
