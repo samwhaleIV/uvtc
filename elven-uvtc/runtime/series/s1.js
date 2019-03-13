@@ -37,7 +37,7 @@ addCardSeries([
         description: "remaining actions for this turn cost 0 energy",
         energyCost: 4,
         action: (sequencer,user) => {
-            sequencer.addCondition(user,"endergonic status");
+            sequencer.addCondition(user,"free energy");
         }
     },
     {
@@ -95,25 +95,6 @@ addCardSeries([
         }
     }
 ],[
-    {
-        name: "solar power status",
-        hidden: true,
-        action: (sequencer,user) => {
-            sequencer.addEnergy(user,1);
-        }
-    },
-    {
-        name: "endergonic status",
-        hidden: true,
-        expirationType: "endOfTurn",
-        filters: [
-            {
-                type: "energy",
-                priority: -200,
-                process: () => 0
-            }
-        ]
-    },
     {
         name: "hibernating",
         description: "generating 1 health at the beginning of every turn",
@@ -179,7 +160,26 @@ addCardSeries([
                 process: (user,target,amount) => amount - 1
             }
         ]
-    }
+    },
+    {
+        name: "solar power status",
+        hidden: true,
+        action: (sequencer,user) => {
+            sequencer.addEnergy(user,1);
+        }
+    },
+    {
+        name: "free energy",
+        expirationType: "endOfTurn",
+        description: "energy costs are reduced to 0 until the end of this turn",
+        filters: [
+            {
+                type: "energy",
+                priority: -200,
+                process: () => 0
+            }
+        ]
+    },
 ],{
     imagePath: "cards/s1",
     statusImagePath: "cards/s1-status",

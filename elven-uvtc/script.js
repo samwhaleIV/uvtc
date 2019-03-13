@@ -5,7 +5,7 @@ drawLoadingText();
 function loadCallback() {
     setRendererState(
         new CardScreenRenderer(
-            new CardSequencer([...allCardsList.slice(0,6),...allCardsList.slice(0,6)],allCardsList.slice(0,6),{
+            new CardSequencer([...allCardsList],[...allCardsList],{
                 getActionData: (sequencer,me) => {
                     return {
                         type: "discard",
