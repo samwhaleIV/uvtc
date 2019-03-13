@@ -31,7 +31,7 @@ const getPageTypeFromIndex = function(index) {
 
 const drawButtonText = "draw";
 const drawEnergyButtonText = "draw energy";
-const attackButtonText = "attack";
+const attackButtonText = "attack ";
 const useButtonText = "use";
 const discardButtonText = "discard";
 const setAttackText = "attack";
@@ -105,6 +105,15 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     }
 
     this.setToPlayerTurn = function() {
+        //TODO: Expire opponent end terminating conditions
+        if(this.fullScreenStatus) {
+            this.hideFullScreenStatus(true);
+        }
+        if(this.fullScreenCard) {
+            this.hideFullScreenCard(true);
+        }
+
+
         this.playerActionIndex = 0;
         this.maxPlayerActions = 3;//TODO: put through the future pre-processor
         this.isOpponentTurn = false;
@@ -122,16 +131,18 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         this.updateRendererData();
         this.updateCardPageText();
 
+        //TODO: turn start actions - append to the current text feed, but do not overwrite
+    }
+
+    this.setToOpponentTurn = function() {
+        //TODO: Expire player end terminating conditions
         if(this.fullScreenStatus) {
             this.hideFullScreenStatus(true);
         }
         if(this.fullScreenCard) {
             this.hideFullScreenCard(true);
         }
-        //TODO: turn start actions - append to the current text feed, but do not overwrite
-    }
 
-    this.setToOpponentTurn = function() {
         this.updateActionText(false);
         this.updateButtonStates(true);
         this.renderer.lockPageCycle();
@@ -149,12 +160,6 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         this.viewingSelfCards = false;
         this.updateRendererData();
         this.updateCardPageText();
-        if(this.fullScreenStatus) {
-            this.hideFullScreenStatus(true);
-        }
-        if(this.fullScreenCard) {
-            this.hideFullScreenCard(true);
-        }
         //TODO: turn start actions - append to the current text feed, but do not overwrite
     }
 
@@ -175,22 +180,20 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         [
             {
                 text: drawEnergyButtonText,
-                enabled: false,
-                image: 1
+                enabled: false
             }
         ],
         [
             {
                 text: attackButtonText,
-                enabled: false,
-                //image: 6
+                enabled: false
             }
         ],
         [],
         [
             {
                 text: "card actions",
-                isNotAButton: true,  
+                isNotAButton: true
             }
         ],
         [
@@ -238,6 +241,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             row[i2].index = buttonRowIndex++;
             this.buttonLookup.push(row[i2]);
             this.buttonNameLookup[row[i2].text] = row[i2];
+            row[i2].text = row[i2].text.trimEnd();
         }
     }
 
@@ -560,7 +564,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                         this.renderer.opponentEnergyPulse();
                         playSound("energy-reverse");
                     }
-                    
+
                     this.opponentState.hand.splice(actionDataResult.cardIndex,1);
                     textResult = `opponent used '${usedCard.name}'`;
                     const actionResult = usedCard.action(this,this.opponentState);
@@ -642,9 +646,9 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                     this.buttonNameLookup[setDefenseText].enabled = false;
                     this.buttonNameLookup[setSpecialText].enabled = false;
 
-                    this.buttonNameLookup[drawButtonText].enabled = false;
-                    this.buttonNameLookup[attackButtonText].enabled = false;
-                    this.buttonNameLookup[drawEnergyButtonText].enabled = false;
+                    this.buttonNameLookup[drawButtonText].enabled = this.playerState.hand.length < 6;
+                    this.buttonNameLookup[attackButtonText].enabled = this.playerState.slots.attack ? true : false;
+                    this.buttonNameLookup[drawEnergyButtonText].enabled = this.playerState.energy < 100;
 
                     this.buttonNameLookup[useButtonText].enabled = false;
 
