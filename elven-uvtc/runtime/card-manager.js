@@ -57,13 +57,20 @@ const addCardSeries = function(cardSeries,statuses,manifest) {
         allCards[cardSeries[i].name] = cardSeries[i];
         allCardsList.push(cardSeries[i]);
     }
+    let iOffset = 0;
     for(let i = 0;i<statuses.length;i++) {
-        statuses[i].sourceX = i * internalStatusWidth;
+        if(statuses[i].hidden) {
+            iOffset--;
+        } else {
+            statuses[i].sourceX = (i+iOffset) * internalStatusWidth;
+            statuses[i].imagePath = manifest.statusImagePath;
+        }
+
         statuses[i].lineBreakName = getLineBreakName(statuses[i].name);
         if(statuses[i].description) {
             statuses[i].description = [...statusPrefix,...processTextForWrapping(statuses[i].description)];
         }
-        statuses[i].imagePath = manifest.statusImagePath;
+
         statusLookup[statuses[i].name] = statuses[i];
         allStatuses.push(statuses[i]);
     }
