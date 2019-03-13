@@ -121,7 +121,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             ID: ID,
             condition: condition,
             conditionData: data,
-            startTurn: this.turnNumber
+            startTurn: condition.action ? this.turnNumber + 1 : this.turnNumber
         }
         target.conditionManifest.lookup[ID] = conditionWrapper;
         this.updateConditionManifest(target);
