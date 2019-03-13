@@ -466,6 +466,53 @@ function compileComplexScaleMatrices() {
 }
 compileComplexScaleMatrices();
 const allScales = {};
+
+function drawTextStencil(color,text,x,y,scale,padding) {
+    let xOffset = 0;
+    const scaleMatrix = ScaleMatrices[scale];
+    const drawHeight = 5 * scale;
+    let i = 0;
+    context.beginPath();
+    context.fillStyle = color;
+    while(i < text.length) {
+        const character = fontDictionary[text[i]];
+        const drawWidth = character.width * scale;
+        const characterMatrix = scaleMatrix[character.width];
+        let i2 = 0;
+        while(i2 < character.glyph.length) {
+            if(!character.glyph[i2]) {
+                const characterRegion = characterMatrix[i2];
+                context.rect(
+                    x+xOffset + characterRegion.x,
+                    y + characterRegion.y,
+                    characterRegion.w,
+                    characterRegion.h
+                );
+            }
+            i2++;
+        }
+
+        xOffset += drawWidth;
+        if(i < text.length-1) {
+            context.rect(x+xOffset,y,scale,drawHeight);
+            xOffset += scale;
+        }
+        i++;
+    }
+
+    context.rect(x-padding,y-padding,padding,drawHeight+padding+padding);//left
+    context.rect(x+xOffset,y-padding,padding,drawHeight+padding+padding);//right
+
+    context.rect(x,y+drawHeight,xOffset,padding);//bottom
+    context.rect(x,y-padding,           xOffset,padding);//top
+
+    context.fill();
+    return {
+        width: xOffset,
+        height: drawHeight
+    }
+}
+
 function drawTextColor(color,text,x,y,scale) {
     let xOffset = 0;
     const scaleMatrix = ScaleMatrices[scale];
