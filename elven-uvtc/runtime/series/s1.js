@@ -26,8 +26,10 @@ addCardSeries([
         action: (sequencer,user) => {
             if(sequencer.hasCondition(user,"alternate dimension")) {
                 sequencer.removeCondition(user,"alternate dimension");
+                return "you have entered the alternate dimension";
             } else {
                 sequencer.addCondition(user,"alternate dimension");
+                return "opponent has entered the alternate dimension";
             }
         }
     },
@@ -38,6 +40,7 @@ addCardSeries([
         energyCost: 4,
         action: (sequencer,user) => {
             sequencer.addCondition(user,"free energy");
+            return "free energy for the rest of the turn!";
         }
     },
     {
@@ -68,6 +71,7 @@ addCardSeries([
         energyCost: 2,
         action: function(sequencer,user) {
             sequencer.addHealth(user,1);
+            return "+1 health";
         }
     },
     {

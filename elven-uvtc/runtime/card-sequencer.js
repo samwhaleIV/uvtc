@@ -676,6 +676,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                 const actionResult = usedCard.action(this,this.playerState,this.opponentState);
                 if(actionResult) {
                     actionResultText += "\n" + actionResult;
+                    this.renderer.showTextFeed();
                 }
                 this.fullScreenCard = null;
                 this.renderer.unlockPageCycle();
