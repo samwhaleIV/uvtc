@@ -3,7 +3,7 @@ function CardBackground(backgroundName,color) {
     if(!color) {
         switch(backgroundName.split("/")[1]) {
             case "card-test":
-                this.color = "#008DFF";
+                this.color = ACoolBlueColor;
                 break;
         }
     } else {

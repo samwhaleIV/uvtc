@@ -504,7 +504,7 @@ function drawTextStencil(color,text,x,y,scale,padding) {
     context.rect(x+xOffset,y-padding,padding,drawHeight+padding+padding);//right
 
     context.rect(x,y+drawHeight,xOffset,padding);//bottom
-    context.rect(x,y-padding,           xOffset,padding);//top
+    context.rect(x,y-padding,xOffset,padding);//top
 
     context.fill();
     return {

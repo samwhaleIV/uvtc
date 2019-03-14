@@ -37,12 +37,6 @@ const rightBubbleText = {
     scale: bubbleTextScale
 };
 
-const hoverPadding = 2.5;
-const doubleHoverPadding = hoverPadding + hoverPadding; 
-
-const flatHoverPadding = Math.floor(hoverPadding);
-const flatDoubleHoverPadding = flatHoverPadding + flatHoverPadding;
-
 const bubbleSelectorHitTest = {};
 bubbleSelectorHitTest.y = bubbleSelectorY;
 bubbleSelectorHitTest.height = bubbleSelectorHeight;
@@ -174,8 +168,6 @@ const statusWidth = 64;
 const statusHeight = 64;
 const statusY = innerLeftAreaMargin + bubbleSelectorHeight;
 
-const handDisplayHeightRatio = 144 / 128;
-const handDisplayWidthRatio = 128 / 144;
 const handDisplaySlots = [];
 (function(){
     for(let i = 0;i<6;i++) {
@@ -253,7 +245,7 @@ let noCardsTextY;
     noCardsTextYOffset = Math.floor(t1.height/2);
 })();
 
-function updateRenderElements() {
+function updateCardScreenElements() {
     rightBar.x = fullWidth - Math.floor(fullWidth * rightBarWidthPercent);
     rightBar.width = fullWidth - rightBar.x;
     rightBar.height = fullHeight;
@@ -609,27 +601,6 @@ function updateRenderElements() {
 
 }
 
-function drawRectangle(rectangle,color) {
-    context.fillStyle = color;
-    context.fillRect(
-        rectangle.x,rectangle.y,rectangle.width,rectangle.height
-    );
-}
-
-function drawColoredRectangle(rectangle) {
-    context.fillStyle = rectangle.color;
-    context.fillRect(
-        rectangle.x,rectangle.y,rectangle.width,rectangle.height
-    );
-}
-
-function contains(x,y,r) {
-    return x >= r.x && x <= r.x + r.width && y >= r.y && y <= r.y + r.height;
-}
-function areaContains(x,y,rx,ry,rw,rh) {
-    return x >= rx && x <= rx + rw && y >= ry && y <= ry + rh;
-}
-
 function renderButtonRow(buttonRow,index,withHover,hoverIndex,specialHover,hoverColor) {
     const yPosition = index * (moveButtonHeight + moveButtonMargin);
 
@@ -703,23 +674,6 @@ function getButtonForegroundColor(hover,specialHover,enabled) {
     }
 }
 
-const hoverTypes = {
-    none: Symbol("none"),
-    moveButtons: Symbol("moveButtons"),
-    bubbleSelector: Symbol("bubbleSelector"),
-    cycleButtons: Symbol("cycleButtons"),
-    textFeedToggleButton: Symbol("textFeedToggleButton"),
-    fullScreenCard: Symbol("fullScreenCard"),
-    handPageCard: Symbol("handPageCard"),
-    fullScreenStatus: Symbol("fullScreenStatus"),
-    statusIcon: Symbol("statusIcon"),
-    slotCard: Symbol("slotCard"),
-    nextButton: Symbol("nextButton")
-}
-
-const defaultHoverIndex = -1;
-const barPulseTime = 200;
-
 const getBarColorForShade = function(whiteBackground,shade,isRed) {
     if(whiteBackground) {
         if(isRed) {
@@ -737,6 +691,23 @@ const getBarColorForShade = function(whiteBackground,shade,isRed) {
 }
 
 function CardScreenRenderer(sequencer,callbacks,background) {
+
+    const defaultHoverIndex = -1;
+    const barPulseTime = 200;
+
+    const hoverTypes = {
+        none: Symbol("none"),
+        moveButtons: Symbol("moveButtons"),
+        bubbleSelector: Symbol("bubbleSelector"),
+        cycleButtons: Symbol("cycleButtons"),
+        textFeedToggleButton: Symbol("textFeedToggleButton"),
+        fullScreenCard: Symbol("fullScreenCard"),
+        handPageCard: Symbol("handPageCard"),
+        fullScreenStatus: Symbol("fullScreenStatus"),
+        statusIcon: Symbol("statusIcon"),
+        slotCard: Symbol("slotCard"),
+        nextButton: Symbol("nextButton")
+    }    
 
     this.sequencer = sequencer;
     this.sequencer.renderer = this;
@@ -761,9 +732,9 @@ function CardScreenRenderer(sequencer,callbacks,background) {
     let pageCycleEnabled = true;
     let fullScreenCardLocked = false;
 
-    updateRenderElements();
+    updateCardScreenElements();
 
-    this.updateSize = updateRenderElements;
+    this.updateSize = updateCardScreenElements;
 
     let toggleTextFeedTimeout = 150;
     let lastToggleTextSwap = 0;
