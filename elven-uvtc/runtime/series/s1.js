@@ -189,5 +189,6 @@ addCardSeries([
     statusImagePath: "cards/s1-status",
     backFacePath: "cards/s1-backface",
     name: "series 1",
+    backgroundTexturePath: "cards/s1-texture",
     description: "a tumble woods speciality"
 });

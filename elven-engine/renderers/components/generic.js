@@ -18,3 +18,38 @@ function contains(x,y,r) {
 function areaContains(x,y,rx,ry,rw,rh) {
     return x >= rx && x <= rx + rw && y >= ry && y <= ry + rh;
 }
+
+function drawOutline(x,y,width,height,size,color) {
+
+    context.fillStyle = color;
+    context.beginPath();
+
+    context.rect(
+        x-size,
+        y-size,
+        size,
+        height+size
+    );
+
+    context.rect(
+        x+width,
+        y-size,
+        size,
+        height+size+size
+    );
+
+    context.rect(
+        x-size,
+        y-size,
+        width+size,
+        size
+    );
+    context.rect(
+        x-size,
+        y+height,
+        width+size,
+        size
+    );
+
+    context.fill();
+}

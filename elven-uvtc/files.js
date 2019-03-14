@@ -13,6 +13,7 @@ ImagePaths.push(
 
     getFile("cards/s1.png",FileTypes.Image),
     getFile("cards/s1-status.png",FileTypes.Image),
+    getFile("cards/s1-texture.png",FileTypes.Image),
     getFile("cards/s1-backface.png",FileTypes.Image),
     getFile("cards/s2-backface.png",FileTypes.Image),
 

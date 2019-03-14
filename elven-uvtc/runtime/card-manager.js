@@ -75,6 +75,7 @@ const addCardSeries = function(cardSeries,statuses,manifest) {
         allStatuses.push(statuses[i]);
     }
     allCardSeries.push({
+        name: `series ${allCardSeries.length+1}`,
         cards: cardSeries,
         manifest: manifest
     });

@@ -74,7 +74,7 @@ function renderFullScreenName(name,lineBreakName,x,y,width,scale) {
     }
 }
 
-function renderCard(card,x,y,width,height,partial=false) {
+function renderCard(card,x,y,width,height,partial=false,withName=true) {
 
     context.drawImage(
         imageDictionary[card.imagePath],
@@ -85,7 +85,9 @@ function renderCard(card,x,y,width,height,partial=false) {
         x,y,width,height
     );
 
-    renderFullScreenName(card.name,card.lineBreakName,x,y,width,cardTitleTextScale);
+    if(withName) {
+        renderFullScreenName(card.name,card.lineBreakName,x,y,width,cardTitleTextScale);
+    }
 
     //render card energy cost?
 }
