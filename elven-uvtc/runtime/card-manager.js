@@ -32,6 +32,30 @@ const getLineBreakName = function(name) {
 }
 
 const addCardSeries = function(cardSeries,statuses,manifest) {
+
+    const rootPath = `series/s${allCardSeries.length+1}/`;
+
+    manifest.imagePath = rootPath + "cards";
+    manifest.statusImagePath = rootPath + "status";
+    manifest.backFacePath = rootPath + "backface";
+    manifest.backgroundTexturePath = rootPath + "texture";
+
+    ImagePaths.push(
+        getFile(manifest.imagePath+".png",FileTypes.Image),
+        getFile(manifest.statusImagePath+".png",FileTypes.Image),
+        getFile(manifest.backFacePath+".png",FileTypes.Image),
+        getFile(manifest.backgroundTexturePath+".png",FileTypes.Image),
+    );
+/*
+
+    imagePath: "cards/s1",
+    statusImagePath: "status",
+    backFacePath: "backface",
+    backgroundTexturePath: "texture",
+
+*/
+
+
     for(let i = 0;i<cardSeries.length;i++) {
 
         cardSeries[i].sourceX = i * internalCardWidth;

@@ -19,21 +19,6 @@ addCardSeries([
         }
     },
     {
-        name: "dimensional shift",
-        type: "generic",
-        description: "can be used to leave or enter the alternate dimension\n(lasts 3 turns)",
-        energyCost: 3,
-        action: (sequencer,user) => {
-            if(sequencer.hasCondition(user,"alternate dimension")) {
-                sequencer.removeCondition(user,"alternate dimension");
-                return "you have entered the alternate dimension";
-            } else {
-                sequencer.addCondition(user,"alternate dimension");
-                return "opponent has entered the alternate dimension";
-            }
-        }
-    },
-    {
         name: "endergonic",
         type: "generic",
         description: "remaining actions for this turn cost 0 energy",
@@ -97,6 +82,23 @@ addCardSeries([
         replacedAction: function(sequencer,user) {
             sequencer.removeCondition(user,"solar power status");
         }
+    },
+    {
+        name: "green apple",
+        type: "generic"
+    },
+    {
+        name: "golden apple",
+        type: "generic"
+    },
+    {
+        name: "poison apple",
+        type: "generic",
+        energyCost: 3,
+        description: "inflicts opponent with poison that lasts 2 turns",
+        action: (sequencer,user,target) => {
+            target.addCondition("poisoned by fruit")
+        }
     }
 ],[
     {
@@ -107,34 +109,6 @@ addCardSeries([
         action: (sequencer,user) => {
             sequencer.addHealth(user,1);
         }
-    },
-    {
-        name: "alternate dimension",
-        description: "can only attack and defend against those in the same dimension",
-        expirationType: "timed",
-        timeToLive: 3,
-        filters: [
-            {
-                type: "outgoingDamage",
-                priority: -10000,
-                process: (user,target,amount) => {
-                    if(!target.hasCondition("alternate dimension")) {
-                        return 0;
-                    }
-                    return amount;
-                }
-            },
-            {
-                type: "incomingDamage",
-                priority: -10000,
-                process: (user,target,amount) => {
-                    if(!target.hasCondition("alternate dimension")) {
-                        return 0
-                    }
-                    return amount;
-                }
-            }
-        ]
     },
     {
         name: "honey pot status",
@@ -184,11 +158,19 @@ addCardSeries([
             }
         ]
     },
+    {
+        name: "poisoned by fruit",
+        expirationType: "timed",
+        timeToLive: 2,
+        action: (sequencer,inflicted) => {
+            inflicted.dropHealth(1);
+            if(inflicted.isPlayer) {
+                return "you are hurt by fruit poison";
+            } else {
+                return "opponent is hurt by fruit poison";
+            }
+        }
+    }
 ],{
-    imagePath: "cards/s1",
-    statusImagePath: "cards/s1-status",
-    backFacePath: "cards/s1-backface",
-    name: "series 1",
-    backgroundTexturePath: "cards/s1-texture",
     description: "a tumble woods speciality"
 });

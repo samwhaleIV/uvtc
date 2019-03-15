@@ -121,7 +121,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             ID: ID,
             condition: condition,
             conditionData: data,
-            startTurn: condition.action ? this.turnNumber + 1 : this.turnNumber
+            turnCount: 0
         }
         target.conditionManifest.lookup[ID] = conditionWrapper;
         this.updateConditionManifest(target);
@@ -344,9 +344,9 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     this.expireTurnBased = function(target) {
         let expiredText = "";
         target.conditionManifest.byExpire.timed.forEach(conditionWrapper => {
-            if(this.turnNumber >= conditionWrapper.startTurn + conditionWrapper.condition.timeToLive) {
+            if(++conditionWrapper.turnCount > conditionWrapper.condition.timeToLive) {
                 this.removeConditionByWrapper(target,conditionWrapper);
-                expiredText += `\n${target.isPlayer?"your":"opponent's"} '${conditionWrapper.condition.name}' status expired.`;
+                expiredText += `${target.isPlayer?"your":"opponent's"} '${conditionWrapper.condition.name}' status expired.\n`;
             }
         });
         return expiredText;
@@ -358,9 +358,17 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     }
 
     this.runActionableStatuses = function(target) {
+        let result = "";
+        if(!target.conditionManifest.startActionable.length) {
+            return null;
+        }
         target.conditionManifest.startActionable.forEach(conditionWrapper => {
-            conditionWrapper.condition.action(this,target,conditionWrapper.data);
+            const actionResult = conditionWrapper.condition.action(this,target,conditionWrapper.data);
+            if(actionResult) {
+                result += `${actionResult}.\n`;
+            }
         });
+        return result;
     }
 
     this.setToPlayerTurn = function() {
@@ -370,7 +378,8 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         this.expireEndTerminating(this.opponentState);
 
         if(expirationManifest) {
-            this.textFeed = [...this.textFeed,"\n",...processTextForWrapping(expirationManifest)];
+            this.textFeed = [...this.textFeed,...processTextForWrapping(expirationManifest)];
+            this.renderer.showTextFeed();
         }
 
         if(this.fullScreenStatus) {
@@ -399,13 +408,20 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         this.updateRendererData();
         this.updateCardPageText();
 
-        this.runActionableStatuses(this.playerState);
-        //TODO: append to the current text feed, but do not overwrite ?
+        const actionResultText = this.runActionableStatuses(this.playerState);
+        if(actionResultText) {
+            if(this.textFeed.length) {
+                this.textFeed = [...this.textFeed,...processTextForWrapping(actionResultText)];
+            } else {
+                this.textFeed = processTextForWrapping(actionResultText);
+            }
+            this.renderer.showTextFeed();
+        }
     }
 
     this.setToOpponentTurn = function() {
 
-        const expirationManifest = this.expireTurnBased(this.opponentState);
+        const expirationManifest =  this.expireTurnBased(this.opponentState);
         this.expireEndTerminating(this.playerState);
 
         if(this.fullScreenStatus) {
@@ -424,19 +440,17 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             this.opponentState,
             defaultActionAmount
         );
-        this.opponentActionIndex = 0;
+        this.opponentActionIndex = -1;
         this.isOpponentTurn = true;
         this.nextButtonEnabled = true;
         this.nextButtonShown = true;
-        this.textFeed = [...this.textFeed,...processTextForWrapping(expirationManifest + "\nplayer turn is over\n\npress [continue] to advance opponent moves")];
+        this.textFeed = [...this.textFeed,...processTextForWrapping(`player turn is over.\n${expirationManifest?"\n"+expirationManifest:""}\npress [continue] to advance opponent moves.`)];
         this.renderer.showTextFeed();
         this.cardPageType = cardPageTypes.slots;
         this.pageIndex = 1;
         this.viewingSelfCards = false;
         this.updateRendererData();
         this.updateCardPageText();
-        
-        this.runActionableStatuses(this.opponentState);
     }
 
     this.buttonRows = [
@@ -740,7 +754,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                     this.maxPlayerActions
                 }\n${
                     actionResultText
-                }`
+                }\n\n`
             );
             this.playerActionIndex++;
             if(this.playerActionIndex >= this.maxPlayerActions) {
@@ -776,6 +790,14 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     this.nextButtonClicked = function() {
         playSound("click");
         if(this.isOpponentTurn) {
+            if(this.opponentActionIndex === -1) {
+                const resultText = this.runActionableStatuses(this.opponentState);
+                this.opponentActionIndex = 0;
+                if(resultText) {
+                    this.textFeed = processTextForWrapping(resultText);
+                    return;
+                }
+            }
             const actionDataResult = opponentSequencer.getActionData(this,this.opponentState);
             if(this.nextNextButtonCard) {
                 this.fullScreenCard = this.nextNextButtonCard;
@@ -789,10 +811,10 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                     this.textFeed = [];
                     this.setToPlayerTurn();
                     if(this.textFeed.length < 1) {
-                        this.textFeed = processTextForWrapping("opponent turn over");
+                        this.textFeed = processTextForWrapping("opponent turn over.\n\n");
                     } else {
                         this.textFeed = [
-                            ...this.textFeed,...processTextForWrapping("\n\nopponent turn over")
+                            ...processTextForWrapping("opponent turn over.\n\n"),...this.textFeed
                         ];
                     }
                     this.renderer.showTextFeed();
@@ -875,17 +897,15 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                     this.maxOpponentActions
                 }\n${
                     textResult
-                }`
+                }\n\n`
             );
 
             this.opponentActionIndex++;
 
             if(!this.nextNextButtonCard) {
                 if(this.opponentActionIndex >= this.maxOpponentActions) {
+                    this.textFeed = [...this.textFeed,...processTextForWrapping("opponent turn over.\n\n")];
                     this.setToPlayerTurn();
-                    this.textFeed = [
-                        ...this.textFeed,...processTextForWrapping("\n\nopponent turn over")
-                    ];
                 }
             } else {
                 this.renderer.lockTextFeedToggle();

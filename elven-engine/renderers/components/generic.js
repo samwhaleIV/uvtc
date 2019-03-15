@@ -20,7 +20,6 @@ function areaContains(x,y,rx,ry,rw,rh) {
 }
 
 function drawOutline(x,y,width,height,size,color) {
-
     context.fillStyle = color;
     context.beginPath();
 
