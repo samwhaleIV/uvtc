@@ -746,20 +746,40 @@ function CardScreenRenderer(sequencer,callbacks,background) {
     this.opponentPulseType = -1;
 
     this.playerHealthPulse = function() {
-        this.playerPulseStart = performance.now();
+        if(this.playerPulseType === -1) {
+            this.playerPulseStart = performance.now();
+            this.playerPulseType = 0;
+            return true;
+        }
+        let returnResult = this.playerPulseType === 1;
         this.playerPulseType = 0;
+        return returnResult;
     }
     this.playerEnergyPulse = function() {
-        this.playerPulseStart = performance.now();
-        this.playerPulseType = 1;
+        if(this.playerPulseType === -1) {
+            this.playerPulseStart = performance.now();
+            this.playerPulseType = 1;
+            return true;
+        }
+        return this.playerPulseType === 0;
     }
     this.opponentHealthPulse = function() {
-        this.opponentPulseStart = performance.now();
+        if(this.opponentPulseType === -1) {
+            this.opponentPulseStart = performance.now();
+            this.opponentPulseType = 0;
+            return true;
+        }
+        let returnResult = this.opponentPulseType === 1;
         this.opponentPulseType = 0;
+        return returnResult;
     }
     this.opponentEnergyPulse = function() {
-        this.opponentPulseStart = performance.now();
-        this.opponentPulseType = 1;
+        if(this.opponentPulseType === -1) {
+            this.opponentPulseStart = performance.now();
+            this.opponentPulseType = 1;
+            return true;
+        }
+        return this.opponentPulseType === 0;
     }
 
     this.getPlayerBarColor = function(timestamp) {

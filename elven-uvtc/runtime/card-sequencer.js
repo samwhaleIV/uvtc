@@ -117,11 +117,23 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         if(!ID) {
             ID = this.getConditionID();
         }
+
+        let turnCount;
+        if(condition.action && !condition.filters) {
+            turnCount = 0;
+        } else if(condition.filters && !condition.action) {
+            turnCount = 1;
+        } else if(condition.filters && condition.action) {
+            turnCount = 1;
+        } else {
+            turnCount = 0;
+        }
+
         const conditionWrapper = {
             ID: ID,
             condition: condition,
             conditionData: data,
-            turnCount: condition.action ? 1 : 0,
+            turnCount: turnCount
         }
         target.conditionManifest.lookup[ID] = conditionWrapper;
         this.updateConditionManifest(target);
@@ -139,13 +151,16 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             if(target.health > maxHealth) {
                 target.health = maxHealth;
             }
+            let shouldPlaySound;
             if(target.isPlayer) {
-                this.renderer.playerHealthPulse();
+                shouldPlaySound = this.renderer.playerHealthPulse();
                 
             } else {
-                this.renderer.opponentHealthPulse();
+                shouldPlaySound = this.renderer.opponentHealthPulse();
             }
-            playSound("heal");
+            if(shouldPlaySound) {
+                playSound("heal");
+            }
         }
     }
     this.dropHealth = function(target,amount) {
@@ -154,12 +169,15 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             if(target.health < 0) {
                 target.health = 0;
             }
+            let shouldPlaySound;
             if(target.isPlayer) {
-                this.renderer.playerHealthPulse();
+                shouldPlaySound = this.renderer.playerHealthPulse();
             } else {
-                this.renderer.opponentHealthPulse();
+                shouldPlaySound = this.renderer.opponentHealthPulse();
             }
-            playSound("damage");
+            if(shouldPlaySound) {
+                playSound("damage");
+            }
         }
     }
 
@@ -169,12 +187,15 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             if(target.energy > maxEnergy) {
                 target.energy = maxEnergy;
             }
+            let shouldPlaySound;
             if(target.isPlayer) {
-                this.renderer.playerEnergyPulse();
+                shouldPlaySound = this.renderer.playerEnergyPulse();
             } else {
-                this.renderer.opponentEnergyPulse();
+                shouldPlaySound = this.renderer.opponentEnergyPulse();
             }
-            playSound("energy");
+            if(shouldPlaySound) {
+                playSound("energy");
+            }
         }
     }
     this.dropEnergy = function(target,amount) {
@@ -183,12 +204,15 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             if(target.energy < 0) {
                 target.energy = 0;
             }
+            let shouldPlaySound;
             if(target.isPlayer) {
-                this.renderer.playerEnergyPulse();
+                shouldPlaySound = this.renderer.playerEnergyPulse();
             } else {
-                this.renderer.opponentEnergyPulse();
+                shouldPlaySound = this.renderer.opponentEnergyPulse();
             }
-            playSound("energy-reverse");
+            if(shouldPlaySound) {
+                playSound("energy-reverse");
+            }
         }
     }
 
@@ -257,6 +281,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     }
 
     this.playerState = {
+        name: "you",
         isPlayer: true,
         isOpponent: false,
         health: 6,
@@ -275,6 +300,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     };
 
     this.opponentState = {
+        name: "opponent",
         isPlayer: false,
         isOpponent: true,
         health: 6,
@@ -689,7 +715,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                 actionResultText = `used '${usedCard.name}'`;
                 const actionResult = usedCard.action(this,this.playerState,this.opponentState);
                 if(actionResult) {
-                    actionResultText += "\n" + actionResult;
+                    actionResultText += "\n" + actionResult + "\n\n";
                     this.renderer.showTextFeed();
                 }
                 this.fullScreenCard = null;
@@ -859,7 +885,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                     textResult = `opponent used '${usedCard.name}'`;
                     const actionResult = usedCard.action(this,this.opponentState,this.playerState);
                     if(actionResult) {
-                        textResult += "\n" + actionResult;
+                        textResult += "\n" + actionResult + "\n\n";
                     }
                     break;
                 case "discard":

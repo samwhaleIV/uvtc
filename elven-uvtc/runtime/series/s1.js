@@ -97,7 +97,7 @@ addCardSeries([
         energyCost: 3,
         description: "inflicts opponent with poison that lasts 2 turns",
         action: (sequencer,user,target) => {
-            target.addCondition("poisoned by fruit")
+            target.addCondition("poisoned by fruit");
         }
     }
 ],[
@@ -108,6 +108,7 @@ addCardSeries([
         timeToLive: 3,
         action: (sequencer,user) => {
             sequencer.addHealth(user,1);
+            return `${user.name} got +1 health from hibernating`;
         }
     },
     {
@@ -144,6 +145,7 @@ addCardSeries([
         hidden: true,
         action: (sequencer,user) => {
             sequencer.addEnergy(user,1);
+            return `${user.name} got 1 energy from solar power` 
         }
     },
     {

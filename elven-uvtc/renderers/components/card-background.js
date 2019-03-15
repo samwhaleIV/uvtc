@@ -5,6 +5,9 @@ function CardBackground(backgroundName,color) {
             case "card-test":
                 this.color = ACoolBlueColor;
                 break;
+            case "deck-background":
+                this.color = ACoolBlueColor;
+                break;
         }
     } else {
         this.color = color;

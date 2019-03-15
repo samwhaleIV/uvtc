@@ -18,7 +18,7 @@ function loadCallback() {
                 lose: ()=>{},
                 quit: ()=>{}
             },
-            new CardBackground("backgrounds/card-test")
+            new CardBackground("backgrounds/deck-background")
         )
     );
     startRenderer();
