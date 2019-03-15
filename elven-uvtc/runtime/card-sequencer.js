@@ -357,15 +357,18 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
 
     this.isOpponentTurn = false;
 
-    this.updateActionText = function(isPlayerTurn) {
+
+    this.updateActionText = function() {
         let text;
         if(!this.isOpponentTurn) {
-            text = `action ${this.playerActionIndex+1} of ${this.maxPlayerActions}`;
+            text = `turn ${this.turnNumber+1} - action ${this.playerActionIndex+1} of ${this.maxPlayerActions}`;
         } else {
-            text = "opponent turn";
+            text = `turn ${this.turnNumber+1} - opponent turn`;
         }
         this.buttonLookup[0].text = text;
     }
+
+    this.updateTurnText = this.updateActionText;
 
     this.expireTurnBased = function(target) {
         let expiredText = "";
@@ -399,6 +402,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
 
     this.setToPlayerTurn = function() {
         this.turnNumber++;
+        this.updateTurnText();
 
         const expirationManifest = this.expireTurnBased(this.playerState);
         this.expireEndTerminating(this.opponentState);
@@ -424,7 +428,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         this.renderer.unlockViewTab();
         this.renderer.unlockTextFeedToggle();
         this.updateButtonStates(false);
-        this.updateActionText(true);
+        this.updateActionText();
         this.nextButtonEnabled = false;
         this.nextButtonShown = false;
 
@@ -457,7 +461,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             this.hideFullScreenCard(true);
         }
 
-        this.updateActionText(false);
+        this.updateActionText();
         this.updateButtonStates(true);
         this.renderer.lockPageCycle();
         this.renderer.lockViewTab();
@@ -482,7 +486,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     this.buttonRows = [
         [
             {
-                text: "action 1 of 3",
+                text: "[turn description]",
                 isNotAButton: true,
             }
         ],
@@ -1059,4 +1063,6 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     this.updateRendererData();
     this.updateButtonStates(false);
 
+    this.updateActionText();
+    this.updateTurnText();
 }

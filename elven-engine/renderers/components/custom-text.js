@@ -363,7 +363,7 @@ const fontDictionary = {
         0,0,0,
         1,1,1,
         0,0,0
-    ]},
+    ]}
 }
 function drawTextTest(text,scale) {
     let xOffset = 0;
@@ -559,7 +559,7 @@ const processTextForWrapping = function(description) {
     return description;
 }
 
-function drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,color) {
+function drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,color,horizontalSpace=7) {
     let xOffset = 0;
     let yOffset = 0;
     const scaleMatrix = ScaleMatrices[scale];
@@ -615,17 +615,17 @@ function drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,color) {
             }
         }
         if(xOffset) {
-            xOffset += 7;
+            xOffset += horizontalSpace;
         }
         i++;
     }
     context.fill();
 }
-function drawTextWrappingWhite(words,x,y,maxWidth,verticalSpace,scale) {
-    drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,"white");
+function drawTextWrappingWhite(words,x,y,maxWidth,verticalSpace,scale,horizontalSpace) {
+    drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,"white",horizontalSpace);
 }
-function drawTextWrappingBlack(words,x,y,maxWidth,verticalSpace,scale) {
-    drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,"black");
+function drawTextWrappingBlack(words,x,y,maxWidth,verticalSpace,scale,horizontalSpace) {
+    drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,"black",horizontalSpace);
 }
 
 function drawTextWhite(text,x,y,scale) {

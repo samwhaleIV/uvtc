@@ -610,7 +610,7 @@ function renderButtonRow(buttonRow,index,withHover,hoverIndex,specialHover,hover
         const button = buttonRow[i];
 
         if(button.isNotAButton) {
-            drawTextWhite(button.text,buttonSchema.textX,moveButtonTextY+yPosition,SmallTextScale);
+            drawTextWrappingWhite(button.text,buttonSchema.textX,moveButtonTextY+yPosition,buttonSchema.width,3,smallestTextScale,1);
             continue;
         }
 
