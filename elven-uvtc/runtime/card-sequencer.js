@@ -735,7 +735,6 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             case drawEnergyButtonText:
                 this.addEnergy(this.playerState,1);
                 this.renderer.playerEnergyPulse();
-                playSound("energy");
                 actionResultText = "you drew 1 energy.";
                 didAction = true;
                 break;
@@ -845,7 +844,6 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                     textResult = "opponent drew 1 energy";
                     this.addEnergy(this.opponentState,1);
                     this.renderer.opponentEnergyPulse();
-                    playSound("energy");
                     break;
                 case "attack":
                     const damageDone = processDamage(this.opponentState,this.playerState);
