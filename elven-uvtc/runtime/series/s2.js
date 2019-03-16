@@ -52,5 +52,6 @@ addCardSeries([
         ]
     }
 ],{
-    description: "hey wait i've seen these before"
+    description: "hey wait i've seen these before",
+    brightBadge: true
 });

@@ -430,7 +430,7 @@ function CardBookRenderer(callback) {
                     book.x,book.y,
                     book.width,book.height
                 );
-                drawTextStencil("black",allCardSeries[i].name,book.textX,book.textY,smallestTextScale,stencilPadding);
+                drawTextStencil(allCardSeries[i].manifest.brightBadge?"white":"black",allCardSeries[i].name,book.textX,book.textY,smallestTextScale,stencilPadding);
                 i++;
             }
 

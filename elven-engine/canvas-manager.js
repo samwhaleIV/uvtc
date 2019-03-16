@@ -10,7 +10,7 @@ let doubleHeight;
 let verticalSizeRatio;
 let horizontalSizeRatio;
 
-const defaultFullScreenZoom = 1.25;
+const defaultFullScreenZoom = 1.5;
 const mediumFullScreenZoom = 1;
 const smallFullScreenZoom = 0.8;
 

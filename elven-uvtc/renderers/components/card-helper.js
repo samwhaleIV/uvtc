@@ -37,7 +37,7 @@ function renderCardBack(card,x,y,width,height) {
 
 function renderFullScreenName(name,lineBreakName,x,y,width,scale) {
     const textTestResult = drawTextTest(name,scale);
-    if(textTestResult.width + doubleCardTitlePadding > width - 10) {
+    if(textTestResult.width + doubleCardTitlePadding > width - 5) {
 
         const ttr1 = drawTextTest(lineBreakName[0],scale);
         const ttr2 = drawTextTest(lineBreakName[1],scale);

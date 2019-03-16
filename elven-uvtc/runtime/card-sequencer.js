@@ -361,9 +361,9 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     this.updateActionText = function() {
         let text;
         if(!this.isOpponentTurn) {
-            text = `turn ${this.turnNumber+1} - action ${this.playerActionIndex+1} of ${this.maxPlayerActions}`;
+            text = `turn ${this.turnNumber} - action ${this.playerActionIndex+1} of ${this.maxPlayerActions}`;
         } else {
-            text = `turn ${this.turnNumber+1} - opponent turn`;
+            text = `turn ${this.turnNumber} - opponent turn`;
         }
         this.buttonLookup[0].text = text;
     }
@@ -800,8 +800,8 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         if(!this.cardPageRenderData[index]) {
             return;
         }
-        playSound("click");
         if(this.viewingSelfCards) {
+            playSound("click");
             this.fullScreenCard = this.cardPageRenderData[index];
             if(this.viewingSelfCards) {
                 this.fullScreenCardIndex = index;
