@@ -53,7 +53,7 @@ const actionPrioritySort = function(a,b) {
     return (a.condition.actionPriority || 0) < (b.condition.actionPriority || 0) ? 1 : -1
 }
 
-//Opponent move table
+//Opponent move table (O.M.T.)
 const OMT = {
     drawCard: 0,
     drawEnergy: 1,
@@ -65,46 +65,34 @@ const OMT = {
     setSpecial: 7
 }
 
+const zeroClamp = function(value) {
+    if(value < 0) {
+        return 0;
+    }
+    return value;
+}
+const oneClamp = function(value) {
+    if(value < 1) {
+        return 1;
+    }
+    return value;
+}
+
 const filterTypes = {
     outgoingDamage: {
-        clamp:function(value) {
-            if(value < 0) {
-                value = 0;
-            }
-            return value;
-        }
+        clamp:zeroClamp
     },
     incomingDamage: {
-        clamp:function(value) {
-            if(value < 0) {
-                value = 0;
-            }
-            return value;
-        }
+        clamp:zeroClamp
     },
     turnCount: {
-        clamp:function(value) {
-            if(value < 1) {
-                value = 1;
-            }
-            return value;
-        }
+        clamp:oneClamp
     },
     energyCost: {
-        clamp:function(value) {
-            if(value < 0) {
-                value = 0;
-            }
-            return value;
-        }
+        clamp:zeroClamp
     },
     energyDraw: {
-        clamp:function(value) {
-            if(value < 1) {
-                value = 1;
-            }
-            return value;
-        }
+        clamp:oneClamp
     }
 }
 
@@ -117,9 +105,18 @@ const accumulateFilters = function(type,target,value) {
     });
     return value;
 }
+const accumulateDamageFilters = function(type,user,target,damage) {
+    const theSuperFilterForFilters = filterTypes[type].clamp;
+    target.conditionManifest.filters[type].forEach(filterSet => {
+        const filter = filterSet.filter;
+        damage = filter.process(user,target,damage,filterSet.conditionWrapper.data);
+        damage = theSuperFilterForFilters(damage);
+    });
+    return damage;
+}
 
 const processDamage = function(user,target) {
-    let damage = accumulateFilters("outgoingDamage",
+    let damage = accumulateDamageFilters("outgoingDamage",
         user,
         target,
         user.slots.attack.getAttackDamage(
@@ -128,7 +125,7 @@ const processDamage = function(user,target) {
         )
     );
 
-    damage = accumulateFilters("incomingDamage",
+    damage = accumulateDamageFilters("incomingDamage",
         target,
         user,
         damage
