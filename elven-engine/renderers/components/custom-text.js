@@ -559,7 +559,7 @@ const processTextForWrapping = function(description) {
     return description;
 }
 
-function drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,color,horizontalSpace=7) {
+function drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,color,horizontalSpace=1) {
     let xOffset = 0;
     let yOffset = 0;
     const scaleMatrix = ScaleMatrices[scale];
@@ -609,7 +609,10 @@ function drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,color,horizonta
                 }
                 xOffset += drawWidth;
                 if(i2 < word.length-1) {
-                    xOffset += scale;
+                    xOffset += horizontalSpace;
+                }
+                if(word[i2] === " ") {
+                    xOffset += smallestTextSpacing;
                 }
                 i2++;
             }

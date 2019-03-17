@@ -143,7 +143,7 @@ function updateCardBookElements() {
         cardCenter.x = innerBookArea.x + Math.floor((innerBookArea.width/2)-(cardCenter.width/2));
 
     } else {
-        cardCenter.width = cardCenter.width;
+        cardCenter.width = innerBookArea.width;
         cardCenter.height = (cardCenter.width * cardCenter.widthRatio);
 
         cardCenter.x = innerBookArea.x;
@@ -386,9 +386,9 @@ function CardBookRenderer(callback) {
                     this.fullScreenCard = null;
                     playSound("reverse-click");
                 } else {
+                    playSound("click");
                     if(this.pageCount > 1) {
                         this.cyclePage();
-                        playSound("click");
                     }
                 }
                 break;
@@ -425,12 +425,15 @@ function CardBookRenderer(callback) {
                     );
                     drawRectangle(book.hover,"white");
                 }
+
+                const series = allCardSeries[i] || allCardSeries[0];//DEBUG ONLY
+
                 renderCardBack(
-                    allCardSeries[i].manifest,
+                    series.manifest,
                     book.x,book.y,
                     book.width,book.height
                 );
-                drawTextStencil(allCardSeries[i].manifest.brightBadge?"white":"black",allCardSeries[i].name,book.textX,book.textY,smallestTextScale,stencilPadding);
+                drawTextStencil(series.manifest.brightBadge?"white":"black",series.name,book.textX,book.textY,smallestTextScale,stencilPadding);
                 i++;
             }
 

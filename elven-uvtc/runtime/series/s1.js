@@ -106,7 +106,7 @@ addCardSeries([
         description: "generating 1 health at the beginning of every turn",
         expirationType: "timed",
         timeToLive: 3,
-        action: (sequencer,user) => {
+        action: (sequencer,user,data) => {
             sequencer.addHealth(user,1);
             return `${user.name} got +1 health from hibernating`;
         }

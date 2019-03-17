@@ -112,7 +112,7 @@ function renderCardFullScreen(card,x,y,width,height) {
 
     if(card.description) {
 
-        const yTop = Math.floor(height*0.75);
+        const yTop = Math.floor(height*0.5);
 
 
         context.fillStyle = "rgba(255,255,255,1)";
@@ -123,7 +123,7 @@ function renderCardFullScreen(card,x,y,width,height) {
             height - yTop
         );
 
-        drawTextWrappingBlack(card.description,x + 6,y+yTop+6,width - (smallestTextScale*15),7,smallestTextScale);
+        drawTextWrappingBlack(card.description,x + 6,y+yTop+6,width - (smallestTextScale*15),7,smallestTextScale,1);
     }
 
 }

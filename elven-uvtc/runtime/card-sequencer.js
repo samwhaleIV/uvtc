@@ -31,12 +31,10 @@ const getPageTypeFromIndex = function(index) {
 
 const drawButtonText = "draw";
 const drawEnergyButtonText = "draw energy";
-const attackButtonText = "do attack";
+const attackButtonText = "attack";
 const useButtonText = "use";
 const discardButtonText = "discard";
-const setAttackText = "attack";
-const setDefenseText = "defense";
-const setSpecialText = "special";
+const setSlotText = "set slot";
 
 const defaultCardPageType = cardPageTypes.hand;
 const defaultOpponentCardPageType = cardPageTypes.slots;
@@ -47,37 +45,26 @@ const filterPrioritySort = function(a,b) {
     return (a.filter.priority || 0) < (b.filter.priority || 0) ? 1 : -1
 }
 const actionPrioritySort = function(a,b) {
-    return (a.condition.action.priority || 0) < (b.condition.action.priority || 0) ? 1 : -1
+    return (a.condition.actionPriority || 0) < (b.condition.actionPriority || 0) ? 1 : -1
 }
 
-const processEnergyAmount = function(target,energyAmount) {
-    target.conditionManifest.filters.energy.forEach(filter => {
-        energyAmount = filter.process(target,energyAmount);
+const accumulateFilters = function(type,target,value) {
+    target.conditionManifest.filters[type].forEach(filterSet => {
+        const filter = filterSet.filter;
+        value = filter.process(target,value,filterSet.conditionWrapper.data);
     });
-    return energyAmount;
-}
-const processActionCount = function(target,actionCount) {
-    target.conditionManifest.filters.turnCount.forEach(filter => {
-        actionCount = filter.process(target,actionCount);
-    });
-    return actionCount;
+    return value;
 }
 
-const processIncomingDamage = function(user,target,amount) {
-    user.conditionManifest.filters.incomingDamage.forEach(filter => {
-        amount = filter.process(user,target,amount);
-    });
-    return amount;
-}
 const processOutgoingDamage = function(user,target,amount) {
-    user.conditionManifest.filters.outgoingDamage.forEach(filter => {
+    user.conditionManifest.filters.outgoingDamage.forEach(filterSet => {
         amount = filter.process(user,target,amount);
     });
     return amount;
 }
 
 const processDamage = function(user,target,amount) {
-    let damage = processOutgoingDamage(
+    let damage = accumulateFilters("outgoingDamage",
         user,
         target,
         user.slots.attack.getAttackDamage(
@@ -86,7 +73,7 @@ const processDamage = function(user,target,amount) {
         )
     );
 
-    damage = processIncomingDamage(
+    damage = accumulateFilters("incomingDamage",
         target,
         user,
         damage
@@ -103,7 +90,7 @@ const maxEnergy = 100;
 function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
 
     this.renderer = null;
-    this.textFeed = processTextForWrapping("to check to rules hit escape and click 'the rules'\n\n(unless this feature doesn't exist yet)");
+    this.textFeed = processTextForWrapping("to check the rules hit escape and click 'the rules'\n\n(unless this feature doesn't exist yet)\n\n");
 
     this.turnNumber = 1;
 
@@ -132,7 +119,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         const conditionWrapper = {
             ID: ID,
             condition: condition,
-            conditionData: data,
+            data: data,
             turnCount: turnCount
         }
         target.conditionManifest.lookup[ID] = conditionWrapper;
@@ -268,16 +255,16 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             }
             if(condition.filters) {
                 condition.filters.forEach(filter =>
-                    target.conditionManifest.filters[filter.type].push(filter)//{condition:condition,filter:filter}
+                    target.conditionManifest.filters[filter.type].push({conditionWrapper:conditionWrapper,filter:filter})
                 );
             }
 
         });
 
-        target.conditionManifest.filters.energy.sort(filterPrioritySort);
-        target.conditionManifest.filters.turnCount.sort(filterPrioritySort);
+        Object.values(target.conditionManifest.filters).forEach(filterBundle => {
+            filterBundle.sort(filterPrioritySort);
+        });
         target.conditionManifest.startActionable.sort(actionPrioritySort);
-
     }
 
     this.playerState = {
@@ -318,7 +305,8 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         conditionManifest: {lookup:{}}
     };
 
-
+    this.playerState.sequencer = this;
+    this.opponentState.sequencer = this;
 
     this.playerState.hasCondition = conditionName => this.hasCondition(this.playerState,conditionName);
     this.opponentState.hasCondition = conditionName => this.hasCondition(this.opponentState,conditionName);
@@ -375,7 +363,9 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         target.conditionManifest.byExpire.timed.forEach(conditionWrapper => {
             if(++conditionWrapper.turnCount > conditionWrapper.condition.timeToLive) {
                 this.removeConditionByWrapper(target,conditionWrapper);
-                expiredText += `${target.isPlayer?"your":"opponent's"} '${conditionWrapper.condition.name}' status expired.\n`;
+                if(!conditionWrapper.condition.hiddenExpiration) {
+                    expiredText += `${target.isPlayer?"your":"opponent's"} '${conditionWrapper.condition.name}' status expired.\n`;
+                }
             }
         });
         return expiredText;
@@ -419,7 +409,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             this.hideFullScreenCard(true);
         }
         this.playerActionIndex = 0;
-        this.maxPlayerActions = processActionCount(
+        this.maxPlayerActions = accumulateFilters("turnCount",
             this.playerState,
             defaultActionAmount
         );
@@ -449,6 +439,21 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         }
     }
 
+    this.skipRemainingActions = function() {
+        if(this.isOpponentTurn) {
+            if(this.opponentActionIndex + 1 >= this.maxOpponentActions) {
+                return;
+            }
+            this.setToPlayerTurn();
+            this.textFeed = [...this.textFeed,...processTextForWrapping("opponent turn ended early.\n\n")];
+        } else {
+            if(this.playerActionIndex + 1 >= this.maxPlayerActions) {
+                return;
+            }
+            this.setToOpponentTurn();
+        }
+    }
+
     this.setToOpponentTurn = function() {
 
         const expirationManifest =  this.expireTurnBased(this.opponentState);
@@ -460,21 +465,20 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         if(this.fullScreenCard) {
             this.hideFullScreenCard(true);
         }
-
-        this.updateActionText();
         this.updateButtonStates(true);
         this.renderer.lockPageCycle();
         this.renderer.lockViewTab();
         this.renderer.lockTextFeedToggle();
-        this.maxOpponentActions = processActionCount(
+        this.maxOpponentActions = accumulateFilters("turnCount",
             this.opponentState,
             defaultActionAmount
         );
         this.opponentActionIndex = -1;
         this.isOpponentTurn = true;
+        this.updateActionText();
         this.nextButtonEnabled = true;
         this.nextButtonShown = true;
-        this.textFeed = [...this.textFeed,...processTextForWrapping(`player turn is over.\n${expirationManifest?"\n"+expirationManifest:""}\npress [continue] to advance opponent moves.`)];
+        this.textFeed = [...this.textFeed,...processTextForWrapping(`your turn is over.\n${expirationManifest?"\n"+expirationManifest:""}\npress [continue] to advance opponent moves.\n\n`)];
         this.renderer.showTextFeed();
         this.cardPageType = cardPageTypes.slots;
         this.pageIndex = 1;
@@ -526,28 +530,9 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                 enabled: false
             },
         ],
-        [],
         [
             {
-                text: "set slot cards",
-                isNotAButton: true,
-            }
-        ],
-        [
-            {
-                text: setAttackText,
-                enabled: false
-            }
-        ],
-        [
-            {
-                text: setDefenseText,
-                enabled: false
-            }
-        ],
-        [
-            {
-                text: setSpecialText,
+                text: setSlotText,
                 enabled: false
             }
         ]
@@ -670,7 +655,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             this.playerState.slots[name].action(this,this.playerState);
         }
         this.playerState.hand.splice(this.fullScreenCardIndex,1);
-        const energyCost = processEnergyAmount(
+        const energyCost = accumulateFilters("energy",
             this.playerState,
             this.playerState.slots[name].energyCost
         );
@@ -698,7 +683,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             this.opponentState.slots[name].action(this,this.opponentState);
         }
         this.opponentState.hand.splice(index,1);
-        const energyCost = processEnergyAmount(
+        const energyCost = accumulateFilters("energy",
             this.opponentState,
             this.opponentState.slots[name].energyCost
         );
@@ -713,7 +698,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         switch(this.buttonLookup[index].text) {
             case useButtonText:
                 const usedCard = this.playerState.hand[this.fullScreenCardIndex];
-                const energyCost = processEnergyAmount(this.playerState,usedCard.energyCost);
+                const energyCost = accumulateFilters("energy",this.playerState,usedCard.energyCost);
                 this.dropEnergy(this.playerState,energyCost);
                 this.playerState.hand.splice(this.fullScreenCardIndex,1);
                 actionResultText = `used '${usedCard.name}'`;
@@ -737,16 +722,8 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                 this.renderer.unlockViewTab();
                 didAction = true;
                 break;
-            case setAttackText:
-                actionResultText = this.updatePlayerSlot("attack");
-                didAction = true;
-                break;
-            case setDefenseText:
-                actionResultText = this.updatePlayerSlot("defense");
-                didAction = true;
-                break;
-            case setSpecialText:
-                actionResultText = this.updatePlayerSlot("special");
+            case setSlotText:
+                actionResultText = this.updatePlayerSlot(this.fullScreenCard.type);
                 didAction = true;
                 break;
             case drawButtonText:
@@ -882,7 +859,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                 case "use":
                     const usedCard = this.opponentState.hand[actionDataResult.cardIndex];
                     this.nextNextButtonCard = usedCard;
-                    const energyCost = processEnergyAmount(this.opponentState,usedCard.energyCost);
+                    const energyCost = accumulateFilters("energy",this.opponentState,usedCard.energyCost);
                     this.dropEnergy(this.opponentState,energyCost);
 
                     this.opponentState.hand.splice(actionDataResult.cardIndex,1);
@@ -951,9 +928,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         this.buttonNameLookup[useButtonText].enabled = false;
         this.buttonNameLookup[discardButtonText].enabled = false;
 
-        this.buttonNameLookup[setAttackText].enabled = false;
-        this.buttonNameLookup[setDefenseText].enabled = false;
-        this.buttonNameLookup[setSpecialText].enabled = false;
+        this.buttonNameLookup[setSlotText].enabled = false;
     }
 
     this.updateButtonStates = function(disableAll) {
@@ -964,9 +939,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         } else {
             if(this.viewingSelfCards) {
                 if(this.fullScreenCard && this.cardPageType === cardPageTypes.hand) {
-                    this.buttonNameLookup[setAttackText].enabled = false;
-                    this.buttonNameLookup[setDefenseText].enabled = false;
-                    this.buttonNameLookup[setSpecialText].enabled = false;
+                    this.buttonNameLookup[setSlotText].enabled = false;
 
                     this.buttonNameLookup[drawButtonText].enabled = this.playerState.hand.length < 6;
                     this.buttonNameLookup[attackButtonText].enabled = this.playerState.slots.attack ? true : false;
@@ -974,20 +947,16 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
 
                     this.buttonNameLookup[useButtonText].enabled = false;
 
-                    const playerHasEnoughEnergy = this.playerState.energy >= processEnergyAmount(
+                    const playerHasEnoughEnergy = this.playerState.energy >= accumulateFilters("energy",
                         this.playerState,
                         this.fullScreenCard.energyCost
                     );
 
                     switch(this.fullScreenCard.type) {
                         case "attack":
-                            this.buttonNameLookup[setAttackText].enabled = playerHasEnoughEnergy;
-                            break;
                         case "defense":
-                            this.buttonNameLookup[setDefenseText].enabled = playerHasEnoughEnergy;
-                            break;
                         case "special":
-                            this.buttonNameLookup[setSpecialText].enabled = playerHasEnoughEnergy;
+                            this.buttonNameLookup[setSlotText].enabled = playerHasEnoughEnergy;
                             break;
                         default:
                             this.buttonNameLookup[useButtonText].enabled = playerHasEnoughEnergy;

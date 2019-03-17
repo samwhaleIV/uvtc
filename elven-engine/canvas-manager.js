@@ -10,14 +10,15 @@ let doubleHeight;
 let verticalSizeRatio;
 let horizontalSizeRatio;
 
-const defaultFullScreenZoom = 1.5;
+const defaultFullScreenZoom = 1.25;
 const mediumFullScreenZoom = 1;
 const smallFullScreenZoom = 0.8;
 
-const mediumScaleSnapPoint = 1300;
-const smallScaleSnapPoint = 900;
+const maxHorizontalResolution = 1920;
+const mediumScaleSnapPoint = 1600;
+const smallScaleSnapPoint = 810;
 
-let smallestTextScale;
+let smallestTextScale, smallestTextSpacing;
 
 function setSizeConstants() {
     fullWidth = canvas.width;
@@ -222,9 +223,16 @@ window.onkeyup = event => {
     routeKeyEvent(event,keyEventTypes.keyUp);
 }
 function applySizeMode() {
-    switch(canvasSizeMode) {
+    let sizeMode = canvasSizeMode;
+
+    if(window.innerWidth / window.innerHeight > 2 || window.innerHeight / window.innerWidth > 1.25) {
+        sizeMode = "fit";
+    }
+
+    switch(sizeMode) {
         case "fit":
             smallestTextScale = 2;
+            smallestTextSpacing = 1;
             canvas.width = internalWidth;
             canvas.height = internalHeight;
             if(window.innerWidth / window.innerHeight > widthByHeight) {
@@ -248,11 +256,16 @@ function applySizeMode() {
         default:
         case "stretch":
             smallestTextScale = 3;
+            smallestTextSpacing = 4;
 
             let zoomDivider = rendererState ? rendererState.zoomDivider || defaultFullScreenZoom : defaultFullScreenZoom;
 
-            if(window.innerWidth < smallScaleSnapPoint) {
+            if(window.innerWidth >= maxHorizontalResolution) {
+                zoomDivider = (window.innerWidth / maxHorizontalResolution) * defaultFullScreenZoom;
+            } else if(window.innerWidth < smallScaleSnapPoint) {
                 zoomDivider = smallFullScreenZoom;
+                smallestTextScale = 2;
+                smallestTextSpacing = 1;
             } else if(window.innerWidth < mediumScaleSnapPoint) {
                 zoomDivider = mediumFullScreenZoom;
             }
@@ -267,6 +280,7 @@ function applySizeMode() {
             break;
         case "center":
             smallestTextScale = 2;
+            smallestTextSpacing = 1;
 
             canvas.width = internalWidth;
             canvas.height = internalHeight;
