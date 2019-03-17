@@ -154,7 +154,7 @@ addCardSeries([
         description: "energy costs are reduced to 0 until the end of this turn",
         filters: [
             {
-                type: "energy",
+                type: "energyCost",
                 priority: -200,
                 process: () => 0
             }

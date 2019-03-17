@@ -751,9 +751,8 @@ function CardScreenRenderer(sequencer,callbacks,background) {
             this.playerPulseType = 0;
             return true;
         }
-        let returnResult = this.playerPulseType === 1;
         this.playerPulseType = 0;
-        return returnResult;
+        return false;
     }
     this.playerEnergyPulse = function() {
         if(this.playerPulseType === -1) {
@@ -761,7 +760,7 @@ function CardScreenRenderer(sequencer,callbacks,background) {
             this.playerPulseType = 1;
             return true;
         }
-        return this.playerPulseType === 0;
+        return false;
     }
     this.opponentHealthPulse = function() {
         if(this.opponentPulseType === -1) {
@@ -769,9 +768,8 @@ function CardScreenRenderer(sequencer,callbacks,background) {
             this.opponentPulseType = 0;
             return true;
         }
-        let returnResult = this.opponentPulseType === 1;
         this.opponentPulseType = 0;
-        return returnResult;
+        return false;
     }
     this.opponentEnergyPulse = function() {
         if(this.opponentPulseType === -1) {
@@ -779,7 +777,7 @@ function CardScreenRenderer(sequencer,callbacks,background) {
             this.opponentPulseType = 1;
             return true;
         }
-        return this.opponentPulseType === 0;
+        return false;
     }
 
     this.getPlayerBarColor = function(timestamp) {

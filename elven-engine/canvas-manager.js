@@ -225,7 +225,7 @@ window.onkeyup = event => {
 function applySizeMode() {
     let sizeMode = canvasSizeMode;
 
-    if(window.innerWidth / window.innerHeight > 2 || window.innerHeight / window.innerWidth > 1.25) {
+    if(window.innerWidth / window.innerHeight > 2.25 || window.innerHeight / window.innerWidth > 1.25) {
         sizeMode = "fit";
     }
 

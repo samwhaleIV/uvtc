@@ -5,10 +5,10 @@ drawLoadingText();
 function loadCallback() {
     setRendererState(
         new CardScreenRenderer(
-            new CardSequencer([...allCardsList],[...allCardsList],{
+            new CardSequencer([...allCardsList],[allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"]],{
                 getActionData: (sequencer,me) => {
                     return {
-                        type: "discard",
+                        type: "useCard",
                         cardIndex: 0
                     }
                 }

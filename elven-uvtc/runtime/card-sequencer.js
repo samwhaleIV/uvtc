@@ -48,22 +48,52 @@ const actionPrioritySort = function(a,b) {
     return (a.condition.actionPriority || 0) < (b.condition.actionPriority || 0) ? 1 : -1
 }
 
+const filterValueClamps = {
+    //Because because because, this is also the definitive place that filter names are defined. Deal with it.
+    "outgoingDamage": function(value) {
+        if(value < 0) {
+            value = 0;
+        }
+        return value;
+    },
+    "incomingDamage": function(value) {
+        if(value < 0) {
+            value = 0;
+        }
+        return value;
+    },
+    "turnCount": function(value) {
+        if(value < 1) {
+            value = 1;
+        }
+        return value;
+    },
+    "energyCost": function(value) {
+        if(value < 0) {
+            value = 0;
+        }
+        return value;
+    },
+    "energyDraw": function(value) {
+        if(value < 1) {
+            value = 1;
+        }
+        return value;
+    }
+    
+}
+
 const accumulateFilters = function(type,target,value) {
+    const theSuperFilterForFilters = filterValueClamps[type];
     target.conditionManifest.filters[type].forEach(filterSet => {
         const filter = filterSet.filter;
         value = filter.process(target,value,filterSet.conditionWrapper.data);
+        value = theSuperFilterForFilters(value);
     });
     return value;
 }
 
-const processOutgoingDamage = function(user,target,amount) {
-    user.conditionManifest.filters.outgoingDamage.forEach(filterSet => {
-        amount = filter.process(user,target,amount);
-    });
-    return amount;
-}
-
-const processDamage = function(user,target,amount) {
+const processDamage = function(user,target) {
     let damage = accumulateFilters("outgoingDamage",
         user,
         target,
@@ -133,6 +163,9 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     }
 
     this.addHealth = function(target,amount) {
+        if(amount < 0) {
+            this.dropHealth(target,-amount);
+        }
         if(amount) {
             target.health += amount;
             if(target.health > maxHealth) {
@@ -151,6 +184,9 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         }
     }
     this.dropHealth = function(target,amount) {
+        if(amount < 0) {
+            this.addHealth(target,-amount);
+        }
         if(amount) {
             target.health -= amount;
             if(target.health < 0) {
@@ -168,7 +204,10 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         }
     }
 
-    this.addEnergy = function(target,amount) {
+    this.addEnergy = function(target,amount,fromClick) {
+        if(amount < 0) {
+            this.addEnergy(target,-amount);
+        }
         if(amount) {
             target.energy += amount;
             if(target.energy > maxEnergy) {
@@ -180,12 +219,15 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             } else {
                 shouldPlaySound = this.renderer.opponentEnergyPulse();
             }
-            if(shouldPlaySound) {
+            if(shouldPlaySound || fromClick) {
                 playSound("energy");
             }
         }
     }
     this.dropEnergy = function(target,amount) {
+        if(amount < 0) {
+            this.addEnergy(target,-amount);
+        }
         if(amount) {
             target.energy -= amount;
             if(target.energy < 0) {
@@ -223,13 +265,11 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             timed: [],
             manual: []
         }
-        target.conditionManifest.filters = {
-            energy: [],
-            turnCount: [],
-            outgoingDamage: [],
-            incomingDamage: []
-        }
 
+        target.conditionManifest.filters = {};
+        Object.keys(filterValueClamps).forEach(filterName => {
+            target.conditionManifest.filters[filterName] = [];
+        });
         Object.values(target.conditionManifest.lookup).forEach(conditionWrapper => {
             const condition = conditionWrapper.condition;
 
@@ -655,7 +695,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             this.playerState.slots[name].action(this,this.playerState);
         }
         this.playerState.hand.splice(this.fullScreenCardIndex,1);
-        const energyCost = accumulateFilters("energy",
+        const energyCost = accumulateFilters("energyCost",
             this.playerState,
             this.playerState.slots[name].energyCost
         );
@@ -683,10 +723,13 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
             this.opponentState.slots[name].action(this,this.opponentState);
         }
         this.opponentState.hand.splice(index,1);
-        const energyCost = accumulateFilters("energy",
+        const energyCost = accumulateFilters("energyCost",
             this.opponentState,
             this.opponentState.slots[name].energyCost
         );
+        if(energyCost > this.opponentState.energy) {
+            return `opponent does not have enough energy to slot '${this.opponentState.slots[name].name}'`;
+        }
         this.dropEnergy(this.opponentState,energyCost);
         return actionResultText;     
     }
@@ -698,7 +741,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         switch(this.buttonLookup[index].text) {
             case useButtonText:
                 const usedCard = this.playerState.hand[this.fullScreenCardIndex];
-                const energyCost = accumulateFilters("energy",this.playerState,usedCard.energyCost);
+                const energyCost = accumulateFilters("energyCost",this.playerState,usedCard.energyCost);
                 this.dropEnergy(this.playerState,energyCost);
                 this.playerState.hand.splice(this.fullScreenCardIndex,1);
                 actionResultText = `used '${usedCard.name}'`;
@@ -740,9 +783,9 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                 didAction = true;
                 break;
             case drawEnergyButtonText:
-                this.addEnergy(this.playerState,1);
-                this.renderer.playerEnergyPulse();
-                actionResultText = "you drew 1 energy.";
+                const energyDrawAmount = accumulateFilters("energyDraw",this.playerState,1);
+                this.addEnergy(this.playerState,energyDrawAmount,true);
+                actionResultText = `you drew ${energyDrawAmount} energy.`;
                 didAction = true;
                 break;
             case attackButtonText:
@@ -848,18 +891,35 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                     textResult += `opponent drew a card from the deck.`;
                     break;
                 case "drawEnergy":
-                    textResult = "opponent drew 1 energy";
-                    this.addEnergy(this.opponentState,1);
-                    this.renderer.opponentEnergyPulse();
+                    if(this.opponentState.energy >= maxEnergy) {
+                        textResult = "opponent tried to draw energy but they are maxed out";
+                    } else {
+                        const energyDrawAmount = accumulateFilters("energyDraw",this.opponentState,1);
+                        textResult = `opponent drew ${energyDrawAmount} energy`;
+                        this.addEnergy(this.opponentState,energyDrawAmount,true);
+                    }
                     break;
                 case "attack":
-                    const damageDone = processDamage(this.opponentState,this.playerState);
-                    textResult = `opponent did ${damageDone} damage`;
+                    if(this.opponentState.slots.attack) {
+                        const damageDone = processDamage(this.opponentState,this.playerState);
+                        textResult = `opponent did ${damageDone} damage`;
+                    } else {
+                        textResult = "opponent tried to attack but they have no attack card. what an idiot";
+                    }
                     break;
+                case "useCard":
                 case "use":
                     const usedCard = this.opponentState.hand[actionDataResult.cardIndex];
+                    if(!usedCard) {
+                        textResult = "opponent tried to use a card they don't have";
+                        break;
+                    }
                     this.nextNextButtonCard = usedCard;
-                    const energyCost = accumulateFilters("energy",this.opponentState,usedCard.energyCost);
+                    const energyCost = accumulateFilters("energyCost",this.opponentState,usedCard.energyCost);
+                    if(energyCost > this.opponentState.energy) {
+                        textResult = `opponent doesn't have enough energy to use '${usedCard.name}'`;
+                        break;
+                    }
                     this.dropEnergy(this.opponentState,energyCost);
 
                     this.opponentState.hand.splice(actionDataResult.cardIndex,1);
@@ -869,6 +929,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                         textResult += "\n" + actionResult + "\n\n";
                     }
                     break;
+                case "discardCard":
                 case "discard":
                     if(this.opponentState.hand.length < 1) {
                         textResult = "opponent tried to discard but they have no cards";
@@ -947,7 +1008,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
 
                     this.buttonNameLookup[useButtonText].enabled = false;
 
-                    const playerHasEnoughEnergy = this.playerState.energy >= accumulateFilters("energy",
+                    const playerHasEnoughEnergy = this.playerState.energy >= accumulateFilters("energyCost",
                         this.playerState,
                         this.fullScreenCard.energyCost
                     );
