@@ -69,7 +69,7 @@ let stencilPadding;
 
 function updateCardBookElements() {
 
-    const testResult = drawTextTest("series 1",smallestTextScale);
+    const testResult = drawTextTest("series 1",adaptiveTextScale);
     bookCenter.bookTextXOffset = testResult.width/2;
     bookCenter.bookTextYOffset = testResult.height/2;
 
@@ -133,7 +133,6 @@ function updateCardBookElements() {
     }
     cardBookExitButton.x = bookCenter.books[0].x + 6;
 
-//break point
     if(innerBookArea.width / innerBookArea.height > cardCenter.heightRatio) {
 
         cardCenter.height = innerBookArea.height;
@@ -433,7 +432,7 @@ function CardBookRenderer(callback) {
                     book.x,book.y,
                     book.width,book.height
                 );
-                drawTextStencil(series.manifest.brightBadge?"white":"black",series.name,book.textX,book.textY,smallestTextScale,stencilPadding);
+                drawTextStencil(series.manifest.brightBadge?"white":"black",series.name,book.textX,book.textY,adaptiveTextScale,stencilPadding);
                 i++;
             }
 

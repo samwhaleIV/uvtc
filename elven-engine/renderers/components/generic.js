@@ -20,23 +20,23 @@ function areaContains(x,y,rx,ry,rw,rh) {
 }
 
 function drawOutline(x,y,width,height,size,color) {
+    //Prefer stroke, but we can use this because stroke is mean on odd pixels.
+    //This simply works the same regardless of cooridinate.
+    //... that doesn't mean it's always better, just, sometimes it's better subjectively speaking.
     context.fillStyle = color;
     context.beginPath();
-
     context.rect(
         x-size,
         y-size,
         size,
         height+size
     );
-
     context.rect(
         x+width,
         y-size,
         size,
         height+size+size
     );
-
     context.rect(
         x-size,
         y-size,
@@ -49,6 +49,5 @@ function drawOutline(x,y,width,height,size,color) {
         width+size,
         size
     );
-
     context.fill();
 }

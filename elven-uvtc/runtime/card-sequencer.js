@@ -29,6 +29,13 @@ const getPageTypeFromIndex = function(index) {
     }
 }
 
+const handLimit = 6;
+const startHealth = 6;
+const startEnergy = 6;
+const maxHealth = 100;
+const maxEnergy = 100;
+const defaultActionCount = 3;
+
 const drawButtonText = "draw";
 const drawEnergyButtonText = "draw energy";
 const attackButtonText = "attack";
@@ -39,8 +46,6 @@ const setSlotText = "set slot";
 const defaultCardPageType = cardPageTypes.hand;
 const defaultOpponentCardPageType = cardPageTypes.slots;
 
-const defaultActionAmount = 3;
-
 const filterPrioritySort = function(a,b) {
     return (a.filter.priority || 0) < (b.filter.priority || 0) ? 1 : -1
 }
@@ -48,43 +53,63 @@ const actionPrioritySort = function(a,b) {
     return (a.condition.actionPriority || 0) < (b.condition.actionPriority || 0) ? 1 : -1
 }
 
-const filterValueClamps = {
-    //Because because because, this is also the definitive place that filter names are defined. Deal with it.
-    "outgoingDamage": function(value) {
-        if(value < 0) {
-            value = 0;
+//Opponent move table
+const OMT = {
+    drawCard: 0,
+    drawEnergy: 1,
+    useCard: 2,
+    discardCard: 3,
+    attack: 4,
+    setAttack: 5,
+    setDefense: 6,
+    setSpecial: 7
+}
+
+const filterTypes = {
+    outgoingDamage: {
+        clamp:function(value) {
+            if(value < 0) {
+                value = 0;
+            }
+            return value;
         }
-        return value;
     },
-    "incomingDamage": function(value) {
-        if(value < 0) {
-            value = 0;
+    incomingDamage: {
+        clamp:function(value) {
+            if(value < 0) {
+                value = 0;
+            }
+            return value;
         }
-        return value;
     },
-    "turnCount": function(value) {
-        if(value < 1) {
-            value = 1;
+    turnCount: {
+        clamp:function(value) {
+            if(value < 1) {
+                value = 1;
+            }
+            return value;
         }
-        return value;
     },
-    "energyCost": function(value) {
-        if(value < 0) {
-            value = 0;
+    energyCost: {
+        clamp:function(value) {
+            if(value < 0) {
+                value = 0;
+            }
+            return value;
         }
-        return value;
     },
-    "energyDraw": function(value) {
-        if(value < 1) {
-            value = 1;
+    energyDraw: {
+        clamp:function(value) {
+            if(value < 1) {
+                value = 1;
+            }
+            return value;
         }
-        return value;
     }
-    
 }
 
 const accumulateFilters = function(type,target,value) {
-    const theSuperFilterForFilters = filterValueClamps[type];
+    const theSuperFilterForFilters = filterTypes[type].clamp;
     target.conditionManifest.filters[type].forEach(filterSet => {
         const filter = filterSet.filter;
         value = filter.process(target,value,filterSet.conditionWrapper.data);
@@ -113,9 +138,6 @@ const processDamage = function(user,target) {
 
     return damage;
 }
-
-const maxHealth = 100;
-const maxEnergy = 100;
 
 function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
 
@@ -267,7 +289,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         }
 
         target.conditionManifest.filters = {};
-        Object.keys(filterValueClamps).forEach(filterName => {
+        Object.keys(filterTypes).forEach(filterName => {
             target.conditionManifest.filters[filterName] = [];
         });
         Object.values(target.conditionManifest.lookup).forEach(conditionWrapper => {
@@ -311,8 +333,8 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         name: "you",
         isPlayer: true,
         isOpponent: false,
-        health: 6,
-        energy: 6,
+        health: startHealth,
+        energy: startEnergy,
         fullDeck: playerDeck,
         discardDeck: [],
         usableDeck: [...playerDeck],
@@ -330,8 +352,8 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         name: "opponent",
         isPlayer: false,
         isOpponent: true,
-        health: 6,
-        energy: 6,
+        health: startHealth,
+        energy: startEnergy,
         fullDeck: opponentDeck,
         discardDeck: [],
         usableDeck: [...opponentDeck],
@@ -378,7 +400,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     this.fieldRightIconText = undefined;
 
     this.playerActionIndex = 0;
-    this.maxPlayerActions = 3;
+    this.maxPlayerActions = defaultActionCount;
 
     this.opponentActionIndex = 0;
     this.maxOpponentActions = 0;
@@ -451,7 +473,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         this.playerActionIndex = 0;
         this.maxPlayerActions = accumulateFilters("turnCount",
             this.playerState,
-            defaultActionAmount
+            defaultActionCount
         );
         this.isOpponentTurn = false;
         this.renderer.unlockPageCycle();
@@ -511,7 +533,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         this.renderer.lockTextFeedToggle();
         this.maxOpponentActions = accumulateFilters("turnCount",
             this.opponentState,
-            defaultActionAmount
+            defaultActionCount
         );
         this.opponentActionIndex = -1;
         this.isOpponentTurn = true;
@@ -878,7 +900,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                 default:
                     textResult = "opponent did nothing";
                     break;
-                case "draw":
+                case OMT.drawCard:
                     if(this.opponentState.usableDeck.length <= 0) {
                         textResult = "deck empty. discard pile shuffled.\n";
                         this.opponentState.usableDeck = this.opponentState.discardDeck;
@@ -890,7 +912,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                     this.opponentState.usableDeck.splice(index,1);
                     textResult += `opponent drew a card from the deck.`;
                     break;
-                case "drawEnergy":
+                case OMT.drawEnergy:
                     if(this.opponentState.energy >= maxEnergy) {
                         textResult = "opponent tried to draw energy but they are maxed out";
                     } else {
@@ -899,7 +921,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                         this.addEnergy(this.opponentState,energyDrawAmount,true);
                     }
                     break;
-                case "attack":
+                case OMT.attack:
                     if(this.opponentState.slots.attack) {
                         const damageDone = processDamage(this.opponentState,this.playerState);
                         textResult = `opponent did ${damageDone} damage`;
@@ -907,8 +929,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                         textResult = "opponent tried to attack but they have no attack card. what an idiot";
                     }
                     break;
-                case "useCard":
-                case "use":
+                case OMT.useCard:
                     const usedCard = this.opponentState.hand[actionDataResult.cardIndex];
                     if(!usedCard) {
                         textResult = "opponent tried to use a card they don't have";
@@ -929,8 +950,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                         textResult += "\n" + actionResult + "\n\n";
                     }
                     break;
-                case "discardCard":
-                case "discard":
+                case OMT.discardCard:
                     if(this.opponentState.hand.length < 1) {
                         textResult = "opponent tried to discard but they have no cards";
                         break;
@@ -942,15 +962,15 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                     this.opponentState.discardDeck.push(discardedCard);
                     textResult = `opponent discarded '${discardedCard.name}'`;
                     break;
-                case "setAttack":
+                case OMT.setAttack:
                     this.nextNextButtonCard = this.opponentState.hand[actionDataResult.cardIndex];
                     textResult = this.updateOpponentSlot("attack",actionDataResult.cardIndex);
                     break;
-                case "setDefense":
+                case OMT.setDefense:
                     this.nextNextButtonCard = this.opponentState.hand[actionDataResult.cardIndex];
                     textResult = this.updateOpponentSlot("defense",actionDataResult.cardIndex);
                     break;
-                case "setSpecial":
+                case OMT.setSpecial:
                     this.nextNextButtonCard = this.opponentState.hand[actionDataResult.cardIndex];
                     textResult = this.updateOpponentSlot("special",actionDataResult.cardIndex);
                     break;
@@ -982,9 +1002,9 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     }
 
     this.setButtonStatesLogical = function() {
-        this.buttonNameLookup[drawButtonText].enabled = this.playerState.hand.length < 6;
+        this.buttonNameLookup[drawButtonText].enabled = this.playerState.hand.length < handLimit;
         this.buttonNameLookup[attackButtonText].enabled = this.playerState.slots.attack ? true : false;
-        this.buttonNameLookup[drawEnergyButtonText].enabled = this.playerState.energy < 100;
+        this.buttonNameLookup[drawEnergyButtonText].enabled = this.playerState.energy < maxEnergy;
 
         this.buttonNameLookup[useButtonText].enabled = false;
         this.buttonNameLookup[discardButtonText].enabled = false;
@@ -1002,9 +1022,9 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                 if(this.fullScreenCard && this.cardPageType === cardPageTypes.hand) {
                     this.buttonNameLookup[setSlotText].enabled = false;
 
-                    this.buttonNameLookup[drawButtonText].enabled = this.playerState.hand.length < 6;
+                    this.buttonNameLookup[drawButtonText].enabled = this.playerState.hand.length < handLimit;
                     this.buttonNameLookup[attackButtonText].enabled = this.playerState.slots.attack ? true : false;
-                    this.buttonNameLookup[drawEnergyButtonText].enabled = this.playerState.energy < 100;
+                    this.buttonNameLookup[drawEnergyButtonText].enabled = this.playerState.energy < maxEnergy;
 
                     this.buttonNameLookup[useButtonText].enabled = false;
 
@@ -1074,7 +1094,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         this.renderer.unlockPageCycle();
     }
 
-    for(let i = 0;i<6;i++) {
+    for(let i = 0;i<handLimit;i++) {
         if(this.playerState.usableDeck.length>0) {
             const cardIndex = Math.floor(this.playerState.usableDeck.length*Math.random());
             this.playerState.hand.push(this.playerState.usableDeck[cardIndex]);

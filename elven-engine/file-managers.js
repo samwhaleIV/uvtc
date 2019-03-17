@@ -1,16 +1,16 @@
 "use strict";
 const FileTypes = {
-    None: Symbol(),
-    Sound: Symbol(),
-    Music: Symbol(),
-    Image: Symbol(),
-    BackgroundImage: Symbol(),
-    Renderer: Symbol(),
-    RendererComponent: Symbol(),
+    None: Symbol("None"),
+    Sound: Symbol("Sound"),
+    Music: Symbol("Music"),
+    Image: Symbol("Image"),
+    BackgroundImage: Symbol("BackgroundImage"),
+    Renderer: Symbol("Renderer"),
+    RendererComponent: Symbol("RendererComponent"),
 }
 const IndexModes = {
-    NameOnly: Symbol(),
-    LoseRoot: Symbol()
+    NameOnly: Symbol("NameOnly"),
+    LoseRoot: Symbol("LoseRoot")
 }
 function validIndexMode(mode) {
     switch(mode) {

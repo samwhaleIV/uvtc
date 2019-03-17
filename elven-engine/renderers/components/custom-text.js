@@ -1,370 +1,4 @@
 "use strict";
-const fontDictionary = {
-    " ":{width:1,glyph:[
-        0,
-        0,
-        0,
-        0,
-        0
-    ]},
-    'a':{width:3,glyph:[
-       1,1,1,
-       1,0,1,
-       1,1,1,
-       1,0,1,
-       1,0,1
-    ]},
-    'b':{width:3,glyph:[
-        1,1,0,
-        1,0,1,
-        1,1,0,
-        1,0,1,
-        1,1,0
-    ]},
-    'c':{width:3,glyph:[
-        1,1,1,
-        1,0,0,
-        1,0,0,
-        1,0,0,
-        1,1,1
-    ]},
-    'd':{width:3,glyph:[
-        1,1,0,
-        1,0,1,
-        1,0,1,
-        1,0,1,
-        1,1,0
-    ]},
-    'e':{width:3,glyph:[
-        1,1,1,
-        1,0,0,
-        1,1,1,
-        1,0,0,
-        1,1,1
-    ]},
-    'f':{width:3,glyph:[
-        1,1,1,
-        1,0,0,
-        1,1,1,
-        1,0,0,
-        1,0,0
-    ]},
-    'g':{width:3,glyph:[
-        1,1,1,
-        1,0,0,
-        1,0,1,
-        1,0,1,
-        1,1,1
-    ]},
-    'h':{width:3,glyph:[
-        1,0,1,
-        1,0,1,
-        1,1,1,
-        1,0,1,
-        1,0,1
-    ]},
-    'i':{width:3,glyph:[
-        1,1,1,
-        0,1,0,
-        0,1,0,
-        0,1,0,
-        1,1,1
-    ]},
-    'j':{width:3,glyph:[
-        1,1,1,
-        0,1,0,
-        0,1,0,
-        0,1,0,
-        1,1,0   
-    ]},
-    'k':{width:3,glyph:[
-        1,0,1,
-        1,0,1,
-        1,1,0,
-        1,0,1,
-        1,0,1
-    ]},
-    'l':{width:3,glyph:[
-        1,0,0,
-        1,0,0,
-        1,0,0,
-        1,0,0,
-        1,1,1
-    ]},
-    'm':{width:5,glyph:[
-        1,1,1,1,1,
-        1,0,1,0,1,
-        1,0,1,0,1,
-        1,0,1,0,1,
-        1,0,1,0,1
-    ]},
-    'n':{width:3,glyph:[
-        1,1,1,
-        1,0,1,
-        1,0,1,
-        1,0,1,
-        1,0,1
-    ]},
-    'o':{width:3,glyph:[
-        1,1,1,
-        1,0,1,
-        1,0,1,
-        1,0,1,
-        1,1,1
-    ]},
-    'p':{width:3,glyph:[
-        1,1,1,
-        1,0,1,
-        1,1,1,
-        1,0,0,
-        1,0,0
-    ]},
-    'q':{width:3,glyph:[
-        1,1,1,
-        1,0,1,
-        1,1,1,
-        0,0,1,
-        0,0,1
-    ]},
-    'r':{width:3,glyph:[
-        1,1,1,
-        1,0,1,
-        1,1,0,
-        1,0,1,
-        1,0,1
-    ]},
-    's':{width:3,glyph:[
-        1,1,1,
-        1,0,0,
-        1,1,1,
-        0,0,1,
-        1,1,1
-    ]},
-    't':{width:3,glyph:[
-        1,1,1,
-        0,1,0,
-        0,1,0,
-        0,1,0,
-        0,1,0
-    ]},
-    'u':{width:3,glyph:[
-        1,0,1,
-        1,0,1,
-        1,0,1,
-        1,0,1,
-        1,1,1
-    ]},
-    'v':{width:3,glyph:[
-        1,0,1,
-        1,0,1,
-        1,0,1,
-        1,0,1,
-        0,1,0
-    ]},
-    'w':{width:5,glyph:[
-        1,0,1,0,1,
-        1,0,1,0,1,
-        1,0,1,0,1,
-        1,0,1,0,1,
-        0,1,0,1,0
-    ]},
-    'x':{width:3,glyph:[
-        1,0,1,
-        1,0,1,
-        0,1,0,
-        1,0,1,
-        1,0,1
-    ]},
-    'y':{width:3,glyph:[
-        1,0,1,
-        1,0,1,
-        0,1,0,
-        0,1,0,
-        0,1,0
-    ]},
-    'z':{width:3,glyph:[
-        1,1,1,
-        0,0,1,
-        0,1,0,
-        1,0,0,
-        1,1,1
-    ]},
-    '0':{width:3,glyph:[
-        1,1,1,
-        1,0,1,
-        1,0,1,
-        1,0,1,
-        1,1,1    
-    ]},
-    '1':{width:3,glyph:[
-        1,1,0,
-        0,1,0,
-        0,1,0,
-        0,1,0,
-        1,1,1
-    ]},
-    '2':{width:3,glyph:[
-        1,1,1,
-        0,0,1,
-        1,1,1,
-        1,0,0,
-        1,1,1
-    ]},
-    '3':{width:3,glyph:[
-        1,1,1,
-        0,0,1,
-        1,1,1,
-        0,0,1,
-        1,1,1
-    ]},
-    '4':{width:3,glyph:[
-        1,0,1,
-        1,0,1,
-        1,1,1,
-        0,0,1,
-        0,0,1
-    ]},
-    '5':{width:3,glyph:[
-        1,1,1,
-        1,0,0,
-        1,1,1,
-        0,0,1,
-        1,1,1
-    ]},
-    '6':{width:3,glyph:[
-        1,0,0,
-        1,0,0,
-        1,1,1,
-        1,0,1,
-        1,1,1
-    ]},
-    '7':{width:3,glyph:[
-        1,1,1,
-        0,0,1,
-        0,1,0,
-        0,1,0,
-        0,1,0
-    ]},
-    '8':{width:3,glyph:[
-        1,1,1,
-        1,0,1,
-        1,1,1,
-        1,0,1,
-        1,1,1
-    ]},
-    '9':{width:3,glyph:[
-        1,1,1,
-        1,0,1,
-        1,1,1,
-        0,0,1,
-        0,0,1
-    ]},
-    "*":{width:3,glyph:[
-        0,0,0,
-        1,0,1,
-        0,1,0,
-        1,0,1,
-        0,0,0
-    ]},
-    "'":{width:1,glyph:[
-        1,
-        1,
-        0,
-        0,
-        0
-    ]},
-    ".":{width:1,glyph:[
-        0,
-        0,
-        0,
-        0,
-        1
-    ]},
-    ":":{width:1,glyph:[
-        0,
-        1,
-        0,
-        1,
-        0
-    ]},
-    "-":{width:3,glyph:[
-        0,0,0,
-        0,0,0,
-        1,1,1,
-        0,0,0,
-        0,0,0
-    ]},
-    "!":{width:1,glyph:[
-        1,
-        1,
-        1,
-        0,
-        1
-    ]},
-    "?":{width:3,glyph:[
-        1,1,1,
-        0,0,1,
-        0,1,1,
-        0,0,0,
-        0,1,0
-    ]},
-    "(":{width:2,glyph:[
-        0,1,
-        1,0,
-        1,0,
-        1,0,
-        0,1
-    ]},
-    ")":{width:2,glyph:[
-        1,0,
-        0,1,
-        0,1,
-        0,1,
-        1,0
-    ]},
-    "+":{width:3,glyph:[
-        0,0,0,
-        0,1,0,
-        1,1,1,
-        0,1,0,
-        0,0,0
-    ]},
-    ">":{width:3,glyph:[
-        1,0,0,
-        0,1,0,
-        0,0,1,
-        0,1,0,
-        1,0,0
-    ]},
-    "<":{width:3,glyph:[
-        0,0,1,
-        0,1,0,
-        1,0,0,
-        0,1,0,
-        0,0,1
-    ]},
-    "[":{width:2,glyph:[
-        1,1,
-        1,0,
-        1,0,
-        1,0,
-        1,1
-    ]},
-    "]":{width:2,glyph:[
-        1,1,
-        0,1,
-        0,1,
-        0,1,
-        1,1
-    ]},
-    "=":{width:3,glyph:[
-        0,0,0,
-        1,1,1,
-        0,0,0,
-        1,1,1,
-        0,0,0
-    ]}
-}
 function drawTextTest(text,scale) {
     let xOffset = 0;
     const drawHeight = 5 * scale;
@@ -382,6 +16,7 @@ function drawTextTest(text,scale) {
         height: drawHeight
     }
 }
+
 const TinyTextScale = 2;
 const SmallTextScale = 3;
 const MediumTextScale = 4;
@@ -502,7 +137,6 @@ function drawTextStencil(color,text,x,y,scale,padding) {
 
     context.rect(x-padding,y-padding,padding,drawHeight+padding+padding);//left
     context.rect(x+xOffset,y-padding,padding,drawHeight+padding+padding);//right
-
     context.rect(x,y+drawHeight,xOffset,padding);//bottom
     context.rect(x,y-padding,xOffset,padding);//top
 
@@ -559,7 +193,7 @@ const processTextForWrapping = function(description) {
     return description;
 }
 
-function drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,color,horizontalSpace=1) {
+function drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,color) {
     let xOffset = 0;
     let yOffset = 0;
     const scaleMatrix = ScaleMatrices[scale];
@@ -609,26 +243,26 @@ function drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,color,horizonta
                 }
                 xOffset += drawWidth;
                 if(i2 < word.length-1) {
-                    xOffset += horizontalSpace;
+                    xOffset++; //Single pixel letter spacing
                 }
                 if(word[i2] === " ") {
-                    xOffset += smallestTextSpacing;
+                    xOffset += adaptiveTextSpacing; //Extra spacing between words - it's adpative
                 }
                 i2++;
             }
         }
         if(xOffset) {
-            xOffset += horizontalSpace;
+            xOffset++; //Single pixel letter spacing
         }
         i++;
     }
     context.fill();
 }
-function drawTextWrappingWhite(words,x,y,maxWidth,verticalSpace,scale,horizontalSpace) {
-    drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,"white",horizontalSpace);
+function drawTextWrappingWhite(words,x,y,maxWidth,verticalSpace,scale) {
+    drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,"white");
 }
-function drawTextWrappingBlack(words,x,y,maxWidth,verticalSpace,scale,horizontalSpace) {
-    drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,"black",horizontalSpace);
+function drawTextWrappingBlack(words,x,y,maxWidth,verticalSpace,scale) {
+    drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,"black");
 }
 
 function drawTextWhite(text,x,y,scale) {

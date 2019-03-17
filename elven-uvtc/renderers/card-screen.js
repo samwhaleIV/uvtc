@@ -1,3 +1,6 @@
+const handDisplayHeightRatio = 144 / 128;
+const handDisplayWidthRatio = 128 / 144;
+
 const rightBar = {};
 rightBar.y = 0;
 rightBar.color = "rgba(255,255,255,0.5)";
@@ -428,31 +431,30 @@ function updateCardScreenElements() {
 
     let handCardHeight, handCardWidth, xStart, yStart;
 
+    //This is awful and we did far far far better in the card book - but this is a legacy piece of garbage that might not be worth refactoring for all extensive purposes of sanity;
     if(fullScreenCardArea.width / fullScreenCardArea.height > handDisplayHeightRatio) {
         const fullHandCardHeight = fullScreenCardArea.height - 20;
-        const fullHandCardWidth = fullHandCardHeight * handDisplayHeightRatio;
+        
+        handCardHeight = fullHandCardHeight / 2;
+        handCardWidth = handCardHeight * (48 / 64);
 
-        xStart = fullScreenCardArea.x + Math.floor((fullScreenCardArea.width / 2) - (fullHandCardWidth / 2));
+        xStart = fullScreenCardArea.x + Math.floor((fullScreenCardArea.width / 2) - ((((handCardWidth+fullScreenCardMargin)*3))/2)) + fullScreenCardMargin + 5;
         yStart = fullScreenCardArea.y - 5;
 
         
-        handCardHeight = fullHandCardHeight / 2;
-        handCardWidth = fullHandCardWidth / 3;
+        handCardHeight = (fullHandCardHeight / 2) - 10;
+        handCardWidth = handCardHeight * (48 / 64);
 
     } else {
         const fullHandCardWidth = fullScreenCardArea.width - 20;
         const fullHandCardHeight = fullHandCardWidth * handDisplayWidthRatio;
 
-        yStart = fullScreenCardArea.y + Math.floor((fullScreenCardArea.height / 2) - (fullHandCardHeight / 2));
-        xStart = fullScreenCardArea.x + Math.floor((fullScreenCardArea.width/2)-(fullHandCardWidth/2));
-
-        
         handCardHeight = fullHandCardHeight / 2;
-        handCardWidth = fullHandCardWidth / 3;
+        handCardWidth = handCardHeight * (48 / 64);
 
+        yStart = fullScreenCardArea.y + Math.floor((fullScreenCardArea.height / 2) - (fullHandCardHeight / 2));
+        xStart = fullScreenCardArea.x + Math.floor((fullScreenCardArea.width / 2) - ((((handCardWidth+fullScreenCardMargin)*3))/2)) + 9;
     }
-
-    xStart -= Math.floor(fullScreenCardMargin);
 
     handCardHeight = Math.floor(handCardHeight);
     handCardWidth = Math.floor(handCardWidth);
@@ -463,11 +465,14 @@ function updateCardScreenElements() {
             const index = x+(y*3);
             const displaySlot = handDisplaySlots[index];
 
+            //todo change these
             displaySlot.x = xStart + x * (handCardWidth + fullScreenCardMargin);
             displaySlot.y = yStart + y * (handCardHeight + fullScreenCardMargin);
-
             displaySlot.width = handCardWidth;
             displaySlot.height = handCardHeight;
+
+
+
 
             displaySlot.hoverEffect.x = displaySlot.x - hoverPadding;
             displaySlot.hoverEffect.y = displaySlot.y - hoverPadding;
@@ -610,7 +615,7 @@ function renderButtonRow(buttonRow,index,withHover,hoverIndex,specialHover,hover
         const button = buttonRow[i];
 
         if(button.isNotAButton) {
-            drawTextWrappingWhite(button.text,buttonSchema.textX,moveButtonTextY+yPosition,buttonSchema.width,3,smallestTextScale,1);
+            drawTextWrappingWhite(button.text,buttonSchema.textX,moveButtonTextY+yPosition,buttonSchema.width,3,adaptiveTextScale,1);
             continue;
         }
 
@@ -1139,7 +1144,7 @@ function CardScreenRenderer(sequencer,callbacks,background) {
             );
             drawTextWhite(textFeedToggleButton.text,textFeedToggleButton.textX,textFeedToggleButton.textY,moveButtonTextScale);
             if(this.sequencer.textFeed) {
-                drawTextWrappingBlack(this.sequencer.textFeed,textFeed.textX,textFeed.textY,textFeed.maxTextWidth,10,smallestTextScale);
+                drawTextWrappingBlack(this.sequencer.textFeed,textFeed.textX,textFeed.textY,textFeed.maxTextWidth,10,adaptiveTextScale);
             }
 
         } else {

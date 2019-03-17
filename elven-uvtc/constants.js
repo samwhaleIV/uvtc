@@ -15,7 +15,4 @@ const doubleHoverPadding = hoverPadding + hoverPadding;
 const flatHoverPadding = Math.floor(hoverPadding);
 const flatDoubleHoverPadding = flatHoverPadding + flatHoverPadding;
 
-const handDisplayHeightRatio = 144 / 128;
-const handDisplayWidthRatio = 128 / 144;
-
 const ACoolBlueColor = "#008DFF";

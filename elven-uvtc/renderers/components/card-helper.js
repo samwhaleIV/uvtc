@@ -1,17 +1,14 @@
 const cardTitleTextScale = TinyTextScale;
 const cardTitlePadding = 4;
 const doubleCardTitlePadding = cardTitlePadding + cardTitlePadding;
-
 const fullScreenCardEnergyWidth = 64;
 
 function renderStatus(status,x,y,width,height) {
-    //todo: Render the name?
     if(status) {
         context.drawImage(imageDictionary[status.imagePath],status.sourceX,0,internalStatusWidth,internalStatusHeight,x,y,width,height)
     } else {
         context.fillStyle = "white";
         context.fillRect(Math.floor(x),Math.floor(y),Math.floor(width),Math.floor(height));
-        //context.drawImage(imageDictionary["ui/card-icons"],64,0,32,32,x,y,width,height);
     }
 }
 function renderStatusFullscreen(status,x,y,width,height) {
@@ -27,7 +24,7 @@ function renderStatusFullscreen(status,x,y,width,height) {
             width,
             height - yTop
         );
-        drawTextWrappingBlack(status.description,x + 6,y+yTop+6,width - (smallestTextScale*15),7,smallestTextScale);
+        drawTextWrappingBlack(status.description,x + 6,y+yTop+6,width - (adaptiveTextScale*15),7,adaptiveTextScale);
     }
 }
 
@@ -75,7 +72,6 @@ function renderFullScreenName(name,lineBreakName,x,y,width,scale) {
 }
 
 function renderCard(card,x,y,width,height,partial=false,withName=true) {
-
     context.drawImage(
         imageDictionary[card.imagePath],
         card.sourceX,
@@ -88,15 +84,12 @@ function renderCard(card,x,y,width,height,partial=false,withName=true) {
     if(withName) {
         renderFullScreenName(card.name,card.lineBreakName,x,y,width,cardTitleTextScale);
     }
-
-    //render card energy cost?
 }
 function renderCardPartial(card,x,y,width,height) {
     renderCard(card,x,y,width,height,true);
 }
 
 function renderCardFullScreen(card,x,y,width,height) {
-    //TODO: Render more card shit because we have more space wooooo
     renderCard(card,x,y,width,height,false);
 
     if(!isNaN(card.energyCost)) {
@@ -123,7 +116,6 @@ function renderCardFullScreen(card,x,y,width,height) {
             height - yTop
         );
 
-        drawTextWrappingBlack(card.description,x + 6,y+yTop+6,width - (smallestTextScale*15),7,smallestTextScale,1);
+        drawTextWrappingBlack(card.description,x + 6,y+yTop+6,width - (adaptiveTextScale*15),7,adaptiveTextScale,1);
     }
-
 }

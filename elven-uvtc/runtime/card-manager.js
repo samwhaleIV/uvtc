@@ -46,16 +46,7 @@ const addCardSeries = function(cardSeries,statuses,manifest) {
         getFile(manifest.backFacePath+".png",FileTypes.Image),
         getFile(manifest.backgroundTexturePath+".png",FileTypes.Image),
     );
-/*
-
-    imagePath: "cards/s1",
-    statusImagePath: "status",
-    backFacePath: "backface",
-    backgroundTexturePath: "texture",
-
-*/
-
-
+    
     for(let i = 0;i<cardSeries.length;i++) {
 
         cardSeries[i].sourceX = i * internalCardWidth;
