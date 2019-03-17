@@ -164,6 +164,7 @@ addCardSeries([
         name: "poisoned by fruit",
         expirationType: "timed",
         timeToLive: 2,
+        description: "fruit is evil and it will hurt you. 1 damage every turn. ouch!",
         action: (sequencer,inflicted) => {
             inflicted.dropHealth(1);
             if(inflicted.isPlayer) {
