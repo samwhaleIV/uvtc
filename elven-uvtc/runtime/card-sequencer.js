@@ -764,7 +764,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                 this.dropEnergy(this.playerState,energyCost);
                 this.playerState.hand.splice(this.fullScreenCardIndex,1);
                 actionResultText = `used '${usedCard.name}'`;
-                const actionResult = usedCard.action(this,this.playerState,this.opponentState);
+                const actionResult = usedCard.action ? usedCard.action(this,this.playerState,this.opponentState) : null;
                 if(actionResult) {
                     actionResultText += "\n" + actionResult + "\n\n";
                     this.renderer.showTextFeed();
@@ -942,7 +942,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
 
                     this.opponentState.hand.splice(actionDataResult.cardIndex,1);
                     textResult = `opponent used '${usedCard.name}'`;
-                    const actionResult = usedCard.action(this,this.opponentState,this.playerState);
+                    const actionResult = usedCard.action ? usedCard.action(this,this.opponentState,this.playerState) : null;
                     if(actionResult) {
                         textResult += "\n" + actionResult + "\n\n";
                     }

@@ -85,11 +85,17 @@ addCardSeries([
     },
     {
         name: "green apple",
-        type: "generic"
+        description: "green apples are better than red apples\n+2 energy",
+        type: "generic",
+        energyCost: 0,
+        action: (sequencer,user) => {
+            user.addEnergy(2);
+        }
     },
     {
         name: "golden apple",
-        type: "generic"
+        type: "generic",
+        description: "worth its weight in gold"
     },
     {
         name: "poison apple",
@@ -99,6 +105,16 @@ addCardSeries([
         action: (sequencer,user,target) => {
             target.addCondition("poisoned by fruit");
         }
+    },
+    {
+        name: "alchemist",
+        type: "generic",
+        description: "if you have a golden apple in your hand it turns into +5 health",
+    },
+    {
+        name: "apple pie",
+        type: "generic",
+        description: "each apple in your hand deals 1 damage"
     }
 ],[
     {

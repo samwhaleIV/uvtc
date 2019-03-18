@@ -21,6 +21,32 @@ addCardSeries([
                 }
             }
         }
+    },
+    {
+        name: "violent spell",
+        type: "generic",
+        description: "does 2 damage ignoring defense cards and status conditions but hurts you too"
+    },
+    {
+        name: "n.s.t.a.m.",
+        type: "special",
+        description: "prevents violent spells being cast against, fruit poison, and magic eight ball use."
+    },
+    {
+        name: "elfmart bandage",
+        type: "generic",
+        description: "elfmart makes the best bandages\n+2 health"
+    },
+    {
+        name: "nuclear reactor",
+        type: "special",
+        description: "+10 energy per turn. requires use of coolant every turn after use or it goes critical and you die"
+    },
+    {
+        name: "coolant",
+        type: "generic",
+        description: "coolant",
+        energyCost: 1
     }
 ],[
     {
