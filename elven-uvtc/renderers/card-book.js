@@ -400,8 +400,6 @@ function CardBookRenderer(callback) {
         this.processMove(mouseX,mouseY);
     }
 
-    updateCardBookElements();
-
     this.updateSize = updateCardBookElements;
 
     this.render = timestamp => {

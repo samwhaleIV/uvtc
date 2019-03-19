@@ -12,5 +12,6 @@ ImagePaths.push(
     getFile("card-test.png",FileTypes.BackgroundImage),
     getFile("deck-background.png",FileTypes.BackgroundImage),
     getFile("ui/card-icons.png",FileTypes.Image),
-    getFile("ui/status-roll.png",FileTypes.Image)
+    getFile("ui/status-roll.png",FileTypes.Image),
+    getFile("world-tileset.png",FileTypes.Image)
 );

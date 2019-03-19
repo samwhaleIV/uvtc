@@ -240,7 +240,17 @@ function applyMediumResolutionTextAdapations() {
 }
 
 function applySizeMode() {
-    let sizeMode = canvasSizeMode;
+    let sizeMode;
+    if(rendererState && rendererState.forcedSizeMode) {
+        sizeMode = rendererState.forcedSizeMode;
+        if(canvasSizeMode === sizeModes.center.name && rendererState.forcedSizeMode === sizeModes.fit.name) {
+            sizeMode = sizeModes.center.name;
+        } else if(canvasSizeMode === sizeModes.fit.name && rendererState.forcedSizeMode === sizeModes.center.name) {
+            sizeMode = sizeModes.fit.name;
+        }
+    } else {
+        sizeMode = canvasSizeMode;
+    }
     if(sizeMode === sizeModes.stretch.name &&
         (
             window.innerWidth / window.innerHeight > maximumWidthToHeightRatio ||
@@ -385,9 +395,7 @@ function startRenderer() {
 
 function setRendererState(newRendererState) {
     rendererState = newRendererState;
-    if(rendererState.horizontalRenderMargin || rendererState.verticalRenderMargin || rendererState.renderMargin) {
-        applySizeMode();
-    }
+    applySizeMode();
     if(rendererState.processKey) {
         if(rendererState.processKeyUp) {
             keyEventMode = keyEventModes.upAndDown;

@@ -688,8 +688,6 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         this.updateCardPageText();
     }
 
-
-
     this.switchedPanes = function() {
         playSound("click");
         this.viewingSelfCards = !this.viewingSelfCards;

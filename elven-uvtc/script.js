@@ -4,8 +4,11 @@ drawLoadingText();
 
 function loadCallback() {
     setRendererState(
+        new WorldRenderer(worldMaps["test-map"])
+
+        /*
         new CardScreenRenderer(
-            new CardSequencer([...allCardsList],[allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"]],{
+            new CardSequencer([...allCardSeries[0].cards],[allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"]],{
                 getActionData: (sequencer,me) => {
                     return {
                         type: "useCard",
@@ -19,7 +22,7 @@ function loadCallback() {
                 quit: ()=>{}
             },
             new CardBackground("backgrounds/deck-background")
-        )
+        )*/
     );
     startRenderer();
 }

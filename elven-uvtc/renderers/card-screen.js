@@ -737,8 +737,6 @@ function CardScreenRenderer(sequencer,callbacks,background) {
     let pageCycleEnabled = true;
     let fullScreenCardLocked = false;
 
-    updateCardScreenElements();
-
     this.updateSize = updateCardScreenElements;
 
     let toggleTextFeedTimeout = 150;
