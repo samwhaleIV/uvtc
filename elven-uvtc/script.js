@@ -4,9 +4,8 @@ drawLoadingText();
 
 function loadCallback() {
     setRendererState(
-        new WorldRenderer(worldMaps["checker-test"])
-
-        /*
+        //new WorldRenderer(worldMaps["checker-test"])
+        
         new CardScreenRenderer(
             new CardSequencer([...allCardSeries[0].cards],[allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"]],{
                 getActionData: (sequencer,me) => {
@@ -22,7 +21,7 @@ function loadCallback() {
                 quit: ()=>{}
             },
             new CardBackground("backgrounds/deck-background")
-        )*/
+        )
     );
     startRenderer();
 }

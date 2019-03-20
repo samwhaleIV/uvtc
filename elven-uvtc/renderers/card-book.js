@@ -1,221 +1,219 @@
-
-const bookCenter = {
-    widthRatio: 5.75 / 9,
-    heightRatio: 9 / 5.75,
-    bookSizeDivider: 4.5,
-    books: []
-};
-const cardCenter = {
-    widthRatio: 4.5 / 6,
-    heightRatio: 6 / 4.5,
-    cards: [],
-    cardSizeDivider: 4,
-    backgroundScale: 200
-};
-
-const bookFullScreenCard = {
-    widthRatio: 64 / 48,
-    heightRatio: 48 / 64,
-    hover: {}
-}
-
-const innerBookArea = {
-    x: 100,
-    y: 100,
-    bottomMargin: 60
-}
-
-let cardBookButtonY;
-let cardBookButonUnderlineY;
-
-const cardBookExitButton = {};
-const cardBookBackButton = {};
-
-const cardBookCycleButton = {};
-
-(function(){
-    for(let i = 0;i<8;i++) {
-        bookCenter.books[i] = {hover:{}};
-    }
-    for(let i = 0;i<6;i++) {
-        cardCenter.cards[i] = {hover:{}};
-    }
-    const testResult = drawTextTest("exit",3);
-
-    cardBookButtonY = Math.floor((innerBookArea.y/2)-(testResult.height/2));
-    cardBookButonUnderlineY = cardBookButtonY+testResult.height+2;
-
-    cardBookExitButton.width = testResult.width;
-    cardBookExitButton.height = testResult.height;
-    cardBookExitButton.y = cardBookButtonY;
-
-    const testResult2 = drawTextTest("back",3);
-
-    cardBookBackButton.y = cardBookButtonY;
-    cardBookBackButton.width = testResult2.width;
-    cardBookBackButton.height = testResult2.height;
-
-    const testResult3 = drawTextTest("page 0 of 0",3);
-    cardBookCycleButton.y = cardBookButtonY;
-    cardBookCycleButton.width = testResult3.width;
-    cardBookCycleButton.height = testResult3.height;
-    cardBookCycleButton.xOffset = testResult3.width / 2;
-})();
-
-const bookHoverPadding = 4;
-const bookDoubleHoverPadding = bookHoverPadding + bookHoverPadding;
-
-let stencilPadding;
-
-function updateCardBookElements() {
-
-    const testResult = drawTextTest("series 1",adaptiveTextScale);
-    bookCenter.bookTextXOffset = testResult.width/2;
-    bookCenter.bookTextYOffset = testResult.height/2;
-
-    innerBookArea.x = Math.floor(fullWidth / 12);
-
-    innerBookArea.width = fullWidth - innerBookArea.x - innerBookArea.x;
-    innerBookArea.height = fullHeight - innerBookArea.y - innerBookArea.bottomMargin;
-
-    if(innerBookArea.width / innerBookArea.height > bookCenter.heightRatio) {
-
-        bookCenter.height = innerBookArea.height;
-        bookCenter.width = Math.floor(bookCenter.height * bookCenter.heightRatio);
-
-        bookCenter.y = innerBookArea.y;
-        bookCenter.x = innerBookArea.x + Math.floor((innerBookArea.width/2)-(bookCenter.width/2));
-
-    } else {
-        bookCenter.width = innerBookArea.width;
-        bookCenter.height = (innerBookArea.width * bookCenter.widthRatio);
-
-        bookCenter.x = innerBookArea.x;
-        bookCenter.y = innerBookArea.y + Math.floor((innerBookArea.height/2)-(bookCenter.height/2));
-    }
-
-    let bookWidth = bookCenter.width / bookCenter.bookSizeDivider;
-    let bookHeight = bookWidth * (64 / 48);
-
-    let halfWidth = bookWidth/2;
-    let halfHeight = bookHeight/2;
-
-    bookWidth = Math.floor(bookWidth);
-    bookHeight = Math.floor(bookHeight);
-
-    stencilPadding = Math.floor(bookWidth / 24);
-
-    let horizontalStep = bookCenter.width / 8;//this is double the number of columns
-    let verticalStep = bookCenter.height / 4;//this is double the number of rows
-
-    for(let x = 0;x<4;x++) {
-        for(let y = 0;y<2;y++) {
-            const index = x+(y*4);
-            const xCenter = horizontalStep * (1+(2*x));
-            const yCenter = verticalStep * (1+(2*y));
-
-            const book = bookCenter.books[index];
-
-            book.x = bookCenter.x + Math.floor(xCenter - halfWidth);
-            book.y = bookCenter.y + Math.floor(yCenter - halfHeight);
-
-            book.width = bookWidth;
-            book.height = bookHeight;
-
-            book.hover.x = book.x - 2;
-            book.hover.y = book.y - 2;
-            book.hover.width = book.width + 4;
-            book.hover.height = book.height + 4;
-
-            book.textX = bookCenter.x + Math.floor(xCenter - bookCenter.bookTextXOffset);
-            book.textY = bookCenter.y + Math.floor(yCenter - bookCenter.bookTextYOffset);
-        }
-    }
-    cardBookExitButton.x = bookCenter.books[0].x + 6;
-
-    if(innerBookArea.width / innerBookArea.height > cardCenter.heightRatio) {
-
-        cardCenter.height = innerBookArea.height;
-        cardCenter.width = Math.floor(cardCenter.height * cardCenter.heightRatio);
-
-        cardCenter.y = innerBookArea.y;
-        cardCenter.x = innerBookArea.x + Math.floor((innerBookArea.width/2)-(cardCenter.width/2));
-
-    } else {
-        cardCenter.width = innerBookArea.width;
-        cardCenter.height = (cardCenter.width * cardCenter.widthRatio);
-
-        cardCenter.x = innerBookArea.x;
-        cardCenter.y = innerBookArea.y + Math.floor((innerBookArea.height/2)-(cardCenter.height/2));
-    }
-
-    let cardWidth = cardCenter.width / cardCenter.cardSizeDivider;
-    let cardHeight = cardWidth * (64 / 48);
-
-    halfWidth = cardWidth/2;
-    halfHeight = cardHeight/2;
-
-    cardWidth = Math.floor(cardWidth);
-    cardHeight = Math.floor(cardHeight);
-
-    horizontalStep = cardCenter.width / 6;//this is double the number of columns
-    verticalStep = cardCenter.height / 4;//this is double the number of rows
-
-    for(let x = 0;x<3;x++) {
-        for(let y = 0;y<2;y++) {
-            const index = x+(y*3);
-            const xCenter = horizontalStep * (1+(2*x));
-            const yCenter = verticalStep * (1+(2*y));
-
-            const card = cardCenter.cards[index];
-
-            card.x = cardCenter.x + Math.floor(xCenter - halfWidth);
-            card.y = cardCenter.y + Math.floor(yCenter - halfHeight);
-
-            card.width = cardWidth;
-            card.height = cardHeight;
-
-            card.hover.x = card.x - 2;
-            card.hover.y = card.y - 2;
-            card.hover.width = card.width + 4;
-            card.hover.height = card.height + 4;
-        }
-    }
-
-    cardBookBackButton.x = cardCenter.x + 6;
-
-    cardCenter.backgroundWidth = cardCenter.backgroundScale;
-    cardCenter.backgroundHeight = cardCenter.backgroundWidth * cardCenter.widthRatio;
-
-
-    if(innerBookArea.width / innerBookArea.height > bookFullScreenCard.heightRatio) {
-
-        bookFullScreenCard.height = innerBookArea.height;
-        bookFullScreenCard.width = Math.floor(bookFullScreenCard.height * bookFullScreenCard.heightRatio);
-
-        bookFullScreenCard.y = innerBookArea.y;
-        bookFullScreenCard.x = innerBookArea.x + Math.floor((innerBookArea.width/2)-(bookFullScreenCard.width/2));
-
-    } else {
-        bookFullScreenCard.width = innerBookArea.width;
-        bookFullScreenCard.height = (innerBookArea.width * bookFullScreenCard.widthRatio);
-
-        bookFullScreenCard.x = innerBookArea.x;
-        bookFullScreenCard.y = innerBookArea.y + Math.floor((innerBookArea.height/2)-(bookFullScreenCard.height/2));
-    }
-
-
-
-    bookFullScreenCard.hover.x = bookFullScreenCard.x - 6;
-    bookFullScreenCard.hover.y = bookFullScreenCard.y - 6;
-    bookFullScreenCard.hover.width = bookFullScreenCard.width + 12;
-    bookFullScreenCard.hover.height = bookFullScreenCard.height + 12;
-
-    cardBookCycleButton.x = Math.floor((fullWidth/2)-cardBookCycleButton.xOffset);
-}
-
-
 function CardBookRenderer(callback) {
+
+    const bookCenter = {
+        widthRatio: 5.75 / 9,
+        heightRatio: 9 / 5.75,
+        bookSizeDivider: 4.5,
+        books: []
+    };
+    const cardCenter = {
+        widthRatio: 4.5 / 6,
+        heightRatio: 6 / 4.5,
+        cards: [],
+        cardSizeDivider: 4,
+        backgroundScale: 200
+    };
+    
+    const bookFullScreenCard = {
+        widthRatio: 64 / 48,
+        heightRatio: 48 / 64,
+        hover: {}
+    }
+    
+    const innerBookArea = {
+        x: 100,
+        y: 100,
+        bottomMargin: 60
+    }
+    
+    let cardBookButtonY;
+    let cardBookButonUnderlineY;
+    
+    const cardBookExitButton = {};
+    const cardBookBackButton = {};
+    
+    const cardBookCycleButton = {};
+    
+    (function(){
+        for(let i = 0;i<8;i++) {
+            bookCenter.books[i] = {hover:{}};
+        }
+        for(let i = 0;i<6;i++) {
+            cardCenter.cards[i] = {hover:{}};
+        }
+        const testResult = drawTextTest("exit",3);
+    
+        cardBookButtonY = Math.floor((innerBookArea.y/2)-(testResult.height/2));
+        cardBookButonUnderlineY = cardBookButtonY+testResult.height+2;
+    
+        cardBookExitButton.width = testResult.width;
+        cardBookExitButton.height = testResult.height;
+        cardBookExitButton.y = cardBookButtonY;
+    
+        const testResult2 = drawTextTest("back",3);
+    
+        cardBookBackButton.y = cardBookButtonY;
+        cardBookBackButton.width = testResult2.width;
+        cardBookBackButton.height = testResult2.height;
+    
+        const testResult3 = drawTextTest("page 0 of 0",3);
+        cardBookCycleButton.y = cardBookButtonY;
+        cardBookCycleButton.width = testResult3.width;
+        cardBookCycleButton.height = testResult3.height;
+        cardBookCycleButton.xOffset = testResult3.width / 2;
+    })();
+    
+    const bookHoverPadding = 4;
+    const bookDoubleHoverPadding = bookHoverPadding + bookHoverPadding;
+    
+    let stencilPadding;
+
+    this.updateSize = function() {
+
+        const testResult = drawTextTest("series 1",adaptiveTextScale);
+        bookCenter.bookTextXOffset = testResult.width/2;
+        bookCenter.bookTextYOffset = testResult.height/2;
+    
+        innerBookArea.x = Math.floor(fullWidth / 12);
+    
+        innerBookArea.width = fullWidth - innerBookArea.x - innerBookArea.x;
+        innerBookArea.height = fullHeight - innerBookArea.y - innerBookArea.bottomMargin;
+    
+        if(innerBookArea.width / innerBookArea.height > bookCenter.heightRatio) {
+    
+            bookCenter.height = innerBookArea.height;
+            bookCenter.width = Math.floor(bookCenter.height * bookCenter.heightRatio);
+    
+            bookCenter.y = innerBookArea.y;
+            bookCenter.x = innerBookArea.x + Math.floor((innerBookArea.width/2)-(bookCenter.width/2));
+    
+        } else {
+            bookCenter.width = innerBookArea.width;
+            bookCenter.height = (innerBookArea.width * bookCenter.widthRatio);
+    
+            bookCenter.x = innerBookArea.x;
+            bookCenter.y = innerBookArea.y + Math.floor((innerBookArea.height/2)-(bookCenter.height/2));
+        }
+    
+        let bookWidth = bookCenter.width / bookCenter.bookSizeDivider;
+        let bookHeight = bookWidth * (64 / 48);
+    
+        let halfWidth = bookWidth/2;
+        let halfHeight = bookHeight/2;
+    
+        bookWidth = Math.floor(bookWidth);
+        bookHeight = Math.floor(bookHeight);
+    
+        stencilPadding = Math.floor(bookWidth / 24);
+    
+        let horizontalStep = bookCenter.width / 8;//this is double the number of columns
+        let verticalStep = bookCenter.height / 4;//this is double the number of rows
+    
+        for(let x = 0;x<4;x++) {
+            for(let y = 0;y<2;y++) {
+                const index = x+(y*4);
+                const xCenter = horizontalStep * (1+(2*x));
+                const yCenter = verticalStep * (1+(2*y));
+    
+                const book = bookCenter.books[index];
+    
+                book.x = bookCenter.x + Math.floor(xCenter - halfWidth);
+                book.y = bookCenter.y + Math.floor(yCenter - halfHeight);
+    
+                book.width = bookWidth;
+                book.height = bookHeight;
+    
+                book.hover.x = book.x - 2;
+                book.hover.y = book.y - 2;
+                book.hover.width = book.width + 4;
+                book.hover.height = book.height + 4;
+    
+                book.textX = bookCenter.x + Math.floor(xCenter - bookCenter.bookTextXOffset);
+                book.textY = bookCenter.y + Math.floor(yCenter - bookCenter.bookTextYOffset);
+            }
+        }
+        cardBookExitButton.x = bookCenter.books[0].x + 6;
+    
+        if(innerBookArea.width / innerBookArea.height > cardCenter.heightRatio) {
+    
+            cardCenter.height = innerBookArea.height;
+            cardCenter.width = Math.floor(cardCenter.height * cardCenter.heightRatio);
+    
+            cardCenter.y = innerBookArea.y;
+            cardCenter.x = innerBookArea.x + Math.floor((innerBookArea.width/2)-(cardCenter.width/2));
+    
+        } else {
+            cardCenter.width = innerBookArea.width;
+            cardCenter.height = (cardCenter.width * cardCenter.widthRatio);
+    
+            cardCenter.x = innerBookArea.x;
+            cardCenter.y = innerBookArea.y + Math.floor((innerBookArea.height/2)-(cardCenter.height/2));
+        }
+    
+        let cardWidth = cardCenter.width / cardCenter.cardSizeDivider;
+        let cardHeight = cardWidth * (64 / 48);
+    
+        halfWidth = cardWidth/2;
+        halfHeight = cardHeight/2;
+    
+        cardWidth = Math.floor(cardWidth);
+        cardHeight = Math.floor(cardHeight);
+    
+        horizontalStep = cardCenter.width / 6;//this is double the number of columns
+        verticalStep = cardCenter.height / 4;//this is double the number of rows
+    
+        for(let x = 0;x<3;x++) {
+            for(let y = 0;y<2;y++) {
+                const index = x+(y*3);
+                const xCenter = horizontalStep * (1+(2*x));
+                const yCenter = verticalStep * (1+(2*y));
+    
+                const card = cardCenter.cards[index];
+    
+                card.x = cardCenter.x + Math.floor(xCenter - halfWidth);
+                card.y = cardCenter.y + Math.floor(yCenter - halfHeight);
+    
+                card.width = cardWidth;
+                card.height = cardHeight;
+    
+                card.hover.x = card.x - 2;
+                card.hover.y = card.y - 2;
+                card.hover.width = card.width + 4;
+                card.hover.height = card.height + 4;
+            }
+        }
+    
+        cardBookBackButton.x = cardCenter.x + 6;
+    
+        cardCenter.backgroundWidth = cardCenter.backgroundScale;
+        cardCenter.backgroundHeight = cardCenter.backgroundWidth * cardCenter.widthRatio;
+    
+    
+        if(innerBookArea.width / innerBookArea.height > bookFullScreenCard.heightRatio) {
+    
+            bookFullScreenCard.height = innerBookArea.height;
+            bookFullScreenCard.width = Math.floor(bookFullScreenCard.height * bookFullScreenCard.heightRatio);
+    
+            bookFullScreenCard.y = innerBookArea.y;
+            bookFullScreenCard.x = innerBookArea.x + Math.floor((innerBookArea.width/2)-(bookFullScreenCard.width/2));
+    
+        } else {
+            bookFullScreenCard.width = innerBookArea.width;
+            bookFullScreenCard.height = (innerBookArea.width * bookFullScreenCard.widthRatio);
+    
+            bookFullScreenCard.x = innerBookArea.x;
+            bookFullScreenCard.y = innerBookArea.y + Math.floor((innerBookArea.height/2)-(bookFullScreenCard.height/2));
+        }
+    
+    
+    
+        bookFullScreenCard.hover.x = bookFullScreenCard.x - 6;
+        bookFullScreenCard.hover.y = bookFullScreenCard.y - 6;
+        bookFullScreenCard.hover.width = bookFullScreenCard.width + 12;
+        bookFullScreenCard.hover.height = bookFullScreenCard.height + 12;
+    
+        cardBookCycleButton.x = Math.floor((fullWidth/2)-cardBookCycleButton.xOffset);
+    }
 
     const hoverTypes = {
         none: -1,
@@ -399,8 +397,6 @@ function CardBookRenderer(callback) {
 
         this.processMove(mouseX,mouseY);
     }
-
-    this.updateSize = updateCardBookElements;
 
     this.render = timestamp => {
         context.fillStyle = "white";

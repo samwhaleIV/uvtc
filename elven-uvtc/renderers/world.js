@@ -35,8 +35,8 @@ function WorldRenderer(startMap) {
             verticalTiles++;
         }
 
-        horizontalOffset = Math.floor(halfWidth - horizontalTiles * horizontalTileSize / 2);
-        verticalOffset = Math.floor(halfHeight - verticalTiles * verticalTileSize / 2);
+        horizontalOffset = Math.round(halfWidth - horizontalTiles * horizontalTileSize / 2);
+        verticalOffset = Math.round(halfHeight - verticalTiles * verticalTileSize / 2);
         
         halfHorizontalTiles = Math.floor(horizontalTiles / 2);
         halfVerticalTiles = Math.floor(verticalTiles / 2);
@@ -44,8 +44,8 @@ function WorldRenderer(startMap) {
 
     this.objects = [];
     this.camera = {
-        x: 10,
-        y: 10,
+        x: 9,
+        y: 9,
         xOffset: 0.5,
         yOffset: 0.5
     }
