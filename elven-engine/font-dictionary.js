@@ -7,6 +7,13 @@ const fontDictionary = {
         0,
         0
     ]},
+    ",":{yOffset:1,width:1,glyph:[
+        0,
+        0,
+        0,
+        1,
+        1
+    ]},
     'a':{width:3,glyph:[
        1,1,1,
        1,0,1,

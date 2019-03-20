@@ -24,10 +24,13 @@ const MediumLargeTextScale = 5;
 const LargeTextScale = 8;
 
 const TextScales = [
+    1,
     TinyTextScale,
     SmallTextScale,
     MediumTextScale,
     MediumLargeTextScale,
+    6,
+    7,
     LargeTextScale
 ];
 
@@ -45,6 +48,16 @@ const ScaleMatrices = {
         5: {width:[4,3,3,3,4],height:[3,4,3,4,3]}
     }
 }
+
+function prepareFontDictionary() {
+    Object.values(fontDictionary).forEach(character => {
+        if(isNaN(character.yOffset)) {
+            character.yOffset = 0;
+        }
+    });
+}
+prepareFontDictionary();
+
 function generateBasicScaleMatrices() {
     const widths = [1,2,3,5];
     TextScales.forEach(scaleFactor => {
@@ -113,13 +126,14 @@ function drawTextStencil(color,text,x,y,scale,padding) {
         const character = fontDictionary[text[i]];
         const drawWidth = character.width * scale;
         const characterMatrix = scaleMatrix[character.width];
+        const characterYOffset = character.yOffset * scale;
         let i2 = 0;
         while(i2 < character.glyph.length) {
             if(!character.glyph[i2]) {
                 const characterRegion = characterMatrix[i2];
                 context.rect(
                     x+xOffset + characterRegion.x,
-                    y + characterRegion.y,
+                    y + characterRegion.y + characterYOffset,
                     characterRegion.w,
                     characterRegion.h
                 );
@@ -157,13 +171,14 @@ function drawTextColor(color,text,x,y,scale) {
         const character = fontDictionary[text[i]];
         const drawWidth = character.width * scale;
         const characterMatrix = scaleMatrix[character.width];
+        const characterYOffset = character.yOffset * scale;
         let i2 = 0;
         while(i2 < character.glyph.length) {
             if(character.glyph[i2]) {
                 const characterRegion = characterMatrix[i2];
                 context.rect(
-                    x+xOffset + characterRegion.x,
-                    y + characterRegion.y,
+                    x + xOffset + characterRegion.x,
+                    y + characterRegion.y + characterYOffset,
                     characterRegion.w,
                     characterRegion.h
                 );
@@ -228,13 +243,14 @@ function drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,color) {
                 const character = fontDictionary[word[i2]];
                 const drawWidth = character.width * scale;
                 const characterMatrix = scaleMatrix[character.width];
+                const characterYOffset = character.yOffset * scale;
                 let i3 = 0;
                 while(i3 < character.glyph.length) {
                     if(character.glyph[i3]) {
                         const characterRegion = characterMatrix[i3];
                         context.rect(
                             x+xOffset + characterRegion.x,
-                            y+yOffset + characterRegion.y,
+                            y+yOffset + characterRegion.y + characterYOffset,
                             characterRegion.w,
                             characterRegion.h
                         );
