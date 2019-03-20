@@ -272,8 +272,13 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     this.getHandIndex = function(target,cardName) {
         return target.hand.indexOf(allCards[cardName]);
     }
-    this.removeHandCard = function(target,index) {
+    this.discardHandCard = function(target,index) {
+        const removedCard = target.hand[index];
+        target.discardDeck.push(removedCard);
         target.hand.splice(index,1);
+    }
+    this.discardHandCards = function(target,indices) {
+        indices.sort((a,b)=>a<b?1:-1).forEach(index=>this.discardHandCard(target,index));
     }
 
     this.hasCondition = function(target,conditionName) {
@@ -395,10 +400,13 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     this.opponentState.dropHealth = amount => this.dropHealth(this.opponentState,amount);
 
     this.playerState.getHandIndex = cardName => this.getHandIndex(this.playerState,cardName);
-    this.playerState.removeHandCard = index => this.removeHandCard(this.playerState,index);
+    this.playerState.discardHandCard = index => this.discardHandCard(this.playerState,index);
 
     this.opponentState.getHandIndex = cardName => this.getHandIndex(this.opponentState,cardName);
-    this.opponentState.removeHandCard = index => this.removeHandCard(this.opponentState,index);
+    this.opponentState.discardHandCard = index => this.discardHandCard(this.opponentState,index);
+
+    this.playerState.discardHandCards = indices => this.discardHandCards(this.playerState,indices);
+    this.opponentState.discardHandCards = indices => this.discardHandCards(this.opponentState,indices);
 
     this.playerState.opponent = this.opponentState;
     this.opponentState.opponent = this.playerState;
@@ -561,56 +569,40 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         this.updateRendererData();
         this.updateCardPageText();
     }
-
     this.buttonRows = [
-        [
-            {
-                text: "[turn description]",
-                isNotAButton: true,
-            }
-        ],
-        [
-            {
-                text: drawButtonText,
-                enabled: false,
-                image: 4
-            },
-        ],
-        [
-            {
-                text: drawEnergyButtonText,
-                enabled: false
-            }
-        ],
-        [
-            {
-                text: attackButtonText,
-                enabled: false
-            }
-        ],
+        [{
+            text: "[turn description]",
+            isNotAButton: true,
+        }],
+        [{
+            text: drawButtonText,
+            enabled: false,
+            image: 4
+        },],
+        [{
+            text: drawEnergyButtonText,
+            enabled: false
+        }],
+        [{
+            text: attackButtonText,
+            enabled: false
+        }],
         [],
-        [
-            {
+        [{
                 text: "card actions",
                 isNotAButton: true
-            }
-        ],
-        [
-            {
-                text: useButtonText,
-                enabled: false
-            },
-            {
-                text: discardButtonText,
-                enabled: false
-            },
-        ],
-        [
-            {
-                text: setSlotText,
-                enabled: false
-            }
-        ]
+        }],
+        [{
+            text: useButtonText,
+            enabled: false
+        },{
+            text: discardButtonText,
+            enabled: false
+        },],
+        [{
+            text: setSlotText,
+            enabled: false
+        }]
     ];
     this.buttonLookup = [];
     this.buttonNameLookup = {};

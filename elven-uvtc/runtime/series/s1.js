@@ -95,7 +95,7 @@ addCardSeries([
         action: (sequencer,user) => {
             const index = user.getHandIndex("golden apple");
             if(index >= 0) {
-                user.removeHandCard(index);
+                user.discardHandCard(index);
                 user.addHealth(5);
             } else {
                 return `${user.name} didn't have any golden apples`;
@@ -112,6 +112,7 @@ addCardSeries([
             let damage = 0;
 
             const removalIndices = [];
+
             user.hand.forEach((card,index) => {
                 switch(card.name) {
                     case "red apple":
@@ -124,7 +125,7 @@ addCardSeries([
                 }
             });
 
-            removalIndices.forEach(user.removeHandCard);
+            user.discardHandCards(removalIndices);
 
             if(damage) {
                 opponent.dropHealth(damage);
