@@ -340,6 +340,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
 
     this.playerState = {
         name: "you",
+        adjective: "your",
         isPlayer: true,
         isOpponent: false,
         health: startHealth,
@@ -359,6 +360,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
 
     this.opponentState = {
         name: "opponent",
+        adjective: "their",
         isPlayer: false,
         isOpponent: true,
         health: startHealth,

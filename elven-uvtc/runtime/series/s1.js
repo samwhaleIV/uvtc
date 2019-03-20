@@ -131,7 +131,7 @@ addCardSeries([
                 opponent.dropHealth(damage);
                 return `${opponent.name} got attacked with ${damage} damage`;
             } else {
-                return `${user.name} didn't have any apples in their hand`;
+                return `${user.name} didn't have any apples in ${user.adjective} hand`;
             }
         }
     },
