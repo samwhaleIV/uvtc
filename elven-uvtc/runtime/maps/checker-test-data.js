@@ -7,7 +7,7 @@
  }
  if(typeof module === 'object' && module && module.exports) {
   module.exports = data;
- }})("test-map-data",
+ }})("checker-test-data",
 { "height":20,
  "infinite":false,
  "layers":[

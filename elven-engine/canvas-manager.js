@@ -255,7 +255,7 @@ function applySizeMode() {
         (
             window.innerWidth / window.innerHeight > maximumWidthToHeightRatio ||
             window.innerHeight / window.innerWidth > maximumHeightToWidthRatio
-        )
+        ) && (rendererState ? !rendererState.disableAdapativeFill : true)
     ) {
         sizeMode = sizeModes.fit.name;
     }

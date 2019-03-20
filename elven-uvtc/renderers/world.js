@@ -1,29 +1,73 @@
 function WorldRenderer(startMap) {
 
-    let horizontalTiles, verticalTiles, horizontalOffset, verticalOffset, verticalTileSize, horizontalTileSize;
+    let horizontalTiles, verticalTiles, horizontalOffset, verticalOffset, verticalTileSize, horizontalTileSize, halfHorizontalTiles, halfVerticalTiles;
 
-    this.forcedSizeMode = sizeModes.fit.name;
+    this.disableAdapativeFill = true;
     this.map = startMap;
 
     this.updateSize = function() {
-        horizontalTiles =  Math.ceil(fullWidth / WorldTileSize);
-        verticalTiles = Math.ceil(fullHeight / WorldTileSize);
-        horizontalOffset = Math.round(halfWidth - horizontalTiles * WorldTileSize / 2);
-        verticalOffset = Math.round(halfHeight - verticalTiles * WorldTileSize / 2);
 
-        horizontalTileSize = WorldTileSize;
-        verticalTileSize = WorldTileSize;
+        let adjustedTileSize = WorldTileSize;
 
-        this.camera.x = Math.floor(horizontalTiles / 2);
-        this.camera.y = Math.floor(verticalTiles / 2);
+        if(fullWidth < smallScaleSnapPoint) {
+            adjustedTileSize *= 1.5;
+        } else if(fullWidth < mediumScaleSnapPoint && fullWidth < maxHorizontalResolution) {
+            adjustedTileSize *= 2;
+        } else if(fullWidth >= maxHorizontalResolution) {
+            adjustedTileSize *= 2;
+        }
+
+        adjustedTileSize = Math.floor(adjustedTileSize);
+        if(adjustedTileSize % 2 !== 0) {
+            adjustedTileSize++;
+        }
+
+        horizontalTileSize = adjustedTileSize;
+        verticalTileSize = adjustedTileSize;
+
+        horizontalTiles =  Math.ceil(fullWidth / horizontalTileSize);
+        verticalTiles = Math.ceil(fullHeight / verticalTileSize);
+
+        horizontalOffset = Math.round(halfWidth - horizontalTiles * horizontalTileSize / 2) - (horizontalTileSize/2);
+        verticalOffset = Math.round(halfHeight - verticalTiles * verticalTileSize / 2);
+        
+        halfHorizontalTiles = Math.floor(horizontalTiles / 2);
+        halfVerticalTiles = Math.floor(verticalTiles / 2);
     }
 
     this.objects = [];
     this.camera = {
-        x: 0,
-        y: 0,
-        xOffset:0,
-        yOffset:0
+        x: 20,
+        y: 15,
+        xOffset: 0.5,
+        yOffset: 0.5
+    }
+
+    this.debug_test_camera = function(polarity=true) {
+        let increment = 0.1;
+        setInterval(polarity?()=>{
+            this.camera.xOffset += increment;
+            this.camera.yOffset += increment;
+            if(this.camera.xOffset >= 1) {
+                this.camera.xOffset = 0;
+                this.camera.x++;
+            }
+            if(this.camera.yOffset >= 1) {
+                this.camera.yOffset = 0;
+                this.camera.y++;
+            }
+        }:()=>{
+            this.camera.xOffset -= increment;
+            this.camera.yOffset -= increment;
+            if(this.camera.xOffset <= 0) {
+                this.camera.xOffset = 1;
+                this.camera.x--;
+            }
+            if(this.camera.yOffset <= 0) {
+                this.camera.yOffset = 1;
+                this.camera.y--;
+            }      
+        },30);
     }
 
     const tileset = imageDictionary["world-tileset"];
@@ -34,43 +78,68 @@ function WorldRenderer(startMap) {
         context.fillStyle = "black";
         context.fillRect(0,0,fullWidth,fullHeight);
 
-        const xOffset = this.camera.xOffset + horizontalOffset;
-        const yOffset = this.camera.yOffset + verticalOffset;
+        let verticalTileCount = verticalTiles;
+        let horizontalTileCount = horizontalTiles;
 
-        let y = 0, x;
+        let adjustedYPos = this.camera.y - halfVerticalTiles;
+        let adjustedXPos = this.camera.x - halfHorizontalTiles;
 
-        while(y < verticalTiles) {
-            x = 0;
+        let xStart = 0;
+        let yStart = 0;
 
-            while(x < horizontalTiles) {
+        if(this.camera.xOffset > 0) {
+            horizontalTileCount++;
+        } else if(this.camera.xOffset < 0) {
+            adjustedXPos--;
+            xStart--;
+        }
 
-                const xPos = this.camera.x + x;
-                const yPos = this.camera.y + y;
+        if(this.camera.yOffset > 0) {
+            verticalTileCount++;
+        } else if(this.camera.yOffset < 0) {
+            adjustedYPos--;
+            yStart--;
+        }
 
-                const mapIndex = xPos + yPos * this.map.columns;
-                const backgroundValue = this.map.background[mapIndex];
-                const foregroundValue = this.map.foreground[mapIndex];
+        const xOffset = Math.round(-this.camera.xOffset * horizontalTileSize) + horizontalOffset;
+        const yOffset = Math.round(-this.camera.yOffset * verticalTileSize) + verticalOffset;
 
-                const xDestination = xOffset + x * WorldTileSize;
-                const yDestination = yOffset + y * WorldTileSize;
+        let y = yStart, x;
 
-                if(backgroundValue) {
-                    const textureX = backgroundValue % WorldTextureColumns * WorldTextureSize;
-                    const textureY = Math.floor(backgroundValue / WorldTextureColumns) * WorldTextureSize;
-                    context.drawImage(
-                        tileset,
-                        textureX,textureY,WorldTextureSize,WorldTextureSize,
-                        xDestination,yDestination,horizontalTileSize,verticalTileSize
-                    );
-                }
-                if(foregroundValue) {
-                    const textureX = foregroundValue % WorldTextureColumns * WorldTextureSize;
-                    const textureY = Math.floor(foregroundValue / WorldTextureColumns) * WorldTextureSize;
-                    context.drawImage(
-                        tileset,
-                        textureX,textureY,WorldTextureSize,WorldTextureSize,
-                        xDestination,yDestination,horizontalTileSize,verticalTileSize
-                    );
+        while(y < verticalTileCount) {
+            x = xStart;
+
+            while(x < horizontalTileCount) {
+
+                const xPos = adjustedXPos + x;
+                const yPos = adjustedYPos + y;
+
+                if(xPos < this.map.columns && xPos >= 0) {
+                    const mapIndex = xPos + yPos * this.map.columns;
+                    const backgroundValue = this.map.background[mapIndex];
+                    const foregroundValue = this.map.foreground[mapIndex];
+    
+                    const xDestination = xOffset + x * horizontalTileSize;
+                    const yDestination = yOffset + y * verticalTileSize;
+    
+                    if(backgroundValue) {
+                        const textureX = backgroundValue % WorldTextureColumns * WorldTextureSize;
+                        const textureY = Math.floor(backgroundValue / WorldTextureColumns) * WorldTextureSize;
+                        context.drawImage(
+                            tileset,
+                            textureX,textureY,WorldTextureSize,WorldTextureSize,
+                            xDestination,yDestination,horizontalTileSize,verticalTileSize
+                        );
+                    }
+                    if(foregroundValue) {
+                        const textureX = foregroundValue % WorldTextureColumns * WorldTextureSize;
+                        const textureY = Math.floor(foregroundValue / WorldTextureColumns) * WorldTextureSize;
+                        context.drawImage(
+                            tileset,
+                            textureX,textureY,WorldTextureSize,WorldTextureSize,
+                            xDestination,yDestination,horizontalTileSize,verticalTileSize
+                        );
+                    }
                 }
                 x++;
             }
