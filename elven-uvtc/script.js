@@ -4,7 +4,7 @@ drawLoadingText();
 
 function loadCallback() {
     setRendererState(
-        new WorldRenderer(worldMaps["test-map"])
+        new WorldRenderer(worldMaps["checker-test"])
 
         /*
         new CardScreenRenderer(

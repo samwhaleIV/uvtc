@@ -28,8 +28,15 @@ function WorldRenderer(startMap) {
         horizontalTiles =  Math.ceil(fullWidth / horizontalTileSize);
         verticalTiles = Math.ceil(fullHeight / verticalTileSize);
 
-        horizontalOffset = Math.round(halfWidth - horizontalTiles * horizontalTileSize / 2) - (horizontalTileSize/2);
-        verticalOffset = Math.round(halfHeight - verticalTiles * verticalTileSize / 2);
+        if(horizontalTiles % 2 === 0) {
+            horizontalTiles++;
+        }
+        if(verticalTiles % 2 === 0) {
+            verticalTiles++;
+        }
+
+        horizontalOffset = Math.floor(halfWidth - horizontalTiles * horizontalTileSize / 2);
+        verticalOffset = Math.floor(halfHeight - verticalTiles * verticalTileSize / 2);
         
         halfHorizontalTiles = Math.floor(horizontalTiles / 2);
         halfVerticalTiles = Math.floor(verticalTiles / 2);
@@ -37,44 +44,33 @@ function WorldRenderer(startMap) {
 
     this.objects = [];
     this.camera = {
-        x: 20,
-        y: 15,
+        x: 10,
+        y: 10,
         xOffset: 0.5,
         yOffset: 0.5
     }
 
-    this.debug_test_camera = function(polarity=true) {
-        let increment = 0.1;
-        setInterval(polarity?()=>{
-            this.camera.xOffset += increment;
-            this.camera.yOffset += increment;
-            if(this.camera.xOffset >= 1) {
-                this.camera.xOffset = 0;
-                this.camera.x++;
-            }
-            if(this.camera.yOffset >= 1) {
-                this.camera.yOffset = 0;
-                this.camera.y++;
-            }
-        }:()=>{
-            this.camera.xOffset -= increment;
-            this.camera.yOffset -= increment;
-            if(this.camera.xOffset <= 0) {
-                this.camera.xOffset = 1;
-                this.camera.x--;
-            }
-            if(this.camera.yOffset <= 0) {
-                this.camera.yOffset = 1;
-                this.camera.y--;
-            }      
-        },30);
+    this.debug_test_camera = function() {
+        this.debugMethod = function(timestamp) {
+            const angle = timestamp % 100 / 100 * PI2;
+            const xOffset = horizontalTileSize * Math.cos(angle) / horizontalTileSize;
+            const yOffset = verticalTileSize * Math.sin(angle) / verticalTileSize;
+
+            this.camera.xOffset = xOffset;
+            this.camera.yOffset = yOffset;
+        }
     }
+
+    this.debugMethod = () => null;
 
     const tileset = imageDictionary["world-tileset"];
 
     //load objects from map into this.objects - and when we reload the map inline
 
     this.render = function(timestamp) {
+
+        this.debugMethod(timestamp);
+
         context.fillStyle = "black";
         context.fillRect(0,0,fullWidth,fullHeight);
 
@@ -87,22 +83,22 @@ function WorldRenderer(startMap) {
         let xStart = 0;
         let yStart = 0;
 
-        if(this.camera.xOffset > 0) {
-            horizontalTileCount++;
-        } else if(this.camera.xOffset < 0) {
-            adjustedXPos--;
+        if(this.camera.xOffset < 0) {
             xStart--;
+        } else if(this.camera.xOffset > 0) {
+            xStart--;
+            horizontalTileCount++;
         }
 
-        if(this.camera.yOffset > 0) {
-            verticalTileCount++;
-        } else if(this.camera.yOffset < 0) {
-            adjustedYPos--;
+        if(this.camera.yOffset < 0) {
             yStart--;
+        } else if(this.camera.yOffset > 0) {
+            yStart--;
+            verticalTileCount++;
         }
 
-        const xOffset = Math.round(-this.camera.xOffset * horizontalTileSize) + horizontalOffset;
-        const yOffset = Math.round(-this.camera.yOffset * verticalTileSize) + verticalOffset;
+        const xOffset = horizontalOffset - Math.round(this.camera.xOffset * horizontalTileSize);
+        const yOffset = verticalOffset - Math.round(this.camera.yOffset * verticalTileSize);
 
         let y = yStart, x;
 
@@ -145,5 +141,7 @@ function WorldRenderer(startMap) {
             }
             y++;
         }
+
+        drawTextBlack(String(this.camera.yOffset),15,15,4);
     }
 }
