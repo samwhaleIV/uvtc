@@ -22,12 +22,12 @@ addCardSeries([
     {
         name: "tranquility",
         type: "generic",
-        description: "inflicts tranquility status, reduces attack damage to 0"
+        description: "inflicts tranquility condition, reduces attack damage to 0"
     },
     {
         name: "commando",
         type: "generic",
-        description: "breaks tranquility status"
+        description: "breaks tranquility condition"
     },
     {
         name: "equality",

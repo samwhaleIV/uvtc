@@ -7,7 +7,7 @@ function loadCallback() {
         //new WorldRenderer(worldMaps["checker-test"])
         
         new CardScreenRenderer(
-            new CardSequencer([...allCardSeries[0].cards],[allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"]],{
+            new CardSequencer([allCards["apple pie"],allCards["red apple"],allCards["golden apple"],allCards["poison apple"]],[allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"]],{
                 getActionData: (sequencer,me) => {
                     return {
                         type: "useCard",

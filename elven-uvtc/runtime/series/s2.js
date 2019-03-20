@@ -25,7 +25,7 @@ addCardSeries([
     {
         name: "violent spell",
         type: "generic",
-        description: "does 2 damage ignoring defense cards and status conditions but hurts you too"
+        description: "does 2 damage ignoring defense slot and conditions but hurts you too"
     },
     {
         name: "n.s.t.a.m.",

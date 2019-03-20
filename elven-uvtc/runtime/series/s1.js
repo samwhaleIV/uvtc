@@ -19,13 +19,15 @@ addCardSeries([
         }
     },
     {
-        name: "endergonic",
-        type: "generic",
-        description: "remaining actions for this turn cost 0 energy",
-        energyCost: 4,
-        action: (sequencer,user) => {
-            sequencer.addCondition(user,"free energy");
-            return "free energy for the rest of the turn!";
+        name: "solar power",
+        description: "generates 1 energy at the beginning of every turn",
+        type: "special",
+        energyCost: 0,
+        action: function(sequencer,user) {
+            sequencer.addCondition(user,"solar power status");
+        },
+        replacedAction: function(sequencer,user) {
+            sequencer.removeCondition(user,"solar power status");
         }
     },
     {
@@ -72,18 +74,6 @@ addCardSeries([
         }
     },
     {
-        name: "solar power",
-        description: "generates 1 energy at the beginning of every turn",
-        type: "special",
-        energyCost: 0,
-        action: function(sequencer,user) {
-            sequencer.addCondition(user,"solar power status");
-        },
-        replacedAction: function(sequencer,user) {
-            sequencer.removeCondition(user,"solar power status");
-        }
-    },
-    {
         name: "green apple",
         description: "green apples are better than red apples\n+2 energy",
         type: "generic",
@@ -95,7 +85,54 @@ addCardSeries([
     {
         name: "golden apple",
         type: "generic",
-        description: "worth its weight in gold"
+        description: "golden apples are better than green apples\nworth its weight in gold"
+    },
+    {
+        name: "alchemist",
+        type: "generic",
+        energyCost: 2,
+        description: "if you have a golden apple in your hand it turns into +5 health",
+        action: (sequencer,user) => {
+            const index = user.getHandIndex("golden apple");
+            if(index >= 0) {
+                user.removeHandCard(index);
+                user.addHealth(5);
+            } else {
+                return `${user.name} didn't have any golden apples`;
+            }
+        }
+    },
+    {
+        name: "apple pie",
+        type: "generic",
+        description: "each apple in your hand (including poison) deals 1 damage, ignoring conditions and defense slot",
+        energyCost: 3,
+        action: (sequencer,user,opponent) => {
+
+            let damage = 0;
+
+            const removalIndices = [];
+            user.hand.forEach((card,index) => {
+                switch(card.name) {
+                    case "red apple":
+                    case "poison apple":
+                    case "green apple":
+                    case "golden apple":
+                        damage++;
+                        removalIndices.push(index);
+                        break;
+                }
+            });
+
+            removalIndices.forEach(user.removeHandCard);
+
+            if(damage) {
+                opponent.dropHealth(damage);
+                return `${opponent.name} got attacked with ${damage} damage`;
+            } else {
+                return `${user.name} didn't have any apples in their hand`;
+            }
+        }
     },
     {
         name: "poison apple",
@@ -105,16 +142,6 @@ addCardSeries([
         action: (sequencer,user,target) => {
             target.addCondition("poisoned by fruit");
         }
-    },
-    {
-        name: "alchemist",
-        type: "generic",
-        description: "if you have a golden apple in your hand it turns into +5 health",
-    },
-    {
-        name: "apple pie",
-        type: "generic",
-        description: "each apple in your hand deals 1 damage"
     }
 ],[
     {
@@ -180,7 +207,7 @@ addCardSeries([
         name: "poisoned by fruit",
         expirationType: "timed",
         timeToLive: 2,
-        description: "fruit is evil and it will hurt you. 1 damage every turn. ouch!",
+        description: "fruit is evil and will hurt you.\n\n1 damage every turn. ouch!",
         action: (sequencer,inflicted) => {
             inflicted.dropHealth(1);
             if(inflicted.isPlayer) {

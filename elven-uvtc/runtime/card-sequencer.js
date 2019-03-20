@@ -269,6 +269,13 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         this.updateConditionManifest(target);
     }
 
+    this.getHandIndex = function(target,cardName) {
+        return target.hand.indexOf(allCards[cardName]);
+    }
+    this.removeHandCard = function(target,index) {
+        target.hand.splice(index,1);
+    }
+
     this.hasCondition = function(target,conditionName) {
         return target.conditionManifest.namedLists[conditionName] ? true : false;
     }
@@ -386,6 +393,15 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     this.opponentState.dropEnergy = amount => this.dropEnergy(this.opponentState,amount);
     this.opponentState.addHealth = amount => this.addHealth(this.opponentState,amount);
     this.opponentState.dropHealth = amount => this.dropHealth(this.opponentState,amount);
+
+    this.playerState.getHandIndex = cardName => this.getHandIndex(this.playerState,cardName);
+    this.playerState.removeHandCard = index => this.removeHandCard(this.playerState,index);
+
+    this.opponentState.getHandIndex = cardName => this.getHandIndex(this.opponentState,cardName);
+    this.opponentState.removeHandCard = index => this.removeHandCard(this.opponentState,index);
+
+    this.playerState.opponent = this.opponentState;
+    this.opponentState.opponent = this.playerState;
 
 
     this.opponentSequencer = opponentSequencer;
@@ -1071,6 +1087,9 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
     }
     
     this.statusClicked = function(index) {
+        if(!this.cardPageRenderData[index]) {
+            return;
+        }
         playSound("click");
         const condition = this.viewingSelfCards ? this.playerState.conditions[index] : this.opponentState.conditions[index];
         if(condition) {

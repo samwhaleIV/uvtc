@@ -294,7 +294,7 @@ function CardBookRenderer(callback) {
                     return;
                 }
             } else {
-                for(let i = 0;i<this.pageCards.length;i++) {
+                for(let i = 0;i<this.pageCardsLength;i++) {
                     const card = cardCenter.cards[i];
                     if(contains(mouseX,mouseY,card)) {
                         hoverType = hoverTypes.card;
@@ -319,20 +319,15 @@ function CardBookRenderer(callback) {
     }
 
     this.pageCards = [];
+    this.pageCardsLength = 0;
 
     this.cyclePage = function() {
         this.pageIndex = (this.pageIndex + 1) % this.pageCount;
         this.cycleButtonText = `page ${this.pageIndex+1} of ${this.pageCount}`;
 
         let sliceStart = this.pageIndex * 6;
-        let sliceEnd = this.currentSeries.cards.length-sliceStart;
-        if(sliceEnd < 6) {
-            sliceEnd = sliceStart + sliceEnd;
-        } else {
-            sliceEnd = 6;
-        }
-
-        this.pageCards = this.currentSeries.cards.slice(sliceStart,sliceEnd);
+        this.pageCards = this.currentSeries.cards.slice(sliceStart);
+        this.pageCardsLength = Math.min(6,this.pageCards.length);
     }
 
     this.exitCardBook = callback;
@@ -466,7 +461,7 @@ function CardBookRenderer(callback) {
     
     
                 let i = 0;
-                while(i < this.pageCards.length) {
+                while(i < this.pageCardsLength) {
                     const card = cardCenter.cards[i];
                     if(hoverType === hoverTypes.card && hoverIndex === i) {
                         drawOutline(card.hover.x,card.hover.y,card.hover.width,card.hover.height,3,"white");
