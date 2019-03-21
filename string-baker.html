@@ -27,11 +27,10 @@
 
     const nextWord = function(event) {
         wordIndex++;
-        if(wordIndex < neededWords.length) {
-            const word = wordFeed.textContent;
+        const word = wordFeed.textContent;
             wordSyllableMaps[word] = makeSyllableMap(word.length,Number(event.key));
             wordFeed.textContent = neededWords[wordIndex];
-        } else {
+        if(wordIndex >= neededWords.length) {
             document.body.innerHTML = `const wordSyllableMaps = ${JSON.stringify(wordSyllableMaps)};`
             console.log(wordSyllableMaps);
         }

@@ -37,9 +37,13 @@ function applySonographToPopupFeed(popupFeed) {
 
     for(let i = 0;i<wordSets.length;i++) {
         const wordSet = wordSets[i];
-        const soundMap = getSyllableMap(wordSet.word);
+        let soundMap = getSyllableMap(wordSet.word);
+        if(!soundMap) {
+            console.warn(`Warning: '${wordSet.word}' is missing a sonograph`);
+            soundMap = [true];
+        }
         for(let x = 0;x<soundMap.length;x++) {
-            popupFeed[x+wordSet.start] = !soundMap[x];
+            popupFeed[x+wordSet.start].noSound = !soundMap[x];
         }
     }
 
@@ -52,6 +56,7 @@ function WorldPopup(pages,callback) {
     const characterSpeed = 30;
     const spaceSpeed = 20;
 
+    const hyphenDelay = 600;
     const commaDelay = 300;
     const periodDelay = 500;
     const ellipsisDelay = 400;
@@ -82,6 +87,8 @@ function WorldPopup(pages,callback) {
                     speed = spaceSpeed;
                     break;
                 case "-":
+                    speed = hyphenDelay;
+                    break;
                 case ",":
                     delay = commaDelay;
                     break;
@@ -116,7 +123,7 @@ function WorldPopup(pages,callback) {
                 if(!pageValue.noSound) {
                     playSound("text-sound");
                 }
-                timeout = setTimeout(timeoutMethod,pageValue.speed);
+                timeout = setTimeout(timeoutMethod,pageValue.noSound ? pageValue.speed / 2 : pageValue.speed);
             }
         } else {
             pageComplete = true;
