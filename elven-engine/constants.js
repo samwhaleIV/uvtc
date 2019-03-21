@@ -1,5 +1,6 @@
 "use strict";
 const PI2 = Math.PI * 2;
+const ellipsis = "…";
 
 const maxHorizontalResolution = 1920;
 const mediumScaleSnapPoint = 1600;

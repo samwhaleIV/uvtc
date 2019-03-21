@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Painful and extreme string baker</title>
+</head>
+<body>
+    <script src="elven-engine/constants.js"></script>
+    <script src="elven-uvtc/runtime/strings.js"></script>
+    <script src="elven-uvtc/runtime/raw-strings.js"></script>
+
+    <p id="word-feed"></p>
+    <input type="text" id="number-input" onkeydown="nextWord(event)"></input>
+
+    <script>
+
+    let wordIndex = 0;
+
+    const wordFeed = document.getElementById("word-feed");
+    const numberInput = document.getElementById("number-input");
+    
+    const neededWords = processRawStrings();
+
+    const maps = [];
+
+    const nextWord = function(event) {
+        wordIndex++;
+        if(wordIndex < neededWords.length) {
+            const word = wordFeed.textContent;
+            wordSyllableMaps[word] = makeSyllableMap(word.length,Number(event.key));
+            wordFeed.textContent = neededWords[wordIndex];
+        } else {
+            document.body.innerHTML = `const wordSyllableMaps = ${JSON.stringify(wordSyllableMaps)};`
+            console.log(wordSyllableMaps);
+        }
+        event.preventDefault();
+    }
+    wordFeed.textContent = neededWords[wordIndex];
+    </script>
+</body>
+</html>

@@ -1,12 +1,10 @@
 addMap({
-    generateWorldState: () => {
-        return {
-            load: world => {
-                world.addObject(
-                    new PlayerRenderer(),
-                    world.camera.x,world.camera.y
-                );
-            }
+    WorldState: function(globalState) {
+        this.load = world => {
+            world.addObject(
+                new PlayerRenderer(),
+                world.camera.x,world.camera.y
+            );
         }
     },
     name: "checker-test",

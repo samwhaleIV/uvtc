@@ -11,22 +11,22 @@ function PlayerRenderer() {
 
     const animationFrameTime = 1000 / 10;
 
-    let horizontalOffset = 0.5;
-    let verticalOffset = 0.5;
+    let horizontalOffset = 0;
+    let verticalOffset = 0;
 
     this.updateDirection = function(direction) {
         switch(direction) {
             case "down":
-                currentColumn = 0;
+                currentColumn = columnWidth * 0;
                 break;
             case "up":
-                currentColumn = 16;
+                currentColumn = columnWidth * 1;
                 break;
             case "left":
-                currentColumn = 32;
+                currentColumn = columnWidth * 2;
                 break;
             case "right":
-                currentColumn = 48;
+                currentColumn = columnWidth * 3;
                 break;
         }
     }

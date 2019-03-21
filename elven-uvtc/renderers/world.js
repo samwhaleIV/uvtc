@@ -54,12 +54,14 @@ function WorldRenderer(startMap) {
         this.objectsLookup[object.x][object.y] = object;
     }
 
+    this.popup = null;
+
     this.updateMap = function(newMap) {
         if(this.map && this.map.unload) {
             this.map.unload(this);
         }
         this.objects = {};
-        this.map = newMap.generateWorldState ? newMap.generateWorldState(
+        this.map = newMap.WorldState ? new newMap.WorldState(
             null //TODO provide a global state to the world state generator
         ) : {};
         this.renderMap = newMap;
@@ -124,8 +126,8 @@ function WorldRenderer(startMap) {
     this.camera = {
         x: 9,
         y: 9,
-        xOffset: 0.5,
-        yOffset: 0.5
+        xOffset: 0,
+        yOffset: 0
     }
 
     this.updateMap(startMap);
@@ -220,6 +222,9 @@ function WorldRenderer(startMap) {
                 verticalTileSize
             );
             objectBufferIndex += 3;
+        }
+        if(this.popup) {
+            this.popup.render(timestamp);
         }
     }
 }

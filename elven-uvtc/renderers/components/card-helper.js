@@ -24,7 +24,7 @@ function renderStatusFullscreen(status,x,y,width,height) {
             width,
             height - yTop
         );
-        drawTextWrappingBlack(status.description,x + 6,y+yTop+6,width - (adaptiveTextScale*15),7,adaptiveTextScale);
+        drawTextWrappingBlack(status.description,x + 6,y+yTop+6,width - (adaptiveTextScale*15),1,7,adaptiveTextScale);
     }
 }
 
@@ -116,6 +116,6 @@ function renderCardFullScreen(card,x,y,width,height) {
             height - yTop
         );
 
-        drawTextWrappingBlack(card.description,x + 6,y+yTop+6,width - (adaptiveTextScale*15),7,adaptiveTextScale,1);
+        drawTextWrappingBlack(card.description,x + 6,y+yTop+6,width - (adaptiveTextScale*15),1,7,adaptiveTextScale,1);
     }
 }

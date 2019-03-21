@@ -612,7 +612,7 @@ function CardScreenRenderer(sequencer,callbacks,background) {
             const button = buttonRow[i];
 
             if(button.isNotAButton) {
-                drawTextWrappingWhite(button.text,buttonSchema.textX,moveButtonTextY+yPosition,buttonSchema.width,3,adaptiveTextScale,1);
+                drawTextWrappingWhite(button.text,buttonSchema.textX,moveButtonTextY+yPosition,buttonSchema.width,1,3,adaptiveTextScale);
                 continue;
             }
 
@@ -1137,7 +1137,7 @@ function CardScreenRenderer(sequencer,callbacks,background) {
             );
             drawTextWhite(textFeedToggleButton.text,textFeedToggleButton.textX,textFeedToggleButton.textY,moveButtonTextScale);
             if(this.sequencer.textFeed) {
-                drawTextWrappingBlack(this.sequencer.textFeed,textFeed.textX,textFeed.textY,textFeed.maxTextWidth,10,adaptiveTextScale);
+                drawTextWrappingBlack(this.sequencer.textFeed,textFeed.textX,textFeed.textY,textFeed.maxTextWidth,1,10,adaptiveTextScale);
             }
 
         } else {

@@ -1,4 +1,12 @@
 addMap({
+    WorldState: function(globalState) {
+        this.load = world => {
+            world.addObject(
+                new PlayerRenderer(),
+                world.camera.x,world.camera.y
+            );
+        }
+    },
     name: "test-map",
     columns: 43,
     backgroundTile: 21,

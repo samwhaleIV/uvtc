@@ -208,11 +208,12 @@ const processTextForWrapping = function(description) {
     return description;
 }
 
-function drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,color) {
+function drawTextWrapping(words,x,y,maxWidth,horizontalSpace,verticalSpace,scale,color) {
     let xOffset = 0;
     let yOffset = 0;
     const scaleMatrix = ScaleMatrices[scale];
     const drawHeight = scale * 5; //This is hard-coded - might fuck me over later
+    const textSpacing = scale * 2;
     let i = 0;
     context.fillStyle = color;
     context.beginPath();
@@ -259,26 +260,26 @@ function drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,color) {
                 }
                 xOffset += drawWidth;
                 if(i2 < word.length-1) {
-                    xOffset++; //Single pixel letter spacing
+                    xOffset += horizontalSpace;
                 }
                 if(word[i2] === " ") {
-                    xOffset += adaptiveTextSpacing; //Extra spacing between words - it's adpative
+                    xOffset += textSpacing;
                 }
                 i2++;
             }
         }
         if(xOffset) {
-            xOffset++; //Single pixel letter spacing
+            xOffset += horizontalSpace;
         }
         i++;
     }
     context.fill();
 }
-function drawTextWrappingWhite(words,x,y,maxWidth,verticalSpace,scale) {
-    drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,"white");
+function drawTextWrappingWhite(words,x,y,maxWidth,horizontalSpace,verticalSpace,scale) {
+    drawTextWrapping(words,x,y,maxWidth,horizontalSpace,verticalSpace,scale,"white");
 }
-function drawTextWrappingBlack(words,x,y,maxWidth,verticalSpace,scale) {
-    drawTextWrapping(words,x,y,maxWidth,verticalSpace,scale,"black");
+function drawTextWrappingBlack(words,x,y,maxWidth,horizontalSpace,verticalSpace,scale) {
+    drawTextWrapping(words,x,y,maxWidth,horizontalSpace,verticalSpace,scale,"black");
 }
 
 function drawTextWhite(text,x,y,scale) {

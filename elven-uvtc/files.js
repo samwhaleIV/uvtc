@@ -5,7 +5,8 @@ EssentialSounds.push(
     getFile("energy-reverse.mp3",FileTypes.Sound),
     getFile("reverse-click.mp3",FileTypes.Sound),
     getFile("damage.mp3",FileTypes.Sound),
-    getFile("heal.mp3",FileTypes.Sound)
+    getFile("heal.mp3",FileTypes.Sound),
+    getFile("text-sound.mp3",FileTypes.Sound)
 );
 NonEssentialSounds.push();
 ImagePaths.push(
