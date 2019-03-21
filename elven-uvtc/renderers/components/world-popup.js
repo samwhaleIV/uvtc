@@ -181,6 +181,6 @@ function WorldPopup(pages,callback) {
             popupY,
             popupWidth,popupHeight
         );
-        drawTextWrappingBlack(textFeed,popupX + 5,popupY + 5,popupWidth-10,2,12,4);
+        drawTextWrappingBlack(textFeed,popupX + 5,popupY + 5,popupWidth-30,2,12,4);
     }
 }

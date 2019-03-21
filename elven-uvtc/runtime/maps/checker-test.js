@@ -1,10 +1,7 @@
 addMap({
     WorldState: function(globalState) {
         this.load = world => {
-            world.addObject(
-                new PlayerRenderer(),
-                world.camera.x,world.camera.y
-            );
+            world.addPlayer(world.camera.x,world.camera.y,"down");
         }
     },
     name: "checker-test",

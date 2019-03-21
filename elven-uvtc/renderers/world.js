@@ -1,5 +1,79 @@
 function WorldRenderer(startMap) {
 
+    this.camera = {
+        x: 10,
+        y: 10,
+        xOffset: 0,
+        yOffset: 0
+    }
+
+    this.playerObject = null;
+    this.popup = null;
+
+    this.playerController = new PlayerController(this);
+
+    let enterReleased = true;
+
+    this.processKey = function(key) {
+        if(this.popup) {
+            switch(key) {
+                case "Enter":
+                    if(!enterReleased) {
+                        break;
+                    }
+                    enterReleased = false;
+                    this.popup.progress();
+                    break;
+            }
+        } else if(this.playerObject) {
+            if(key === "Enter" && !enterReleased) {
+                return;
+            }
+            this.playerController.processKey(key);
+        }
+    }
+    this.processKeyUp = function(key) {
+        switch(key) {
+            case "Enter":
+                enterReleased = true;
+                break;
+        }
+        this.playerController.processKeyUp(key);
+    }
+    this.processMove = function(mouseX,mouseY) {
+    }
+    
+    this.processClick = function(mouseX,mouseY) {
+    }
+    this.processClickEnd = function(mouseX,mouseY) {
+        this.processMove(mouseX,mouseY);
+    }
+
+    this.clearPopup = function() {
+        this.popup = null;
+    }
+
+    this.showTextPopup = function(pages) {
+        this.popup = new WorldPopup(pages,this.clearPopup);
+    }
+
+    this.getCollisionState = function(x,y) {
+        const mapCollision = this.renderMap.collision[
+            x + y * this.renderMap.columns
+        ];
+        
+        const objectCollision = this.objectsLookup[x][y];
+
+        return {
+            map: mapCollision,
+            object: objectCollision
+        }
+    }
+    this.collides = function(x,y) {
+        const collisionState = this.getCollisionState(x,y);
+        return collisionState.map >= 1 || collisionState.object ? true : false;
+    }
+
     const tileset = imageDictionary["world-tileset"];
 
     this.map = null;
@@ -16,6 +90,12 @@ function WorldRenderer(startMap) {
     }
     this.getObjectID = function(object) {
         return object.ID;
+    }
+
+    this.addPlayer = function(x,y,...parameters) {
+        const newPlayer = new PlayerRenderer(...parameters);
+        this.playerObject = newPlayer;
+        return this.addObject(newPlayer,x,y);
     }
 
     this.addObject = function(object,x,y) {
@@ -54,16 +134,19 @@ function WorldRenderer(startMap) {
         this.objectsLookup[object.x][object.y] = object;
     }
 
-    this.popup = null;
-
     this.updateMap = function(newMap) {
         if(this.map && this.map.unload) {
             this.map.unload(this);
         }
         this.objects = {};
+        this.playerObject = null;
         this.map = newMap.WorldState ? new newMap.WorldState(
             null //TODO provide a global state to the world state generator
         ) : {};
+        if(newMap.cameraStart) {
+            this.camera.x = newMap.cameraStart.x;
+            this.camera.y = newMap.cameraStart.y;
+        }
         this.renderMap = newMap;
         this.objectsLookup = [];
         for(let x = 0;x < newMap.rows;x++) {
@@ -79,7 +162,7 @@ function WorldRenderer(startMap) {
         if(this.map.getCameraStart) {
             this.camera = this.map.getCameraStart(this);
         }
-        //TODO load player information
+        this.playerController.player = this.playerObject;
     }
 
     let horizontalTiles, verticalTiles, horizontalOffset, verticalOffset, verticalTileSize, horizontalTileSize, halfHorizontalTiles, halfVerticalTiles;
@@ -121,13 +204,6 @@ function WorldRenderer(startMap) {
         
         halfHorizontalTiles = Math.floor(horizontalTiles / 2);
         halfVerticalTiles = Math.floor(verticalTiles / 2);
-    }
-
-    this.camera = {
-        x: 9,
-        y: 9,
-        xOffset: 0,
-        yOffset: 0
     }
 
     this.updateMap(startMap);

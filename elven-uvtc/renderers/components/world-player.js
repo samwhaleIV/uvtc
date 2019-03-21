@@ -1,4 +1,4 @@
-function PlayerRenderer() {
+function PlayerRenderer(startDirection) {
 
     const sprite = imageDictionary["character-sprite"];
 
@@ -6,13 +6,15 @@ function PlayerRenderer() {
     const rowHeight = 16;
     const rowCount = 4;
 
-    let walking = true;
+    let walking = false;
     let currentColumn = 0;
 
     const animationFrameTime = 1000 / 10;
 
     let horizontalOffset = 0;
     let verticalOffset = 0;
+
+    this.direction = null;
 
     this.updateDirection = function(direction) {
         switch(direction) {
@@ -22,17 +24,23 @@ function PlayerRenderer() {
             case "up":
                 currentColumn = columnWidth * 1;
                 break;
-            case "left":
+            case "right":
                 currentColumn = columnWidth * 2;
                 break;
-            case "right":
+            case "left":
                 currentColumn = columnWidth * 3;
                 break;
         }
+        this.direction = direction;
     }
-
     this.setWalking = function(isWalking) {
         walking = isWalking;
+    }
+
+    if(startDirection) {
+        this.updateDirection(startDirection);
+    } else {
+        this.updateDirection("down");
     }
 
     this.render = function(timestamp,x,y,width,height) {
