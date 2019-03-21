@@ -118,7 +118,7 @@ function WorldPopup(pages,callback) {
         textFeed = pageValue.textFeed;
         if(++characterIndex < pages[pageIndex].length) {
             if(pageValue.delay) {
-                setTimeout(timeoutMethod,pageValue.delay);
+                timeout = setTimeout(timeoutMethod,pageValue.delay);
             } else {
                 if(!pageValue.noSound) {
                     playSound("text-sound");
@@ -126,26 +126,45 @@ function WorldPopup(pages,callback) {
                 timeout = setTimeout(timeoutMethod,pageValue.noSound ? pageValue.speed / 2 : pageValue.speed);
             }
         } else {
+            if(pageIndex + 1 >= pageCount) {
+                readyToTerminate = true;
+            }
             pageComplete = true;
         }
     }
 
     timeoutMethod();
 
+    let readyToTerminate = false;
 
     this.progress = function() {
-        if(pageComplete) {
-            this.pageIndex++;
-            if(pageIndex >= pageCount) {
-                terminated = true;
+        clearTimeout(timeout);
+        if(readyToTerminate) {
+            if(terminated) {
+                return;
+            }
+            terminated = true;
+            if(callback) {
                 callback();
             }
-            timeoutMethod();
+            return;
+        }
+        if(pageComplete) {
+            pageIndex++;
+            characterIndex = 0;
+            if(pageIndex >= pageCount) {
+                readyToTerminate = true;
+            } else {
+                pageComplete = false;
+                timeoutMethod();
+            }
         } else {
             const page = pages[pageIndex];
             textFeed = page[page.length-1].textFeed;
-            clearTimeout(timeout);
             pageComplete = true;
+            if(pageIndex + 1 >= pageCount) {
+                readyToTerminate = true;
+            }
         }
     }
     this.render = function(timestamp) {
