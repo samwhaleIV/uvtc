@@ -30,7 +30,7 @@ addCardSeries([
     {
         name: "n.s.t.a.m.",
         type: "special",
-        description: "prevents violent spells being cast against, fruit poison, and magic eight ball use."
+        description: "prevents violent spells being cast against you, fruit poison, and magic eight ball use."
     },
     {
         name: "elfmart bandage",

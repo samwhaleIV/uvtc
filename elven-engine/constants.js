@@ -9,7 +9,7 @@ const defaultFullScreenZoom = 1.25;
 const mediumFullScreenZoom = 1;
 const smallFullScreenZoom = 0.8;
 
-const maximumWidthToHeightRatio = 2.25;
+const maximumWidthToHeightRatio = 2;
 const maximumHeightToWidthRatio = 1.25;
 
 const highResolutionAdaptiveTextScale = 3;

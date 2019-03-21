@@ -1,9 +1,85 @@
 function WorldRenderer(startMap) {
 
+    this.map = null;
+    this.objects = {};
+    this.objectsLookup = [];
+
+    let lastID = 0;
+    const getNextObjectID = function() {
+        return `world_object_${lastID++}`;
+    }
+
+    this.getObject = function(objectID) {
+        return this.objects[objectID];
+    }
+    this.getObjectID = function(object) {
+        return object.ID;
+    }
+
+    this.addObject = function(object,x,y) {
+        const objectID = getNextObjectID();
+        object.ID = objectID;
+        if(!isNaN(x) && !isNaN(y)) {
+            object.x = x;
+            object.y = y;
+        } else if(isNaN(object.x) || !isNaN(object.y)) {
+            console.error("Error: An object was supplied to the world renderer without initial coordinates");
+        }
+        this.objects[objectID] = object;
+        if(this.objectsLookup[object.x][object.y]) {
+            console.error("Error: An object collision has occured through the add object method");
+            console.log("Existing item",this.objectsLookup[object.x][object.y],"New item",object);
+        }
+        this.objectsLookup[object.x][object.y] = object;
+        return objectID;
+    }
+    this.removeObject = function(objectID) {
+        const object = this.objects[objectID];
+        delete this.objects[objectID];
+        this.objectsLookup[object.x][object.y] = null;
+    }
+    this.moveObject = function(objectID,newX,newY) {
+
+        const object = this.objects[objectID];
+        this.objectsLookup[object.x][object.y] = null;
+
+        object.x = newX;
+        object.y = newY;
+        if(this.objectsLookup[object.x][object.y]) {
+            console.error("Error: An object collision has occured through the move object method");
+            console.log("Existing item",this.objectsLookup[object.x][object.y],"New item",object);
+        }
+        this.objectsLookup[object.x][object.y] = object;
+    }
+
+    this.updateMap = function(newMap) {
+        if(this.map && this.map.unload) {
+            this.map.unload(this);
+        }
+        this.objects = {};
+        this.map = newMap;
+        this.objectsLookup = [];
+        for(let x = 0;x < newMap.rows;x++) {
+            const newColumn = [];
+            for(let y = 0;y < newMap.columns;y++) {
+                newColumn[y] = null;
+            }
+            this.objectsLookup[x] = newColumn;
+        }
+        if(this.map.load) {
+            this.map.load(this);
+        }
+        if(this.map.getCameraStart) {
+            this.camera = this.map.getCameraStart(this);
+        }
+        //TODO load player information
+    }
+
+    this.updateMap(startMap);
+
     let horizontalTiles, verticalTiles, horizontalOffset, verticalOffset, verticalTileSize, horizontalTileSize, halfHorizontalTiles, halfVerticalTiles;
 
     this.disableAdapativeFill = true;
-    this.map = startMap;
 
     this.updateSize = function() {
 
@@ -42,7 +118,6 @@ function WorldRenderer(startMap) {
         halfVerticalTiles = Math.floor(verticalTiles / 2);
     }
 
-    this.objects = [];
     this.camera = {
         x: 9,
         y: 9,
@@ -50,26 +125,9 @@ function WorldRenderer(startMap) {
         yOffset: 0.5
     }
 
-    this.debug_test_camera = function() {
-        this.debugMethod = function(timestamp) {
-            const angle = timestamp % 100 / 100 * PI2;
-            const xOffset = horizontalTileSize * Math.cos(angle) / horizontalTileSize;
-            const yOffset = verticalTileSize * Math.sin(angle) / verticalTileSize;
-
-            this.camera.xOffset = xOffset;
-            this.camera.yOffset = yOffset;
-        }
-    }
-
-    this.debugMethod = () => null;
-
     const tileset = imageDictionary["world-tileset"];
 
-    //load objects from map into this.objects - and when we reload the map inline
-
     this.render = function(timestamp) {
-
-        this.debugMethod(timestamp);
 
         context.fillStyle = "black";
         context.fillRect(0,0,fullWidth,fullHeight);
@@ -112,6 +170,7 @@ function WorldRenderer(startMap) {
 
                 if(xPos < this.map.columns && xPos >= 0) {
                     const mapIndex = xPos + yPos * this.map.columns;
+                    
                     const backgroundValue = this.map.background[mapIndex];
                     const foregroundValue = this.map.foreground[mapIndex];
     
@@ -136,12 +195,21 @@ function WorldRenderer(startMap) {
                             xDestination,yDestination,horizontalTileSize,verticalTileSize
                         );
                     }
+
+                    const objectRegister = this.objectsLookup[xPos][yPos];
+                    if(objectRegister) {
+                        objectRegister.render(
+                            timestamp,
+                            xDestination,
+                            yDestination,
+                            horizontalTileSize,
+                            verticalTileSize
+                        );
+                    }
                 }
                 x++;
             }
             y++;
         }
-
-        drawTextBlack(String(this.camera.yOffset),15,15,4);
     }
 }

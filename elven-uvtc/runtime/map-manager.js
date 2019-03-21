@@ -3,12 +3,9 @@ const worldMaps = {};
 function addMap(map) {
     worldMapList.push(map);
     worldMaps[map.name] = map;
-    if(map.background && map.foreground) {
-        for(let i = 0;i<map.background.length;i++) {
-            map.background[i] += WorldMapValueOffset;
-            map.foreground[i] += WorldMapValueOffset;
-        }
-    } else {
-        console.warn("Map manager: A map is missing a background or foreground layer and has not been pre-processed!");
+    map.rows = map.background.length / map.columns;
+    for(let i = 0;i<map.background.length;i++) {
+        map.background[i] = (map.background[i] || 1) + WorldMapValueOffset;
+        map.foreground[i] = (map.foreground[i] || 1) + WorldMapValueOffset;
     }
 }
