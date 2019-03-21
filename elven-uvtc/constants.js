@@ -18,7 +18,7 @@ const flatDoubleHoverPadding = flatHoverPadding + flatHoverPadding;
 const ACoolBlueColor = "#008DFF";
 
 const WorldTextureSize = 16;
-const WorldTextureScale = 2;
+const WorldTextureScale = 3;
 const WorldTileSize = WorldTextureSize * WorldTextureScale;
 const WorldTextureColumns = 64;
 const WorldMapValueOffset = -1;

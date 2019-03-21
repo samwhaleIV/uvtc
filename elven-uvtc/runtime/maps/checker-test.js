@@ -3,7 +3,7 @@ addMap({
         return {
             load: world => {
                 world.addObject(
-                    new ObjectRenderer(),
+                    new PlayerRenderer(),
                     world.camera.x,world.camera.y
                 );
             }

@@ -161,6 +161,8 @@ function WorldRenderer(startMap) {
         const xOffset = horizontalOffset - Math.round(this.camera.xOffset * horizontalTileSize);
         const yOffset = verticalOffset - Math.round(this.camera.yOffset * verticalTileSize);
 
+        const objectBuffer = [];
+
         let y = yStart, x;
 
         while(y < verticalTileCount) {
@@ -201,18 +203,23 @@ function WorldRenderer(startMap) {
 
                     const objectRegister = this.objectsLookup[xPos][yPos];
                     if(objectRegister) {
-                        objectRegister.render(
-                            timestamp,
-                            xDestination,
-                            yDestination,
-                            horizontalTileSize,
-                            verticalTileSize
-                        );
+                        objectBuffer.push(objectRegister,xDestination,yDestination);
                     }
                 }
                 x++;
             }
             y++;
+        }
+        let objectBufferIndex = 0;
+        while(objectBufferIndex < objectBuffer.length) {
+            objectBuffer[objectBufferIndex].render(
+                timestamp,
+                objectBuffer[objectBufferIndex+1],
+                objectBuffer[objectBufferIndex+2],
+                horizontalTileSize,
+                verticalTileSize
+            );
+            objectBufferIndex += 3;
         }
     }
 }
