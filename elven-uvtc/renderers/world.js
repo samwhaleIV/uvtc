@@ -59,7 +59,9 @@ function WorldRenderer(startMap) {
             this.map.unload(this);
         }
         this.objects = {};
-        this.map = newMap.generateWorldState ? newMap.generateWorldState(this) : {};
+        this.map = newMap.generateWorldState ? newMap.generateWorldState(
+            null //TODO provide a global state to the world state generator
+        ) : {};
         this.renderMap = newMap;
         this.objectsLookup = [];
         for(let x = 0;x < newMap.rows;x++) {
