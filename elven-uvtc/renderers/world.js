@@ -1,5 +1,7 @@
 function WorldRenderer(startMap) {
 
+    const tileset = imageDictionary["world-tileset"];
+
     this.map = null;
     this.objects = {};
     this.objectsLookup = [];
@@ -57,7 +59,8 @@ function WorldRenderer(startMap) {
             this.map.unload(this);
         }
         this.objects = {};
-        this.map = newMap;
+        this.map = newMap.generateWorldState ? newMap.generateWorldState(this) : {};
+        this.renderMap = newMap;
         this.objectsLookup = [];
         for(let x = 0;x < newMap.rows;x++) {
             const newColumn = [];
@@ -74,8 +77,6 @@ function WorldRenderer(startMap) {
         }
         //TODO load player information
     }
-
-    this.updateMap(startMap);
 
     let horizontalTiles, verticalTiles, horizontalOffset, verticalOffset, verticalTileSize, horizontalTileSize, halfHorizontalTiles, halfVerticalTiles;
 
@@ -125,7 +126,7 @@ function WorldRenderer(startMap) {
         yOffset: 0.5
     }
 
-    const tileset = imageDictionary["world-tileset"];
+    this.updateMap(startMap);
 
     this.render = function(timestamp) {
 
@@ -168,11 +169,11 @@ function WorldRenderer(startMap) {
                 const xPos = adjustedXPos + x;
                 const yPos = adjustedYPos + y;
 
-                if(xPos < this.map.columns && xPos >= 0) {
-                    const mapIndex = xPos + yPos * this.map.columns;
+                if(xPos < this.renderMap.columns && xPos >= 0) {
+                    const mapIndex = xPos + yPos * this.renderMap.columns;
                     
-                    const backgroundValue = this.map.background[mapIndex];
-                    const foregroundValue = this.map.foreground[mapIndex];
+                    const backgroundValue = this.renderMap.background[mapIndex];
+                    const foregroundValue = this.renderMap.foreground[mapIndex];
     
                     const xDestination = xOffset + x * horizontalTileSize;
                     const yDestination = yOffset + y * verticalTileSize;

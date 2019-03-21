@@ -1,4 +1,14 @@
 addMap({
+    generateWorldState: () => {
+        return {
+            load: world => {
+                world.addObject(
+                    new ObjectRenderer(),
+                    world.camera.x,world.camera.y
+                );
+            }
+        }
+    },
     name: "checker-test",
     columns: 20,
     foreground: [],
