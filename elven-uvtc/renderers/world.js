@@ -49,8 +49,15 @@ function WorldRenderer(startMap) {
         this.processMove(mouseX,mouseY);
     }
 
+    this.clearTextPopup = () => {
+        this.popup = null;
+    }
+
     this.showTextPopup = pages => {
-        this.popup = new WorldPopup(pages,()=>this.popup=null);
+        this.popup = new WorldPopup(
+            pages,
+            this.clearTextPopup
+        );
     }
 
     this.getCollisionState = function(x,y) {
@@ -214,8 +221,8 @@ function WorldRenderer(startMap) {
 
     this.render = function(timestamp) {
 
-        if(this.playerController.renderLoopMethod) {
-            this.playerController.renderLoopMethod(timestamp);
+        if(this.playerController.renderMethod) {
+            this.playerController.renderMethod(timestamp);
         }
 
         if(this.playerObject) {

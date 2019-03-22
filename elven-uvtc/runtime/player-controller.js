@@ -212,7 +212,7 @@ function PlayerController(world) {
     }
 
     let lastFrame = 0;
-    const movementLoopMethod = timestamp => {
+    const movementMethod = timestamp => {
         const delta = timestamp - lastFrame;
         lastFrame = timestamp;
         if(delta > maxDelta) {
@@ -234,16 +234,16 @@ function PlayerController(world) {
     }
 
     let loopRunning = false;
-    this.renderLoopMethod = null;
+    this.renderMethod = null;
 
     const startMovementLoop = () => {
         lastFrame = performance.now();
         loopRunning = true;
-        this.renderLoopMethod = movementLoopMethod;
+        this.renderMethod = movementMethod;
     }
     const stopMovementLoop = () => {
+        this.renderMethod = null;
         loopRunning = false;
-        this.renderLoopMethod = null;
         this.player.setWalking(false);
     }
 
