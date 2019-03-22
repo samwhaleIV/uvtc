@@ -15,5 +15,6 @@ ImagePaths.push(
     getFile("ui/card-icons.png",FileTypes.Image),
     getFile("ui/status-roll.png",FileTypes.Image),
     getFile("world-tileset.png",FileTypes.Image),
-    getFile("character-sprite.png",FileTypes.Image)
+    getFile("character-sprite.png",FileTypes.Image),
+    getFile("footsteps.png",FileTypes.Image),
 );

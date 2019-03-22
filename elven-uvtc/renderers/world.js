@@ -84,10 +84,15 @@ function WorldRenderer(startMapName) {
         let mapCollision = this.renderMap.collision[
             x + y * this.renderMap.columns
         ];
-        const objectCollision = this.objectsLookup[x][y];
+        let objectCollision = this.objectsLookup[x][y];
         if(this.map.noCollide && !ignoreNoCollide) {
             if(this.map.noCollide[mapCollision]) {
                 mapCollision = 0;
+            }
+        }
+        if(objectCollision && !ignoreNoCollide) {
+            if(objectCollision.noCollide) {
+                objectCollision = null;
             }
         }
         return {
@@ -156,14 +161,26 @@ function WorldRenderer(startMapName) {
 
         const object = this.objects[objectID];
         this.objectsLookup[object.x][object.y] = null;
-
+        const oldX = object.x;
+        const oldY = object.y;
         object.x = newX;
         object.y = newY;
+        if(object.worldPositionUpdated) {
+            object.worldPositionUpdated(oldX,oldY,this);
+        }
         if(this.objectsLookup[object.x][object.y]) {
             console.error("Error: An object collision has occured through the move object method");
             console.log("Existing item",this.objectsLookup[object.x][object.y],"New item",object);
         }
         this.objectsLookup[object.x][object.y] = object;
+    }
+
+    this.decals = [];
+    this.addDecal = decal => {
+        this.decals[decal.x][decal.y] = decal;
+    }
+    this.removeDecal = decal => {
+        this.decals[decal.x][decal.y] = null;
     }
 
     this.updateMap = function(newMapName,data={}) {
@@ -188,10 +205,13 @@ function WorldRenderer(startMapName) {
 
         for(let y = 0;y < newMap.columns;y++) {
             const newRow = [];
+            const newDecalRow = [];
             for(let x = 0;x < newMap.rows;x++) {
                 newRow[x] = null;
+                newDecalRow[x] = null;
             }
             this.objectsLookup[y] = newRow;
+            this.decals[y] = newDecalRow;
         }
 
 
@@ -329,10 +349,15 @@ function WorldRenderer(startMapName) {
                         );
                     }
 
+                    const decalRegister = this.decals[xPos][yPos];
+                    if(decalRegister) {
+                        objectBuffer.push(decalRegister,xDestination,yDestination);
+                    }
                     const objectRegister = this.objectsLookup[xPos][yPos];
                     if(objectRegister) {
                         objectBuffer.push(objectRegister,xDestination,yDestination);
                     }
+
                 }
                 x++;
             }
