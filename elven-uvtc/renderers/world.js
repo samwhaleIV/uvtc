@@ -215,6 +215,17 @@ function WorldRenderer(startMap) {
 
     this.render = function(timestamp) {
 
+        if(this.playerController.renderLoopMethod) {
+            this.playerController.renderLoopMethod(timestamp);
+        }
+
+        if(this.playerObject) {
+            this.camera.x = this.playerObject.x;
+            this.camera.y = this.playerObject.y;
+            this.camera.xOffset = this.playerObject.xOffset;
+            this.camera.yOffset = this.playerObject.yOffset;
+        }
+
         context.fillStyle = "black";
         context.fillRect(0,0,fullWidth,fullHeight);
 

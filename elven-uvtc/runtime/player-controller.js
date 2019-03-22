@@ -73,8 +73,8 @@ function PlayerController(world) {
         return {x:x,y:y};
     }
 
-    const movementDistance = 0.05;
-    const movementLoopInterval = 20;
+    const tilesPerSecond = 5;
+    const maxDelta = 50;
 
     this.horizontalVelocity = 0;
     this.verticalVelocity = 0;
@@ -83,8 +83,7 @@ function PlayerController(world) {
     const cornerCollisionThreshold = 0.1;
     const inverseCornerCollisionThreshold = -cornerCollisionThreshold
 
-
-    const tryMoveUp = () => {
+    const tryMoveUp = movementDistance => {
         let horizontalCollision = false;
 
         if(this.player.xOffset > cornerCollisionThreshold) {
@@ -116,7 +115,7 @@ function PlayerController(world) {
         }
         return true;
     }
-    const tryMoveDown = () => {
+    const tryMoveDown = movementDistance => {
         let horizontalCollision = false;
 
         if(this.player.xOffset > cornerCollisionThreshold) {
@@ -147,7 +146,7 @@ function PlayerController(world) {
         }
         return true;
     }
-    const tryMoveLeft = () => {
+    const tryMoveLeft = movementDistance => {
         let verticalCollision = false;
 
         if(this.player.yOffset > cornerCollisionThreshold) {
@@ -179,7 +178,7 @@ function PlayerController(world) {
         }
         return true;
     }
-    const tryMoveRight = () => {
+    const tryMoveRight = movementDistance => {
         let verticalCollision = false;
 
         if(this.player.yOffset > cornerCollisionThreshold) {
@@ -212,29 +211,40 @@ function PlayerController(world) {
         return true;
     }
 
-    const movementLoopMethod = () => {
+    let lastFrame = 0;
+    const movementLoopMethod = timestamp => {
+        const delta = timestamp - lastFrame;
+        lastFrame = timestamp;
+        if(delta > maxDelta) {
+            console.warn("Player controller: Dropped movement frame");
+            return;
+        }
+        const movementDistance = delta / 1000 * tilesPerSecond;
+
         if(this.horizontalVelocity > 0) {
-            this.player.setWalking(tryMoveRight());
+            this.player.setWalking(tryMoveRight(movementDistance));
         } else if(this.horizontalVelocity < 0) {
-            this.player.setWalking(tryMoveLeft());
+            this.player.setWalking(tryMoveLeft(movementDistance));
         }
         if(this.verticalVelocity > 0) {
-            this.player.setWalking(tryMoveDown());
+            this.player.setWalking(tryMoveDown(movementDistance));
         } else if(this.verticalVelocity < 0) {
-            this.player.setWalking(tryMoveUp());
+            this.player.setWalking(tryMoveUp(movementDistance));
         }
     }
 
+    let loopRunning = false;
+    this.renderLoopMethod = null;
+
     const startMovementLoop = () => {
-        movementLoop = setInterval(
-            movementLoopMethod,
-            movementLoopInterval
-        );
+        lastFrame = performance.now();
+        loopRunning = true;
+        this.renderLoopMethod = movementLoopMethod;
     }
     const stopMovementLoop = () => {
-        clearInterval(movementLoop);
+        loopRunning = false;
+        this.renderLoopMethod = null;
         this.player.setWalking(false);
-        movementLoop = -1;
     }
 
     const applyPlayerVelocities = none => {
@@ -283,7 +293,7 @@ function PlayerController(world) {
             applyPlayerVelocities();
         }
         if(movementDown()) {
-            if(movementLoop < 0) {
+            if(!loopRunning) {
                 startMovementLoop();
             }
         }
