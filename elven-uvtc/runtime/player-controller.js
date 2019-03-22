@@ -73,6 +73,31 @@ function PlayerController(world) {
         return {x:x,y:y};
     }
 
+    const processEnter = () => {
+        if(this.player.isWalking()) {
+            return;
+        }
+        const pulseLocation = addDirectionToCoordinate(
+            this.player.x + Math.round(this.player.xOffset),
+            this.player.y + Math.round(this.player.yOffset),
+            this.player.direction
+        );
+        const collisionState = this.world.getCollisionState(
+            pulseLocation.x,pulseLocation.y
+        );
+        if(collisionState.object) {
+            
+        } else if(collisionState.map) {
+            switch(collisionState.map) {
+                case 2:
+                    this.world.showTextPopup([
+                        getString("nobody_home")
+                    ]);
+                    break;
+            }
+        }
+    }
+
     const tilesPerSecond = 5;
     const maxDelta = 50;
 
@@ -270,7 +295,6 @@ function PlayerController(world) {
     }
 
     this.processKey = function(key) {
-        const startDirection = this.player.direction;
         switch(key) {
             case "KeyW":
                 this.player.updateDirection("up");
@@ -288,10 +312,11 @@ function PlayerController(world) {
                 this.player.updateDirection("right");
                 dDown = true;
                 break;
+            case "Enter":
+                processEnter();
+                break;
         }
-        if(startDirection !== this.player.direction) {
-            applyPlayerVelocities();
-        }
+        applyPlayerVelocities();
         if(movementDown()) {
             if(!loopRunning) {
                 startMovementLoop();
@@ -330,9 +355,7 @@ function PlayerController(world) {
                     this.player.updateDirection("right");
                     break;
             }
-            if(startDirection !== this.player.direction) {
-                applyPlayerVelocities();
-            }
+            applyPlayerVelocities();
         } else {
             stopMovementLoop();
         }

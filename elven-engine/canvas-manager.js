@@ -351,20 +351,21 @@ function cycleSizeMode() {
 }
 
 function render(timestamp) {
+    animationFrame = window.requestAnimationFrame(render); 
 
     backgroundContext.fill = "black";
     backgroundContext.fillRect(0,0,1,1);
 
     if(!paused) {
-        animationFrame = window.requestAnimationFrame(render); 
         const gamepads = navigator.getGamepads();
-        for(let i = 0;i<gamepads.length;i++) {
+        let i = 0;
+        while(i < gamepads.length) {
             if(gamepads[i] && gamepads[i].mapping === "standard") {
                 processGamepad(gamepads[i],timestamp);
-                break;
+                i = gamepads.length;
             }
+            i++;
         }
-
         rendererState.render(timestamp);
     }
 }
