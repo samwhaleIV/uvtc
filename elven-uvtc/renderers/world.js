@@ -69,8 +69,13 @@ function WorldRenderer(startMap) {
             object: objectCollision
         }
     }
-    this.collides = function(x,y) {
+    this.collides = function(x,y,exemptionID) {
         const collisionState = this.getCollisionState(x,y);
+        if(exemptionID && collisionState.object) {
+            if(exemptionID === collisionState.object.ID) {
+                collisionState.object = null;
+            }
+        }
         return collisionState.map >= 1 || collisionState.object ? true : false;
     }
 

@@ -12,88 +12,112 @@ function PlayerController(world) {
     let dDown = false;
 
     let movementLoop = -1;
-    const loopInterval = 200;
+    const loopInterval = 10;
 
     const movementJumpThreshold = 0.5;
+    const collisionThreshold = 0.1;
 
     const cancelWalkLoop = () => {
-        console.log("Cancel walk loop");
+        clearInterval(movementLoop);
         this.player.setWalking(false);
-        clearTimeout(movementLoop);
         movementLoop = -1;
-        if(this.player.nextXStartTime) {
-            const xProgress = (performance.now() - this.player.nextXStartTime) / loopInterval;
-            if(xProgress > movementJumpThreshold) {
-                let newXPos;
-                if(this.player.nextXPolarity > 0) {
-                    newXPos = addDirectionToCoordinate(
-                        this.player.x,this.player.y,"right"
-                    );
-                } else {
-                    newXPos = addDirectionToCoordinate(
-                        this.player.x,this.player.y,"left"
-                    );
+    }
+
+    const playerKindaCollides = direction => {
+        let collidesKinda = false;
+        if(direction) {
+            switch(direction) {
+                case "up":
+                    collidesKinda = this.player.verticalOffset < -collisionThreshold && this.world.collides(this.player.x,this.player.y-1,this.player.ID);
+                    break;
+                case "down":
+                    collidesKinda = this.player.verticalOffset > collisionThreshold && this.world.collides(this.player.x,this.player.y+1,this.player.ID);
+                    break;
+                case "left":
+                    collidesKinda = this.player.horizontalOffset < -collisionThreshold && this.world.collides(this.player.x-1,this.player.y,this.player.ID);
+                    break;
+                case "right":
+                    collidesKinda = this.player.horizontalOffset > collisionThreshold && this.world.collides(this.player.x+1,this.player.y,this.player.ID);
+                    break;
+            }
+        } else {
+            if(this.player.horizontalOffset > collisionThreshold) {
+                if(this.world.collides(this.player.x+1,this.player.y,this.player.ID)) {
+                    collidesKinda = true;
                 }
-                if(!this.world.collides(newXPos.x,newXPos.y)) {
-                    this.world.moveObject(this.player.ID,newXPos.x,newXPos.y);
+            } else if(this.player.horizontalOffset < -collisionThreshold) {
+                if(this.world.collides(this.player.x-1,this.player.y,this.player.ID)) {
+                    collidesKinda = true;
+                }
+            }
+            if(this.player.verticalOffset > collisionThreshold) {
+                if(this.world.collides(this.player.x,this.player.y+1,this.player.ID)) {
+                    collidesKinda = true;
+                }
+            } else if(this.player.verticalOffset < -collisionThreshold) {
+                if(this.world.collides(this.player.x,this.player.y-1,this.player.ID)) {
+                    collidesKinda = true;
                 }
             }
         }
-        if(this.player.nextYStartTime) {
-            const yProgress = (performance.now() - this.player.nextYStartTime) / loopInterval;
-            if(yProgress > movementJumpThreshold) {
-                let newYPos;
-                if(this.player.nextYPolarity > 0) {
-                    newYPos = addDirectionToCoordinate(
-                        this.player.x,this.player.y,"down"
-                    );
-                } else {
-                    newYPos = addDirectionToCoordinate(
-                        this.player.x,this.player.y,"up"
-                    );
-                }
-                if(!this.world.collides(newYPos.x,newYPos.y)) {
-                    this.world.moveObject(this.player.ID,newYPos.x,newYPos.y);
-                }
-            }
-        }
-        this.player.clearNextAnimationValues();
+        return collidesKinda;
     }
 
     const loopFunction = direction => {
-        console.log("Loop",direction);
-        const newCoordinate = addDirectionToCoordinate(this.player.x,this.player.y,direction);
-
-        if(this.world.collides(newCoordinate.x,newCoordinate.y)) {
-            console.log("Walk loop collision");
-            cancelWalkLoop();
-            return;
-        } else {
-            if(newCoordinate.x > this.player.x) {
-                this.player.nextXStartTime = performance.now();
-                this.player.nextXPolarity = 1;
-            } else if(newCoordinate.x < this.player.x) {
-                this.player.nextXStartTime = performance.now();
-                this.player.nextXPolarity = -1;
-            }
-    
-            if(newCoordinate.y > this.player.y) {
-                this.player.nextYStartTime = performance.now();
-                this.player.nextYPolarity = 1;
-            } else if(newCoordinate.y < this.player.y) {
-                this.player.nextYStartTime = performance.now();
-                this.player.nextYPolarity = -1;
-            }   
-            this.player.nextTravelDuration = loopInterval;
+        console.log(this.player.horizontalOffset,this.player.verticalOffset);
+        switch(direction) {
+            case "up":
+                this.player.verticalOffset -= 0.05;
+                break;
+            case "down":
+                this.player.verticalOffset += 0.05;
+                break;
+            case "left":
+                this.player.horizontalOffset -= 0.05;
+                break;
+            case "right":
+                this.player.horizontalOffset += 0.05;
+                break;
         }
 
-        this.world.moveObject(this.player.ID,newCoordinate.x,newCoordinate.y);
+        let newX = this.player.x, newY = this.player.y;
+        if(this.player.horizontalOffset >= 1) {
+            newX++;
+        } else if(this.player.horizontalOffset <= -1) {
+            newX--;
+        }
+        if(this.player.verticalOffset >= 1) {
+            newY++;
+        } else if(this.player.verticalOffset <= -1) {
+            newY--;
+        }
+
+        if(newX !== this.player.x || newY !== this.player.y) {
+            const collidesInWorld = this.world.collides(newX,newY,this.player.ID);
+
+            if(!collidesInWorld) {
+
+                this.world.moveObject(this.player.ID,newX,newY);
+
+                if(this.player.horizontalOffset >= 1 || this.player.horizontalOffset <= -1) {
+                    this.player.horizontalOffset = 0;
+                }
+                if(this.player.verticalOffset >= 1 || this.player.verticalOffset <= -1) {
+                    this.player.verticalOffset = 0;
+                }
+
+            } else {
+                cancelWalkLoop();
+            }
+        }
+        if(playerKindaCollides(this.player.direction)) {
+            cancelWalkLoop();
+            return;
+        }
     }
 
     const startMovementLoop = direction => {
         console.log("Started movement loop",direction);
-        this.player.clearNextAnimationValues();
-        loopFunction(direction);
         movementLoop = setInterval(loopFunction,loopInterval,direction);
     }
 
@@ -162,6 +186,7 @@ function PlayerController(world) {
     }
 
     this.processKey = function(key) {
+        console.log(key);
         const startDirection = this.player.direction;
         switch(key) {
             case "KeyW":
@@ -185,11 +210,45 @@ function PlayerController(world) {
             const nextPosition = addDirectionToCoordinate(
                 this.player.x,this.player.y,this.player.direction
             );
+
+            if(this.player.horizontalOffset < 1 && this.player.direction === "right") {
+                nextPosition.x--;
+                if(this.player.verticalOffset > collisionThreshold) {
+                    nextPosition.y--;
+                } else if(this.player.verticalOffset < -collisionThreshold) {
+                    nextPosition.y++;
+                }
+            } else if(this.player.horizontalOffset < 0 && this.player.direction === "left") {
+                nextPosition.x++;
+                if(this.player.verticalOffset > collisionThreshold) {
+                    nextPosition.y--;
+                } else if(this.player.verticalOffset < -collisionThreshold) {
+                    nextPosition.y++;
+                }
+            }
+
+            if(this.player.verticalOffset < 1 && this.player.direction === "down") {
+                nextPosition.y--;
+                if(this.player.horizontalOffset > collisionThreshold) {
+                    nextPosition.x--;
+                } else if(this.player.horizontalOffset < -collisionThreshold) {
+                    nextPosition.x++;
+                }
+            } else if(this.player.verticalOffset > 0 && this.player.direction === "up") {
+                nextPosition.y++;
+                if(this.player.horizontalOffset > collisionThreshold) {
+                    nextPosition.x--;
+                } else if(this.player.horizontalOffset < -collisionThreshold) {
+                    nextPosition.x++;
+                }
+            }
+
+
             const collidesAtNextPosition = this.world.collides(
-                nextPosition.x,nextPosition.y
+                nextPosition.x,nextPosition.y,this.player.ID
             );
             this.player.setWalking(
-                !collidesAtNextPosition
+                !collidesAtNextPosition && !playerKindaCollides(this.player.direction)
             );
         }
         if(movementLoop >= 0 && !this.player.isWalking()) {
