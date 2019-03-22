@@ -13,8 +13,8 @@ function PlayerRenderer(startDirection) {
 
     this.direction = null;
 
-    this.horizontalOffset = 0;
-    this.verticalOffset = 0;
+    this.xOffset = 0;
+    this.yOffset = 0;
 
     this.updateDirection = function(direction) {
         switch(direction) {
@@ -48,13 +48,12 @@ function PlayerRenderer(startDirection) {
     }
 
     this.render = function(timestamp,x,y,width,height) {
-        const destinationX = this.horizontalOffset * width + x;
-        const destinationY = this.verticalOffset * height + y;
+        const destinationX = this.xOffset * width + x;
+        const destinationY = this.yOffset * height + y;
 
         const animationRow = walking ? 
             Math.floor(timestamp / animationFrameTime) % rowCount * rowHeight
         : 0;
-
         context.drawImage(
             sprite,currentColumn,animationRow,columnWidth,rowHeight,destinationX,destinationY,width,height
         );
