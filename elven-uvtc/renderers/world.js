@@ -49,12 +49,8 @@ function WorldRenderer(startMap) {
         this.processMove(mouseX,mouseY);
     }
 
-    this.clearPopup = function() {
-        this.popup = null;
-    }
-
-    this.showTextPopup = function(pages) {
-        this.popup = new WorldPopup(pages,this.clearPopup);
+    this.showTextPopup = pages => {
+        this.popup = new WorldPopup(pages,()=>this.popup=null);
     }
 
     this.getCollisionState = function(x,y) {
