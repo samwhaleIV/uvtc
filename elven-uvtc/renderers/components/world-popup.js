@@ -53,13 +53,13 @@ function applySonographToPopupFeed(popupFeed) {
 }
 function WorldPopup(pages,callback) {
 
-    const characterSpeed = 30;
-    const spaceSpeed = 20;
+    const characterSpeed = 40;
+    const spaceSpeed = 25;
 
-    const hyphenDelay = 600;
+    const hyphenDelay = 500;
     const commaDelay = 300;
     const periodDelay = 500;
-    const ellipsisDelay = 400;
+    const ellipsisDelay = 600;
 
     let pageIndex = 0;
     let characterIndex = 0;
@@ -181,6 +181,6 @@ function WorldPopup(pages,callback) {
             popupY,
             popupWidth,popupHeight
         );
-        drawTextWrappingBlack(textFeed,popupX + 5,popupY + 5,popupWidth-30,2,12,4);
+        drawTextWrappingBlack(textFeed,popupX + 5,popupY + 5,popupWidth-50,2,12,4);
     }
 }
