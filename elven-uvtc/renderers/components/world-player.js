@@ -100,16 +100,8 @@ function PlayerRenderer(startDirection) {
     }
 
     this.render = function(timestamp,x,y,width,height) {
-
         const destinationX = this.xOffset * width + x;
         const destinationY = this.yOffset * height + y;
-
-        let i = 0;
-        while(i<footStepBuffer.length) {
-            
-            
-            i++;
-        }
 
         const animationRow = walking ? 
             Math.floor(timestamp / animationFrameTime) % rowCount * rowHeight
