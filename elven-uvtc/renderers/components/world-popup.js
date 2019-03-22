@@ -46,9 +46,6 @@ function applySonographToPopupFeed(popupFeed) {
             popupFeed[x+wordSet.start].noSound = !soundMap[x];
         }
     }
-
-    console.log(wordSets);
-
     return popupFeed;
 }
 function WorldPopup(pages,callback) {

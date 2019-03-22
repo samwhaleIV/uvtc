@@ -9,7 +9,6 @@ function addMap(map) {
         map.foreground[i] = (map.foreground[i] || 1) + WorldMapValueOffset;
         if(map.collision[i] !== 0) {
             map.collision[i] = map.collision[i] + CollisionMapValueOffset;
-            console.log(map.collision[i]);
         }
     }
 

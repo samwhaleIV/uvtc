@@ -83,7 +83,7 @@ function PlayerController(world) {
             this.player.direction
         );
         const collisionState = this.world.getCollisionState(
-            pulseLocation.x,pulseLocation.y
+            pulseLocation.x,pulseLocation.y,true
         );
         if(collisionState.object) {
             if(collisionState.object.worldClick) {

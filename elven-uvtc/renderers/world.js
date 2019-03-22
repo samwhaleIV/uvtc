@@ -80,20 +80,23 @@ function WorldRenderer(startMapName) {
         );
     }
 
-    this.getCollisionState = function(x,y) {
-        const mapCollision = this.renderMap.collision[
+    this.getCollisionState = function(x,y,ignoreNoCollide) {
+        let mapCollision = this.renderMap.collision[
             x + y * this.renderMap.columns
         ];
-        
         const objectCollision = this.objectsLookup[x][y];
-
+        if(this.map.noCollide && !ignoreNoCollide) {
+            if(this.map.noCollide[mapCollision]) {
+                mapCollision = 0;
+            }
+        }
         return {
             map: mapCollision,
             object: objectCollision
         }
     }
     this.collides = function(x,y,exemptionID) {
-        const collisionState = this.getCollisionState(x,y);
+        const collisionState = this.getCollisionState(x,y,false);
         if(exemptionID && collisionState.object) {
             if(exemptionID === collisionState.object.ID) {
                 collisionState.object = null;
