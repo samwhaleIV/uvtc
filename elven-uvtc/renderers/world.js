@@ -154,13 +154,16 @@ function WorldRenderer(startMap) {
         }
         this.renderMap = newMap;
         this.objectsLookup = [];
-        for(let x = 0;x < newMap.rows;x++) {
-            const newColumn = [];
-            for(let y = 0;y < newMap.columns;y++) {
-                newColumn[y] = null;
+
+        for(let y = 0;y < newMap.columns;y++) {
+            const newRow = [];
+            for(let x = 0;x < newMap.rows;x++) {
+                newRow[x] = null;
             }
-            this.objectsLookup[x] = newColumn;
+            this.objectsLookup[y] = newRow;
         }
+
+
         if(this.map.load) {
             this.map.load(this);
         }
