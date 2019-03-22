@@ -86,13 +86,28 @@ function PlayerController(world) {
             pulseLocation.x,pulseLocation.y
         );
         if(collisionState.object) {
-            
+            if(collisionState.object.worldClick) {
+                collisionState.object.clicked(
+                    pulseLocation.x,pulseLocation.y
+                );
+            }
         } else if(collisionState.map) {
             switch(collisionState.map) {
                 case 2:
-                    this.world.showTextPopup([
-                        getString("nobody_home")
-                    ]);
+                    this.world.map.doorClicked(
+                        this.world.renderMap.doorLookup[
+                            pulseLocation.x
+                        ][
+                            pulseLocation.y
+                        ]
+                    );
+                    break;
+                default:
+                    this.world.map.otherClicked(
+                        collisionState.map,
+                        pulseLocation.x,
+                        pulseLocation.y
+                    );
                     break;
             }
         }
@@ -314,7 +329,7 @@ function PlayerController(world) {
                 break;
             case "Enter":
                 processEnter();
-                break;
+                return;
         }
         applyPlayerVelocities();
         if(movementDown()) {
@@ -337,10 +352,11 @@ function PlayerController(world) {
             case "KeyD":
                 dDown = false;
                 break;
+            case "Enter":
+                return;
         }
         const soloMovementRegister = checkForSoloMovement();
         if(soloMovementRegister >= 0) {
-            const startDirection = this.player.direction;
             switch(soloMovementRegister) {
                 case 0:
                     this.player.updateDirection("up");

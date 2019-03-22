@@ -30,7 +30,6 @@ const processRawStrings = function() {
                 case ".":
                 case "?":
                 case "!":
-                case " ":
                     if(word) {
                         if(!wordSyllableMaps[word] && !allWordsLookup[word]) {
                             allWords.push(word);

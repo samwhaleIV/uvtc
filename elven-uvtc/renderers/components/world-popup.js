@@ -53,13 +53,13 @@ function applySonographToPopupFeed(popupFeed) {
 }
 function WorldPopup(pages,callback) {
 
-    const characterSpeed = 40;
-    const spaceSpeed = 25;
+    const characterSpeed = 25;
+    const spaceSpeed = 20;
 
-    const hyphenDelay = 500;
+    const hyphenDelay = 300;
     const commaDelay = 300;
     const periodDelay = 500;
-    const ellipsisDelay = 600;
+    const ellipsisDelay = 400;
 
     let pageIndex = 0;
     let characterIndex = 0;
@@ -76,6 +76,7 @@ function WorldPopup(pages,callback) {
         let textFeed = "";
         for(let x = 0;x<page.length;x++) {
             let speed = characterSpeed;
+            let instant = false;
             const character = page[x];
             textFeed += character;
             let delay = 0;
@@ -89,6 +90,9 @@ function WorldPopup(pages,callback) {
                 case "-":
                     speed = hyphenDelay;
                     break;
+                case "'":
+                    instant = true;
+                    break;
                 case ",":
                     delay = commaDelay;
                     break;
@@ -96,12 +100,14 @@ function WorldPopup(pages,callback) {
                 case "?":
                 case ".":
                     delay = periodDelay;
+                    instant = true;
                     break;
             }
             newPage.push({
                 textFeed:processTextForWrapping(textFeed),
                 newCharacter:character,
                 noSound:true,
+                instant:instant,
                 delay:delay,
                 speed:speed
             });
@@ -117,6 +123,13 @@ function WorldPopup(pages,callback) {
         const pageValue = pages[pageIndex][characterIndex];
         textFeed = pageValue.textFeed;
         if(++characterIndex < pages[pageIndex].length) {
+            const lookAhead = pages[pageIndex][characterIndex]
+            if(lookAhead) {
+                if(lookAhead.instant) {
+                    timeoutMethod();
+                    return;
+                }
+            }
             if(pageValue.delay) {
                 timeout = setTimeout(timeoutMethod,pageValue.delay);
             } else {
@@ -175,12 +188,19 @@ function WorldPopup(pages,callback) {
         const popupHeight = Math.floor(fullHeight * 0.33);
         const popupY = fullHeight - 10 - popupHeight;
         const popupX = Math.round(halfWidth - popupWidth / 2);
+        context.fillStyle = "black";
+        context.fillRect(
+            popupX-3,
+            popupY-3,
+            popupWidth+6,
+            popupHeight+6
+        );
         context.fillStyle = "white";
         context.fillRect(
             popupX,
             popupY,
             popupWidth,popupHeight
         );
-        drawTextWrappingBlack(textFeed,popupX + 5,popupY + 5,popupWidth-50,2,12,4);
+        drawTextWrappingBlack(textFeed,popupX + 10,popupY + 10,popupWidth-40,2,13,4);
     }
 }

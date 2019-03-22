@@ -1,7 +1,19 @@
 addMap({
-    WorldState: function(globalState) {
+    WorldState: function(world,globalState,data) {
         this.load = world => {
-            world.addPlayer(world.camera.x,world.camera.y,"down");
+            if(data.playerPosition) {
+                world.addPlayer(...unpackagePlayerPosition(data));
+            } else {
+                world.addPlayer(world.camera.x,world.camera.y,"down");
+            }
+        }
+        this.doorClicked = (x,y) => {
+            const newMapData = {};
+            shiftPlayerToDoorFrame(x,y,world);
+            packagePlayerPosition(newMapData,world);
+            world.updateMap("test-map",newMapData);
+        }
+        this.otherClicked = (type,x,y) => {
         }
     },
     name: "test-map",

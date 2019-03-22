@@ -1,4 +1,4 @@
-function WorldRenderer(startMap) {
+function WorldRenderer(startMapName) {
 
     this.camera = {
         x: 10,
@@ -53,7 +53,27 @@ function WorldRenderer(startMap) {
         this.popup = null;
     }
 
-    this.showTextPopup = pages => {
+    this.showTextPopupID = ID => {
+        this.popup = new WorldPopup(
+            [getString(ID)],
+            this.clearTextPopup
+        );
+    }
+    this.showTextPopupsID = (...IDs) => {
+        this.popup = new WorldPopup(
+            IDs.map(id => getString(id)),
+            this.clearTextPopup
+        );
+    }
+
+    this.showTextPopup = page => {
+        this.popup = new WorldPopup(
+            [page],
+            this.clearTextPopup
+        );
+    }
+
+    this.showTextPopups = pages => {
         this.popup = new WorldPopup(
             pages,
             this.clearTextPopup
@@ -115,6 +135,7 @@ function WorldRenderer(startMap) {
         } else if(isNaN(object.x) || !isNaN(object.y)) {
             console.error("Error: An object was supplied to the world renderer without initial coordinates");
         }
+        object.world = this;
         this.objects[objectID] = object;
         if(this.objectsLookup[object.x][object.y]) {
             console.error("Error: An object collision has occured through the add object method");
@@ -142,14 +163,18 @@ function WorldRenderer(startMap) {
         this.objectsLookup[object.x][object.y] = object;
     }
 
-    this.updateMap = function(newMap) {
+    this.updateMap = function(newMapName,data={}) {
+        if(this.renderMap) {
+            data.sourceRoom = this.renderMap.name;
+        }
+        const newMap = worldMaps[newMapName];
         if(this.map && this.map.unload) {
             this.map.unload(this);
         }
         this.objects = {};
         this.playerObject = null;
         this.map = newMap.WorldState ? new newMap.WorldState(
-            null //TODO provide a global state to the world state generator
+            this,null,data //TODO provide a global state to the world state generator
         ) : {};
         if(newMap.cameraStart) {
             this.camera.x = newMap.cameraStart.x;
@@ -217,7 +242,7 @@ function WorldRenderer(startMap) {
         halfVerticalTiles = Math.floor(verticalTiles / 2);
     }
 
-    this.updateMap(startMap);
+    this.updateMap(startMapName);
 
     this.render = function(timestamp) {
 

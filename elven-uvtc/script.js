@@ -4,7 +4,7 @@ drawLoadingText();
 
 function loadCallback() {
     setRendererState(
-        new WorldRenderer(worldMaps["test-map"]) ||
+        new WorldRenderer("bedroom_1") ||
         
         new CardScreenRenderer(
             new CardSequencer([allCards["apple pie"],allCards["red apple"],allCards["golden apple"],allCards["poison apple"],allCards["green apple"]],[allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"]],{
