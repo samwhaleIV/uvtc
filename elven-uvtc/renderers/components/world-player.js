@@ -14,7 +14,7 @@ function PlayerRenderer(startDirection) {
     let walking = false;
     let currentColumn = 0;
 
-    const animationFrameTime = 1000 / 10;
+    const animationFrameTime = 1000 / 12;
 
     this.direction = null;
 
@@ -60,7 +60,7 @@ function PlayerRenderer(startDirection) {
         }
         const shouldPushNew = footPrintTiles[
             world.renderMap.background[
-                newX + newY * world.renderMap.columns
+                (newX + Math.round(xOffset)) + (newY + Math.round(yOffset)) * world.renderMap.columns
             ]
         ];
         if(footStepBuffer.length < maxFootStepCount) {
