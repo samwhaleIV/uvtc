@@ -24,13 +24,28 @@ function PlayerRenderer(startDirection) {
     const maxFootStepCount = 2;
     const footStepBuffer = [];
 
-    this.worldPositionUpdated = function(oldX,oldY,world) {
+    const invertDirection = direction => {
+        switch(direction) {
+            case "up":
+                return "down";
+            case "down":
+                return "up";
+            case "left":
+                return "right";
+            case "right":
+                return "left";
+            default:
+                return direction;
+        }
+    }
+
+    this.worldPositionUpdated = function(oldX,oldY,newX,newY,world) {
         const decalSourceX = this.direction === "up" || this.direction === "down" ? 0 : columnWidth;
         const xOffset = this.xOffset;
         const yOffset = this.yOffset;
         const newFootStep = {
-            x: this.x,
-            y: this.y,
+            x: newX,
+            y: newY,
             render: (timestamp,x,y,width,height) => {
                 const horizontalOffset = xOffset * width;
                 const verticalOffset = yOffset * height;
@@ -45,7 +60,7 @@ function PlayerRenderer(startDirection) {
         }
         const shouldPushNew = footPrintTiles[
             world.renderMap.background[
-                this.x + this.y * world.renderMap.columns
+                newX + newY * world.renderMap.columns
             ]
         ];
         if(footStepBuffer.length < maxFootStepCount) {
@@ -63,6 +78,13 @@ function PlayerRenderer(startDirection) {
                 footStepBuffer.push(newFootStep);
                 world.addDecal(newFootStep);
             }
+        }
+        const trigger = world.getTriggerState(newX,newY);
+        if(trigger !== null) {
+            world.map.triggerActivated(
+                trigger,
+                invertDirection(this.direction)
+            );
         }
     }
 
@@ -98,12 +120,14 @@ function PlayerRenderer(startDirection) {
     } else {
         this.updateDirection("down");
     }
+    
+    this.walkingOverride = false;
 
     this.render = function(timestamp,x,y,width,height) {
         const destinationX = this.xOffset * width + x;
         const destinationY = this.yOffset * height + y;
 
-        const animationRow = walking ? 
+        const animationRow = !this.walkingOverride && walking ? 
             Math.floor(timestamp / animationFrameTime) % rowCount * rowHeight
         : 0;
         context.drawImage(

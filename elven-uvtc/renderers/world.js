@@ -7,12 +7,25 @@ function WorldRenderer(startMapName) {
         yOffset: 0
     }
 
+    const collisionTriggers = {
+        3: true,
+        4: true,
+        5: true,
+        6: true,
+        7: true
+    }
+    const collisionTriggerOffset = -3;
+
     this.playerObject = null;
     this.popup = null;
 
     this.playerController = new PlayerController(this);
 
     let enterReleased = true;
+
+    const playerInteractionLocked = () => {
+        return this.popup ? true : false;
+    }
 
     this.processKey = function(key) {
         if(this.popup) {
@@ -80,20 +93,34 @@ function WorldRenderer(startMapName) {
         );
     }
 
+    this.getTriggerState = function(x,y) {
+        const collisionType = this.renderMap.collision[
+            x + y * this.renderMap.columns
+        ];
+        if(collisionTriggers[collisionType]) {
+            return collisionType + collisionTriggerOffset;
+        }
+        return null;
+    }
+
     this.getCollisionState = function(x,y,ignoreNoCollide) {
         let mapCollision = this.renderMap.collision[
             x + y * this.renderMap.columns
         ];
         let objectCollision = this.objectsLookup[x][y];
-        if(this.map.noCollide && !ignoreNoCollide) {
-            if(this.map.noCollide[mapCollision]) {
+        if(!ignoreNoCollide) {
+            if((this.map.noCollide && this.map.noCollide[
+                mapCollision
+            ]) || collisionTriggers[
+                mapCollision
+            ])  {
                 mapCollision = 0;
             }
-        }
-        if(objectCollision && !ignoreNoCollide) {
-            if(objectCollision.noCollide) {
+            if(objectCollision && objectCollision.noCollide) {
                 objectCollision = null;
             }
+        } else if(collisionTriggers[mapCollision]) {
+            mapCollision = 0;
         }
         return {
             map: mapCollision,
@@ -166,7 +193,7 @@ function WorldRenderer(startMapName) {
         object.x = newX;
         object.y = newY;
         if(object.worldPositionUpdated) {
-            object.worldPositionUpdated(oldX,oldY,this);
+            object.worldPositionUpdated(oldX,oldY,newX,newY,this);
         }
         if(this.objectsLookup[object.x][object.y]) {
             console.error("Error: An object collision has occured through the move object method");
@@ -191,6 +218,7 @@ function WorldRenderer(startMapName) {
         if(this.map && this.map.unload) {
             this.map.unload(this);
         }
+        this.decals = [];
         this.objects = {};
         this.playerObject = null;
         this.map = newMap.WorldState ? new newMap.WorldState(
@@ -213,16 +241,16 @@ function WorldRenderer(startMapName) {
             this.objectsLookup[y] = newRow;
             this.decals[y] = newDecalRow;
         }
-
-
         if(this.map.load) {
             this.map.load(this);
         }
         if(this.map.getCameraStart) {
             this.camera = this.map.getCameraStart(this);
         }
+
         this.playerController.player = this.playerObject;
     }
+
 
     let horizontalTiles, verticalTiles, horizontalOffset, verticalOffset, verticalTileSize, horizontalTileSize, halfHorizontalTiles, halfVerticalTiles;
 
@@ -269,7 +297,9 @@ function WorldRenderer(startMapName) {
 
     this.render = function(timestamp) {
 
-        if(this.playerController.renderMethod) {
+        const movementLocked = playerInteractionLocked();
+
+        if(!movementLocked && this.playerController.renderMethod) {
             this.playerController.renderMethod(timestamp);
         }
 
@@ -278,6 +308,28 @@ function WorldRenderer(startMapName) {
             this.camera.y = this.playerObject.y;
             this.camera.xOffset = this.playerObject.xOffset;
             this.camera.yOffset = this.playerObject.yOffset;
+            this.playerObject.walkingOverride = movementLocked;
+
+            if(this.renderMap.useCameraPadding) {
+                const abolsuteCameraX = this.camera.x + this.camera.xOffset;
+                const absoluteCameraY = this.camera.y+ this.camera.yOffset;
+
+                if(abolsuteCameraX - halfHorizontalTiles < 0) {
+                    this.camera.x = halfHorizontalTiles;
+                    this.camera.xOffset = 0;   
+                } else if(abolsuteCameraX + halfHorizontalTiles > this.renderMap.horizontalUpperBound) {
+                    this.camera.x = this.renderMap.horizontalUpperBound - halfHorizontalTiles;
+                    this.camera.xOffset = 0;
+                }
+
+                if(absoluteCameraY - halfVerticalTiles < 0) {
+                    this.camera.y = halfVerticalTiles;
+                    this.camera.yOffset = 0;
+                } else if(absoluteCameraY + halfVerticalTiles > this.renderMap.verticalUpperBound) {
+                    this.camera.y = this.renderMap.verticalUpperBound - halfVerticalTiles;
+                    this.camera.yOffset = 0;
+                }
+            }
         }
 
         context.fillStyle = "black";
@@ -330,7 +382,7 @@ function WorldRenderer(startMapName) {
                     const xDestination = xOffset + x * horizontalTileSize;
                     const yDestination = yOffset + y * verticalTileSize;
     
-                    if(backgroundValue) {
+                    if(backgroundValue > 0) {
                         const textureX = backgroundValue % WorldTextureColumns * WorldTextureSize;
                         const textureY = Math.floor(backgroundValue / WorldTextureColumns) * WorldTextureSize;
                         context.drawImage(
@@ -339,7 +391,7 @@ function WorldRenderer(startMapName) {
                             xDestination,yDestination,horizontalTileSize,verticalTileSize
                         );
                     }
-                    if(foregroundValue) {
+                    if(foregroundValue > 0) {
                         const textureX = foregroundValue % WorldTextureColumns * WorldTextureSize;
                         const textureY = Math.floor(foregroundValue / WorldTextureColumns) * WorldTextureSize;
                         context.drawImage(
