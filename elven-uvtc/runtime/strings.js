@@ -9,7 +9,7 @@ const stringLookup = {
     bookcase_3_3: "what an interesting read...",
     bookcase_4_1: "there's a book called 'generic motivational book'",
     bookcase_4_2: "'success breeds competition, competition breeds success'",
-    bed_1: "this bed looks like it's quite a bit bigger than you.",
+    bed_1: "this RbedR looks like it's quite a bit bigger than you.",
     toilet_1: "it's important to use this sometimes.",
     bathtub_1: "it's important to clean yourself.",
     sink_1: "it's important to clean your hands."

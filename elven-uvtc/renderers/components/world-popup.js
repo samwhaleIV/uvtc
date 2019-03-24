@@ -6,7 +6,9 @@ function applySonographToPopupFeed(popupFeed) {
         const character = popupFeed[i].newCharacter;
         switch(character) {
             default:
-                word += character;
+                if(character !== character.toUpperCase() || character === "'") {
+                    word += character;
+                }
                 break;
             case ellipsis:
             case "-":
@@ -75,9 +77,14 @@ function WorldPopup(pages,callback) {
             let speed = characterSpeed;
             let instant = false;
             const character = page[x];
-            textFeed += character;
             let delay = 0;
+            textFeed += character;
             switch(character) {
+                default:
+                    if(character === character.toUpperCase()) {
+                        continue;
+                    }
+                    break;
                 case ellipsis:
                     delay = ellipsisDelay;
                     break;

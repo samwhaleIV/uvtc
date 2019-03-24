@@ -39,10 +39,16 @@ function WorldRenderer(startMapName) {
                     break;
             }
         } else if(this.playerObject) {
-            if(key === "Enter" && !enterReleased) {
-                return;
+            if(key === "Enter") { 
+                if(!enterReleased) {
+                    return;
+                } else {
+                    enterReleased = false;
+                }
             }
             this.playerController.processKey(key);
+        } else if(key === "Enter") {
+            enterReleased = false;
         }
     }
     this.processKeyUp = function(key) {

@@ -198,14 +198,52 @@ function drawTextColor(color,text,x,y,scale) {
     }
 }
 
-const processTextForWrapping = function(description) {
-    description = description.replace(/\n/g," \n ").split(" ");
-    for(let i = 0;i<description.length-1;i++) {
-        if(description[i] !== "\n") {
-            description[i] = description[i] + " ";
+const textControlCodes = {
+    "\n": /\n/g,
+    "R": /R/g,
+    "G": /G/g,
+    "B": /B/g
+}
+const textColorLookup = {
+    "R": "red",
+    "G": "green",
+    "B": "blue"
+}
+const textControlCodesList = Object.entries(textControlCodes);
+
+const processTextForWrapping = function(text) {
+    const words = [];
+    let bufferWord = "";
+
+    for(let i = 0;i<text.length;i++) {
+        const character = text[i];
+        switch(character) {
+            default:
+                const controlCode = textControlCodes[character];
+                if(controlCode) {
+                    if(bufferWord) {
+                        words.push(bufferWord);
+                        bufferWord = "";
+                    }
+                    words.push(character);
+                } else {
+                    bufferWord += character;
+                }
+                break;
+            case " ":
+                if(bufferWord) {
+                    words.push(bufferWord);
+                    bufferWord = "";
+                }
+                break;
         }
     }
-    return description;
+
+    if(bufferWord) {
+        words.push(bufferWord);
+    }
+
+    return words;
 }
 
 function drawTextWrapping(words,x,y,maxWidth,horizontalSpace,verticalSpace,scale,color) {
@@ -216,15 +254,37 @@ function drawTextWrapping(words,x,y,maxWidth,horizontalSpace,verticalSpace,scale
     const textSpacing = scale * 2;
     let i = 0;
     context.fillStyle = color;
+    let drawingCustomColor = false;
+    let isNewLine = true;
     context.beginPath();
     while(i < words.length) {
-
         const word = words[i];
-
-        if(word === "\n") {
-            xOffset = 0;
-            yOffset += verticalSpace + drawHeight;
+        if(textControlCodes[word]) {
+            if(word === "\n") {
+                xOffset = 0;
+                yOffset += verticalSpace + drawHeight;
+                isNewLine = true;
+            } else {
+                if(drawingCustomColor) {
+                    context.fill();
+                    context.fillStyle = color;
+                    context.beginPath();
+                    drawingCustomColor = false;
+                } else {
+                    context.fill();
+                    context.fillStyle = textColorLookup[
+                        word
+                    ];
+                    context.beginPath();
+                    drawingCustomColor = true;
+                }
+            }
         } else {
+            if(!isNewLine) {
+                xOffset += textSpacing;
+            } else {
+                isNewLine = false;
+            }
             let wordTestWidth = 0;
             let i2 = 0;
 
@@ -261,9 +321,6 @@ function drawTextWrapping(words,x,y,maxWidth,horizontalSpace,verticalSpace,scale
                 xOffset += drawWidth;
                 if(i2 < word.length-1) {
                     xOffset += horizontalSpace;
-                }
-                if(word[i2] === " ") {
-                    xOffset += textSpacing;
                 }
                 i2++;
             }
