@@ -31,7 +31,7 @@ function PlayerController(world) {
             register = 3;
             count++;
         }
-        if(count === 1) {
+        if(count >= 1) {
             return register;
         } else {
             return -1;

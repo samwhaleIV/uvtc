@@ -32,3 +32,33 @@ let downButtonCode = {code:"KeyS"};
 let leftButtonCode = {code:"KeyA"};
 let rightButtonCode = {code:"KeyD"};
 let startButtonCode = {code:"Enter"};
+
+const textControlCodes = {
+    "\n": /\n/g,
+    "R": /R/g,
+    "G": /G/g,
+    "B": /B/g,
+    "Y": /Y/g,
+    "P": /P/g,
+    "O": /P/g,
+    "X": /X/g
+}
+const textColorLookup = {
+    "R": "red",
+    "G": "green",
+    "B": "blue",
+    "Y": "yellow",
+    "P": "purple",
+    "O": "orange",
+    "X:": 0
+}
+const popupControlCharacters = {
+    "-": true,
+    " ": true,
+    ",": true,
+    ".": true,
+    "?": true,
+    "!": true,
+    " ": true
+}
+popupControlCharacters[ellipsis] = true;

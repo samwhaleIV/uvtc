@@ -198,17 +198,6 @@ function drawTextColor(color,text,x,y,scale) {
     }
 }
 
-const textControlCodes = {
-    "\n": /\n/g,
-    "R": /R/g,
-    "G": /G/g,
-    "B": /B/g
-}
-const textColorLookup = {
-    "R": "red",
-    "G": "green",
-    "B": "blue"
-}
 const textControlCodesList = Object.entries(textControlCodes);
 
 const processTextForWrapping = function(text) {
@@ -272,9 +261,10 @@ function drawTextWrapping(words,x,y,maxWidth,horizontalSpace,verticalSpace,scale
                     drawingCustomColor = false;
                 } else {
                     context.fill();
-                    context.fillStyle = textColorLookup[
+                    const newColor = textColorLookup[
                         word
                     ];
+                    context.fillStyle = newColor ? newColor : rainbowGradient;
                     context.beginPath();
                     drawingCustomColor = true;
                 }

@@ -34,14 +34,14 @@ const processRawStrings = function() {
 
             switch(character) {
                 default:
-                    if(character !== character.toUpperCase()) {
-                        word += character;
-                    } else if(character === "'") {
+                    if(character === "'") {
                         if(!popupControlCharacters[lastCharacter] && lastCharacter
                         && !popupControlCharacters[nextCharacter] && nextCharacter
                         ) {
                             word += character;
                         }
+                    } else if(!textControlCodes[character]) {
+                        word += character;
                     }
                     break;
                 case ellipsis:

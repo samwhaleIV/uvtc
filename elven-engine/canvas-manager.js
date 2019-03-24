@@ -13,6 +13,8 @@ let horizontalSizeRatio;
 let adaptiveTextScale;
 let adaptiveTextSpacing;
 
+let rainbowGradient;
+
 function setSizeConstants() {
     fullWidth = canvas.width;
     fullHeight = canvas.height;
@@ -22,6 +24,18 @@ function setSizeConstants() {
     doubleHeight = fullHeight * 2;
     horizontalSizeRatio = fullWidth / internalWidth;
     verticalSizeRatio = fullHeight / internalHeight;
+}
+
+function createRainbowGradient() {
+    const gradient = context.createLinearGradient(fullWidth*0.3,0,fullWidth*0.7,0);
+    gradient.addColorStop(0,"red");
+    gradient.addColorStop(1/6,"orange");
+    gradient.addColorStop(2/6,"yellow");
+    gradient.addColorStop(3/6,"green");
+    gradient.addColorStop(4/6,"blue");
+    gradient.addColorStop(5/6,"indigo");
+    gradient.addColorStop(1,"violet");
+    return gradient;
 }
 
 const internalWidth = 800;
@@ -317,6 +331,7 @@ function applySizeMode() {
             break;
     }
     setSizeConstants();
+    rainbowGradient = createRainbowGradient();
     if(rendererState && rendererState.updateSize) {
         rendererState.updateSize();
     }

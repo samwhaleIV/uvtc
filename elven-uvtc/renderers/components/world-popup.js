@@ -1,5 +1,4 @@
 function applySonographToPopupFeed(popupFeed) {
-
     const wordSets = [];
     let wordStart = 0, word = "";
     let lastCharacter = null;
@@ -11,14 +10,14 @@ function applySonographToPopupFeed(popupFeed) {
 
         switch(character) {
             default:
-                if(character !== character.toUpperCase()) {
-                    word += character;
-                } else if(character === "'") {
+                if(character === "'") {
                     if(!popupControlCharacters[lastCharacter] && lastCharacter
                     && !popupControlCharacters[nextCharacter] && nextCharacter
                     ) {
                         word += character;
                     }
+                } else if(!textControlCodes[character]) {
+                    word += character;
                 }
                 break;
             case ellipsis:
@@ -63,6 +62,7 @@ function applySonographToPopupFeed(popupFeed) {
     return popupFeed;
 }
 function WorldPopup(pages,callback) {
+    const popupFeedMaxWidthPadding = -60;
 
     const characterSpeed = 25;
     const spaceSpeed = 20;
@@ -217,6 +217,6 @@ function WorldPopup(pages,callback) {
             popupY,
             popupWidth,popupHeight
         );
-        drawTextWrappingBlack(textFeed,popupX + 10,popupY + 10,popupWidth-40,2,13,4);
+        drawTextWrappingBlack(textFeed,popupX + 10,popupY + 10,popupWidth+popupFeedMaxWidthPadding,2,13,4);
     }
 }
