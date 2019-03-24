@@ -438,7 +438,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         } else {
             text = `turn ${this.turnNumber} - opponent turn`;
         }
-        this.buttonLookup[0].text = text;
+        this.buttonLookup[0].text = processTextForWrapping(text);
     }
 
     this.updateTurnText = this.updateActionText;
@@ -591,7 +591,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
         }],
         [],
         [{
-                text: "card actions",
+                text: processTextForWrapping("card actions"),
                 isNotAButton: true
         }],
         [{

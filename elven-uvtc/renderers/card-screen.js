@@ -612,7 +612,14 @@ function CardScreenRenderer(sequencer,callbacks,background) {
             const button = buttonRow[i];
 
             if(button.isNotAButton) {
-                drawTextWrappingWhite(button.text,buttonSchema.textX,moveButtonTextY+yPosition,buttonSchema.width,1,3,adaptiveTextScale);
+                drawTextWrappingWhite(
+                    button.text,
+                    buttonSchema.textX,
+                    moveButtonTextY+yPosition,
+                    buttonSchema.width,
+                    1,3,
+                    adaptiveTextScale
+                );
                 continue;
             }
 
@@ -718,7 +725,6 @@ function CardScreenRenderer(sequencer,callbacks,background) {
     this.quitCallback = callbacks.quit;
 
     this.background = background;
-    this.sequencer = sequencer;
 
     let viewTabLocked = false;
 
