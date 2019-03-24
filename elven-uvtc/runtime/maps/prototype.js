@@ -140,8 +140,13 @@ addMap({
             }
         }
         this.triggerActivated = (ID,fromDirection) => {
-            return;
-            world.showTextPopup(`trigger '${ID}' activated from the ${fromDirection} direction`);
+            world.showNamedTextPopup(
+                `trigger '${ID}' activated from the ${fromDirection} direction`,"Bannoying popup:B ",
+                world.showNamedTextPopup,
+                `this is fucking magic rip`,"who knows: ",
+                world.showNamedTextPopup,
+                `seriously this is a really cool pattern`,"i guess: "
+            );
         }
     },
     doors: [

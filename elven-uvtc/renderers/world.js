@@ -71,31 +71,81 @@ function WorldRenderer(startMapName) {
     this.clearTextPopup = () => {
         this.popup = null;
     }
-
-    this.showTextPopupID = ID => {
+    this.showTextPopupID = (ID,callback,...callbackParameters) => {
         this.popup = new WorldPopup(
             [getString(ID)],
-            this.clearTextPopup
+            callback ? () => {
+                this.clearTextPopup();
+                callback(...callbackParameters);
+            } : this.clearTextPopup
         );
     }
-    this.showTextPopupsID = (...IDs) => {
+    this.showTextPopupsID = (IDs,callback,...callbackParameters) => {
         this.popup = new WorldPopup(
             IDs.map(id => getString(id)),
-            this.clearTextPopup
+            callback ? () => {
+                this.clearTextPopup();
+                callback(...callbackParameters);
+            } : this.clearTextPopup
         );
     }
-
-    this.showTextPopup = page => {
+    this.showTextPopup = (page,callback,...callbackParameters) => {
         this.popup = new WorldPopup(
             [page],
-            this.clearTextPopup
+            callback ? () => {
+                this.clearTextPopup();
+                callback(...callbackParameters);
+            } : this.clearTextPopup
+        );
+    }
+    this.showTextPopups = (pages,callback,...callbackParameters) => {
+        this.popup = new WorldPopup(
+            pages,
+            callback ? () => {
+                this.clearTextPopup();
+                callback(...callbackParameters);
+            } : this.clearTextPopup
+        );
+    }
+    this.showNamedTextPopupID = (ID,name,callback,...callbackParameters) => {
+        this.popup = new WorldPopup(
+            [getString(ID)],
+            callback ? () => {
+                this.clearTextPopup();
+                callback(...callbackParameters);
+            } : this.clearTextPopup,
+            name
+        );
+    }
+    this.showNamedTextPopupsID = (IDs,name,callback,...callbackParameters) => {
+        this.popup = new WorldPopup(
+            IDs.map(id => getString(id)),
+            callback ? () => {
+                this.clearTextPopup();
+                callback(...callbackParameters);
+            } : this.clearTextPopup,
+            name
         );
     }
 
-    this.showTextPopups = pages => {
+    this.showNamedTextPopup = (page,name,callback,...callbackParameters) => {
+        this.popup = new WorldPopup(
+            [page],
+            callback ? () => {
+                this.clearTextPopup();
+                callback(...callbackParameters);
+            } : this.clearTextPopup,
+            name
+        );
+    }
+    this.showNamedTextPopups = (pages,name,callback,...callbackParameters) => {
         this.popup = new WorldPopup(
             pages,
-            this.clearTextPopup
+            callback ? () => {
+                this.clearTextPopup();
+                callback(...callbackParameters);
+            } : this.clearTextPopup,
+            name
         );
     }
 

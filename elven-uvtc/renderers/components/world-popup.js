@@ -61,7 +61,7 @@ function applySonographToPopupFeed(popupFeed) {
     }
     return popupFeed;
 }
-function WorldPopup(pages,callback) {
+function WorldPopup(pages,callback,prefix) {
     const popupFeedMaxWidthPadding = -60;
 
     const characterSpeed = 25;
@@ -84,7 +84,7 @@ function WorldPopup(pages,callback) {
         let page = pages[i];
         const newPage = [];
         page = page.replace(/\.\.\./gi,ellipsis);
-        let textFeed = "";
+        let textFeed = prefix ? prefix : "";
         for(let x = 0;x<page.length;x++) {
             let speed = characterSpeed;
             let instant = false;
