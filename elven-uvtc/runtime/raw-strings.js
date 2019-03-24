@@ -1,11 +1,18 @@
+const syllableMemo = {};
 const makeSyllableMap = function(wordLength,syllables) {
+    const lookup = `${wordLength},${syllables}`;
+    const stored = syllableMemo[lookup];
+    if(stored) {
+        return stored;
+    }
     const map = [];
-    const distance = Math.floor(wordLength / syllables);
+    const distance = Math.round(wordLength / syllables);
     let i = 0;
     while(i<wordLength){
-        map.push(i % distance === 0);
+        map.push(i % distance === 0 ? 1 : 0);
         i++;
     }
+    syllableMemo[lookup] = map;
     return map;
 }
 const processRawStrings = function() {
@@ -17,11 +24,25 @@ const processRawStrings = function() {
         const fullString = rawString[1];
 
         let word = "";
+        let lastCharacter = null;
         for(let i = 0;i<fullString.length;i++) {
+
+            //This has to be compatiable (and essentially identical) to the method found within applySonographToPopupFeed
+
             const character = fullString[i];
+            const nextCharacter = fullString[i+1];
+
             switch(character) {
                 default:
-                    word += character;
+                    if(character !== character.toUpperCase()) {
+                        word += character;
+                    } else if(character === "'") {
+                        if(!popupControlCharacters[lastCharacter] && lastCharacter
+                        && !popupControlCharacters[nextCharacter] && nextCharacter
+                        ) {
+                            word += character;
+                        }
+                    }
                     break;
                 case ellipsis:
                 case "-":
@@ -30,18 +51,23 @@ const processRawStrings = function() {
                 case ".":
                 case "?":
                 case "!":
+                case " ":
                     if(word) {
                         if(!wordSyllableMaps[word] && !allWordsLookup[word]) {
                             allWords.push(word);
+                            console.log(word);
                         }
                         allWordsLookup[word] = true;
                         word = "";
                     }
                     break;
             }
+
+            lastCharacter = character;
         }
         if(word && !wordSyllableMaps[word] && !allWordsLookup[word]) {
             allWords.push(word);
+            console.log(word);
         }
     });
     return allWords;

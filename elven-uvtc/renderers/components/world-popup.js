@@ -2,12 +2,23 @@ function applySonographToPopupFeed(popupFeed) {
 
     const wordSets = [];
     let wordStart = 0, word = "";
+    let lastCharacter = null;
     for(let i = 0;i<popupFeed.length;i++) {
         const character = popupFeed[i].newCharacter;
+
+        let nextCharacter = popupFeed[i+1];
+        nextCharacter = nextCharacter ? nextCharacter.newCharacter : null;
+
         switch(character) {
             default:
-                if(character !== character.toUpperCase() || character === "'") {
+                if(character !== character.toUpperCase()) {
                     word += character;
+                } else if(character === "'") {
+                    if(!popupControlCharacters[lastCharacter] && lastCharacter
+                    && !popupControlCharacters[nextCharacter] && nextCharacter
+                    ) {
+                        word += character;
+                    }
                 }
                 break;
             case ellipsis:
@@ -28,6 +39,7 @@ function applySonographToPopupFeed(popupFeed) {
                 }
                 break;
         }
+        lastCharacter = character;
 
     }
     if(word) {

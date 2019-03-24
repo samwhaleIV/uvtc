@@ -140,6 +140,7 @@ addMap({
             }
         }
         this.triggerActivated = (ID,fromDirection) => {
+            return;
             world.showTextPopup(`trigger '${ID}' activated from the ${fromDirection} direction`);
         }
     },

@@ -29,11 +29,10 @@
     const nextWord = function(event) {
         wordIndex++;
         const word = wordFeed.textContent;
-            wordSyllableMaps[word] = makeSyllableMap(word.length,Number(event.key));
-            wordFeed.textContent = neededWords[wordIndex];
+        wordSyllableMaps[word] = makeSyllableMap(word.length,Number(event.key));
+        wordFeed.textContent = neededWords[wordIndex];
         if(wordIndex >= neededWords.length) {
             document.body.innerHTML = `const wordSyllableMaps = ${JSON.stringify(wordSyllableMaps)};`
-            console.log(wordSyllableMaps);
         }
         event.preventDefault();
     }

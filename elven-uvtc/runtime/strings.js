@@ -14,6 +14,16 @@ const stringLookup = {
     bathtub_1: "it's important to clean yourself.",
     sink_1: "it's important to clean your hands."
 }
+const popupControlCharacters = {
+    '…': true,
+    "-": true,
+    " ": true,
+    ",": true,
+    ".": true,
+    "?": true,
+    "!": true,
+    " ": true
+}
 const getString = function(ID) {
     return stringLookup[ID];
 }
