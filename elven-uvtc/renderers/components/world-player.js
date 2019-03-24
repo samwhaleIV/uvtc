@@ -1,9 +1,4 @@
 function PlayerRenderer(startDirection) {
-
-    const footPrintTiles = {
-        21: true
-    }
-
     const sprite = imageDictionary["character-sprite"];
     const footStepsSprite = imageDictionary["footsteps"];
 
@@ -133,6 +128,9 @@ function PlayerRenderer(startDirection) {
         context.drawImage(
             sprite,currentColumn,animationRow,columnWidth,rowHeight,destinationX,destinationY,width,height
         );
+
+        context.fillStyle = "red";
+        //context.fillRect(destinationX,destinationY,width,height);
 
     }
 

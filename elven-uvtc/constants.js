@@ -21,5 +21,6 @@ const WorldTextureSize = 16;
 const WorldTextureScale = 3;
 const WorldTileSize = WorldTextureSize * WorldTextureScale;
 const WorldTextureColumns = 64;
-const WorldMapValueOffset = -1;
-const CollisionMapValueOffset = -4097;
+const footPrintTiles = {
+    21: true
+}

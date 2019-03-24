@@ -119,8 +119,8 @@ function PlayerController(world) {
     this.horizontalVelocity = 0;
     this.verticalVelocity = 0;
 
-    const cornerCollisionThreshold = 0.1;
-    const inverseCornerCollisionThreshold = -cornerCollisionThreshold
+    const cornerCollisionThreshold = 0.15;
+    const inverseCornerCollisionThreshold = -cornerCollisionThreshold;
 
     const tryMoveUp = movementDistance => {
         let horizontalCollision = false;

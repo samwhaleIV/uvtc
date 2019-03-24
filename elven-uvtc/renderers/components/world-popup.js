@@ -64,8 +64,8 @@ function applySonographToPopupFeed(popupFeed) {
 function WorldPopup(pages,callback,prefix) {
     const popupFeedMaxWidthPadding = -60;
 
-    const characterSpeed = 25;
-    const spaceSpeed = 20;
+    const characterSpeed = 30;
+    const spaceSpeed = 30;
 
     const hyphenDelay = 300;
     const commaDelay = 300;

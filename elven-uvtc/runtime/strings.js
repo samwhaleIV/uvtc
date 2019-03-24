@@ -1,18 +1,26 @@
 const stringLookup = {
-    debug: "so... this is it, huh? the fancy text renderer? and you say it has velocity? that's cool, i guess.",
-    debug_2: "so... what the hell are you even supposed to be? an alien? an ant? a bad and sad attempt at art? well, good job... i guess.",
-    nobody_home: "hmm... it looks like nobody is home right now.",
-    bookcase_1: "there's some books in the bookcase... one says 'cards... cards never change.'",
-    bookcase_2: "these books seem really inappropriate to have right here in the open.",
-    bookcase_3_1: "there's a book called 'the cat lady manifesto'",
-    bookcase_3_2: "'if i loved my children as much as my cats, i'd have children.'",
-    bookcase_3_3: "what an interesting read...",
-    bookcase_4_1: "there's a book called 'generic motivational book'",
-    bookcase_4_2: "'success breeds competition, competition breeds success'",
-    bed_1: "this bed looks like it's quite a bit bigger than you.",
-    toilet_1: "it's important to use this sometimes.",
-    bathtub_1: "it's important to clean...\nyourself.",
-    sink_1: "it's important to clean your hands."
+    bookcase_1: "there's a lot of books on this shelf.",
+    bed_1: "a sleeping bag on a hardwood floor, a fine luxury.",
+    bookcase_2: "lots of books here... a lot of them seem to mention some kind of card game?",
+    bookcase_3: "this bookcase demonstrates that it's okay to be small. way to go bookcase!",
+    table_1: "these plastic, foldable tables have seen a lot of life. are they for parties?",
+    table_2: "these tables are pretty much everywhere.",
+    counter_1: "this must be a kitchen... seems to be missing a few things, though.",
+    counter_2: "this is the cleanest kitchen you've seen in your entire life.",
+    sink_1: "it's important to wash your hands!",
+    toilet_1: "it's important to use toilets!",
+    bathtub_1: "it's important to...\nwash yourself.",
+    bookcase_4: "this bookcase doesn't have very many books on it.",
+    bookcase_5_1: "this bookcase has a few intersting books on it.",
+    bookcase_5_2: "one book is called 'the cat lady manifesto'",
+    bookcase_5_3: "Rif i loved my children as much as i love my cats, i'd have children.R",
+    bookcase_6_1: "this bookcase is trying to be an edgy reflection of society.",
+    bookcase_6_2: "is it working?",
+    bookcase_7_1: "this bookcase seems to be more inappropriate than the other bookcases.",
+    bookcase_7_2: "hey... what're you wearing?",
+    couch_1: "this couch looks too clean to sit on.\nwho gets a white couch anyways?",
+    tv_1: "i'm the tv!\nit's so nice to meet you!\nwatch me anytime."
+
 }
 const getString = function(ID) {
     return stringLookup[ID];

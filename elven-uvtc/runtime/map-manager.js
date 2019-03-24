@@ -1,18 +1,22 @@
 const worldMapList = [];
 const worldMaps = {};
 function addMap(map) {
+
     worldMapList.push(map);
     worldMaps[map.name] = map;
-    map.rows = map.background.length / map.columns;
+
+    const tilemaps = rawMapData[map.name];
+    map.background = tilemaps.background;
+    map.collision = tilemaps.collision;
+    map.foreground = tilemaps.foreground;
+
+    map.rows = tilemaps.rows;
+    map.columns = tilemaps.columns;
+
     map.horizontalUpperBound = map.columns - 1;
     map.verticalUpperBound = map.rows - 1;
-    for(let i = 0;i<map.background.length;i++) {
-        map.background[i] = (map.background[i] || 1) + WorldMapValueOffset;
-        map.foreground[i] = (map.foreground[i] || 1) + WorldMapValueOffset;
-        if(map.collision[i] !== 0) {
-            map.collision[i] = map.collision[i] + CollisionMapValueOffset;
-        }
-    }
+
+    delete rawMapData[map.name];
 
     if(!map.doors) {
         return;
