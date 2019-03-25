@@ -19,13 +19,22 @@ function WorldRenderer(startMapName) {
     this.playerObject = null;
     this.popup = null;
     this.prompt = null;
+    this.customRenderer = null;
 
     this.playerController = new PlayerController(this);
 
     let enterReleased = true;
+    let playerMovementLocked = false;
 
     const playerInteractionLocked = () => {
-        return this.popup ? true : false;
+        return playerMovementLocked || this.popup || this.prompt ? true : false;
+    }
+
+    this.lockPlayerMovement = function() {
+        playerMovementLocked = true;
+    }
+    this.unlockPlayerMovement = function() {
+        playerMovementLocked = true;
     }
 
     let wDown = false;
@@ -355,6 +364,14 @@ function WorldRenderer(startMapName) {
         this.objectsLookup[object.x][object.y] = object;
     }
 
+    let tileRenderingEnabled = true;
+    this.enableTileRendering = function() {
+        tileRenderingEnabled = true;
+    }
+    this.disableTileRendering = function() {
+        tileRenderingEnabled = false;
+    }
+
     this.decals = [];
     this.addDecal = decal => {
         this.decals[decal.x][decal.y] = decal;
@@ -450,139 +467,145 @@ function WorldRenderer(startMapName) {
 
     this.render = function(timestamp) {
 
-        const movementLocked = playerInteractionLocked();
-
-        if(!movementLocked && this.playerController.renderMethod) {
-            this.playerController.renderMethod(timestamp);
-        }
-
-        if(this.playerObject) {
-            this.camera.x = this.playerObject.x;
-            this.camera.y = this.playerObject.y;
-            this.camera.xOffset = this.playerObject.xOffset;
-            this.camera.yOffset = this.playerObject.yOffset;
-            this.playerObject.walkingOverride = movementLocked;
-
-            if(this.renderMap.useCameraPadding) {
-                const abolsuteCameraX = this.camera.x + this.camera.xOffset;
-                const absoluteCameraY = this.camera.y+ this.camera.yOffset;
-
-                if(abolsuteCameraX - halfHorizontalTiles < 0) {
-                    this.camera.x = halfHorizontalTiles;
-                    this.camera.xOffset = 0;   
-                } else if(abolsuteCameraX + halfHorizontalTiles > this.renderMap.horizontalUpperBound) {
-                    this.camera.x = this.renderMap.horizontalUpperBound - halfHorizontalTiles;
-                    this.camera.xOffset = 0;
-                }
-
-                if(absoluteCameraY - halfVerticalTiles < 0) {
-                    this.camera.y = halfVerticalTiles;
-                    this.camera.yOffset = 0;
-                } else if(absoluteCameraY + halfVerticalTiles > this.renderMap.verticalUpperBound) {
-                    this.camera.y = this.renderMap.verticalUpperBound - halfVerticalTiles;
-                    this.camera.yOffset = 0;
-                }
-            }
-        }
-
         context.fillStyle = "black";
         context.fillRect(0,0,fullWidth,fullHeight);
 
-        let verticalTileCount = verticalTiles;
-        let horizontalTileCount = horizontalTiles;
+        if(tileRenderingEnabled) {
+        
+            const movementLocked = playerInteractionLocked();
 
-        let adjustedYPos = this.camera.y - halfVerticalTiles;
-        let adjustedXPos = this.camera.x - halfHorizontalTiles;
-
-        let xStart = 0;
-        let yStart = 0;
-
-        if(this.camera.xOffset < 0) {
-            xStart--;
-        } else if(this.camera.xOffset > 0) {
-            xStart--;
-            horizontalTileCount++;
-        }
-
-        if(this.camera.yOffset < 0) {
-            yStart--;
-        } else if(this.camera.yOffset > 0) {
-            yStart--;
-            verticalTileCount++;
-        }
-
-        const xOffset = horizontalOffset - Math.round(this.camera.xOffset * horizontalTileSize);
-        const yOffset = verticalOffset - Math.round(this.camera.yOffset * verticalTileSize);
-
-        const objectBuffer = [];
-
-        let y = yStart, x;
-
-        while(y < verticalTileCount) {
-            x = xStart;
-
-            while(x < horizontalTileCount) {
-
-                const xPos = adjustedXPos + x;
-                const yPos = adjustedYPos + y;
-
-                if(xPos < this.renderMap.columns && xPos >= 0) {
-                    const mapIndex = xPos + yPos * this.renderMap.columns;
-                    
-                    const backgroundValue = this.renderMap.background[mapIndex];
-                    const foregroundValue = this.renderMap.foreground[mapIndex];
-    
-                    const xDestination = xOffset + x * horizontalTileSize;
-                    const yDestination = yOffset + y * verticalTileSize;
-    
-                    if(backgroundValue > 0) {
-                        const textureX = backgroundValue % WorldTextureColumns * WorldTextureSize;
-                        const textureY = Math.floor(backgroundValue / WorldTextureColumns) * WorldTextureSize;
-                        context.drawImage(
-                            tileset,
-                            textureX,textureY,WorldTextureSize,WorldTextureSize,
-                            xDestination,yDestination,horizontalTileSize,verticalTileSize
-                        );
-                    }
-                    if(foregroundValue > 0) {
-                        const textureX = foregroundValue % WorldTextureColumns * WorldTextureSize;
-                        const textureY = Math.floor(foregroundValue / WorldTextureColumns) * WorldTextureSize;
-                        context.drawImage(
-                            tileset,
-                            textureX,textureY,WorldTextureSize,WorldTextureSize,
-                            xDestination,yDestination,horizontalTileSize,verticalTileSize
-                        );
-                    }
-
-                    const decalRegister = this.decals[xPos][yPos];
-                    if(decalRegister) {
-                        objectBuffer.push(decalRegister,xDestination,yDestination);
-                    }
-                    const objectRegister = this.objectsLookup[xPos][yPos];
-                    if(objectRegister) {
-                        objectBuffer.push(objectRegister,xDestination,yDestination);
-                    }
-
-                }
-                x++;
+            if(!movementLocked && this.playerController.renderMethod) {
+                this.playerController.renderMethod(timestamp);
             }
-            y++;
-        }
-        let objectBufferIndex = 0;
-        while(objectBufferIndex < objectBuffer.length) {
-            objectBuffer[objectBufferIndex].render(
-                timestamp,
-                objectBuffer[objectBufferIndex+1],
-                objectBuffer[objectBufferIndex+2],
-                horizontalTileSize,
-                verticalTileSize
-            );
-            objectBufferIndex += 3;
+
+            if(this.playerObject) {
+                this.camera.x = this.playerObject.x;
+                this.camera.y = this.playerObject.y;
+                this.camera.xOffset = this.playerObject.xOffset;
+                this.camera.yOffset = this.playerObject.yOffset;
+                this.playerObject.walkingOverride = movementLocked;
+
+                if(this.renderMap.useCameraPadding) {
+                    const abolsuteCameraX = this.camera.x + this.camera.xOffset;
+                    const absoluteCameraY = this.camera.y+ this.camera.yOffset;
+
+                    if(abolsuteCameraX - halfHorizontalTiles < 0) {
+                        this.camera.x = halfHorizontalTiles;
+                        this.camera.xOffset = 0;   
+                    } else if(abolsuteCameraX + halfHorizontalTiles > this.renderMap.horizontalUpperBound) {
+                        this.camera.x = this.renderMap.horizontalUpperBound - halfHorizontalTiles;
+                        this.camera.xOffset = 0;
+                    }
+
+                    if(absoluteCameraY - halfVerticalTiles < 0) {
+                        this.camera.y = halfVerticalTiles;
+                        this.camera.yOffset = 0;
+                    } else if(absoluteCameraY + halfVerticalTiles > this.renderMap.verticalUpperBound) {
+                        this.camera.y = this.renderMap.verticalUpperBound - halfVerticalTiles;
+                        this.camera.yOffset = 0;
+                    }
+                }
+            }
+
+            let verticalTileCount = verticalTiles;
+            let horizontalTileCount = horizontalTiles;
+
+            let adjustedYPos = this.camera.y - halfVerticalTiles;
+            let adjustedXPos = this.camera.x - halfHorizontalTiles;
+
+            let xStart = 0;
+            let yStart = 0;
+
+            if(this.camera.xOffset < 0) {
+                xStart--;
+            } else if(this.camera.xOffset > 0) {
+                xStart--;
+                horizontalTileCount++;
+            }
+
+            if(this.camera.yOffset < 0) {
+                yStart--;
+            } else if(this.camera.yOffset > 0) {
+                yStart--;
+                verticalTileCount++;
+            }
+
+            const xOffset = horizontalOffset - Math.round(this.camera.xOffset * horizontalTileSize);
+            const yOffset = verticalOffset - Math.round(this.camera.yOffset * verticalTileSize);
+
+            const objectBuffer = [];
+
+            let y = yStart, x;
+
+            while(y < verticalTileCount) {
+                x = xStart;
+
+                while(x < horizontalTileCount) {
+
+                    const xPos = adjustedXPos + x;
+                    const yPos = adjustedYPos + y;
+
+                    if(xPos < this.renderMap.columns && xPos >= 0) {
+                        const mapIndex = xPos + yPos * this.renderMap.columns;
+                        
+                        const backgroundValue = this.renderMap.background[mapIndex];
+                        const foregroundValue = this.renderMap.foreground[mapIndex];
+        
+                        const xDestination = xOffset + x * horizontalTileSize;
+                        const yDestination = yOffset + y * verticalTileSize;
+        
+                        if(backgroundValue > 0) {
+                            const textureX = backgroundValue % WorldTextureColumns * WorldTextureSize;
+                            const textureY = Math.floor(backgroundValue / WorldTextureColumns) * WorldTextureSize;
+                            context.drawImage(
+                                tileset,
+                                textureX,textureY,WorldTextureSize,WorldTextureSize,
+                                xDestination,yDestination,horizontalTileSize,verticalTileSize
+                            );
+                        }
+                        if(foregroundValue > 0) {
+                            const textureX = foregroundValue % WorldTextureColumns * WorldTextureSize;
+                            const textureY = Math.floor(foregroundValue / WorldTextureColumns) * WorldTextureSize;
+                            context.drawImage(
+                                tileset,
+                                textureX,textureY,WorldTextureSize,WorldTextureSize,
+                                xDestination,yDestination,horizontalTileSize,verticalTileSize
+                            );
+                        }
+
+                        const decalRegister = this.decals[xPos][yPos];
+                        if(decalRegister) {
+                            objectBuffer.push(decalRegister,xDestination,yDestination);
+                        }
+                        const objectRegister = this.objectsLookup[xPos][yPos];
+                        if(objectRegister) {
+                            objectBuffer.push(objectRegister,xDestination,yDestination);
+                        }
+
+                    }
+                    x++;
+                }
+                y++;
+            }
+            let objectBufferIndex = 0;
+            while(objectBufferIndex < objectBuffer.length) {
+                objectBuffer[objectBufferIndex].render(
+                    timestamp,
+                    objectBuffer[objectBufferIndex+1],
+                    objectBuffer[objectBufferIndex+2],
+                    horizontalTileSize,
+                    verticalTileSize
+                );
+                objectBufferIndex += 3;
+            }
         }
         if(this.prompt) {
             this.prompt.render(timestamp);
         } else if(this.popup) {
             this.popup.render(timestamp);
+        }
+        if(this.customRenderer) {
+            this.customRenderer(timestamp);
         }
     }
 }
