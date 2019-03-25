@@ -167,6 +167,7 @@ function WorldPopup(pages,callback,prefix) {
     let readyToTerminate = false;
 
     this.progress = function() {
+        playSound("click");
         clearTimeout(timeout);
         if(readyToTerminate) {
             if(terminated) {
@@ -201,7 +202,7 @@ function WorldPopup(pages,callback,prefix) {
             return;
         }
         const popupWidth = halfWidth > 700 ? halfWidth : fullWidth < 700 ? fullWidth - 20 : 700 - 20;
-        const popupHeight = Math.floor(fullHeight * 0.33);
+        const popupHeight = fullHeight < 290 ? fullHeight - 20 : 270;
         const popupY = fullHeight - 10 - popupHeight;
         const popupX = Math.round(halfWidth - popupWidth / 2);
         context.fillStyle = "black";

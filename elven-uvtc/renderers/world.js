@@ -18,6 +18,7 @@ function WorldRenderer(startMapName) {
 
     this.playerObject = null;
     this.popup = null;
+    this.prompt = null;
 
     this.playerController = new PlayerController(this);
 
@@ -27,16 +28,41 @@ function WorldRenderer(startMapName) {
         return this.popup ? true : false;
     }
 
+    let wDown = false;
+    let sDown = false;
+    let aDown = false;
+    let dDown = false;
+
     this.processKey = function(key) {
-        if(this.popup) {
+        if(this.prompt) {
             switch(key) {
                 case "Enter":
-                    if(!enterReleased) {
-                        break;
-                    }
+                    if(!enterReleased) return;
                     enterReleased = false;
-                    this.popup.progress();
+                    this.prompt.confirmSelection();
                     break;
+                case "KeyW":
+                    if(wDown) return;
+                    this.prompt.moveSelection("up");
+                    break;
+                case "KeyS":
+                    if(sDown) return;
+                    this.prompt.moveSelection("down");
+                    break;
+                case "KeyA":
+                    if(aDown) return;
+                    this.prompt.moveSelection("left");
+                    break;
+                case "KeyD":
+                    if(dDown) return;
+                    this.prompt.moveSelection("right");
+                    break;
+            }
+        } else if(this.popup) {
+            if(key === "Enter") {
+                if(!enterReleased) return;
+                enterReleased = false;
+                this.popup.progress();
             }
         } else if(this.playerObject) {
             if(key === "Enter") { 
@@ -49,12 +75,39 @@ function WorldRenderer(startMapName) {
             this.playerController.processKey(key);
         } else if(key === "Enter") {
             enterReleased = false;
+            return;
+        }
+        switch(key) {
+            case "KeyW":
+                wDown = true;
+                return;
+            case "KeyS":
+                sDown = true;
+                return;
+            case "KeyA":
+                aDown = true;
+                return;
+            case "KeyD":
+                dDown = true;
+                return;
         }
     }
     this.processKeyUp = function(key) {
         switch(key) {
             case "Enter":
                 enterReleased = true;
+                break;
+            case "KeyW":
+                wDown = false;
+                break;
+            case "KeyS":
+                sDown = false;
+                break;
+            case "KeyA":
+                aDown = false;
+                break;
+            case "KeyD":
+                dDown = false;
                 break;
         }
         this.playerController.processKeyUp(key);
@@ -147,6 +200,16 @@ function WorldRenderer(startMapName) {
             } : this.clearTextPopup,
             name
         );
+    }
+
+    this.clearPrompt = () => {
+        this.prompt = null;
+    }
+    this.showPrompt = (question,options,callback,...callbackParameters) => {
+        this.prompt = new WorldPrompt(question,options,selectionIndex => {
+            this.clearPrompt();
+            callback(selectionIndex,...callbackParameters);
+        });
     }
 
     this.getTriggerState = function(x,y) {
@@ -482,7 +545,9 @@ function WorldRenderer(startMapName) {
             );
             objectBufferIndex += 3;
         }
-        if(this.popup) {
+        if(this.prompt) {
+            this.prompt.render(timestamp);
+        } else if(this.popup) {
             this.popup.render(timestamp);
         }
     }
