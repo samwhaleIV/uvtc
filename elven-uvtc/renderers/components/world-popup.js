@@ -1,6 +1,4 @@
 function applySonographToPopupFeed(popupFeed) {
-    let readyToTerminate = false;
-
     const wordSets = [];
     let wordStart = 0, word = "";
     let lastCharacter = null;
@@ -82,6 +80,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
     let pageComplete = false;
 
     let terminated = false;
+    let readyToTerminate = false;
 
     for(let i = 0;i<pages.length;i++) {
         let page = pages[i];
