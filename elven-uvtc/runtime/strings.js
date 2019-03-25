@@ -9,7 +9,7 @@ const stringLookup = {
     counter_2: "this is the cleanest kitchen you've seen in your entire life.",
     sink_1: "it's important to wash your hands!",
     toilet_1: "it's important to use toilets!",
-    bathtub_1: "it's important to...\nwash yourself.",
+    bathtub_1: "it's important to wash...\nyourself.",
     bookcase_4: "this bookcase doesn't have very many books on it.",
     bookcase_5_1: "this bookcase has a few intersting books on it.",
     bookcase_5_2: "one book is called 'the cat lady manifesto'",

@@ -1,5 +1,7 @@
 function WorldPrompt(text,selections,callback) {
 
+    text = processTextForWrapping(text);
+
     for(let i = 0;i<selections.length;i++) {
         const selection = selections[i];
         selections[i] = `>${selection}`;
@@ -44,18 +46,44 @@ function WorldPrompt(text,selections,callback) {
         }
     }
 
-    const textRenderTest = drawTextTest(text,4);
-    const textXOffset = textRenderTest.width / 2;
+    const largeTextScale = 4;
+    const smallTextScale = 3;
+
+    let smallOptionWidthXOffset = 0;
+    let largeOptionWidthXOffset = 0;
+    for(let i = 0;i<selections.length;i++) {
+        const sl = selections[i];
+        let sm_test = drawTextTest(sl,smallTextScale);
+        let lg_test = drawTextTest(sl,largeTextScale);
+        if(sm_test.width > smallOptionWidthXOffset) {
+            smallOptionWidthXOffset = sm_test.width;
+        }
+        if(lg_test.width > largeOptionWidthXOffset) {
+            largeOptionWidthXOffset = lg_test.width;
+        }
+    }
+    smallOptionWidthXOffset /= 2;
+    largeOptionWidthXOffset /= 2;
 
     this.render = function() {
         if(terminated) {
             return;
         }
+
+        const largeText = fullWidth > 600;
+        const textScale = largeText ? largeTextScale : smallTextScale;
+
         const popupWidth = halfWidth > 700 ? halfWidth : fullWidth < 700 ? fullWidth - 20 : 700 - 20;
         const popupHeight = fullHeight < 290 ? fullHeight - 20 : 270;
+
         const popupY = fullHeight - 10 - popupHeight;
-        const popupX = Math.round(halfWidth - popupWidth / 2);
-        let textX = Math.floor(halfWidth - textXOffset);
+
+        const popupX = Math.round(
+            halfWidth - popupWidth / 2
+        );
+
+        let textX = popupX + 20;
+
         context.fillStyle = "black";
         context.fillRect(
             popupX-3,
@@ -70,20 +98,21 @@ function WorldPrompt(text,selections,callback) {
             popupWidth,popupHeight
         );
         let textY = popupY + 20;
-        drawTextBlack(text,
+        drawTextWrappingBlack(text,
             textX,
             textY,
-            4
+            popupWidth - 50,
+            2,8,
+            textScale
         );
-        textX -= 16;
-        textY += 50;
+
+        textY += 63;
         let i = 0;
         while(i < selections.length) {
             if(this.selectionIndex === i) {
-                drawTextStencil("black",selections[i],textX,textY,4,10);
-
+                drawTextStencil("black",selections[i],textX,textY,textScale,10);
             } else {
-                drawTextBlack(selections[i],textX,textY,4);
+                drawTextBlack(selections[i],textX,textY,textScale);
             }
             textY += 40;
             i++;

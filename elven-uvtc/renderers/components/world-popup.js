@@ -64,9 +64,12 @@ function applySonographToPopupFeed(popupFeed) {
 function WorldPopup(pages,callback,prefix,isInstant=false) {
 
 
-    const popupFeedMaxWidthPadding = -60;
+    const popupFeedMaxWidthPadding = -70;
     const characterSpeed = 30;
     const spaceSpeed = 30;
+
+    const largeTextScale = 4;
+    const smallTextScale = 3;
 
     const hyphenDelay = 300;
     const commaDelay = 300;
@@ -178,7 +181,6 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
 
     timeoutMethod();
     this.progress = function() {
-        playSound("click");
         clearTimeout(timeout);
         if(readyToTerminate) {
             if(terminated) {
@@ -212,6 +214,9 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
         if(terminated) {
             return;
         }
+        const largeText = fullWidth > 600;
+        const textScale = largeText ? largeTextScale : smallTextScale;
+
         const popupWidth = halfWidth > 700 ? halfWidth : fullWidth < 700 ? fullWidth - 20 : 700 - 20;
         const popupHeight = fullHeight < 290 ? fullHeight - 20 : 270;
         const popupY = fullHeight - 10 - popupHeight;
@@ -229,6 +234,6 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
             popupY,
             popupWidth,popupHeight
         );
-        drawTextWrappingBlack(textFeed,popupX + 10,popupY + 10,popupWidth+popupFeedMaxWidthPadding,2,13,4);
+        drawTextWrappingBlack(textFeed,popupX + 20,popupY + 20,popupWidth+popupFeedMaxWidthPadding,2,13,textScale);
     }
 }
