@@ -463,10 +463,11 @@ function CardBookRenderer(callback) {
                 let i = 0;
                 while(i < this.pageCardsLength) {
                     const card = cardCenter.cards[i];
-                    if(hoverType === hoverTypes.card && hoverIndex === i) {
+                    const hasHover = hoverType === hoverTypes.card && hoverIndex === i;
+                    if(hasHover) {
                         drawOutline(card.hover.x,card.hover.y,card.hover.width,card.hover.height,3,"white");
                     }
-                    renderCard(this.pageCards[i],card.x,card.y,card.width,card.height,false,false);
+                    renderCard(this.pageCards[i],card.x,card.y,card.width,card.height,false,hasHover);
                     i++;
                 }
             }

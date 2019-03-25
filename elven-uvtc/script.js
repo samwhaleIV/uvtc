@@ -4,10 +4,10 @@ drawLoadingText();
 
 function loadCallback() {
     setRendererState(
-        new WorldRenderer("bedroom_1") ||
+        //new WorldRenderer("bedroom_1") ||
         
         new CardScreenRenderer(
-            new CardSequencer([allCards["apple pie"],allCards["red apple"],allCards["golden apple"],allCards["poison apple"],allCards["green apple"]],[allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"],allCards["red apple"]],{
+            new CardSequencer([...allCardSeries[1].cards],[...allCardsList],{
                 getActionData: (sequencer,me) => {
                     return {
                         type: "useCard",

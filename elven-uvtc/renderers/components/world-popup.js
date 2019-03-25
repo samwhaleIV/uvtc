@@ -221,9 +221,11 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
         const textScale = largeText ? largeTextScale : smallTextScale;
 
         const popupWidth = halfWidth > 700 ? halfWidth : fullWidth < 700 ? fullWidth - 20 : 700 - 20;
+
         const popupHeight = fullHeight < 290 ? fullHeight - 20 : 270;
         const popupY = fullHeight - 10 - popupHeight;
         const popupX = Math.round(halfWidth - popupWidth / 2);
+
         context.fillStyle = "black";
         context.fillRect(
             popupX-3,
