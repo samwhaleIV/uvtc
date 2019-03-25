@@ -8,8 +8,11 @@ const makeSyllableMap = function(wordLength,syllables) {
     const map = [];
     const distance = Math.round(wordLength / syllables);
     let i = 0;
+    let remainingSyllables = syllables;
     while(i<wordLength){
-        map.push(i % distance === 0 ? 1 : 0);
+        const isSyllable = i % distance === 0;
+        map.push(remainingSyllables > 0 && isSyllable ? 1 : 0);
+        if(isSyllable) remainingSyllables--;
         i++;
     }
     syllableMemo[lookup] = map;
@@ -27,8 +30,7 @@ const processRawStrings = function() {
         let lastCharacter = null;
         for(let i = 0;i<fullString.length;i++) {
 
-            //This has to be compatiable (and essentially identical) to the method found within applySonographToPopupFeed
-
+            //This has to be compatiable (essentially identical) to the method found within applySonographToPopupFeed
             const character = fullString[i];
             const nextCharacter = fullString[i+1];
 

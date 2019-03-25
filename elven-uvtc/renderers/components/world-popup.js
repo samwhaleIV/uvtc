@@ -156,9 +156,12 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
         const pageValue = pages[pageIndex][characterIndex];
         textFeed = pageValue.textFeed;
         if(++characterIndex < pages[pageIndex].length) {
-            const lookAhead = pages[pageIndex][characterIndex]
+            const lookAhead = pages[pageIndex][characterIndex];
             if(lookAhead) {
                 if(lookAhead.instant) {
+                    if(!pageValue.delay && !pageValue.noSound) {
+                        playSound("text-sound");
+                    }
                     timeoutMethod();
                     return;
                 }
