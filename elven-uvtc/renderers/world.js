@@ -130,7 +130,7 @@ function WorldRenderer(startMapName) {
             callback ? () => {
                 this.clearTextPopup();
                 callback(...callbackParameters);
-            } : this.clearTextPopup
+            } : this.clearTextPopup,null,false
         );
     }
     this.showTextPopupsID = (IDs,callback,...callbackParameters) => {
@@ -139,7 +139,7 @@ function WorldRenderer(startMapName) {
             callback ? () => {
                 this.clearTextPopup();
                 callback(...callbackParameters);
-            } : this.clearTextPopup
+            } : this.clearTextPopup,null,false
         );
     }
     this.showTextPopup = (page,callback,...callbackParameters) => {
@@ -148,7 +148,7 @@ function WorldRenderer(startMapName) {
             callback ? () => {
                 this.clearTextPopup();
                 callback(...callbackParameters);
-            } : this.clearTextPopup
+            } : this.clearTextPopup,null,false
         );
     }
     this.showTextPopups = (pages,callback,...callbackParameters) => {
@@ -157,7 +157,7 @@ function WorldRenderer(startMapName) {
             callback ? () => {
                 this.clearTextPopup();
                 callback(...callbackParameters);
-            } : this.clearTextPopup
+            } : this.clearTextPopup,null,false
         );
     }
     this.showNamedTextPopupID = (ID,name,callback,...callbackParameters) => {
@@ -167,7 +167,7 @@ function WorldRenderer(startMapName) {
                 this.clearTextPopup();
                 callback(...callbackParameters);
             } : this.clearTextPopup,
-            name
+            name,false
         );
     }
     this.showNamedTextPopupsID = (IDs,name,callback,...callbackParameters) => {
@@ -177,10 +177,9 @@ function WorldRenderer(startMapName) {
                 this.clearTextPopup();
                 callback(...callbackParameters);
             } : this.clearTextPopup,
-            name
+            name,false
         );
     }
-
     this.showNamedTextPopup = (page,name,callback,...callbackParameters) => {
         this.popup = new WorldPopup(
             [page],
@@ -188,7 +187,7 @@ function WorldRenderer(startMapName) {
                 this.clearTextPopup();
                 callback(...callbackParameters);
             } : this.clearTextPopup,
-            name
+            name,false
         );
     }
     this.showNamedTextPopups = (pages,name,callback,...callbackParameters) => {
@@ -198,10 +197,45 @@ function WorldRenderer(startMapName) {
                 this.clearTextPopup();
                 callback(...callbackParameters);
             } : this.clearTextPopup,
-            name
+            name,false
         );
     }
-
+    this.showInstantTextPopupID = (ID,callback,...callbackParameters) => {
+        this.popup = new WorldPopup(
+            [getString(ID)],
+            callback ? () => {
+                this.clearTextPopup();
+                callback(...callbackParameters);
+            } : this.clearTextPopup,null,true
+        );
+    }
+    this.showInstantTextPopupsID = (IDs,callback,...callbackParameters) => {
+        this.popup = new WorldPopup(
+            IDs.map(id => getString(id)),
+            callback ? () => {
+                this.clearTextPopup();
+                callback(...callbackParameters);
+            } : this.clearTextPopup,null,true
+        );
+    }
+    this.showInstantTextPopup = (page,callback,...callbackParameters) => {
+        this.popup = new WorldPopup(
+            [page],
+            callback ? () => {
+                this.clearTextPopup();
+                callback(...callbackParameters);
+            } : this.clearTextPopup,null,true
+        );
+    }
+    this.showInstantTextPopups = (pages,callback,...callbackParameters) => {
+        this.popup = new WorldPopup(
+            pages,
+            callback ? () => {
+                this.clearTextPopup();
+                callback(...callbackParameters);
+            } : this.clearTextPopup,null,true
+        );
+    }
     this.clearPrompt = () => {
         this.prompt = null;
     }

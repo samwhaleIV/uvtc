@@ -1,4 +1,6 @@
 function applySonographToPopupFeed(popupFeed) {
+    let readyToTerminate = false;
+
     const wordSets = [];
     let wordStart = 0, word = "";
     let lastCharacter = null;
@@ -61,9 +63,10 @@ function applySonographToPopupFeed(popupFeed) {
     }
     return popupFeed;
 }
-function WorldPopup(pages,callback,prefix) {
-    const popupFeedMaxWidthPadding = -60;
+function WorldPopup(pages,callback,prefix,isInstant=false) {
 
+
+    const popupFeedMaxWidthPadding = -60;
     const characterSpeed = 30;
     const spaceSpeed = 30;
 
@@ -84,6 +87,18 @@ function WorldPopup(pages,callback,prefix) {
         let page = pages[i];
         const newPage = [];
         page = page.replace(/\.\.\./gi,ellipsis);
+        if(isInstant) {
+            newPage.push({
+                textFeed:processTextForWrapping(page),
+                newCharacter:null,
+                noSound:true,
+                instant:true,
+                speed:0,
+                delay:0
+            });
+            pages[i] = newPage;
+            continue;
+        }
         let textFeed = prefix ? prefix : "";
         for(let x = 0;x<page.length;x++) {
             let speed = characterSpeed;
@@ -163,9 +178,6 @@ function WorldPopup(pages,callback,prefix) {
     }
 
     timeoutMethod();
-
-    let readyToTerminate = false;
-
     this.progress = function() {
         playSound("click");
         clearTimeout(timeout);
