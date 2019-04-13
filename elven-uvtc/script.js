@@ -10,7 +10,7 @@ function loadCallback() {
             new CardSequencer([...allCardSeries[1].cards],[...allCardsList],{
                 getActionData: (sequencer,me) => {
                     return {
-                        type: "useCard",
+                        type: "discardCard",
                         cardIndex: 0
                     }
                 }

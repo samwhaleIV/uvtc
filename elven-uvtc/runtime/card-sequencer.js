@@ -769,6 +769,7 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                 const energyCost = accumulateFilters("energyCost",this.playerState,usedCard.energyCost);
                 this.dropEnergy(this.playerState,energyCost);
                 this.playerState.hand.splice(this.fullScreenCardIndex,1);
+                this.playerState.discardDeck.push(usedCard);
                 actionResultText = `used '${usedCard.name}'`;
                 const actionResult = usedCard.action ? usedCard.action(this,this.playerState,this.opponentState) : null;
                 if(actionResult) {
@@ -945,8 +946,8 @@ function CardSequencer(playerDeck,opponentDeck,opponentSequencer) {
                         break;
                     }
                     this.dropEnergy(this.opponentState,energyCost);
-
                     this.opponentState.hand.splice(actionDataResult.cardIndex,1);
+                    this.opponentState.discardDeck.push(usedCard);
                     textResult = `opponent used '${usedCard.name}'`;
                     const actionResult = usedCard.action ? usedCard.action(this,this.opponentState,this.playerState) : null;
                     if(actionResult) {
