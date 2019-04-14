@@ -1,6 +1,23 @@
+const invertDirection = direction => {
+    switch(direction) {
+        case "up":
+            return "down";
+        case "down":
+            return "up";
+        case "left":
+            return "right";
+        case "right":
+            return "left";
+        default:
+            return direction;
+    }
+}
 function PlayerRenderer(startDirection) {
-    const sprite = imageDictionary["character-sprite"];
-    const footStepsSprite = imageDictionary["footsteps"];
+    SpriteRenderer.call(this,startDirection,"player");
+}
+function SpriteRenderer(startDirection,spriteName,footstepsName="footsteps") {
+    const sprite = imageDictionary[`sprites/${spriteName}`];
+    const footStepsSprite = imageDictionary[`sprites/${footstepsName}`];
 
     const columnWidth = 16;
     const rowHeight = 16;
@@ -18,21 +35,6 @@ function PlayerRenderer(startDirection) {
 
     const maxFootStepCount = 2;
     const footStepBuffer = [];
-
-    const invertDirection = direction => {
-        switch(direction) {
-            case "up":
-                return "down";
-            case "down":
-                return "up";
-            case "left":
-                return "right";
-            case "right":
-                return "left";
-            default:
-                return direction;
-        }
-    }
 
     this.worldPositionUpdated = function(oldX,oldY,newX,newY,world) {
         const decalSourceX = this.direction === "up" || this.direction === "down" ? 0 : columnWidth;
@@ -101,8 +103,6 @@ function PlayerRenderer(startDirection) {
         this.direction = direction;
     }
 
-    
-
     this.setWalking = function(isWalking) {
         walking = isWalking;
     }
@@ -128,10 +128,6 @@ function PlayerRenderer(startDirection) {
         context.drawImage(
             sprite,currentColumn,animationRow,columnWidth,rowHeight,destinationX,destinationY,width,height
         );
-
-        context.fillStyle = "red";
-        //context.fillRect(destinationX,destinationY,width,height);
-
     }
 
 }

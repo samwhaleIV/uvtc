@@ -4,7 +4,7 @@ drawLoadingText();
 
 function loadCallback() {
     setRendererState(
-        //new WorldRenderer("bedroom_1") ||
+        new WorldRenderer("bedroom_1") ||
         
         new CardScreenRenderer(
             new CardSequencer([...allCardSeries[1].cards],[...allCardsList],{

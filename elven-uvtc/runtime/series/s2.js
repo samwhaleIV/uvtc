@@ -45,7 +45,7 @@ addCardSeries([
     {
         name: "coolant",
         type: "generic",
-        description: "coolant",
+        description: "coolant to be used with the nuclear reactor special card",
         energyCost: 1
     }
 ],[
