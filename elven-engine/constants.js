@@ -50,7 +50,7 @@ const textColorLookup = {
     "Y": "yellow",
     "P": "purple",
     "O": "orange",
-    "X:": 0
+    "X": 0
 }
 const popupControlCharacters = {
     "-": true,
