@@ -30,6 +30,8 @@ function SpriteRenderer(startDirection,spriteName,footstepsName="footsteps") {
 
     this.direction = null;
 
+    this.tilesPerSecond = 2.5;
+
     this.xOffset = 0;
     this.yOffset = 0;
 
@@ -117,8 +119,12 @@ function SpriteRenderer(startDirection,spriteName,footstepsName="footsteps") {
     }
     
     this.walkingOverride = false;
+    this.renderLogic = null;
 
     this.render = function(timestamp,x,y,width,height) {
+        if(this.renderLogic) {
+            this.renderLogic(timestamp);
+        }
         const destinationX = this.xOffset * width + x;
         const destinationY = this.yOffset * height + y;
 

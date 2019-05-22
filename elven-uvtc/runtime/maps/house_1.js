@@ -111,6 +111,23 @@ addMap({
             } else {
                 world.addPlayer(18,10,"down");
             }
+            const jim = new SpriteRenderer("down","jim");
+            jim.interacted = (x,y,direction) => {
+                if(direction === "left") {
+                    world.lockPlayerMovement();
+                    world.moveSprite(this.JIM_ID,[{y:2},{x:1}],()=>{
+                        setTimeout(()=>{
+                            world.showNamedTextPopup("that was quite the journey...\nnow you may use the door","Bjim:B ",()=>{
+                                world.unlockPlayerMovement();
+                            });
+                        },1000);
+                    });
+                } else {
+                    jim.updateDirection(direction);
+                    world.showNamedTextPopup(`you touched me from my ${direction} direction.\nthat tickles!`,"Bjim:B ");
+                }
+            }
+            this.JIM_ID = world.addObject(jim,18,10);
         }
         this.doorClicked = doorID => {
             switch(doorID) {

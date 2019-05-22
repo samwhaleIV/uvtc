@@ -60,3 +60,6 @@ const shiftPlayerToDoorFrame = (doorX,doorY,world) => {
             break;
     }
 }
+const stackDelay = (delay,callback,...callbackParameters) => {
+    setTimeout(callback,delay,callbackParameters);
+}

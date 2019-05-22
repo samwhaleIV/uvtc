@@ -40,12 +40,12 @@ addCardSeries([
     {
         name: "nuclear reactor",
         type: "special",
-        description: "+10 energy per turn. requires use of coolant every turn after use or it goes critical and you die"
+        description: "+6 energy per turn, at the cost of 3 health each time"
     },
     {
         name: "coolant",
-        type: "generic",
-        description: "coolant to be used with the nuclear reactor special card",
+        type: "defense",
+        description: "prevents the nuclear reactor special card from causing harm",
         energyCost: 1
     }
 ],[

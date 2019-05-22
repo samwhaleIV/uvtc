@@ -30,11 +30,17 @@ function WorldRenderer(startMapName) {
         return playerMovementLocked || this.popup || this.prompt ? true : false;
     }
 
-    this.lockPlayerMovement = function() {
+    this.lockPlayerMovement = function(callback,...callbackParameters) {
         playerMovementLocked = true;
+        if(callback) {
+            callback(...callbackParameters);
+        }
     }
-    this.unlockPlayerMovement = function() {
-        playerMovementLocked = true;
+    this.unlockPlayerMovement = function(callback,...callbackParameters) {
+        playerMovementLocked = false;
+        if(callback) {
+            callback(...callbackParameters);
+        }
     }
 
     let wDown = false;
@@ -362,6 +368,104 @@ function WorldRenderer(startMapName) {
             console.log("Existing item",this.objectsLookup[object.x][object.y],"New item",object);
         }
         this.objectsLookup[object.x][object.y] = object;
+    }
+
+    this.moveSprite = function(objectID,steps,callback,...callbackParameters) {
+        const object = this.objects[objectID];
+        const world = this;
+        let lastCallback = () => {
+            object.setWalking(false);
+            object.renderLogic = null;
+            if(callback) {
+                callback(...callbackParameters);
+            }
+        }
+        for(let i = steps.length-1;i>=0;i--) {
+            (function(step,callback){
+                if(step.x) {
+                    lastCallback = () => {
+                        let lastFrame = null;
+                        if(step.x > 0) {
+                            object.updateDirection("right");
+                            object.renderLogic = timestamp => {
+                                if(!lastFrame) {
+                                    lastFrame = timestamp;
+                                    return;
+                                }
+                                const delta = timestamp - lastFrame;
+                                lastFrame = timestamp;
+                                object.xOffset += delta / 1000 * object.tilesPerSecond;
+                                if(object.xOffset >= step.x) {
+                                    object.xOffset = 0;
+                                    world.moveObject(objectID,object.x+step.x,object.y);
+                                    callback();
+                                }
+                            }
+                        } else {
+                            object.updateDirection("left");
+                            object.renderLogic = timestamp => {
+                                if(!lastFrame) {
+                                    lastFrame = timestamp;
+                                    return;
+                                }
+                                const delta = timestamp - lastFrame;
+                                lastFrame = timestamp;
+                                object.xOffset -= delta / 1000 * object.tilesPerSecond;
+                                if(object.xOffset <= step.x) {
+                                    object.xOffset = 0;
+                                    world.moveObject(objectID,object.x+step.x,object.y);
+                                    callback();
+                                }
+                            }
+                        }
+                    }
+                } else if(step.y) {
+                    lastCallback = () => {
+                        let lastFrame = null;
+                        if(step.y > 0) {
+                            object.updateDirection("down");
+                            object.renderLogic = timestamp => {
+                                if(!lastFrame) {
+                                    lastFrame = timestamp;
+                                    return;
+                                }
+                                const delta = timestamp - lastFrame;
+                                lastFrame = timestamp;
+                                object.yOffset += delta / 1000 * object.tilesPerSecond;
+                                if(object.yOffset >= step.y) {
+                                    object.yOffset = 0;
+                                    world.moveObject(objectID,object.x,object.y+step.y);
+                                    callback();
+                                }
+                            }
+                        } else {
+                            object.updateDirection("up");
+                            object.renderLogic = timestamp => {
+                                if(!lastFrame) {
+                                    lastFrame = timestamp;
+                                    return;
+                                }
+                                const delta = timestamp - lastFrame;
+                                lastFrame = timestamp;
+                                object.yOffset -= delta / 1000 * object.tilesPerSecond;
+                                if(object.yOffset <= step.y) {
+                                    object.yOffset = 0;
+                                    world.moveObject(objectID,object.x,object.y+step.y);
+                                    callback();
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    lastCallback = () => {
+                        object.renderLogic = null;
+                        callback();
+                    }
+                }
+            })(steps[i],lastCallback);
+        }
+        object.setWalking(true);
+        lastCallback();
     }
 
     let tileRenderingEnabled = true;

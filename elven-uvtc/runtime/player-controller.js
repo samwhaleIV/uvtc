@@ -86,9 +86,11 @@ function PlayerController(world) {
             pulseLocation.x,pulseLocation.y,true
         );
         if(collisionState.object) {
-            if(collisionState.object.worldClick) {
-                collisionState.object.clicked(
-                    pulseLocation.x,pulseLocation.y
+            if(collisionState.object.interacted) {
+                collisionState.object.interacted(
+                    pulseLocation.x,
+                    pulseLocation.y,
+                    invertDirection(this.player.direction)
                 );
             }
         } else if(collisionState.map) {
