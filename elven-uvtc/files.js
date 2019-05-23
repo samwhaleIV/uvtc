@@ -21,7 +21,6 @@ ImagePaths.push(
     getFile("sprites/player.png",FileTypes.Image),
     getFile("sprites/jim.png",FileTypes.Image),
     getFile("sprites/footsteps.png",FileTypes.Image),
-    getFile("main-menu.png",FileTypes.BackgroundImage),
     getFile("stars-menu.png",FileTypes.BackgroundImage),
     getFile("spiral-menu.png",FileTypes.BackgroundImage)
 );

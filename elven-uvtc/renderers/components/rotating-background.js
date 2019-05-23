@@ -4,7 +4,9 @@ function RotatingBackground(imageName) {
     const imageHeight = image.height;
     this.rotationTime = 400000;
     this.clockwise = false;
+    this.timeOffset = 0;
     this.render = timestamp => {
+        timestamp = timestamp - this.timeOffset;
         context.save();
         context.translate(halfWidth,halfHeight);
         if(this.clockwise) {
@@ -13,7 +15,7 @@ function RotatingBackground(imageName) {
             context.rotate((this.rotationTime-timestamp / this.rotationTime) % 1 * PI2);
         }
         context.translate(-halfWidth,-halfHeight);
-        const diameter = Math.round(largestDimension * 1.2);
+        const diameter = Math.round(largestDimension * 1.5);
         const radius = Math.round(diameter / 2);
         context.drawImage(
             image,0,0,imageWidth,imageHeight,

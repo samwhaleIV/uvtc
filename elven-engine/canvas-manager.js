@@ -257,7 +257,12 @@ function applyMediumResolutionTextAdapations() {
     adaptiveTextSpacing = mediumResolutionAdaptiveTextSpacing;
 }
 
-function applySizeMode() {
+let sizeApplicationDeferred = false;
+function applySizeMode(forced=false) {
+    if(!forced && rendererState.transitioning) {
+        sizeApplicationDeferred = true;
+        return;
+    }
     let sizeMode;
     if(rendererState && rendererState.forcedSizeMode) {
         sizeMode = rendererState.forcedSizeMode;
@@ -364,7 +369,7 @@ function cycleSizeMode() {
         pictureModeElementTimeout = null;
     },600);
     canvasSizeMode = newMode;
-    applySizeMode();
+    applySizeMode(false);
     localStorage.setItem("canvasSizeMode",newMode);
     console.log(`Canvas handler: Set size mode to '${newMode}'`);
 }
@@ -415,7 +420,7 @@ function startRenderer() {
 
 function setRendererState(newRendererState) {
     rendererState = newRendererState;
-    applySizeMode();
+    applySizeMode(true);
     if(rendererState.processKey) {
         if(rendererState.processKeyUp) {
             keyEventMode = keyEventModes.upAndDown;
@@ -452,6 +457,7 @@ function forceRender() {
         context,performance.now()
     );
 }
-
-window.onresize = applySizeMode;
-applySizeMode();
+window.onresize = () => {
+    applySizeMode(false);
+};
+applySizeMode(true);

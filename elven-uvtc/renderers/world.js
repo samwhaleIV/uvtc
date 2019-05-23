@@ -1,5 +1,7 @@
 function WorldRenderer(startMapName) {
 
+    this.fader = getFader();
+
     this.camera = {
         x: 10,
         y: 10,
@@ -711,5 +713,6 @@ function WorldRenderer(startMapName) {
         if(this.customRenderer) {
             this.customRenderer(timestamp);
         }
+        this.fader.render(timestamp);
     }
 }

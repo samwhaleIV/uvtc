@@ -4,6 +4,8 @@ drawLoadingText();
 
 function loadCallback() {
     setRendererState(
+        new MainMenuRenderer() ||
+
         new WorldRenderer("bedroom_1") ||
         
         new CardScreenRenderer(
@@ -34,6 +36,6 @@ SoundManager.loadNonEssentialSounds();
 
 //setFaderOutSound("swish-1");
 //setFaderInSound("swish-2");
-//setFaderEffectsRenderer(new Effect());
-setFaderDelay(0);
-setFaderDuration(0);
+setFaderEffectsRenderer(new BoxFaderEffect());
+setFaderDelay(2000);
+setFaderDuration(1000);

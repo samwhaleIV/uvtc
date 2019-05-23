@@ -32,12 +32,19 @@ function getFader() {
             startRenderer();
             rendererState.fader.delta = -1;
             rendererState.fader.start = performance.now();
+            if(faderEffectsRenderer.callbackOnce) {
+                faderEffectsRenderer.callbackOnce();
+                faderEffectsRenderer.callbackOnce = null;
+            }
+            if(sizeApplicationDeferred) {
+                applySizeMode(true);
+            }
             if(exitMethod) {
                 rendererState.fader.inMethod = exitMethod;
             }
             const staticTime = rendererState.fader.time / 1000;
             if(faderInSound) {
-                playSound("swish-2",staticTime);
+                playSound(faderInSound,staticTime);
             }
             if(rendererState.song) {
                 if(!musicMuted) {
@@ -59,7 +66,7 @@ function getFader() {
             rendererState.fader.transitionParameters = parameters;
             const staticTime = rendererState.fader.time / 1000;
             if(faderOutSound) {
-                playSound("swish-1",staticTime);
+                playSound(faderOutSound,staticTime);
             }
             stopMusic();
         },
@@ -74,17 +81,22 @@ function getFader() {
         },
         onoutEnd: () => {
             pauseRenderer();
+            if(faderEffectsRenderer.pauseCallbackOnce) {
+                faderEffectsRenderer.pauseCallbackOnce();
+                faderEffectsRenderer.pauseCallbackOnce = null;
+            }
             if(rendererState.fader.transitionRenderer) {
                 drawLoadingText();
-                setRendererState(
-                    new rendererState.fader.transitionRenderer(
-                        ...rendererState.fader.transitionParameters
-                    )
+                rendererState = new rendererState.fader.transitionRenderer(
+                    ...rendererState.fader.transitionParameters
                 );
                 if(rendererState.fader) {
                     rendererState.transitioning = true;
                     if(musicMuted) {
-                        setTimeout(rendererState.fader.fadeIn,rendererState.fader.fadeInDelay);
+                        setTimeout(()=>{
+                            setRendererState(rendererState);
+                            rendererState.fader.fadeIn();
+                        },rendererState.fader.fadeInDelay);
                         return;
                     }
                     if(rendererState.song && rendererState.songIntro) {
@@ -131,18 +143,27 @@ function getFader() {
                     } else if(rendererState.song) {
                         const songLoaded = audioBuffers[rendererState.song] || failedBuffers[rendererState.song];
                         if(songLoaded) {
-                            setTimeout(rendererState.fader.fadeIn,rendererState.fader.fadeInDelay);
+                            setTimeout(()=>{
+                                setRendererState(rendererState);
+                                rendererState.fader.fadeIn();
+                            },rendererState.fader.fadeInDelay);
                         } else {
                             audioBufferAddedCallback = name => {
                                 if(name === rendererState.song) {
-                                    setTimeout(rendererState.fader.fadeIn,rendererState.fader.fadeInDelay);
+                                    setTimeout(()=>{
+                                        setRendererState(rendererState);
+                                        rendererState.fader.fadeIn();
+                                    },rendererState.fader.fadeInDelay);
                                     audioBufferAddedCallback = null;
                                 }
                             }
                             loadSongOnDemand(rendererState.song);
                         }
                     } else {
-                        setTimeout(rendererState.fader.fadeIn,rendererState.fader.fadeInDelay);
+                        setTimeout(()=>{
+                            setRendererState(rendererState);
+                            rendererState.fader.fadeIn();
+                        },rendererState.fader.fadeInDelay);
                     }
                 }
             } else {
@@ -157,6 +178,9 @@ function getFader() {
                     if(fadeIntensity > 1) {
                         fadeIntensity = 1;
                     }
+                    if(faderEffectsRenderer) {
+                        faderEffectsRenderer.render(fadeIntensity,true);
+                    }
                 } else {
                     fadeIntensity = 1 - (timestamp - rendererState.fader.start) / rendererState.fader.time;
                     if(fadeIntensity < 0) {
@@ -164,17 +188,16 @@ function getFader() {
                         rendererState.fader.oninEnd();
                         return;
                     }
+                    if(faderEffectsRenderer) {
+                        faderEffectsRenderer.render(fadeIntensity,false);
+                    }
                 }
 
-                if(faderEffectsRenderer) {
-                    faderEffectsRenderer.render(fadeIntensity);
-                }
 
                 if(fadeIntensity === 1 && rendererState.fader.delta === 1) {
                     rendererState.fader.delta = 0;
                     rendererState.fader.onoutEnd();
                 }
-
             }
         }
     }
