@@ -9,6 +9,8 @@ let doubleWidth;
 let doubleHeight;
 let verticalSizeRatio;
 let horizontalSizeRatio;
+let largestDimension;
+let halfLargestDimension;
 
 let adaptiveTextScale;
 let adaptiveTextSpacing;
@@ -24,6 +26,8 @@ function setSizeConstants() {
     doubleHeight = fullHeight * 2;
     horizontalSizeRatio = fullWidth / internalWidth;
     verticalSizeRatio = fullHeight / internalHeight;
+    largestDimension = fullWidth > fullHeight ? fullWidth : fullHeight;
+    halfLargestDimension = largestDimension / 2;
 }
 
 function createRainbowGradient() {
