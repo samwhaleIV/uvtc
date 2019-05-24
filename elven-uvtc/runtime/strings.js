@@ -28,7 +28,7 @@ const stringLookup = {
     bookcase_8_1: "there's not many books on this shelf, but there are a few interesting ones.",
     bookcase_8_2: "Rowning two pieces of furniture for dummiesR",
     bookcase_8_3: "it seems to be a book about minimalism.",
-    sleepingbag_2: "whoever lives here also has a sleeping bag. do they only come in one color?",
+    sleepingbag_2: "whoever lives here also has a sleeping bag.\ndo they only come in one color?",
     rudetable: "someone didn't bring the chair back to the table.\n\nhow rude!",
     dryer_1: "what kind of a heathen has their dryer on the left?",
     washer_1: "the washer being on the right is making you very uncomfortable.",
