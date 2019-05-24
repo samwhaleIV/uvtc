@@ -24,7 +24,7 @@ const stringLookup = {
     jims_kink: "if you whisper something in my right ear, i'll get out of your way.",
     jims_intrigue: "oh. my. i'll be getting out of your way now.",
     jims_postop: "let's stay in touch.\n\n*wink*",
-    sleepingbag_1: "sleeping bags seem to be in style in this city.",
+    sleepingbag_1: "hmm...\nsleeping bags seem to be in style in this town.",
     bookcase_8_1: "there's not many books on this shelf, but there are a few interesting ones.",
     bookcase_8_2: "Rowning two pieces of furniture for dummiesR",
     bookcase_8_3: "it seems to be a book about minimalism.",
