@@ -55,6 +55,16 @@ const stringLookup = {
     french_rev_2: "it says something about the french revolution.",
     sat_lt_1: "this lighting is satisfying.",
     sat_lt_1: "perfectly symmetrical, as all things should be.",
+    jims_help_1: "oh. hi there.",
+    jims_help_2: "if you want to talk with me, come over to me and use your mouth.",
+    jims_help_3: ". . .",
+    jims_help_4: "oh. you don't know how to use your mouth?",
+    jims_help_5: ". . .",
+    jims_help_6: "well, this is awkward.",
+    jims_help_7: "give me a second.",
+    jims_help_8: ". . . . . .",
+    jims_help_9: "what? you already figured it out?",
+    jims_help_10: "well, it's nice to meet you.\n\nmy name is jim."
 }
 const getString = function(ID) {
     return stringLookup[ID];

@@ -1,4 +1,20 @@
+import PlayerController from "../runtime/player-controller.js";
+import { PlayerRenderer, SpriteRenderer } from "./components/world/sprite.js";
+import WorldPopup from "./components/world/popup.js";
+import WorldPrompt from "./components/world/prompt.js";
+import GlobalState from "../runtime/global-state.js";
+
 function WorldRenderer(startMapName) {
+
+    this.globalState = GlobalState.data;
+    this.saveState = () => {
+        GlobalState.save();
+    };
+    this.restoreState = () => {
+        GlobalState.restore();
+    }
+
+    this.sprite = SpriteRenderer;
 
     this.fader = getFader();
 
@@ -16,7 +32,7 @@ function WorldRenderer(startMapName) {
         6: true,
         7: true
     }
-    const collisionTriggerOffset = -3;
+    const collisionTriggerOffset = -2;
 
     this.playerObject = null;
     this.popup = null;
@@ -716,3 +732,4 @@ function WorldRenderer(startMapName) {
         this.fader.render(timestamp);
     }
 }
+export default WorldRenderer;

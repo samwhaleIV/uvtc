@@ -100,3 +100,4 @@ function WorldPrompt(text,selections,callback) {
         }
     }
 }
+export default WorldPrompt;

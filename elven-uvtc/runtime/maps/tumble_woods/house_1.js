@@ -92,6 +92,7 @@ addMap({
 });
 addMap({
     WorldState: function(world,data) {
+        let jim;
         this.load = world => {
             if(data.fromDoorWay) {
                 switch(data.sourceRoom) {
@@ -111,12 +112,12 @@ addMap({
             } else {
                 world.addPlayer(18,10,"down");
             }
-            const jim = new SpriteRenderer(globalWorldState.jimsDirection||"down","jim");
+            jim = new world.sprite(world.globalState.jimsDirection||"down","jim");
             jim.prefix = "Bjim:B ";
             jim.interacted = (x,y,direction) => {
-                if(globalWorldState.jimMoved) {
+                if(world.globalState.jimMoved) {
                     jim.updateDirection(direction);
-                    globalWorldState.jimsDirection = direction;
+                    world.globalState.jimsDirection = direction;
                     world.showNamedTextPopupID("jims_postop",jim.prefix);
                     return;
                 }
@@ -130,11 +131,15 @@ addMap({
                                         jim.updateDirection("up");
                                         setTimeout(() => {
                                             jim.updateDirection("left");
-                                            globalWorldState.jimsDirection = "left";
+                                            world.globalState.jimsDirection = "left";
                                             setTimeout(()=>{
                                                 world.showNamedTextPopupID("jims_journey",jim.prefix,()=>{
-                                                    globalWorldState.jimMoved = true;
+                                                    world.globalState.jimMoved = true;
                                                     world.unlockPlayerMovement();
+                                                    finalThread = setTimeout(()=>{
+                                                        jim.updateDirection("up");
+                                                        world.globalState.jimsDirection = "up";
+                                                    },100);
                                                 });
                                             },800);
                                         },700);
@@ -147,11 +152,55 @@ addMap({
                     world.showNamedTextPopupID("jims_kink",jim.prefix);
                 }
             }
-            if(globalWorldState.jimMoved) {
+            if(world.globalState.jimMoved) {
                 this.JIM_ID = world.addObject(jim,19,12);
 
             } else {
                 this.JIM_ID = world.addObject(jim,18,10);
+            }
+        }
+        this.triggerActivated = (triggerID,direction) => {
+            switch(triggerID) {
+                case 1:
+                    if(direction !== "left") {
+                        return;
+                    }
+                    if(!world.globalState.playedEnterTrigger) {
+                        world.lockPlayerMovement();
+                        setTimeout(()=>{
+                            jim.updateDirection("left");
+                            setTimeout(()=>{                             
+                                setTimeout(()=>{
+                                    jim.updateDirection("down");
+                                    setTimeout(()=>{
+                                        jim.updateDirection("left");
+                                        setTimeout(()=>{
+                                            world.showNamedTextPopupsID([
+                                                "jims_help_1",
+                                                "jims_help_2",
+                                                "jims_help_3",
+                                                "jims_help_4",
+                                                "jims_help_5",
+                                                "jims_help_6",
+                                                "jims_help_7",
+                                                "jims_help_8",
+                                                "jims_help_9",
+                                            ],"B???:B ",()=>{
+                                                world.showNamedTextPopupID("jims_help_10",jim.prefix,()=>{
+                                                    world.unlockPlayerMovement();
+                                                    world.globalState.playedEnterTrigger = true;
+                                                    setTimeout(()=>{
+                                                        jim.updateDirection("down");
+                                                    },100);
+                                                });
+                                            });
+                                        },400);
+                                    },400);
+                                },400);
+                            },400);
+                        },200);
+                    }
+                    break;
             }
         }
         this.doorClicked = doorID => {
@@ -181,7 +230,6 @@ addMap({
                 case 10:
                     world.showTextPopupID("bathtub_1");
                     break;
-
                 case 11:
                     world.showTextPopupID("bookcase_4");
                     break;
@@ -203,7 +251,6 @@ addMap({
                     );
                     break;
                 case 15:
-                    //todo
                     break;
                 case 16:
                     world.showTextPopupID("couch_1");

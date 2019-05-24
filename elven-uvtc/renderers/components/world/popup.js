@@ -23,6 +23,7 @@ function applySonographToPopupFeed(popupFeed) {
             case ellipsis:
             case "*":
             case "-":
+            case "Z":
             case " ":
             case ",":
             case ".":
@@ -244,3 +245,4 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
         drawTextWrappingBlack(textFeed,popupX + 20,popupY + 20,popupWidth+popupFeedMaxWidthPadding,2,13,textScale);
     }
 }
+export default WorldPopup;

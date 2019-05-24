@@ -1,3 +1,7 @@
+import WorldRenderer from "../renderers/world.js";
+import SettingsPaneRenderer from "../renderers/settings-pane.js";
+import RotatingBackground from "../renderers/components/rotating-background.js";
+
 function MainMenuRenderer() {
    
     this.updateSize = function() {
@@ -14,6 +18,8 @@ function MainMenuRenderer() {
 
     let hoverType = hoverTypes.none;
     this.background = new RotatingBackground("stars-menu");
+
+    let showHoverSpecialEffect = false;
 
     this.processKey = function(key) {
         if(this.settingsPane) {
@@ -310,3 +316,4 @@ function MainMenuRenderer() {
         this.fader.render(timestamp);
     }
 }
+export default MainMenuRenderer;

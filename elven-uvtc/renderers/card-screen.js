@@ -1372,3 +1372,4 @@ function CardScreenRenderer(sequencer,callbacks,background) {
         renderButtonRows(this.sequencer,hoverType === hoverTypes.moveButtons,hoverIndex,showHoverSpecialEffect,this.background.color);
     }
 }
+export default CardScreenRenderer;

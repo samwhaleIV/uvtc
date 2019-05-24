@@ -1,3 +1,16 @@
+import "./house_1.js";
+import "./house_2.js";
+import "./house_3.js";
+import "./house_4.js";
+import "./house_5.js";
+import "./house_6.js";
+import "./house_7.js";
+import "./house_8.js";
+import "./house_9.js";
+import "./house_10.js";
+import "./mail.js";
+import "./store.js";
+import "./tavern.js";
 addMap({
     WorldState: function(world,data) {
         this.load = world => {

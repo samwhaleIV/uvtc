@@ -1,19 +1,6 @@
-const invertDirection = direction => {
-    switch(direction) {
-        case "up":
-            return "down";
-        case "down":
-            return "up";
-        case "left":
-            return "right";
-        case "right":
-            return "left";
-        default:
-            return direction;
-    }
-}
 function PlayerRenderer(startDirection) {
     SpriteRenderer.call(this,startDirection,"player");
+    this.isPlayer = true;
 }
 function SpriteRenderer(startDirection,spriteName,footstepsName="footsteps") {
     const sprite = imageDictionary[`sprites/${spriteName}`];
@@ -78,6 +65,9 @@ function SpriteRenderer(startDirection,spriteName,footstepsName="footsteps") {
                 world.addDecal(newFootStep);
             }
         }
+        if(!this.isPlayer) {
+            return;
+        }
         const trigger = world.getTriggerState(newX,newY);
         if(trigger !== null) {
             world.map.triggerActivated(
@@ -137,3 +127,5 @@ function SpriteRenderer(startDirection,spriteName,footstepsName="footsteps") {
     }
 
 }
+export default SpriteRenderer;
+export { PlayerRenderer, SpriteRenderer };

@@ -1,14 +1,11 @@
 "use strict";
-
+import MainMenuRenderer from "./renderers/main-menu.js";
+import BoxFaderEffect from "./renderers/components/box-fader-effect.js";
 drawLoadingText();
-
-const globalWorldState = {};
 
 function loadCallback() {
     setRendererState(
         new MainMenuRenderer() ||
-
-        new WorldRenderer("bedroom_1") ||
         
         new CardScreenRenderer(
             new CardSequencer([...allCardSeries[1].cards],[...allCardsList],{
@@ -30,7 +27,7 @@ function loadCallback() {
     startRenderer();
 }
 
-setPageTitle("uvtc - PROTOTYPE CONTENT");
+setPageTitle("UVTC: Pre-alpha");
 setImageIndexMode(IndexModes.LoseRoot);
 ImageManager.loadImages(loadCallback);
 SoundManager.loadSounds(loadCallback);

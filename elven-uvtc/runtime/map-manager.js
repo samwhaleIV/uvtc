@@ -6,6 +6,10 @@ function addMap(map) {
     worldMaps[map.name] = map;
 
     const tilemaps = rawMapData[map.name];
+    if(!tilemaps) {
+        console.error(`Map '${map.name}' does not have any corresponding map data`);
+        return;
+    }
     map.background = tilemaps.background;
     map.collision = tilemaps.collision;
     map.foreground = tilemaps.foreground;
@@ -34,32 +38,4 @@ function addMap(map) {
             }
         }
     }
-}
-
-const packagePlayerPosition = (data,world) => data.playerPosition = {
-    x: world.playerObject.x,
-    y: world.playerObject.y,
-    direction: world.playerObject.direction
-}
-
-const unpackagePlayerPosition = data =>
-[data.playerPosition.x,data.playerPosition.y,data.playerPosition.direction];
-
-const shiftPlayerToDoorFrame = (doorX,doorY,world) => {
-    const player = world.playerObject;
-    switch(player.direction) {
-        case "up":
-        case "down":
-            player.x = doorX;
-            player.xOffset = 0;
-            break;
-        case "left":
-        case "right":
-            player.y = doorY;
-            player.yOffset = 0;
-            break;
-    }
-}
-const stackDelay = (delay,callback,...callbackParameters) => {
-    setTimeout(callback,delay,callbackParameters);
 }

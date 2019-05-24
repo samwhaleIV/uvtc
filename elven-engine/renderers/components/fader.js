@@ -81,6 +81,14 @@ function getFader() {
         },
         onoutEnd: () => {
             pauseRenderer();
+            const fadeInCompleter = (delay=rendererState.fader.fadeInDelay) => {
+                if(delay) {
+                    setTimeout(fadeInCompleter,delay,0);
+                } else {
+                    setRendererState(rendererState);
+                    rendererState.fader.fadeIn();
+                }
+            }
             if(faderEffectsRenderer.pauseCallbackOnce) {
                 faderEffectsRenderer.pauseCallbackOnce();
                 faderEffectsRenderer.pauseCallbackOnce = null;
@@ -93,21 +101,18 @@ function getFader() {
                 if(rendererState.fader) {
                     rendererState.transitioning = true;
                     if(musicMuted) {
-                        setTimeout(()=>{
-                            setRendererState(rendererState);
-                            rendererState.fader.fadeIn();
-                        },rendererState.fader.fadeInDelay);
+                        fadeInCompleter();
                         return;
                     }
                     if(rendererState.song && rendererState.songIntro) {
                         const songLoaded = audioBuffers[rendererState.song] || failedBuffers[rendererState.song];
                         const introLoaded = audioBuffers[rendererState.song] || failedBuffers[rendererState.song];
                         if(songLoaded && introLoaded) {
-                            setTimeout(rendererState.fader.fadeIn,rendererState.fader.fadeInDelay);
+                            fadeInCompleter();
                         } else if(introLoaded) {
                             audioBufferAddedCallback = name => {
                                 if(name === rendererState.song) {
-                                    setTimeout(rendererState.fader.fadeIn,rendererState.fader.fadeInDelay);
+                                    fadeInCompleter();
                                     audioBufferAddedCallback = null;
                                 }
                             }
@@ -115,7 +120,7 @@ function getFader() {
                         } else if(songLoaded) {
                             audioBufferAddedCallback = name => {
                                 if(name === rendererState.songIntro) {
-                                    setTimeout(rendererState.fader.fadeIn,rendererState.fader.fadeInDelay);
+                                    fadeInCompleter();
                                     audioBufferAddedCallback = null;
                                 }
                             }
@@ -133,7 +138,7 @@ function getFader() {
                                         break;
                                 }
                                 if(hasSong && hasIntro) {
-                                    setTimeout(rendererState.fader.fadeIn,rendererState.fader.fadeInDelay);
+                                    fadeInCompleter();
                                     audioBufferAddedCallback = null;
                                 }
                             }
@@ -143,27 +148,18 @@ function getFader() {
                     } else if(rendererState.song) {
                         const songLoaded = audioBuffers[rendererState.song] || failedBuffers[rendererState.song];
                         if(songLoaded) {
-                            setTimeout(()=>{
-                                setRendererState(rendererState);
-                                rendererState.fader.fadeIn();
-                            },rendererState.fader.fadeInDelay);
+                            fadeInCompleter();
                         } else {
                             audioBufferAddedCallback = name => {
                                 if(name === rendererState.song) {
-                                    setTimeout(()=>{
-                                        setRendererState(rendererState);
-                                        rendererState.fader.fadeIn();
-                                    },rendererState.fader.fadeInDelay);
+                                    fadeInCompleter();
                                     audioBufferAddedCallback = null;
                                 }
                             }
                             loadSongOnDemand(rendererState.song);
                         }
                     } else {
-                        setTimeout(()=>{
-                            setRendererState(rendererState);
-                            rendererState.fader.fadeIn();
-                        },rendererState.fader.fadeInDelay);
+                        fadeInCompleter();
                     }
                 }
             } else {
@@ -192,7 +188,6 @@ function getFader() {
                         faderEffectsRenderer.render(fadeIntensity,false);
                     }
                 }
-
 
                 if(fadeIntensity === 1 && rendererState.fader.delta === 1) {
                     rendererState.fader.delta = 0;

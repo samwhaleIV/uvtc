@@ -63,7 +63,9 @@ const SoundManager = {
             if(++loadedSounds === EssentialSounds.length) {
                 console.log("Sound manager: All sounds loaded");
                 SoundManager.soundsLoaded = true;
-                callback();
+                if(ImageManager.imagesLoaded) {
+                    callback();
+                }
             }
         }
         EssentialSounds.forEach(value => addBufferSource(value,soundProcessed,soundProcessed));
@@ -110,7 +112,9 @@ const ImageManager = {
                     if(++loadedImages === ImagePaths.length) {
                         console.log("Image manager: All images loaded");
                         ImageManager.imagesLoaded = true;
-                        callback();
+                        if(SoundManager.soundsLoaded) {
+                            callback();
+                        }
                     }
                 };
             })(image);

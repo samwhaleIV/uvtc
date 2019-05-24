@@ -2,6 +2,8 @@ const SettingsPaneRenderer = new (function(){
 
     this.exit = null;
 
+    let showHoverSpecialEffect = false;
+
     const hoverTypes = {
         none: Symbol("none")
     }
@@ -50,3 +52,4 @@ const SettingsPaneRenderer = new (function(){
         drawTextWhite("(click anywhere to exit)",30,80,3);
     }
 })();
+export default SettingsPaneRenderer;

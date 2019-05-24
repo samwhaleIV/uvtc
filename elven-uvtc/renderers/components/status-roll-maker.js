@@ -31,3 +31,4 @@ function StatusRollMakerRenderer() {
 
     }
 }
+export default StatusRollMakerRenderer;

@@ -26,3 +26,4 @@ function RotatingBackground(imageName) {
         context.restore();
     }
 }
+export default RotatingBackground;

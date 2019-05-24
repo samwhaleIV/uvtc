@@ -485,3 +485,4 @@ function CardBookRenderer(callback) {
 
     }
 }
+export default CardBookRenderer;

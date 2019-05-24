@@ -1,15 +1,17 @@
 {
-  "name": "uv27",
+  "name": "uvtc",
   "productName": "You Versus Trading Cards",
   "version": "1.0.0",
   "description": "The trading cards have turned",
   "main": "app.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "web": "node web-app.js"
   },
   "author": "mistopportunity",
   "license": "CC-BY-NC-4.0",
   "devDependencies": {
-    "electron": "^4.0.5"
+    "electron": "^4.0.5",
+    "express": "^4.16.4"
   }
 }

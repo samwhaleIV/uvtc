@@ -38,3 +38,4 @@ function CardBackground(backgroundName,color) {
         );
     }
 }
+export default CardBackground;

@@ -309,7 +309,6 @@ function PlayerController(world) {
                 break;
         }
     }
-
     this.processKey = function(key) {
         switch(key) {
             case "KeyW":
@@ -378,3 +377,4 @@ function PlayerController(world) {
         }
     }
 }
+export default PlayerController;
