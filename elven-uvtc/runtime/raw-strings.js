@@ -48,6 +48,7 @@ const processRawStrings = function() {
                     break;
                 case ellipsis:
                 case "-":
+                case "*":
                 case " ":
                 case ",":
                 case ".":

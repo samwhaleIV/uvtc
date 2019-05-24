@@ -497,9 +497,7 @@ function WorldRenderer(startMapName) {
         this.decals = [];
         this.objects = {};
         this.playerObject = null;
-        this.map = newMap.WorldState ? new newMap.WorldState(
-            this,null,data //TODO provide a global state to the world state generator
-        ) : {};
+        this.map = newMap.WorldState ? new newMap.WorldState(this,data):{};
         if(newMap.cameraStart) {
             this.camera.x = newMap.cameraStart.x;
             this.camera.y = newMap.cameraStart.y;

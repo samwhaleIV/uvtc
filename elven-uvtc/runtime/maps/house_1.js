@@ -1,5 +1,5 @@
 addMap({
-    WorldState: function(world,globalState,data) {
+    WorldState: function(world,data) {
         this.load = world => {
             if(data.fromDoorWay) {
                 world.addPlayer(5,2,"down");
@@ -30,7 +30,7 @@ addMap({
     ],
 });
 addMap({
-    WorldState: function(world,globalState,data) {
+    WorldState: function(world,data) {
         this.load = world => {
             world.addPlayer(5,2,"down");
         }
@@ -60,7 +60,7 @@ addMap({
     ],
 });
 addMap({
-    WorldState: function(world,globalState,data) {
+    WorldState: function(world,data) {
         this.load = world => {
             world.addPlayer(5,2,"down");
         }
@@ -91,7 +91,7 @@ addMap({
     ],
 });
 addMap({
-    WorldState: function(world,globalState,data) {
+    WorldState: function(world,data) {
         this.load = world => {
             if(data.fromDoorWay) {
                 switch(data.sourceRoom) {
@@ -111,23 +111,48 @@ addMap({
             } else {
                 world.addPlayer(18,10,"down");
             }
-            const jim = new SpriteRenderer("down","jim");
+            const jim = new SpriteRenderer(globalWorldState.jimsDirection||"down","jim");
+            jim.prefix = "Bjim:B ";
             jim.interacted = (x,y,direction) => {
+                if(globalWorldState.jimMoved) {
+                    jim.updateDirection(direction);
+                    globalWorldState.jimsDirection = direction;
+                    world.showNamedTextPopupID("jims_postop",jim.prefix);
+                    return;
+                }
                 if(direction === "left") {
-                    world.lockPlayerMovement();
-                    world.moveSprite(this.JIM_ID,[{y:2},{x:1}],()=>{
+                    world.showPrompt("what do you want to whisper?",["i love you","please move","uh.. nice panel?"],()=>{
+                        world.lockPlayerMovement();
                         setTimeout(()=>{
-                            world.showNamedTextPopup("that was quite the journey...\nnow you may use the door","Bjim:B ",()=>{
-                                world.unlockPlayerMovement();
+                            world.showNamedTextPopupID("jims_intrigue",jim.prefix,()=>{
+                                world.moveSprite(this.JIM_ID,[{y:2},{x:1}],()=>{
+                                    setTimeout(()=>{
+                                        jim.updateDirection("up");
+                                        setTimeout(() => {
+                                            jim.updateDirection("left");
+                                            globalWorldState.jimsDirection = "left";
+                                            setTimeout(()=>{
+                                                world.showNamedTextPopupID("jims_journey",jim.prefix,()=>{
+                                                    globalWorldState.jimMoved = true;
+                                                    world.unlockPlayerMovement();
+                                                });
+                                            },800);
+                                        },700);
+                                    },300);
+                                });
                             });
-                        },1000);
+                        },800);
                     });
                 } else {
-                    jim.updateDirection(direction);
-                    world.showNamedTextPopup(`you touched me from my ${direction} direction.\nthat tickles!`,"Bjim:B ");
+                    world.showNamedTextPopupID("jims_kink",jim.prefix);
                 }
             }
-            this.JIM_ID = world.addObject(jim,18,10);
+            if(globalWorldState.jimMoved) {
+                this.JIM_ID = world.addObject(jim,19,12);
+
+            } else {
+                this.JIM_ID = world.addObject(jim,18,10);
+            }
         }
         this.doorClicked = doorID => {
             switch(doorID) {
@@ -182,9 +207,6 @@ addMap({
                     break;
                 case 16:
                     world.showTextPopupID("couch_1");
-                    break;
-                case 17:
-                    world.showNamedTextPopupID("tv_1","Bcreepy tv:B ");
                     break;
             }
         }

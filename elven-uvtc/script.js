@@ -2,6 +2,8 @@
 
 drawLoadingText();
 
+const globalWorldState = {};
+
 function loadCallback() {
     setRendererState(
         new MainMenuRenderer() ||

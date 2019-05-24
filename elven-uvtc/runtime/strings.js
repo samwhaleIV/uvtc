@@ -19,7 +19,11 @@ const stringLookup = {
     bookcase_7_1: "this bookcase seems to be more inappropriate than the other bookcases.",
     bookcase_7_2: "hey... what're you wearing?",
     couch_1: "this couch looks too clean to sit on.\nwho gets a white couch anyways?",
-    tv_1: "i'm the tv!\nit's so nice to meet you!\nwatch me anytime."
+    tv_1: "i'm the tv!\nit's so nice to meet you!\nwatch me anytime.",
+    jims_journey: "that was quite the journey...\nyou may use the door, now.",
+    jims_kink: "if you whisper something in my right ear, i'll get out of your way.",
+    jims_intrigue: "oh. my. i'll be getting out of your way now.",
+    jims_postop: "let's stay in touch\n*wink*"
 }
 const getString = function(ID) {
     return stringLookup[ID];

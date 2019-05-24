@@ -43,4 +43,4 @@ function processMapData(rawMap,name) {
 }
 
 allMapData.forEach(rawMap => processMapData(rawMap.data,rawMap.name));
-fs.writeFileSync(outputPath,`const rawMapData = ${JSON.stringify(compiledMapData)}`);
+fs.writeFileSync(outputPath,`const rawMapData=${JSON.stringify(compiledMapData)}`);

@@ -21,6 +21,7 @@ function applySonographToPopupFeed(popupFeed) {
                 }
                 break;
             case ellipsis:
+            case "*":
             case "-":
             case " ":
             case ",":
@@ -123,6 +124,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
                 case "-":
                     speed = hyphenDelay;
                     break;
+                case "*":
                 case "'":
                     instant = true;
                     break;
