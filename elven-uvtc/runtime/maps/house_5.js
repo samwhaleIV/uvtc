@@ -12,8 +12,19 @@ addMap({
         this.otherClicked = type => {
             switch(type) {
                 case 8:
+                    world.showTextPopupID("indoor_tree");
                     break;
                 case 9:
+                    world.showTextPopupID("nice_envo");
+                    break;
+                case 10:
+                    world.showTextPopupID("couch_2");
+                    break;
+                case 11:
+                    world.showTextPopupID("couch_3");
+                    break;
+                case 12:
+                    world.showTextPopupID("bright_idea");
                     break;
             }
         }

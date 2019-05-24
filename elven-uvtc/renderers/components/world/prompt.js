@@ -7,7 +7,7 @@ function WorldPrompt(text,selections,callback) {
         selections[i] = `>${selection}`;
     }
 
-    this.selectionIndex = null;
+    this.selectionIndex = 0;
     let terminated = false;
 
     this.confirmSelection = function() {

@@ -12,8 +12,10 @@ addMap({
         this.otherClicked = type => {
             switch(type) {
                 case 8:
+                    world.showTextPopupID("rudetable");
                     break;
                 case 9:
+                    world.showTextPopupID("sleepingbag_2");
                     break;
             }
         }
