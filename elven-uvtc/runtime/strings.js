@@ -23,7 +23,7 @@ const stringLookup = {
     jims_journey: "that was quite the journey...\nyou may use the door, now.",
     jims_kink: "if you whisper something in my right ear, i'll get out of your way.",
     jims_intrigue: "oh. my. i'll be getting out of your way now.",
-    jims_postop: "let's stay in touch\n*wink*"
+    jims_postop: "let's stay in touch\n\n*wink*"
 }
 const getString = function(ID) {
     return stringLookup[ID];

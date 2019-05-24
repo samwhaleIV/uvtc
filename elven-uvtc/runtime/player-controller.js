@@ -74,7 +74,7 @@ function PlayerController(world) {
     }
 
     const processEnter = () => {
-        if(this.player.isWalking()) {
+        if(this.player.isWalking() || this.world.playerInteractionLocked()) {
             return;
         }
         const pulseLocation = addDirectionToCoordinate(

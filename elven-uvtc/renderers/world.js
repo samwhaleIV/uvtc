@@ -32,6 +32,8 @@ function WorldRenderer(startMapName) {
         return playerMovementLocked || this.popup || this.prompt ? true : false;
     }
 
+    this.playerInteractionLocked = playerInteractionLocked;
+
     this.lockPlayerMovement = function(callback,...callbackParameters) {
         playerMovementLocked = true;
         if(callback) {
