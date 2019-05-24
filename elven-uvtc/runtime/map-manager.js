@@ -10,9 +10,11 @@ function addMap(map) {
         console.error(`Map '${map.name}' does not have any corresponding map data`);
         return;
     }
-    map.background = tilemaps.background;
-    map.collision = tilemaps.collision;
-    map.foreground = tilemaps.foreground;
+    map.baseData = {
+        background: tilemaps.background,
+        collision: tilemaps.collision,
+        foreground: tilemaps.foreground
+    };
 
     map.rows = tilemaps.rows;
     map.columns = tilemaps.columns;
@@ -30,7 +32,7 @@ function addMap(map) {
     for(let y = 0;y<map.rows;y++) {
         for(let x = 0;x<map.columns;x++) {
             const mapIndex = x + y * map.columns;
-            if(map.collision[mapIndex] === 2) {
+            if(map.baseData.collision[mapIndex] === 2) {
                 if(!map.doorLookup[x]) {
                     map.doorLookup[x] = {}
                 }

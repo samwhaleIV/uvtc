@@ -149,7 +149,6 @@ function WorldRenderer(startMapName) {
     }
     this.processMove = function(mouseX,mouseY) {
     }
-    
     this.processClick = function(mouseX,mouseY) {
     }
     this.processClickEnd = function(mouseX,mouseY) {
@@ -504,13 +503,30 @@ function WorldRenderer(startMapName) {
         this.decals[decal.x][decal.y] = null;
     }
 
+    const getIdx = (x,y) => x + y * this.renderMap.columns;
+
+    this.changeCollisionTile = (value,x,y) => {
+        this.renderMap.collision[getIdx(x,y)] = value;
+    }
+    this.changeForegroundTile = (value,x,y) => {
+        this.renderMap.foreground[getIdx(x,y)] = value;
+    }
+    this.changeBackgroundTile = (value,x,y) => {
+        this.renderMap.background[getIdx(x,y)] = value;
+    }
+
     this.updateMap = function(newMapName,data={}) {
         if(this.renderMap) {
             data.sourceRoom = this.renderMap.name;
         }
         const newMap = worldMaps[newMapName];
-        if(this.map && this.map.unload) {
-            this.map.unload(this);
+        if(this.map) {
+            if(this.map.unload) {
+                this.map.unload(this);
+            }
+            if(this.map.scriptTerminator) {
+                this.map.scriptTerminator(this);
+            }
         }
         this.decals = [];
         this.objects = {};
@@ -521,6 +537,9 @@ function WorldRenderer(startMapName) {
             this.camera.y = newMap.cameraStart.y;
         }
         this.renderMap = newMap;
+        this.renderMap.background = newMap.baseData.background.slice();
+        this.renderMap.foreground = newMap.baseData.foreground.slice();
+        this.renderMap.collision = newMap.baseData.collision.slice();
         this.objectsLookup = [];
 
         for(let y = 0;y < newMap.columns;y++) {
