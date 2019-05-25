@@ -122,41 +122,16 @@ addMap({
                     return;
                 }
                 if(direction === "left") {
-                    world.showPrompt("what do you want to whisper?",["i love you","please move","uh.. nice panel?"],()=>{
-                        world.lockPlayerMovement();
-                        setTimeout(()=>{
-                            world.showNamedTextPopupID("jims_intrigue",jim.prefix,()=>{
-                                world.moveSprite(this.JIM_ID,[{y:2},{x:1}],()=>{
-                                    setTimeout(()=>{
-                                        jim.updateDirection("up");
-                                        setTimeout(() => {
-                                            jim.updateDirection("left");
-                                            world.globalState.jimsDirection = "left";
-                                            setTimeout(()=>{
-                                                world.showNamedTextPopupID("jims_journey",jim.prefix,()=>{
-                                                    world.globalState.jimMoved = true;
-                                                    world.unlockPlayerMovement();
-                                                    finalThread = setTimeout(()=>{
-                                                        jim.updateDirection("up");
-                                                        world.globalState.jimsDirection = "up";
-                                                    },100);
-                                                });
-                                            },800);
-                                        },700);
-                                    },300);
-                                });
-                            });
-                        },800);
-                    });
+                    scripts.jim_gets_the_hell_out_of_the_way(world,jim);
                 } else {
                     world.showNamedTextPopupID("jims_kink",jim.prefix);
                 }
             }
             if(world.globalState.jimMoved) {
-                this.JIM_ID = world.addObject(jim,19,12);
+                world.addObject(jim,19,12);
 
             } else {
-                this.JIM_ID = world.addObject(jim,18,10);
+                world.addObject(jim,18,10);
             }
         }
         this.triggerActivated = (triggerID,direction) => {
@@ -166,39 +141,7 @@ addMap({
                         return;
                     }
                     if(!world.globalState.playedEnterTrigger) {
-                        world.lockPlayerMovement();
-                        setTimeout(()=>{
-                            jim.updateDirection("left");
-                            setTimeout(()=>{                             
-                                setTimeout(()=>{
-                                    jim.updateDirection("down");
-                                    setTimeout(()=>{
-                                        jim.updateDirection("left");
-                                        setTimeout(()=>{
-                                            world.showNamedTextPopupsID([
-                                                "jims_help_1",
-                                                "jims_help_2",
-                                                "jims_help_3",
-                                                "jims_help_4",
-                                                "jims_help_5",
-                                                "jims_help_6",
-                                                "jims_help_7",
-                                                "jims_help_8",
-                                                "jims_help_9",
-                                            ],"B???:B ",()=>{
-                                                world.showNamedTextPopupID("jims_help_10",jim.prefix,()=>{
-                                                    world.unlockPlayerMovement();
-                                                    world.globalState.playedEnterTrigger = true;
-                                                    setTimeout(()=>{
-                                                        jim.updateDirection("down");
-                                                    },100);
-                                                });
-                                            });
-                                        },400);
-                                    },400);
-                                },400);
-                            },400);
-                        },200);
+                        scripts.how_to_press_enter(world,jim);
                     }
                     break;
             }
@@ -219,7 +162,7 @@ addMap({
                     break;
             }
         }
-        this.otherClicked = (type,x,y) => {
+        this.otherClicked = async (type,x,y) => {
             switch(type) {
                 case 8:
                     world.showTextPopupID("sink_1");
@@ -241,14 +184,12 @@ addMap({
                     ]);
                     break;
                 case 13:
-                    world.showTextPopupID(
-                        "bookcase_6_1",world.showNamedTextPopupID,"bookcase_6_2","Bedgy bookcase:B "
-                    );
+                    await world.showTextPopupID("bookcase_6_1");
+                    world.showNamedTextPopupID("bookcase_6_2","Bedgy bookcase:B ");
                     break;
                 case 14:
-                    world.showTextPopupID(
-                        "bookcase_7_1",world.showNamedTextPopupID,"bookcase_7_2","Bnaugthy bookcase:B "
-                    );
+                    await world.showTextPopupID("bookcase_7_1");
+                    world.showNamedTextPopupID("bookcase_7_2","Bnaugthy bookcase:B ");
                     break;
                 case 15:
                     break;

@@ -9,22 +9,20 @@ addMap({
             };
             world.updateMap("tumble_woods",newMapData);
         }
-        this.otherClicked = type => {
+        this.otherClicked = async type => {
             switch(type) {
                 case 8:
-                    world.showTextPopupsID([
+                    await world.showTextPopupsID([
                         "bookcase_9_1",
                         "bookcase_9_2",
                         "bookcase_9_3",
-                    ],()=>{
-                        world.showPrompt("do you want to read an adult book?",["yes","no"],selection=>{
-                            if(selection === 0) {
-                                world.showTextPopupID("bookcase_9_4_1");
-                            } else {
-                                world.showTextPopupID("bookcase_9_4_2");
-                            }
-                        });
-                    });
+                    ]);
+                    const selection = await world.showPrompt("do you want to read an adult book?",["yes","no"]);
+                    if(selection === 0) {
+                        world.showTextPopupID("bookcase_9_4_1");
+                    } else {
+                        world.showTextPopupID("bookcase_9_4_2");
+                    }
                     break;
                 case 9:
                     world.showTextPopupID("emptyshelf");

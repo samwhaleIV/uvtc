@@ -36,7 +36,6 @@ const invertDirection = direction => {
             return direction;
     }
 }
-
-const runScript = (worldState,canBeUnloaded) => {
+const runScript = async (script,worldState,canBeUnloaded) => {
     worldState.scriptTerminator = null;
 }

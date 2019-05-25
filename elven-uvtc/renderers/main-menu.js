@@ -133,7 +133,7 @@ function MainMenuRenderer() {
         }
         hoverType = hoverTypes.none;
     }
-    const titleText = "you versus trading cards";
+    const titleText = "you versus 'finding a title'";
 
 
     const titleTestResult = drawTextTest(titleText,5);
