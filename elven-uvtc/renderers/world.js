@@ -7,14 +7,41 @@ import ElfSpriteRenderer from "./components/world/elf-sprite.js";
 
 function WorldRenderer(startMapName) {
 
-    this.globalState = GlobalState.data;
-    this.saveState = () => {
+    Object.defineProperty(this,"globalState",{
+        get: function() {
+            return GlobalState.data;
+        }
+    });
+    this.saveState = (withPositionData=true) => {
+        if(withPositionData && this.playerObject) {
+            GlobalState.data["last_map"] = this.renderMap.name;
+            GlobalState.data["last_player_pos"] = {
+                d: this.playerObject.direction,
+                x: this.playerObject.x,
+                y: this.playerObject.y,
+                xo: this.playerObject.xOffset,
+                yo: this.playerObject.yOffset,
+            }
+        }
         GlobalState.save();
     };
-    this.restoreState = () => {
+    this.restoreState = (ignorePositionData=false) => {
         GlobalState.restore();
+        if(ignorePositionData) {
+            return;
+        }
+        let lastMap = GlobalState.data["last_map"]; 
+        if(lastMap) {
+            this.updateMap(lastMap);
+            let lp = GlobalState.data["last_player_pos"];
+            if(lp && this.playerObject) {
+                this.moveObject(this.playerObject.ID,lp.x,lp.y);
+                this.playerObject.xOffset = lp.xo;
+                this.playerObject.yOffset = lp.yo;
+                this.playerObject.updateDirection(lp.d);
+            }
+        }
     }
-
     this.sprite = SpriteRenderer;
 
     this.elf = ElfSpriteRenderer;

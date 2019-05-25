@@ -1,10 +1,19 @@
+const SAVE_KEY = "uvtc_save_data";
 const GlobalState = new (function(){
+    let lastSaveData = localStorage.getItem(SAVE_KEY);
     this.save = () => {
-        console.warn("Did not really save the global state because we are still in a debug setting");
+        const saveData = JSON.stringify(this.data);
+        localStorage.setItem(SAVE_KEY,saveData)
+        lastSaveData = saveData;
     }
     this.restore = () => {
-        console.warn("Did not really restore the global state from disk because we are still in a debug setting")
+        this.data = JSON.parse(lastSaveData);
     }
-    this.data = {};
+    if(lastSaveData) {
+        this.restore();
+    } else {
+        this.data = {};
+        lastSaveData = JSON.stringify(this.data);
+    }
 })();
 export default GlobalState;
