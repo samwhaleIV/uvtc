@@ -3,6 +3,7 @@ import { PlayerRenderer, SpriteRenderer } from "./components/world/sprite.js";
 import WorldPopup from "./components/world/popup.js";
 import WorldPrompt from "./components/world/prompt.js";
 import GlobalState from "../runtime/global-state.js";
+import ElfSpriteRenderer from "./components/world/elf-sprite.js";
 
 function WorldRenderer(startMapName) {
 
@@ -15,6 +16,8 @@ function WorldRenderer(startMapName) {
     }
 
     this.sprite = SpriteRenderer;
+
+    this.elf = ElfSpriteRenderer;
 
     this.fader = getFader();
 

@@ -1,29 +1,11 @@
 "use strict";
 import MainMenuRenderer from "./renderers/main-menu.js";
 import BoxFaderEffect from "./renderers/components/box-fader-effect.js";
+
 drawLoadingText();
 
 function loadCallback() {
-    setRendererState(
-        new MainMenuRenderer() ||
-        
-        new CardScreenRenderer(
-            new CardSequencer([...allCardSeries[1].cards],[...allCardsList],{
-                getActionData: (sequencer,me) => {
-                    return {
-                        type: "discardCard",
-                        cardIndex: 0
-                    }
-                }
-            }),
-            {
-                win: ()=>{},
-                lose: ()=>{},
-                quit: ()=>{}
-            },
-            new CardBackground("backgrounds/deck-background")
-        )
-    );
+    setRendererState(new MainMenuRenderer());
     startRenderer();
 }
 

@@ -1,7 +1,7 @@
 addMap({
     WorldState: function(world,data) {
         this.load = world => {
-            world.addPlayer(NaN,NaN,"down");
+            world.addPlayer(10,3,"down");
         }
         this.doorClicked = () => {
             const newMapData = {
@@ -16,6 +16,9 @@ addMap({
                 case 9:
                     break;
             }
+        }
+        this.triggerActivated = triggerID => {
+            
         }
     },
     name: "tavern",

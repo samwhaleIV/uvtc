@@ -271,7 +271,7 @@ function MainMenuRenderer() {
 
 
         drawTextStencil(
-            "white",
+            "cyan",
             playText,
             Math.floor(halfWidth-playTextTest.width),
             Math.floor(halfHeight-playTextTest.height) + 5,
