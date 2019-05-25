@@ -36,6 +36,13 @@ const invertDirection = direction => {
             return direction;
     }
 }
-const runScript = async (script,worldState,canBeUnloaded) => {
-    worldState.scriptTerminator = null;
+const runCyclicScript = async (worldState,scriptID,...parameters) => {
+    const script = scripts[scriptID];
+    worldState.cyclicScriptsRunning = true;
+    worldState.scriptTerminator = () => {
+        worldState.cyclicScriptsRunning = false;
+    };
+    while(worldState.cyclicScriptsRunning) {
+        await script(...parameters);
+    }
 }
