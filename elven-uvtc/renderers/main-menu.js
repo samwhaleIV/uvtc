@@ -80,7 +80,7 @@ function MainMenuRenderer() {
                 break;
             case hoverTypes.play:
                 playSound("click");
-                this.fader.fadeOut(WorldRenderer,"bedroom_1");
+                this.fader.fadeOut(WorldRenderer);
                 faderEffectsRenderer.fillInLayer = stencilBackground;
                 let startTime = 0;
                 faderEffectsRenderer.pauseCallbackOnce = () => {

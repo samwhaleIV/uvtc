@@ -23,4 +23,6 @@ const WorldTileSize = WorldTextureSize * WorldTextureScale;
 const WorldTextureColumns = 64;
 const footPrintTiles = {
     21: true
-}
+};
+const FIRST_MAP_ID = "bedroom_1";
+const FAST_AS_FUCK_TRANSITIONS = true;

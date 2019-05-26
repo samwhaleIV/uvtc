@@ -5,7 +5,7 @@ import WorldPrompt from "./components/world/prompt.js";
 import GlobalState from "../runtime/global-state.js";
 import ElfSpriteRenderer from "./components/world/elf-sprite.js";
 
-function WorldRenderer(startMapName) {
+function WorldRenderer() {
 
     Object.defineProperty(this,"globalState",{
         get: function() {
@@ -25,11 +25,7 @@ function WorldRenderer(startMapName) {
         }
         GlobalState.save();
     };
-    this.restoreState = (ignorePositionData=false) => {
-        GlobalState.restore();
-        if(ignorePositionData) {
-            return;
-        }
+    const loadLastMapOrDefault = () => {
         let lastMap = GlobalState.data["last_map"]; 
         if(lastMap) {
             this.updateMap(lastMap);
@@ -40,7 +36,16 @@ function WorldRenderer(startMapName) {
                 this.playerObject.yOffset = lp.yo;
                 this.playerObject.updateDirection(lp.d);
             }
+        } else {
+            this.updateMap(FIRST_MAP_ID);
         }
+    }
+    this.restoreState = (ignorePositionData=false) => {
+        GlobalState.restore();
+        if(ignorePositionData) {
+            return;
+        }
+        loadLastMapOrDefault();
     }
     this.sprite = SpriteRenderer;
 
@@ -546,7 +551,7 @@ function WorldRenderer(startMapName) {
         halfVerticalTiles = Math.floor(verticalTiles / 2);
     }
 
-    this.updateMap(startMapName);
+    loadLastMapOrDefault();
 
     this.render = function(timestamp) {
 

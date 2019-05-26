@@ -74,10 +74,15 @@ function SpriteRenderer(startDirection,spriteName,footstepsName="footsteps") {
             return;
         }
         const trigger = world.getTriggerState(newX,newY);
+        const wasOnTrigger = this.onTrigger;
         this.onTrigger = trigger ? true : false;
         if(this.onTrigger) {
             this.lastTrigger = trigger;
             this.impulseTrigger(world);
+        } else if(wasOnTrigger && world.map.triggerDeactivated) {
+            world.map.triggerDeactivated(
+                wasOnTrigger
+            );
         }
     }
     this.impulseTrigger = world => {

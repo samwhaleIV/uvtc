@@ -63,7 +63,22 @@ addMap({
         this.doorClicked = doorID => {
             world.updateMap(doorID.substring(3),{fromDoorWay:true});
         }
-        this.otherClicked = (type,x,y) => {
+        this.activeTrigger = null;
+        this.triggerActivated = (ID,direction) => {
+            if(this.activeTrigger === ID) {
+                return;
+            }
+            switch(ID) {
+                case 2:
+                case 1:
+                    this.activeTrigger = ID;
+                    world.showTextPopupID("you_can_never_leave");
+                    break;
+
+            }
+        }
+        this.triggerDeactivated = () => {
+            this.activeTrigger = null;
         }
     },
     useCameraPadding: true,
