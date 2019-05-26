@@ -113,10 +113,11 @@ const SettingsPaneRenderer = new (function(){
     const trueKeyUp = key => {
         const keyCode = key.code;
         clearTimeout(keyErrorTimeout);
-        if(keyBindBuffer[keyCode]) {
+        let hasModifier = key.altKey || key.ctrlKey || key.shiftKey;
+        if(keyBindBuffer[keyCode] || hasModifier) {
             playSound("damage");
             wrappedKeyBindText = processTextForWrapping(
-                `R${getFriendlyKeyName(keyCode)}R is already used!`
+                hasModifier ? "illegal key modifier!" : `R${getFriendlyKeyName(keyCode)}R is already used!`
             );
             keyErrorTimeout = setTimeout(updateKeyBindRequest,600);
             return;
