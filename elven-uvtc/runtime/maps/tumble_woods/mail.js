@@ -18,5 +18,9 @@ addMap({
         }
     },
     name: "mail",
-    doors: []
+    fixedCamera: true,
+    cameraStart: {
+        x: 5,
+        y: 4
+    }
 });

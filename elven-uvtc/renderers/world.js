@@ -482,6 +482,8 @@ function WorldRenderer() {
         if(newMap.cameraStart) {
             this.camera.x = newMap.cameraStart.x;
             this.camera.y = newMap.cameraStart.y;
+            this.camera.xOffset = 0;
+            this.camera.yOffset = 0;
         }
         this.renderMap = newMap;
         this.renderMap.background = newMap.baseData.background.slice();
@@ -549,9 +551,25 @@ function WorldRenderer() {
         
         halfHorizontalTiles = Math.floor(horizontalTiles / 2);
         halfVerticalTiles = Math.floor(verticalTiles / 2);
+
+        if(this.renderMap.fixedCamera) {
+            if(verticalTiles < this.renderMap.rows || horizontalTiles < this.renderMap.columns) {
+                this.fixedCameraOverride = true;
+            } else {
+                if(this.fixedCameraOverride) {
+                    this.camera.x = this.renderMap.cameraStart.x;
+                    this.camera.y = this.renderMap.cameraStart.y;
+                    this.camera.xOffset = 0;
+                    this.camera.yOffset = 0;
+                }
+                this.fixedCameraOverride = false;
+            }
+        }
     }
 
     loadLastMapOrDefault();
+
+    this.fixedCameraOverride = false;
 
     this.render = function(timestamp) {
 
@@ -566,7 +584,7 @@ function WorldRenderer() {
                 this.playerController.renderMethod(timestamp);
             }
 
-            if(this.playerObject) {
+            if((!this.renderMap.fixedCamera || this.fixedCameraOverride) && this.playerObject) {
                 this.camera.x = this.playerObject.x;
                 this.camera.y = this.playerObject.y;
                 this.camera.xOffset = this.playerObject.xOffset;

@@ -17,5 +17,10 @@ addMap({
             }
         }
     },
+    fixedCamera: true,
+    cameraStart: {
+        x: 5,
+        y: 4
+    },
     name: "store"
 });
