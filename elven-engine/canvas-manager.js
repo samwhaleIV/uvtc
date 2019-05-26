@@ -222,14 +222,19 @@ const setKeyBinds = newBinds => {
     keyBindings = newBinds;
     saveKeyBinds();
 }
-
 const rewriteKeyboardEventCode = eventCode => {
     if(kc_inverse[eventCode]) {
         return eventCode;
     }
     return keyBindings[eventCode];
 }
-window.addEventListener("keydown",event => {
+const keyup = event => {
+    if(paused || !rendererState) {
+        return;
+    }
+    routeKeyEvent(rewriteKeyboardEventCode(event.code),keyEventTypes.keyUp);
+}
+const keydown = event => {
     const keyCode = rewriteKeyboardEventCode(event.code)
     switch(keyCode) {
         case kc.fullscreen:
@@ -255,13 +260,9 @@ window.addEventListener("keydown",event => {
         return;
     }
     routeKeyEvent(keyCode,keyEventTypes.keyDown);
-});
-window.addEventListener("keyup",event => {
-    if(paused || !rendererState) {
-        return;
-    }
-    routeKeyEvent(rewriteKeyboardEventCode(event.code),keyEventTypes.keyUp);
-});
+};
+window.addEventListener("keydown",keydown);
+window.addEventListener("keyup",keyup);
 
 function applyLowResolutionTextAdapations() {
     adaptiveTextScale = lowResolutionAdaptiveTextScale;
