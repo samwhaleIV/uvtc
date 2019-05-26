@@ -25,57 +25,69 @@ function SpriteRenderer(startDirection,spriteName,footstepsName="footsteps") {
     const maxFootStepCount = 2;
     const footStepBuffer = [];
 
+    this.firstPosition = true;
     this.worldPositionUpdated = function(oldX,oldY,newX,newY,world) {
-        const decalSourceX = this.direction === "up" || this.direction === "down" ? 0 : columnWidth;
-        const xOffset = this.xOffset;
-        const yOffset = this.yOffset;
-        const newFootStep = {
-            x: newX,
-            y: newY,
-            render: (timestamp,x,y,width,height) => {
-                const horizontalOffset = xOffset * width;
-                const verticalOffset = yOffset * height;
-                context.drawImage(
-                    footStepsSprite,
-                    decalSourceX,0,
-                    columnWidth,rowHeight,
-                    x+horizontalOffset,y+verticalOffset,
-                    width,height
-                );
+        if(!this.firstPosition) {
+            const decalSourceX = this.direction === "up" || this.direction === "down" ? 0 : columnWidth;
+            const xOffset = this.xOffset;
+            const yOffset = this.yOffset;
+            const newFootStep = {
+                x: newX,
+                y: newY,
+                render: (timestamp,x,y,width,height) => {
+                    const horizontalOffset = xOffset * width;
+                    const verticalOffset = yOffset * height;
+                    context.drawImage(
+                        footStepsSprite,
+                        decalSourceX,0,
+                        columnWidth,rowHeight,
+                        x+horizontalOffset,y+verticalOffset,
+                        width,height
+                    );
+                }
             }
-        }
-        const shouldPushNew = footPrintTiles[
-            world.renderMap.background[
-                (newX + Math.round(xOffset)) + (newY + Math.round(yOffset)) * world.renderMap.columns
-            ]
-        ];
-        if(footStepBuffer.length < maxFootStepCount) {
-            if(shouldPushNew) {
-                footStepBuffer.push(newFootStep);
-                world.addDecal(newFootStep);
-            } else if(footStepBuffer.length > 0) {
+            const shouldPushNew = footPrintTiles[
+                world.renderMap.background[
+                    (newX + Math.round(xOffset)) + (newY + Math.round(yOffset)) * world.renderMap.columns
+                ]
+            ];
+            if(footStepBuffer.length < maxFootStepCount) {
+                if(shouldPushNew) {
+                    footStepBuffer.push(newFootStep);
+                    world.addDecal(newFootStep);
+                } else if(footStepBuffer.length > 0) {
+                    const removedDecal = footStepBuffer.shift();
+                    world.removeDecal(removedDecal);
+                }
+            } else {
                 const removedDecal = footStepBuffer.shift();
                 world.removeDecal(removedDecal);
+                if(shouldPushNew) {
+                    footStepBuffer.push(newFootStep);
+                    world.addDecal(newFootStep);
+                }
             }
         } else {
-            const removedDecal = footStepBuffer.shift();
-            world.removeDecal(removedDecal);
-            if(shouldPushNew) {
-                footStepBuffer.push(newFootStep);
-                world.addDecal(newFootStep);
-            }
+            this.firstPosition = false;
         }
         if(!this.isPlayer) {
             return;
         }
         const trigger = world.getTriggerState(newX,newY);
-        if(trigger !== null) {
-            world.map.triggerActivated(
-                trigger,
-                invertDirection(this.direction)
-            );
+        this.onTrigger = trigger ? true : false;
+        if(this.onTrigger) {
+            this.lastTrigger = trigger;
+            this.impulseTrigger(world);
         }
     }
+    this.impulseTrigger = world => {
+        world.map.triggerActivated(
+            this.lastTrigger,
+            invertDirection(this.direction)
+        );
+    }
+    this.onTrigger = false;
+    this.lastTrigger = null;
 
     this.updateDirection = function(direction) {
         switch(direction) {

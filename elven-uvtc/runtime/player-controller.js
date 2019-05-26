@@ -272,6 +272,9 @@ function PlayerController(world) {
         } else if(this.verticalVelocity < 0) {
             this.player.setWalking(tryMoveUp(movementDistance));
         }
+        if(this.player.onTrigger) {
+            this.player.impulseTrigger(this.world);
+        }
     }
 
     let loopRunning = false;

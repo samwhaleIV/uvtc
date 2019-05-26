@@ -292,6 +292,9 @@ function WorldRenderer(startMapName) {
         if(!isNaN(x) && !isNaN(y)) {
             object.x = x;
             object.y = y;
+            if(object.worldPositionUpdated) {
+                object.worldPositionUpdated(x,y,x,y,this);
+            }
         } else if(isNaN(object.x) || !isNaN(object.y)) {
             console.error("Error: An object was supplied to the world renderer without initial coordinates");
         }
