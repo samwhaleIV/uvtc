@@ -179,6 +179,7 @@ const SettingsPaneRenderer = new (function(){
                     keyBindings = tmpKeyBindings;
                     reloadKeyBindDescription();
                     unsubscribeTrueKeyEvents();
+                    clearTimeout(keyErrorTimeout);
                     changeBindsText = CHANGE_CONTROLS;
                     playSound("reverse-click");
                 } else {
