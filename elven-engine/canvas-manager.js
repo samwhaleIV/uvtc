@@ -206,7 +206,7 @@ function processMouseMove(event) {
         }
     }
 }
-const keyBindings = (function(){
+let keyBindings = (function(){
     const savedBinds = localStorage.getItem(KEY_BINDS_KEY);
     if(savedBinds) {
         return JSON.parse(savedBinds);
@@ -218,6 +218,10 @@ const keyBindings = (function(){
 const saveKeyBinds = () => {
     localStorage.setItem(KEY_BINDS_KEY,JSON.stringify(keyBindings));
 }
+const setKeyBinds = newBinds => {
+    keyBindings = newBinds;
+    saveKeyBinds();
+}
 
 const rewriteKeyboardEventCode = eventCode => {
     if(kc_inverse[eventCode]) {
@@ -225,7 +229,7 @@ const rewriteKeyboardEventCode = eventCode => {
     }
     return keyBindings[eventCode];
 }
-window.onkeydown = event => {
+window.addEventListener("keydown",event => {
     const keyCode = rewriteKeyboardEventCode(event.code)
     switch(keyCode) {
         case kc.fullscreen:
@@ -251,13 +255,13 @@ window.onkeydown = event => {
         return;
     }
     routeKeyEvent(keyCode,keyEventTypes.keyDown);
-}
-window.onkeyup = event => {
+});
+window.addEventListener("keyup",event => {
     if(paused || !rendererState) {
         return;
     }
     routeKeyEvent(rewriteKeyboardEventCode(event.code),keyEventTypes.keyUp);
-}
+});
 
 function applyLowResolutionTextAdapations() {
     adaptiveTextScale = lowResolutionAdaptiveTextScale;
