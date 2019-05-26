@@ -314,23 +314,23 @@ function PlayerController(world) {
     }
     this.processKey = function(key) {
         switch(key) {
-            case "KeyW":
+            case kc.up:
                 this.player.updateDirection("up");
                 wDown = true;
                 break;
-            case "KeyS":
+            case kc.down:
                 this.player.updateDirection("down");
                 sDown = true;
                 break;
-            case "KeyA":
+            case kc.left:
                 this.player.updateDirection("left");
                 aDown = true;
                 break;
-            case "KeyD":
+            case kc.right:
                 this.player.updateDirection("right");
                 dDown = true;
                 break;
-            case "Enter":
+            case kc.accept:
                 processEnter();
                 return;
         }
@@ -343,19 +343,19 @@ function PlayerController(world) {
     }
     this.processKeyUp = function(key) {
         switch(key) {
-            case "KeyW":
+            case kc.up:
                 wDown = false;
                 break;
-            case "KeyS":
+            case kc.down:
                 sDown = false;
                 break;
-            case "KeyA":
+            case kc.left:
                 aDown = false;
                 break;
-            case "KeyD":
+            case kc.right:
                 dDown = false;
                 break;
-            case "Enter":
+            case kc.accept:
                 return;
         }
         const soloMovementRegister = checkForSoloMovement();

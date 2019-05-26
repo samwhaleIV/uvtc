@@ -27,9 +27,9 @@ function MainMenuRenderer() {
             return;
         }
         switch(key) {
-            case "Space":
+            case kc.open:
                 break;
-            case "Escape":
+            case kc.cancel:
                 break;
         }
     }

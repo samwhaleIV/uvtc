@@ -100,36 +100,36 @@ function WorldRenderer() {
     this.processKey = function(key) {
         if(this.prompt) {
             switch(key) {
-                case "Enter":
+                case kc.accept:
                     if(!enterReleased) return;
                     enterReleased = false;
                     this.prompt.confirmSelection();
                     break;
-                case "KeyW":
+                case kc.up:
                     if(wDown) return;
                     this.prompt.moveSelection("up");
                     break;
-                case "KeyS":
+                case kc.down:
                     if(sDown) return;
                     this.prompt.moveSelection("down");
                     break;
-                case "KeyA":
+                case kc.left:
                     if(aDown) return;
                     this.prompt.moveSelection("left");
                     break;
-                case "KeyD":
+                case kc.right:
                     if(dDown) return;
                     this.prompt.moveSelection("right");
                     break;
             }
         } else if(this.popup) {
-            if(key === "Enter") {
+            if(key === kc.accept) {
                 if(!enterReleased) return;
                 enterReleased = false;
                 this.popup.progress();
             }
         } else if(this.playerObject) {
-            if(key === "Enter") { 
+            if(key === kc.accept) { 
                 if(!enterReleased) {
                     return;
                 } else {
@@ -137,40 +137,40 @@ function WorldRenderer() {
                 }
             }
             this.playerController.processKey(key);
-        } else if(key === "Enter") {
+        } else if(key === kc.accept) {
             enterReleased = false;
             return;
         }
         switch(key) {
-            case "KeyW":
+            case kc.up:
                 wDown = true;
                 return;
-            case "KeyS":
+            case kc.down:
                 sDown = true;
                 return;
-            case "KeyA":
+            case kc.left:
                 aDown = true;
                 return;
-            case "KeyD":
+            case kc.right:
                 dDown = true;
                 return;
         }
     }
     this.processKeyUp = function(key) {
         switch(key) {
-            case "Enter":
+            case kc.accept:
                 enterReleased = true;
                 break;
-            case "KeyW":
+            case kc.up:
                 wDown = false;
                 break;
-            case "KeyS":
+            case kc.down:
                 sDown = false;
                 break;
-            case "KeyA":
+            case kc.left:
                 aDown = false;
                 break;
-            case "KeyD":
+            case kc.right:
                 dDown = false;
                 break;
         }

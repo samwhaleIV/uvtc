@@ -814,7 +814,7 @@ function CardScreenRenderer(sequencer,callbacks,background) {
 
     this.processKey = function(key) {
         switch(key) {
-            case "Space":
+            case kc.open:
                 if(this.sequencer.nextButtonEnabled && this.sequencer.nextButtonShown) {
                     this.sequencer.nextButtonClicked();
                 } else if(textFeedToggleButton.enabled) {
@@ -831,7 +831,7 @@ function CardScreenRenderer(sequencer,callbacks,background) {
                     }
                 }
                 break;
-            case "Escape":
+            case kc.cancel:
                 if(textFeedShown && textFeedToggleButton.enabled) {
                     this.hideTextFeed();
                     playSound("reverse-click");
@@ -855,7 +855,7 @@ function CardScreenRenderer(sequencer,callbacks,background) {
     }
     this.processKeyUp = function(key) {
         switch(key) {
-            case "Space":
+            case kc.open:
                 lastToggleTextSwap = performance.now();
                 break;
         }

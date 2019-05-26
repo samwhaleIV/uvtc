@@ -101,11 +101,8 @@ const sizeModes = {
 }
 
 const defaultSizeMode = sizeModes.stretch.name;
-
 let canvasSizeMode = localStorage.getItem("canvasSizeMode") || defaultSizeMode;
-
 let pictureModeElementTimeout = null;
-
 
 let rendererState = null;
 let animationFrame = null;
@@ -127,22 +124,22 @@ function touchEnabled(event) {
 function setPageTitle(title) {
     document.title = title;
 }
-function routeKeyEvent(event,type) {
+function routeKeyEvent(keyCode,type) {
     switch(keyEventMode) {
         case keyEventModes.none:
             break;
         case keyEventModes.downOnly:
             if(type === keyEventTypes.keyDown) {
-                rendererState.processKey(event.code);
+                rendererState.processKey(keyCode);
             }
             break;
         case keyEventModes.upAndDown:
             switch(type) {
                 case keyEventTypes.keyDown:
-                    rendererState.processKey(event.code);
+                    rendererState.processKey(keyCode);
                     break;
                 case keyEventTypes.keyUp:
-                    rendererState.processKeyUp(event.code);
+                    rendererState.processKeyUp(keyCode);
                     break;
             }
             break;
@@ -209,9 +206,29 @@ function processMouseMove(event) {
         }
     }
 }
+const keyBindings = (function(){
+    const savedBinds = localStorage.getItem(KEY_BINDS_KEY);
+    if(savedBinds) {
+        return JSON.parse(savedBinds);
+    } else {
+        localStorage.setItem(KEY_BINDS_KEY,DEFAULT_KEY_BINDS);
+        return JSON.parse(DEFAULT_KEY_BINDS);
+    }
+})();
+const saveKeyBinds = () => {
+    localStorage.setItem(KEY_BINDS_KEY,JSON.stringify(keyBindings));
+}
+
+const rewriteKeyboardEventCode = eventCode => {
+    if(kc_inverse[eventCode]) {
+        return eventCode;
+    }
+    return keyBindings[eventCode];
+}
 window.onkeydown = event => {
-    switch(event.code) {
-        case "F11":
+    const keyCode = rewriteKeyboardEventCode(event.code)
+    switch(keyCode) {
+        case kc.fullscreen:
             if(!electron) {
                 break;
             }
@@ -226,21 +243,20 @@ window.onkeydown = event => {
                 pictureModeElementTimeout = null;
             },600);
             break;
-        case "KeyP":
-        case "F10":
+        case kc.picture_mode:
             cycleSizeMode();
             break;
     }
     if(paused || !rendererState) {
         return;
     }
-    routeKeyEvent(event,keyEventTypes.keyDown);
+    routeKeyEvent(keyCode,keyEventTypes.keyDown);
 }
 window.onkeyup = event => {
     if(paused || !rendererState) {
         return;
     }
-    routeKeyEvent(event,keyEventTypes.keyUp);
+    routeKeyEvent(rewriteKeyboardEventCode(event.code),keyEventTypes.keyUp);
 }
 
 function applyLowResolutionTextAdapations() {

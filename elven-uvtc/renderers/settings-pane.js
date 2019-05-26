@@ -11,7 +11,7 @@ const SettingsPaneRenderer = new (function(){
     let hoverType = hoverTypes.none;
     this.processKey = function(key) {
         switch(key) {
-            case "Space":
+            case kc.open:
                 break;
         }
     }

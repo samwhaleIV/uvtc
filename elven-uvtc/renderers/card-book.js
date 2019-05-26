@@ -239,7 +239,7 @@ function CardBookRenderer(callback) {
 
     this.processKey = function(key) {
         switch(key) {
-            case "Escape":
+            case kc.cancel:
                 if(!releasedEscape) {
                     break;
                 }
@@ -265,7 +265,7 @@ function CardBookRenderer(callback) {
 
     this.processKeyUp = function(key) {
         switch(key) {
-            case "Escape":
+            case kc.cancel:
                 releasedEscape = true;
                 break;
         }

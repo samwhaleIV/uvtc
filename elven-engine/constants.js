@@ -22,16 +22,48 @@ const mediumResolutionAdaptiveTextSpacing = 4;
 const lowResolutionAdaptiveTextScale = 2;
 const lowResolutionAdpativeTextSpacing = 1;
 
-let leftBumperCode = {code:"LeftBumper"};
-let rightBumperCode = {code:"RightBumper"};
-let aButtonCode = {code:"Space"};
-let yButtonCode = {code:"F10"};
-let bButtonCode = {code:"Escape"};
-let upButtonCode = {code:"KeyW"};
-let downButtonCode = {code:"KeyS"};
-let leftButtonCode = {code:"KeyA"};
-let rightButtonCode = {code:"KeyD"};
-let startButtonCode = {code:"Enter"};
+const kc = {
+    accept: "k_accept",
+    cancel: "k_cancel",
+    picture_mode: "k_picture_mode",
+    open: "k_open",
+    up: "k_up",
+    down: "k_down",
+    left: "k_left",
+    right: "k_right",
+    nav_right: "k_nav_right",
+    nav_left: "k_nav_left",
+    fullscreen: "k_fullscreen"
+}
+const kc_inverse = {};
+Object.entries(kc).forEach(entry=>{
+    kc_inverse[entry[1]] = entry[0];
+})
+let leftBumperCode = {code:kc.nav_left};
+let rightBumperCode = {code:kc.nav_right};
+let aButtonCode = {code:kc.accept};
+let yButtonCode = {code:kc.picture_mode};
+let bButtonCode = {code:kc.cancel};
+let upButtonCode = {code:kc.up};
+let downButtonCode = {code:kc.down};
+let leftButtonCode = {code:kc.left};
+let rightButtonCode = {code:kc.right};
+let startButtonCode = {code:kc.accept};
+
+const DEFAULT_KEY_BINDS = JSON.stringify({
+    Enter: kc.accept,
+    Escape: kc.cancel,
+    KeyP: kc.picture_mode,
+    Space: kc.open,
+    KeyW: kc.up,
+    KeyD: kc.right,
+    KeyS: kc.down,
+    KeyA: kc.left,
+    KeyN: kc.nav_left,
+    KeyM: kc.nav_right,
+    F11: kc.fullscreen
+});
+const KEY_BINDS_KEY = "UV_KEY_BINDS";
 
 const textControlCodes = {
     "\n": /\n/g,
