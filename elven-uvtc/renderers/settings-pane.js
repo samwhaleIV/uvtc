@@ -91,8 +91,8 @@ const SettingsPaneRenderer = new (function(){
         none: Symbol("none"),
         change_binds: Symbol("change_binds")
     };
-    const CHANGE_CONTROLS = "change controls";
-    const CANCEL_BINDING =  "        cancel         ";
+    const CHANGE_CONTROLS = "change controls (click me)";
+    const CANCEL_BINDING =  "                   cancel             ";
     let hoverType = hoverTypes.none;
     let keyBindBuffer = null;
     let keyErrorTimeout = null;
