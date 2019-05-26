@@ -22,6 +22,9 @@ function MainMenuRenderer() {
     let showHoverSpecialEffect = false;
 
     this.processKey = function(key) {
+        if(this.transitioning) {
+            return;
+        }
         if(this.settingsPane) {
             this.settingsPane.processKey(key);
             return;
@@ -34,6 +37,9 @@ function MainMenuRenderer() {
         }
     }
     this.processKeyUp = function(key) {
+        if(this.transitioning) {
+            return;
+        }
         if(this.settingsPane) {
             this.settingsPane.processKeyUp(key);
             return;
@@ -44,15 +50,20 @@ function MainMenuRenderer() {
     }
 
     this.processClick = function(x,y) {
-        this.processMove(x,y);
-        if(hoverType !== hoverTypes.none) {
-            showHoverSpecialEffect = true;
+        showHoverSpecialEffect = true;
+        if(this.transitioning) {
+            return;
         }
+        if(this.settingsPane) {
+            this.settingsPane.processClick(x,y);
+        }
+        this.processMove(x,y);
     }
 
     this.settingsPane = null;
 
     this.processClickEnd = function(x,y) {
+        showHoverSpecialEffect = false;
         if(this.transitioning) {
             return;
         }
@@ -60,7 +71,6 @@ function MainMenuRenderer() {
             this.settingsPane.processClickEnd(x,y);
             return;
         }
-        showHoverSpecialEffect = false;
         switch(hoverType) {
             case hoverTypes.music:
                 toggleMusicMute();
@@ -254,7 +264,7 @@ function MainMenuRenderer() {
 
 
         drawTextStencil(
-            "cyan",
+            "white",
             playText,
             Math.floor(halfWidth-playTextTest.width),
             Math.floor(halfHeight-playTextTest.height) + 5,
@@ -287,10 +297,9 @@ function MainMenuRenderer() {
         b1.width = buttonWidth;
         b3.width = buttonWidth;
 
-
-        renderButton(b1,hoverType===hoverTypes.music,musicMuted?"no music":"music on",noMusicTextTest.width,noMusicTextTest.height);
-        renderButton(b2,hoverType===hoverTypes.settings,settingsText,settingsTextTest.width,settingsTextTest.height);
-        renderButton(b3,hoverType===hoverTypes.sound,soundMuted?"no sound":"sound on",noSoundTextTest.width,noSoundTextTest.height);
+        renderButton(b1,hoverType===hoverTypes.music,musicMuted?"no music":"music on",noMusicTextTest.width,noMusicTextTest.height,showHoverSpecialEffect);
+        renderButton(b2,hoverType===hoverTypes.settings,settingsText,settingsTextTest.width,settingsTextTest.height,showHoverSpecialEffect);
+        renderButton(b3,hoverType===hoverTypes.sound,soundMuted?"no sound":"sound on",noSoundTextTest.width,noSoundTextTest.height,showHoverSpecialEffect);
 
         if(this.settingsPane) {
             this.settingsPane.render(timestamp);

@@ -5,6 +5,7 @@ const flatHoverPadding = Math.floor(hoverPadding);
 const flatDoubleHoverPadding = flatHoverPadding + flatHoverPadding;
 
 const ACoolBlueColor = "#008DFF";
+const ADarkerBlueColor = "#1d85d8";
 
 const WorldTextureSize = 16;
 const WorldTextureScale = 3;

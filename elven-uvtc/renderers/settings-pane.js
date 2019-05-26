@@ -4,6 +4,7 @@ const SettingsPaneRenderer = new (function(){
         x: -1,
         y: -1
     };
+    let showHoverSpecialEffect = false;
 
     const getFriendlyKeyName = keyCode => {
         let friendlyName = keyCode.toLowerCase();
@@ -53,8 +54,8 @@ const SettingsPaneRenderer = new (function(){
             this.exit(x,y);
             playSound("reverse-click");
         }
+        showHoverSpecialEffect = false;
     }
-    let showHoverSpecialEffect = false;
     let keyBindInputIndex = 0;
     const bindOrder = [
         {
@@ -154,9 +155,7 @@ const SettingsPaneRenderer = new (function(){
 
     this.processClick = function(x,y) {
         this.processMove(x,y);
-        if(hoverType !== hoverTypes.none) {
-            showHoverSpecialEffect = true;
-        }
+        showHoverSpecialEffect = true;
     }
 
     let changeBindsText = CHANGE_CONTROLS;
@@ -241,7 +240,8 @@ const SettingsPaneRenderer = new (function(){
             hoverType===hoverTypes.change_binds,
             changeBindsText,
             changeBindsTextTest.width,
-            changeBindsTextTest.height
+            changeBindsTextTest.height,
+            showHoverSpecialEffect
         );
         drawTextWrappingWhite(wrappedKeyBindText,halfWidth-100,100,halfWidth,2,20,3);
     }
