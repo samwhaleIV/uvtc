@@ -1,7 +1,7 @@
 const fs = require("fs");
 const opn = require("opn");
 
-const scriptFile = "../elven-uvtc/runtime/script.js";
+const scriptFile = "../elven-uvtc/runtime/scripts.js";
 const inputFolder = "../elven-uvtc/runtime/maps";
 const stringsFilePath = "../elven-uvtc/runtime/strings.js";
 
@@ -66,8 +66,9 @@ for(let i = 0;i<filesToReplaceStringsFrom.length;i++) {
                     stringBuffer += "'";
                 } else {
                     stringBuffer += '"';
-                    newStrings[`${AUTO_STRING_PREFIX}${++highestAutoID}`] = stringBuffer;
-                    fileTextBuffer += stringBuffer;
+                    const tokenName = `${AUTO_STRING_PREFIX}${++highestAutoID}`;
+                    newStrings[tokenName] = stringBuffer;
+                    fileTextBuffer += tokenName;
                     stringBuffer = "";
                 }
             } else {
@@ -96,11 +97,11 @@ const newStringEntries = Object.entries(newStrings);
 if(newStringEntries.length) {
     for(let i = 0;i<newStringEntries.length;i++) {
         const entry = newStringEntries[i];
-        stringsFileLines.splice(whereToInsertIntoStrings,0,`${entry[0]}: ${entry[1]}`);
+        stringsFileLines.splice(whereToInsertIntoStrings,0,`    ${entry[0]}: ${entry[1]},`);
         whereToInsertIntoStrings++;
     }
-    fs.writeFileSync(stringsFileLines.join("\n"),fileText);
+    fs.writeFileSync(stringsFilePath,stringsFileLines.join("\n"));
 }
 
-//opn("file:///C:/Users/jedisammy4/Documents/uvtc/string-baker.html");
+opn("file:///C:/Users/jedisammy4/Documents/uvtc/string-baker.html");
 

@@ -66,7 +66,7 @@ const stringLookup = {
     jims_help_9: "what? you already figured it out?",
     jims_help_10: "well, it's nice to meet you.\n\nmy name is jim.",
     you_can_never_leave: "you can't leave tumble woods yet!\nyou have important things to do!",
-    stranger_danger: "ahh! stranger danger!\nget away from me!"
+    stranger_danger: "ahh! stranger danger!\nget away from me!",
 }
 const getString = function(ID) {
     return stringLookup[ID];
