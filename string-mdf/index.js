@@ -94,10 +94,13 @@ for(let i = 0;i<filesToReplaceStringsFrom.length;i++) {
 }
 
 const newStringEntries = Object.entries(newStrings);
+let lastLine = stringsFileLines[whereToInsertIntoStrings-1] + ",";
+stringsFileLines[whereToInsertIntoStrings-1] = lastLine;
 if(newStringEntries.length) {
     for(let i = 0;i<newStringEntries.length;i++) {
         const entry = newStringEntries[i];
-        stringsFileLines.splice(whereToInsertIntoStrings,0,`    ${entry[0]}: ${entry[1]},`);
+        const shouldAddComma = i !== newStringEntries.length - 1;
+        stringsFileLines.splice(whereToInsertIntoStrings,0,`    ${entry[0]}: ${entry[1]}${shouldAddComma?",":""}`);
         whereToInsertIntoStrings++;
     }
     fs.writeFileSync(stringsFilePath,stringsFileLines.join("\n"));
