@@ -49,7 +49,9 @@ const scripts = {
     },
     meeting_frogert: async (world,frogert) => {
         world.lockPlayerMovement();
-        await delay(500);
+        await delay(200);
+        world.autoCameraOff();
+        await world.moveCamera(...frogert.location,700);
         frogert.updateDirection("left");
         await delay(200);
         world.playerObject.updateDirection("right");
@@ -58,17 +60,19 @@ const scripts = {
         frogert.sayID("stranger_danger");
         frogert.speed *= 1.25;
         world.followObject = frogert;
+        world.autoCameraOn();
         frogert.move({x:4});
-        await delay(600);
-        world.followObject = frogert;
         await delay(1500);
         frogert.updateDirection("up");
         await delay(400);
         frogert.hidden = true;
-        await delay(800);
+        await delay(1000);
+        await world.moveCamera(...world.playerObject.location,700);
         world.followObject = null;
         world.removeObject(frogert.ID);
+        await delay(300);
         world.unlockPlayerMovement();
+        world.clearTextPopup();
         world.popupProgressEnabled = true;
         world.globalState.metFrogert = true;
     }

@@ -161,6 +161,12 @@ function SpriteRenderer(startDirection,spriteName,footstepsName="footsteps") {
     const alertSprite = imageDictionary["sprites/alert"];
 
     this.hidden = false;
+    
+    Object.defineProperty(this,"location",{
+        get: function() {
+            return [this.x,this.y,this.xOffset,this.yOffset];
+        }
+    });
 
     this.render = function(timestamp,x,y,width,height) {
         if(this.renderLogic) {
