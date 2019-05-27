@@ -588,6 +588,59 @@ function WorldRenderer() {
         }
     }
 
+    this.cameraFrozen = false;
+    this.autoCameraOff = () => {
+        this.cameraFrozen = true;
+    }
+    this.autoCameraOn = () => {
+        this.cameraFrozen = false;
+    }
+
+    this.moveCamera = async (x,y,xOffset,yOffset,duration) => {
+        return new Promise(resolve => {
+            const startTime = performance.now();
+            const startX = this.camera.x + this.camera.xOffset;
+            const startY = this.camera.y + this.camera.yOffset;
+            const rangeX =  x + xOffset - startX;
+            const rangeY =  y + yOffset - startY;
+            this.cameraController = timestamp => {
+                let tNormal = (timestamp - startTime) / duration;
+                if(tNormal < 0) {
+                    tNormal = 0;
+                } else if(tNormal >= 1) {
+                    this.camera.x = x;
+                    this.camera.y = y;
+                    this.camera.xOffset = xOffset;
+                    this.camera.yOffset = yOffset;
+                    this.cameraController = null;
+                    resolve();
+                    return;
+                }
+                const xPosition = startX + (rangeX * tNormal);
+                const yPosition = startY + (rangeY * tNormal);
+
+                const pureX = Math.floor(xPosition);
+                const pureY = Math.floor(yPosition);
+                const unpureX = xPosition - pureX;
+                const unpureY = yPosition - pureY;
+
+                this.camera.x = pureX;
+                this.camera.y = pureY;
+                this.camera.xOffset = unpureX;
+                this.camera.yOffset = unpureY;
+            }
+        });
+    }
+    this.pushCamera = async (x,y,xOffset,yOffset,duration) => {
+        return this.moveCamera(
+            this.camera.x+x,
+            this.camera.y+y,
+            this.camera.xOffset+xOffset,
+            this.camera.yOffset+yOffset,
+            duration
+        );
+    }
+
     loadLastMapOrDefault();
 
     this.fixedCameraOverride = false;
@@ -605,7 +658,9 @@ function WorldRenderer() {
                 this.playerController.renderMethod(timestamp);
             }
 
-            if(!this.renderMap.fixedCamera || this.fixedCameraOverride) {
+            if(this.cameraController) {
+                this.cameraController(timestamp);
+            } else if((!this.renderMap.fixedCamera || this.fixedCameraOverride) && !this.cameraFrozen) {
                 let followObject = this.playerObject;
                 if(this.followObject) {
                     followObject = this.followObject;
