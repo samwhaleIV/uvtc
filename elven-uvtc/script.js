@@ -18,9 +18,9 @@ SoundManager.loadNonEssentialSounds();
 //setFaderOutSound("swish-1");
 //setFaderInSound("swish-2");
 setFaderEffectsRenderer(new BoxFaderEffect());
-if(FAST_AS_FUCK_TRANSITIONS) {
-    setFaderDelay(100);
-    setFaderDuration(100);
+if(ENV_FLAGS.FAST_AS_FUCK_TRANSITIONS) {
+    setFaderDelay(60);
+    setFaderDuration(60);
 } else {
     setFaderDelay(2000);
     setFaderDuration(1000);

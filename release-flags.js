@@ -1,0 +1,5 @@
+const ENV_FLAGS = {
+    FAST_AS_FUCK_TRANSITIONS: false,
+    CONTROLLER_DISABLED: false,
+    DO_STEAM_SETUP: false
+}

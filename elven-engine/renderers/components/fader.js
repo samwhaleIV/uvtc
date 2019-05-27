@@ -81,9 +81,12 @@ function getFader() {
         },
         onoutEnd: () => {
             pauseRenderer();
-            const fadeInCompleter = (delay=rendererState.fader.fadeInDelay) => {
-                if(delay) {
-                    setTimeout(fadeInCompleter,delay,0);
+            let fadeInDelay = rendererState.fader.fadeInDelay;
+            const startTime = performance.now();
+            const fadeInCompleter = () => {
+                fadeInDelay -= performance.now() - startTime;
+                if(fadeInDelay > 0) {
+                    setTimeout(fadeInCompleter,fadeInDelay,0);
                 } else {
                     setRendererState(rendererState);
                     rendererState.fader.fadeIn();

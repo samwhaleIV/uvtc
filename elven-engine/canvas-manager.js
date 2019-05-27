@@ -58,8 +58,9 @@ if(typeof(require) !== "undefined") {
     electron = require("electron");
     electronWindow = electron.remote.getCurrentWindow();
 }
-//steamSetup();
-
+if(ENV_FLAGS.DO_STEAM_SETUP) {
+    steamSetup();
+}
 let lastRelativeX = -1;
 let lastRelativeY = -1;
 const keyEventModes = {
@@ -411,25 +412,36 @@ function cycleSizeMode() {
     console.log(`Canvas handler: Set size mode to '${newMode}'`);
 }
 
-function render(timestamp) {
-    animationFrame = window.requestAnimationFrame(render); 
-
-    backgroundContext.fill = "black";
-    backgroundContext.fillRect(0,0,1,1);
-
-    if(!paused) {
-        const gamepads = navigator.getGamepads();
-        let i = 0;
-        while(i < gamepads.length) {
-            if(gamepads[i] && gamepads[i].mapping === "standard") {
-                processGamepad(gamepads[i],timestamp);
-                i = gamepads.length;
+const render = (function(){
+    if(ENV_FLAGS.CONTROLLER_DISABLED) {
+        return function render(timestamp) {
+            animationFrame = window.requestAnimationFrame(render); 
+            backgroundContext.fill = "black";
+            backgroundContext.fillRect(0,0,1,1);
+            if(!paused) {
+                rendererState.render(timestamp);
             }
-            i++;
         }
-        rendererState.render(timestamp);
+    } else {
+        return function render(timestamp) {
+            animationFrame = window.requestAnimationFrame(render); 
+            backgroundContext.fill = "black";
+            backgroundContext.fillRect(0,0,1,1);
+            if(!paused) {
+                const gamepads = navigator.getGamepads();
+                let i = 0;
+                while(i < gamepads.length) {
+                    if(gamepads[i] && gamepads[i].mapping === "standard") {
+                        processGamepad(gamepads[i],timestamp);
+                        i = gamepads.length;
+                    }
+                    i++;
+                }
+                rendererState.render(timestamp);
+            }
+        }
     }
-}
+})();
 
 function stopRenderer() {
     if(!rendererState) {

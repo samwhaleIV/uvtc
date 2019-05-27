@@ -9,34 +9,75 @@
     <meta name="theme-color" content="#000000"/>
 </head>
 <body>
-    <script src="release-flags.js"></script>
+    <script src="debug-flags.js"></script>
+
     <canvas id="background-canvas" width="1" height="1"></canvas>
     <canvas id="canvas"></canvas>
+
     <p id="picture-mode-element"></p>
+
     <script src="steam-helper.js"></script>
+
+    <script>
+    let startKeys = Object.keys(this);
+    startKeys = startKeys.reduce((pv,cv)=>{pv[cv]=true;return pv},{});
+    </script>
+
+    <!-- Begin load engine -->
     <script src="elven-engine/constants.js"></script>
     <script src="elven-engine/canvas-manager.js"></script>
+
     <script src="elven-engine/controller-helper.js"></script>
     <script src="elven-engine/audio-manager.js"></script>
     <script src="elven-engine/file-managers.js"></script>
     <script src="elven-engine/files.js"></script>
     <script src="elven-engine/font-dictionary.js"></script>
+
     <script src="elven-engine/renderers/components/fader.js"></script>
     <script src="elven-engine/renderers/components/custom-text.js"></script>
     <script src="elven-engine/renderers/components/generic.js"></script>
+    <!-- End load engine -->
+
+
+    <!-- Begin expected runtime engine -->
     <script src="elven-uvtc/files.js"></script>
     <script src="elven-uvtc/constants.js"></script>
+    <!-- End expected runtime engine -->
+
+    <!-- Begin custom renderer components -->
     <script src="elven-uvtc/renderers/components/card-helper.js"></script>
     <script src="elven-uvtc/renderers/components/ui-helper.js"></script>
+    <!-- End custom renderer components-->
+
+    <!-- Begin custom runtime components -->
     <script src="word-syllable-maps.js"></script>
     <script src="map-data.js"></script>
     <script src="elven-uvtc/runtime/strings.js"></script>
     <script src="elven-uvtc/runtime/scripts.js"></script>
     <script src="elven-uvtc/runtime/world-helper.js"></script>
+
     <script src="elven-uvtc/runtime/card-manager.js"></script>
     <script src="elven-uvtc/runtime/map-manager.js"></script>
+
     <script src="elven-uvtc/map-manifest.js" type="module"></script>
     <script src="elven-uvtc/card-manifest.js" type="module"></script>
+    <!-- End custom runtime components -->
+
+    <!-- Begin expected runtime initializer -->
     <script src="elven-uvtc/script.js" type="module"></script>
+    <!-- End expected custom engine -->
+
+    <script>
+    (function(){
+        const endKeys = Object.keys(this);
+        console.log("New keys",endKeys.filter(endKey => {
+            if(!startKeys[endKey]) {
+                return true;
+            } else {
+                return false;
+            }
+        }));
+    })();
+    </script>
 </body>
 </html>

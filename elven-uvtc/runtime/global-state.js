@@ -9,7 +9,11 @@ const GlobalState = new (function(){
     this.restore = () => {
         this.data = JSON.parse(lastSaveData);
     }
-    if(lastSaveData) {
+    if(ENV_FLAGS.CUSTOM_GLOBAL_STATE) {
+        this.data = ENV_FLAGS.CUSTOM_GLOBAL_STATE;
+        this.save();
+        this.restore();
+    } else if(lastSaveData) {
         this.restore();
     } else {
         this.data = {};
