@@ -19,6 +19,25 @@ function SpriteRenderer(startDirection,spriteName,footstepsName="footsteps") {
 
     this.tilesPerSecond = 2.5;
 
+    Object.defineProperty(this,"speed",{
+        get: function() {
+            return this.tilesPerSecond;
+        },
+        set: function(value) {
+            this.setSpeed(value);
+        }
+    });
+
+    let tmpSpeed;
+
+    this.setSpeed = speed => {
+        tmpSpeed = this.tilesPerSecond;
+        this.tilesPerSecond = speed;
+    }
+    this.restoreSpeed = () => {
+        this.tilesPerSecond = tmpSpeed;
+    }
+
     this.xOffset = 0;
     this.yOffset = 0;
 
@@ -128,6 +147,19 @@ function SpriteRenderer(startDirection,spriteName,footstepsName="footsteps") {
     this.walkingOverride = false;
     this.renderLogic = null;
 
+    let showingAlert = false;
+    this.alert = () => {
+        return new Promise(resolve=>{
+            playSound("alert");
+            showingAlert = true;
+            setTimeout(() => {
+                showingAlert = false;
+                resolve();
+            },SpriteAlertTimeout);
+        });
+    }
+    const alertSprite = imageDictionary["sprites/alert"];
+
     this.render = function(timestamp,x,y,width,height) {
         if(this.renderLogic) {
             this.renderLogic(timestamp);
@@ -141,6 +173,11 @@ function SpriteRenderer(startDirection,spriteName,footstepsName="footsteps") {
         context.drawImage(
             sprite,currentColumn,animationRow,columnWidth,rowHeight,destinationX,destinationY,width,height
         );
+        if(showingAlert) {
+            context.drawImage(
+                alertSprite,x,y-height,width,height
+            );
+        }
     }
 
 }

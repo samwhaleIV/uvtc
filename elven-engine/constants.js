@@ -79,9 +79,10 @@ const textColorLookup = {
     "R": "red",
     "G": "green",
     "B": "blue",
-    "Y": "yellow",
-    "P": "purple",
-    "O": "orange",
+    "Y": "goldenrod",
+    "P": "blueviolet",
+    "O": "darkorange",
+    "Q": "deeppink",
     "X": 0
 }
 const popupControlCharacters = {
@@ -94,3 +95,5 @@ const popupControlCharacters = {
     " ": true
 }
 popupControlCharacters[ellipsis] = true;
+
+const SpriteAlertTimeout = 400;

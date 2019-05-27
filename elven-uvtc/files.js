@@ -6,7 +6,8 @@ EssentialSounds.push(
     getFile("reverse-click.mp3",FileTypes.Sound),
     getFile("damage.mp3",FileTypes.Sound),
     getFile("heal.mp3",FileTypes.Sound),
-    getFile("text-sound.mp3",FileTypes.Sound)
+    getFile("text-sound.mp3",FileTypes.Sound),
+    getFile("alert.mp3",FileTypes.Sound)
 );
 NonEssentialSounds.push();
 ImagePaths.push(
@@ -20,6 +21,8 @@ ImagePaths.push(
     getFile("world-tileset.png",FileTypes.Image),
     getFile("sprites/player.png",FileTypes.Image),
     getFile("sprites/elves.png",FileTypes.Image),
+    getFile("sprites/frogert.png",FileTypes.Image),
+    getFile("sprites/alert.png",FileTypes.Image),
     getFile("sprites/jim.png",FileTypes.Image),
     getFile("sprites/footsteps.png",FileTypes.Image),
     getFile("stars-menu.png",FileTypes.BackgroundImage),

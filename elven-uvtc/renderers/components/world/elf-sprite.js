@@ -16,6 +16,19 @@ function ElfSpriteRenderer(elfID) {
 
     const textureX = ELF_WIDTH * elfID;
 
+    let showingAlert = false;
+    this.alert = () => {
+        return new Promise(resolve=>{
+            playSound("alert");
+            showingAlert = true;
+            setTimeout(() => {
+                showingAlert = false;
+                resolve();
+            },SpriteAlertTimeout);
+        });
+    }
+    const alertSprite = imageDictionary["sprites/alert"];
+
     this.render = function(_,x,y,width,height) {
         const renderWidth = width * WIDTH_TO_WORLD_SCALE;
         const renderHeight = HEIGHT_WIDTH_RATIO * renderWidth;
@@ -27,6 +40,11 @@ function ElfSpriteRenderer(elfID) {
             Math.round(renderWidth),
             Math.round(renderHeight)
         );
+        if(showingAlert) {
+            context.drawImage(
+                alertSprite,x,y-height,width,height
+            );
+        }
     }
 }
 export default ElfSpriteRenderer;

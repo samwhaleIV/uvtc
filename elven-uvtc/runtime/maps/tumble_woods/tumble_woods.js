@@ -13,11 +13,17 @@ import "./store.js";
 import "./tavern.js";
 addMap({
     WorldState: function(world,data) {
+        let frogert;
         this.load = world => {
             if(data.fromDoorWay) {
                 switch(data.sourceRoom) {
                     case "house_1":
                         world.addPlayer(11,55,"down");
+                        if(!world.globalState.metFrogert) {
+                            frogert = world.getCharacter("frogert","down");
+                            world.addObject(frogert,15,55);
+                            scripts.meeting_frogert(world,frogert);
+                        }
                         break;
                     case "house_2":
                         world.addPlayer(19,55,"down");

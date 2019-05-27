@@ -4,6 +4,7 @@ import WorldPopup from "./components/world/popup.js";
 import WorldPrompt from "./components/world/prompt.js";
 import GlobalState from "../runtime/global-state.js";
 import ElfSpriteRenderer from "./components/world/elf-sprite.js";
+import GetOverworldCharacter from "../runtime/character-creator.js";
 
 function WorldRenderer() {
 
@@ -48,6 +49,7 @@ function WorldRenderer() {
         loadLastMapOrDefault();
     }
     this.sprite = SpriteRenderer;
+    this.getCharacter = (name,direction) => GetOverworldCharacter(this,name,direction);
 
     this.elf = ElfSpriteRenderer;
 

@@ -112,24 +112,22 @@ addMap({
             } else {
                 world.addPlayer(18,10,"down");
             }
-            jim = new world.sprite(world.globalState.jimsDirection||"down","jim");
-            jim.prefix = "Bjim:B ";
+            jim = world.getCharacter("jim",world.globalState.jimsDirection||"down");
             jim.interacted = (x,y,direction) => {
                 if(world.globalState.jimMoved) {
                     jim.updateDirection(direction);
                     world.globalState.jimsDirection = direction;
-                    world.showNamedTextPopupID("jims_postop",jim.prefix);
+                    jim.sayID("jims_postop");
                     return;
                 }
                 if(direction === "left") {
                     scripts.jim_gets_the_hell_out_of_the_way(world,jim);
                 } else {
-                    world.showNamedTextPopupID("jims_kink",jim.prefix);
+                    jim.sayID("jims_kink");
                 }
             }
             if(world.globalState.jimMoved) {
                 world.addObject(jim,19,12);
-
             } else {
                 world.addObject(jim,18,10);
             }

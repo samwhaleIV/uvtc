@@ -1,34 +1,36 @@
 const delay = time => new Promise(resolve => setTimeout(resolve,time));
 
 const scripts = {
-    jim_gets_the_hell_out_of_the_way: async function(world,jim) {
+    jim_gets_the_hell_out_of_the_way: async (world,jim) => {
         world.lockPlayerMovement();
         await world.showPrompt("what do you want to whisper?",["i love you","please move","uh.. nice panel?"]);
         await delay(800);
-        await world.showNamedTextPopupID("jims_intrigue",jim.prefix);
-        await world.moveSprite(jim,[{y:2},{x:1}]);
+        await jim.sayID("jims_intrigue");
+        await jim.move({y:2},{x:1});
         await delay(300);
         jim.updateDirection("up");
         await delay(700);
         jim.updateDirection("left");
         await delay(800);
-        await world.showNamedTextPopupID("jims_journey",jim.prefix);
+        await jim.sayID("jims_journey");
         world.globalState.jimMoved = true;
         world.unlockPlayerMovement();
         await delay(250);
         jim.updateDirection("up");
         world.globalState.jimsDirection = "up";
     },
-    how_to_press_enter: async function(world,jim) {
+    how_to_press_enter: async (world,jim) => {
         world.lockPlayerMovement();
-        await delay(200);
-        jim.updateDirection("left");
         await delay(400);
+        jim.updateDirection("left");
+        await delay(200);
+        await jim.alert();
+        await delay(200);
         jim.updateDirection("down");
         await delay(400);
         jim.updateDirection("left");
         await delay(400);
-        await world.showNamedTextPopupsID([
+        await jim.speechID([
             "jims_help_1",
             "jims_help_2",
             "jims_help_3",
@@ -38,11 +40,27 @@ const scripts = {
             "jims_help_7",
             "jims_help_8",
             "jims_help_9",
-        ],"B???:B ");
-        await world.showNamedTextPopupID("jims_help_10",jim.prefix);
+        ],"???");
+        await jim.sayID("jims_help_10");
         world.unlockPlayerMovement();
         world.globalState.playedEnterTrigger = true;
         await delay(200);
         jim.updateDirection("down");
+    },
+    meeting_frogert: async (world,frogert) => {
+        world.lockPlayerMovement();
+        await delay(500);
+        frogert.updateDirection("left");
+        await delay(200);
+        await frogert.alert();
+        frogert.sayID("stranger_danger");
+        frogert.speed *= 1.25;
+        await frogert.move({x:4});
+        await delay(300);
+        frogert.updateDirection("up");
+        await delay(400);
+        world.removeObject(frogert.ID);
+        world.unlockPlayerMovement();
+        world.globalState.metFrogert = true;
     }
 };

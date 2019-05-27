@@ -21,7 +21,7 @@ const stringLookup = {
     couch_1: "this couch looks too clean to sit on.\nwho gets a white couch anyways?",
     tv_1: "i'm the tv!\nit's so nice to meet you!\nwatch me anytime.",
     jims_journey: "that was quite the journey...\nyou may use the door, now.",
-    jims_kink: "if you whisper something in my right ear, i'll get out of your way.",
+    jims_kink: "if you whisper something in my right ear,\ni'll get out of your way.",
     jims_intrigue: "oh. my. i'll be getting out of your way now.",
     jims_postop: "let's stay in touch.\n\n*wink*",
     sleepingbag_1: "hmm...\nsleeping bags seem to be in style in this town.",
@@ -56,16 +56,17 @@ const stringLookup = {
     sat_lt_1: "this lighting is satisfying.",
     sat_lt_1: "perfectly symmetrical, as all things should be.",
     jims_help_1: "oh. hi there.",
-    jims_help_2: "if you want to talk with me, come over to me and use your mouth.",
+    jims_help_2: "if you want to talk with me,\ncome over to me and use your mouth.",
     jims_help_3: ". . .",
     jims_help_4: "oh. you don't know how to use your mouth?",
     jims_help_5: ". . .",
     jims_help_6: "well, this is awkward.",
     jims_help_7: "give me a second.",
-    jims_help_8: ". . . . . .",
+    jims_help_8: ". . .",
     jims_help_9: "what? you already figured it out?",
     jims_help_10: "well, it's nice to meet you.\n\nmy name is jim.",
-    you_can_never_leave: "you can't leave tumble woods yet!\nyou have important things to do!"
+    you_can_never_leave: "you can't leave tumble woods yet!\nyou have important things to do!",
+    stranger_danger: "ahh! stranger danger!\nget away from me!"
 }
 const getString = function(ID) {
     return stringLookup[ID];
