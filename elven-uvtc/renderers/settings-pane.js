@@ -93,7 +93,7 @@ const SettingsPaneRenderer = new (function(){
         change_binds: Symbol("change_binds")
     };
     const CHANGE_CONTROLS = "change controls (click me)";
-    const CANCEL_BINDING =  "                   cancel             ";
+    const CANCEL_BINDING =  "cancel";
     let hoverType = hoverTypes.none;
     let keyBindBuffer = null;
     let keyErrorTimeout = null;
@@ -123,7 +123,6 @@ const SettingsPaneRenderer = new (function(){
             keyErrorTimeout = setTimeout(updateKeyBindRequest,600);
             return;
         }
-        playSound("energy");
         keyBindBuffer[keyCode] = bindOrder[keyBindInputIndex].key;
         keyBindInputIndex++;
         updateKeyBindRequest();
@@ -134,8 +133,10 @@ const SettingsPaneRenderer = new (function(){
             reloadKeyBindDescription();
             unsubscribeTrueKeyEvents();
             changeBindsText = CHANGE_CONTROLS;
+            playSound("energy-reverse");
             return;
         }
+        playSound("energy");
         wrappedKeyBindText = processTextForWrapping(
             `press key for R${bindOrder[keyBindInputIndex].name}R`
         );
@@ -179,7 +180,7 @@ const SettingsPaneRenderer = new (function(){
                     unsubscribeTrueKeyEvents();
                     clearTimeout(keyErrorTimeout);
                     changeBindsText = CHANGE_CONTROLS;
-                    playSound("reverse-click");
+                    playSound("click");
                 } else {
                     getNewKeybinds();
                     playSound("click");
@@ -208,6 +209,10 @@ const SettingsPaneRenderer = new (function(){
     changeBindsTextTest.width /= 2;
     changeBindsTextTest.height /= 2;
 
+    let cancelTextTest = drawTextTest(CANCEL_BINDING,3);
+    cancelTextTest.width /= 2;
+    cancelTextTest.height /= 2;
+
     this.processMove = function(mouseX,mouseY) {
         lastPos.x = mouseX;
         lastPos.y = mouseY;
@@ -233,15 +238,27 @@ const SettingsPaneRenderer = new (function(){
 
         changeBindsButton.width = fullWidth - 50;
         changeBindsButton.height = 50;
-        renderButton(
-            changeBindsButton,
-            hoverType===hoverTypes.change_binds,
-            changeBindsText,
-            changeBindsTextTest.width,
-            changeBindsTextTest.height,
-            showHoverSpecialEffect
-        );
-        drawTextWrappingWhite(wrappedKeyBindText,halfWidth-100,100,halfWidth,2,20,3);
+        const buttonHover = hoverType===hoverTypes.change_binds;
+        if(changeBindsText === CANCEL_BINDING) {
+            renderButton(
+                changeBindsButton,
+                buttonHover,
+                CANCEL_BINDING,
+                cancelTextTest.width,
+                cancelTextTest.height,
+                showHoverSpecialEffect
+            );
+        } else {
+            renderButton(
+                changeBindsButton,
+                buttonHover,
+                changeBindsText,
+                changeBindsTextTest.width,
+                changeBindsTextTest.height,
+                showHoverSpecialEffect
+            );
+        }
+        drawTextWrappingWhite(wrappedKeyBindText,halfWidth-85,100,halfWidth,2,20,3);
     }
 })();
 export default SettingsPaneRenderer;

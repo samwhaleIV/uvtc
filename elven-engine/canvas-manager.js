@@ -293,12 +293,15 @@ function applyMediumResolutionTextAdapations() {
 
 let sizeApplicationDeferred = false;
 function applySizeMode(forced=false) {
+    if(!rendererState) {
+        return;
+    }
     if(!forced && rendererState.transitioning) {
         sizeApplicationDeferred = true;
         return;
     }
     let sizeMode;
-    if(rendererState && rendererState.forcedSizeMode) {
+    if(rendererState.forcedSizeMode) {
         sizeMode = rendererState.forcedSizeMode;
         if(canvasSizeMode === sizeModes.center.name && rendererState.forcedSizeMode === sizeModes.fit.name) {
             sizeMode = sizeModes.center.name;
@@ -312,7 +315,7 @@ function applySizeMode(forced=false) {
         (
             window.innerWidth / window.innerHeight > maximumWidthToHeightRatio ||
             window.innerHeight / window.innerWidth > maximumHeightToWidthRatio
-        ) && (rendererState ? !rendererState.disableAdapativeFill : true)
+        ) && !rendererState.disableAdapativeFill
     ) {
         sizeMode = sizeModes.fit.name;
     }
@@ -375,7 +378,7 @@ function applySizeMode(forced=false) {
     }
     setSizeConstants();
     rainbowGradient = createRainbowGradient();
-    if(rendererState && rendererState.updateSize) {
+    if(rendererState.updateSize) {
         rendererState.updateSize();
     }
     context.imageSmoothingEnabled = false;
@@ -494,4 +497,3 @@ function forceRender() {
 window.onresize = () => {
     applySizeMode(false);
 };
-applySizeMode(true);
