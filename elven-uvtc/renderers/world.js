@@ -637,27 +637,26 @@ function WorldRenderer() {
                     if(followObject.isPlayer) {
                         followObject.walkingOverride = movementLocked;
                     }
-    
-                    if(this.renderMap.useCameraPadding) {
-                        const abolsuteCameraX = this.camera.x + this.camera.xOffset;
-                        const absoluteCameraY = this.camera.y+ this.camera.yOffset;
-    
-                        if(abolsuteCameraX - halfHorizontalTiles < 0) {
-                            this.camera.x = halfHorizontalTiles;
-                            this.camera.xOffset = 0;   
-                        } else if(abolsuteCameraX + halfHorizontalTiles > this.renderMap.horizontalUpperBound) {
-                            this.camera.x = this.renderMap.horizontalUpperBound - halfHorizontalTiles;
-                            this.camera.xOffset = 0;
-                        }
-    
-                        if(absoluteCameraY - halfVerticalTiles < 0) {
-                            this.camera.y = halfVerticalTiles;
-                            this.camera.yOffset = 0;
-                        } else if(absoluteCameraY + halfVerticalTiles > this.renderMap.verticalUpperBound) {
-                            this.camera.y = this.renderMap.verticalUpperBound - halfVerticalTiles;
-                            this.camera.yOffset = 0;
-                        }
-                    }
+                }
+            }
+            if(this.renderMap.useCameraPadding) {
+                const abolsuteCameraX = this.camera.x + this.camera.xOffset;
+                const absoluteCameraY = this.camera.y + this.camera.yOffset;
+
+                if(abolsuteCameraX - halfHorizontalTiles < 0) {
+                    this.camera.x = halfHorizontalTiles;
+                    this.camera.xOffset = 0;   
+                } else if(abolsuteCameraX + halfHorizontalTiles > this.renderMap.horizontalUpperBound) {
+                    this.camera.x = this.renderMap.horizontalUpperBound - halfHorizontalTiles;
+                    this.camera.xOffset = 0;
+                }
+
+                if(absoluteCameraY - halfVerticalTiles < 0) {
+                    this.camera.y = halfVerticalTiles;
+                    this.camera.yOffset = 0;
+                } else if(absoluteCameraY + halfVerticalTiles > this.renderMap.verticalUpperBound) {
+                    this.camera.y = this.renderMap.verticalUpperBound - halfVerticalTiles;
+                    this.camera.yOffset = 0;
                 }
             }
 
