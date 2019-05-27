@@ -110,7 +110,7 @@ addMap({
                         break;
                 }
             } else {
-                world.addPlayer(18,10,"down");
+                world.addPlayer(12,11,"down");
             }
             jim = world.getCharacter("jim",world.globalState.jimsDirection||"down");
             jim.interacted = (x,y,direction) => {

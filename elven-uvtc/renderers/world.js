@@ -99,6 +99,8 @@ function WorldRenderer() {
     let aDown = false;
     let dDown = false;
 
+    this.popupProgressEnabled = true;
+
     this.processKey = function(key) {
         if(this.prompt) {
             switch(key) {
@@ -128,7 +130,9 @@ function WorldRenderer() {
             if(key === kc.accept) {
                 if(!enterReleased) return;
                 enterReleased = false;
-                this.popup.progress();
+                if(this.popupProgressEnabled) {
+                    this.popup.progress();
+                }
             }
         } else if(this.playerObject) {
             if(key === kc.accept) { 
@@ -352,6 +356,7 @@ function WorldRenderer() {
                 if(step.x) {
                     lastCallback = () => {
                         let lastFrame = null;
+                        let endX = object.x + step.x;
                         if(step.x > 0) {
                             object.updateDirection("right");
                             object.renderLogic = timestamp => {
@@ -362,9 +367,12 @@ function WorldRenderer() {
                                 const delta = timestamp - lastFrame;
                                 lastFrame = timestamp;
                                 object.xOffset += delta / 1000 * object.tilesPerSecond;
-                                if(object.xOffset >= step.x) {
+                                if(object.xOffset > 1) {
+                                    object.xOffset-=1;
+                                    world.moveObject(objectID,object.x+1,object.y);
+                                }
+                                if(endX === object.x) {
                                     object.xOffset = 0;
-                                    world.moveObject(objectID,object.x+step.x,object.y);
                                     callback();
                                 }
                             }
@@ -378,9 +386,12 @@ function WorldRenderer() {
                                 const delta = timestamp - lastFrame;
                                 lastFrame = timestamp;
                                 object.xOffset -= delta / 1000 * object.tilesPerSecond;
-                                if(object.xOffset <= step.x) {
-                                    object.xOffset = 0;
-                                    world.moveObject(objectID,object.x+step.x,object.y);
+                                if(object.xOffset < -1) {
+                                    object.xOffset+=1;
+                                    world.moveObject(objectID,object.x-1,object.y);
+                                }
+                                if(endX === object.x) {
+                                    object.xOffset = 0; 
                                     callback();
                                 }
                             }
@@ -389,6 +400,7 @@ function WorldRenderer() {
                 } else if(step.y) {
                     lastCallback = () => {
                         let lastFrame = null;
+                        let endY = object.y + step.y;
                         if(step.y > 0) {
                             object.updateDirection("down");
                             object.renderLogic = timestamp => {
@@ -399,9 +411,12 @@ function WorldRenderer() {
                                 const delta = timestamp - lastFrame;
                                 lastFrame = timestamp;
                                 object.yOffset += delta / 1000 * object.tilesPerSecond;
-                                if(object.yOffset >= step.y) {
+                                if(object.yOffset > 1) {
+                                    object.yOffset-=1;
+                                    world.moveObject(objectID,object.x,object.y+1);
+                                }
+                                if(object.y === endY) {
                                     object.yOffset = 0;
-                                    world.moveObject(objectID,object.x,object.y+step.y);
                                     callback();
                                 }
                             }
@@ -415,7 +430,11 @@ function WorldRenderer() {
                                 const delta = timestamp - lastFrame;
                                 lastFrame = timestamp;
                                 object.yOffset -= delta / 1000 * object.tilesPerSecond;
-                                if(object.yOffset <= step.y) {
+                                if(object.yOffset < -1) {
+                                    object.yOffset+=1;
+                                    world.moveObject(objectID,object.x,object.y-1);
+                                }
+                                if(object.y === endY) {
                                     object.yOffset = 0;
                                     world.moveObject(objectID,object.x,object.y+step.y);
                                     callback();
@@ -586,31 +605,37 @@ function WorldRenderer() {
                 this.playerController.renderMethod(timestamp);
             }
 
-            if((!this.renderMap.fixedCamera || this.fixedCameraOverride) && this.playerObject) {
-                this.camera.x = this.playerObject.x;
-                this.camera.y = this.playerObject.y;
-                this.camera.xOffset = this.playerObject.xOffset;
-                this.camera.yOffset = this.playerObject.yOffset;
-                this.playerObject.walkingOverride = movementLocked;
-
-                if(this.renderMap.useCameraPadding) {
-                    const abolsuteCameraX = this.camera.x + this.camera.xOffset;
-                    const absoluteCameraY = this.camera.y+ this.camera.yOffset;
-
-                    if(abolsuteCameraX - halfHorizontalTiles < 0) {
-                        this.camera.x = halfHorizontalTiles;
-                        this.camera.xOffset = 0;   
-                    } else if(abolsuteCameraX + halfHorizontalTiles > this.renderMap.horizontalUpperBound) {
-                        this.camera.x = this.renderMap.horizontalUpperBound - halfHorizontalTiles;
-                        this.camera.xOffset = 0;
-                    }
-
-                    if(absoluteCameraY - halfVerticalTiles < 0) {
-                        this.camera.y = halfVerticalTiles;
-                        this.camera.yOffset = 0;
-                    } else if(absoluteCameraY + halfVerticalTiles > this.renderMap.verticalUpperBound) {
-                        this.camera.y = this.renderMap.verticalUpperBound - halfVerticalTiles;
-                        this.camera.yOffset = 0;
+            if(!this.renderMap.fixedCamera || this.fixedCameraOverride) {
+                let followObject = this.playerObject;
+                if(this.followObject) {
+                    followObject = this.followObject;
+                }
+                if(followObject) {
+                    this.camera.x = followObject.x;
+                    this.camera.y = followObject.y;
+                    this.camera.xOffset = followObject.xOffset;
+                    this.camera.yOffset = followObject.yOffset;
+                    followObject.walkingOverride = movementLocked;
+    
+                    if(this.renderMap.useCameraPadding) {
+                        const abolsuteCameraX = this.camera.x + this.camera.xOffset;
+                        const absoluteCameraY = this.camera.y+ this.camera.yOffset;
+    
+                        if(abolsuteCameraX - halfHorizontalTiles < 0) {
+                            this.camera.x = halfHorizontalTiles;
+                            this.camera.xOffset = 0;   
+                        } else if(abolsuteCameraX + halfHorizontalTiles > this.renderMap.horizontalUpperBound) {
+                            this.camera.x = this.renderMap.horizontalUpperBound - halfHorizontalTiles;
+                            this.camera.xOffset = 0;
+                        }
+    
+                        if(absoluteCameraY - halfVerticalTiles < 0) {
+                            this.camera.y = halfVerticalTiles;
+                            this.camera.yOffset = 0;
+                        } else if(absoluteCameraY + halfVerticalTiles > this.renderMap.verticalUpperBound) {
+                            this.camera.y = this.renderMap.verticalUpperBound - halfVerticalTiles;
+                            this.camera.yOffset = 0;
+                        }
                     }
                 }
             }

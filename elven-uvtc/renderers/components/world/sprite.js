@@ -160,9 +160,19 @@ function SpriteRenderer(startDirection,spriteName,footstepsName="footsteps") {
     }
     const alertSprite = imageDictionary["sprites/alert"];
 
+    this.hidden = false;
+
     this.render = function(timestamp,x,y,width,height) {
         if(this.renderLogic) {
             this.renderLogic(timestamp);
+        }
+        if(showingAlert) {
+            context.drawImage(
+                alertSprite,x,y-height,width,height
+            );
+        }
+        if(this.hidden) {
+            return;
         }
         const destinationX = this.xOffset * width + x;
         const destinationY = this.yOffset * height + y;
@@ -173,11 +183,6 @@ function SpriteRenderer(startDirection,spriteName,footstepsName="footsteps") {
         context.drawImage(
             sprite,currentColumn,animationRow,columnWidth,rowHeight,destinationX,destinationY,width,height
         );
-        if(showingAlert) {
-            context.drawImage(
-                alertSprite,x,y-height,width,height
-            );
-        }
     }
 
 }

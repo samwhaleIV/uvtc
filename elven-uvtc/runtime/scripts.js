@@ -52,15 +52,24 @@ const scripts = {
         await delay(500);
         frogert.updateDirection("left");
         await delay(200);
+        world.playerObject.updateDirection("right");
         await frogert.alert();
+        world.popupProgressEnabled = false;
         frogert.sayID("stranger_danger");
         frogert.speed *= 1.25;
-        await frogert.move({x:4});
-        await delay(300);
+        world.followObject = frogert;
+        frogert.move({x:4});
+        await delay(600);
+        world.followObject = frogert;
+        await delay(1500);
         frogert.updateDirection("up");
         await delay(400);
+        frogert.hidden = true;
+        await delay(800);
+        world.followObject = null;
         world.removeObject(frogert.ID);
         world.unlockPlayerMovement();
+        world.popupProgressEnabled = true;
         world.globalState.metFrogert = true;
     }
 };
