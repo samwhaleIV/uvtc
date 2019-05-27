@@ -219,6 +219,19 @@ const saveKeyBinds = () => {
     localStorage.setItem(KEY_BINDS_KEY,JSON.stringify(keyBindings));
 }
 const setKeyBinds = newBinds => {
+    let hasFullscreen = false;
+    let usesF11 = false;
+    Object.entries(newBinds).forEach(entry => {
+        if(entry[0] === "F11") {
+            usesF11 = true;
+        }
+        if(entry[1] === kc.fullscreen) {
+            hasFullscreen = true;
+        }
+    });
+    if(!hasFullscreen && !usesF11) {
+        newBinds["F11"] = kc.fullscreen;
+    }
     keyBindings = newBinds;
     saveKeyBinds();
 }

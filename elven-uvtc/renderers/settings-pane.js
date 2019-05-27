@@ -144,11 +144,9 @@ const SettingsPaneRenderer = new (function(){
     let listeningToKeyEvents = false;
     const subscribeToTrueKeyEvents = () => {
         listeningToKeyEvents = true;
-        window.addEventListener("keydown",trueKeyDown);
         window.addEventListener("keyup",trueKeyUp);
     }
     const unsubscribeTrueKeyEvents = () => {
-        window.removeEventListener("keydown",trueKeyDown);
         window.removeEventListener("keyup",trueKeyUp);
         listeningToKeyEvents = false;
     }
