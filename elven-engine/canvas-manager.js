@@ -443,15 +443,13 @@ const render = (function(){
     }
 })();
 
-function stopRenderer(doNotStripRendererState) {
+function stopRenderer() {
     if(!rendererState) {
         console.warn("Warning: The renderer is already stopped and cannot be stopped further.");
         return;
     }
     window.cancelAnimationFrame(animationFrame);
-    if(!doNotStripRendererState) {
-        rendererState = null;
-    }
+     rendererState = null;
     console.log("Renderer stopped");
 }
 
@@ -496,6 +494,10 @@ function setRendererState(newRendererState) {
 function pauseRenderer() {
     paused = true;
     console.log("Canvas handler: Paused renderer");
+}
+function resumeRenderer() {
+    paused = false;
+    console.log("Canvas handler: Resumed renderer");
 }
 
 function forceRender() {

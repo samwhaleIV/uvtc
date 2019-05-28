@@ -30,7 +30,7 @@ const MusicLinkingManifest = {
         song: null
     },
     "tumble_woods": {
-        song: null
+        song: "test-song-2"
     },
     "house_1": {
         song: "test-song"

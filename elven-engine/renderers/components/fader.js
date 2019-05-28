@@ -4,6 +4,7 @@ let faderOutSound = null;
 let faderEffectsRenderer = null;
 let faderTime = 0;
 let faderDelay = 0;
+let musicFadeOutDuration = 0;
 function setFaderInSound(soundName) {
     faderInSound = soundName;
 }
@@ -18,6 +19,9 @@ function setFaderDuration(time) {
 }
 function setFaderDelay(time) {
     faderDelay = time;
+}
+function setMusicFadeDuration(time) {
+    musicFadeOutDuration = time;
 }
 function getFader() {
     const fader = {
@@ -68,7 +72,11 @@ function getFader() {
             if(faderOutSound) {
                 playSound(faderOutSound,staticTime);
             }
-            stopMusic();
+            if(musicFadeOutDuration) {
+                fadeOutSongs(musicFadeOutDuration);
+            } else {
+                stopMusic();
+            }
         },
         oninEnd: () => {
             if(rendererState.fader) {

@@ -25,8 +25,10 @@ setFaderEffectsRenderer(new BoxFaderEffect());
 if(ENV_FLAGS.FAST_AS_FUCK_TRANSITIONS) {
     setFaderDelay(60);
     setFaderDuration(60);
+    setMusicFadeDuration(60);
 } else {
-    setFaderDelay(2000);
+    setFaderDelay(600);
     setFaderDuration(1000);
+    setMusicFadeDuration(1000);
 }
 

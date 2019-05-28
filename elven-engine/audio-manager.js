@@ -99,6 +99,20 @@ function unmuteTrack(name) {
     }
 }
 
+function fadeOutSongs(musicFadeOutDuration,callback) {
+    const nodes = Object.values(musicNodes);
+    const endTime = audioContext.currentTime + (musicFadeOutDuration / 1000)
+    for(let i = 0;i<nodes.length;i++) {
+        nodes[i].volumeControl.gain.linearRampToValueAtTime(0,endTime);
+    }
+    setTimeout(()=>{
+        stopMusic();
+        if(callback) {
+            callback();
+        }
+    },musicFadeOutDuration);
+}
+
 function playMusicWithIntro(loopName,introName,withLoop=true) {
     const introBuffer = audioBuffers[introName];
     const loopBuffer = audioBuffers[loopName];

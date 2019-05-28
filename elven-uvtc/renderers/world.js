@@ -50,7 +50,6 @@ function WorldRenderer() {
     this.customLoader = (callback,fromMapUpdate) => {
         let loadPlayer = null;
         const finishedLoading = () => {
-            callback();
             this.updateMapEnd();
             if(!fromMapUpdate) {
                 if(loadPlayer) {
@@ -58,6 +57,7 @@ function WorldRenderer() {
                 }
                 ranCustomLoader = true;
             }
+            callback();
         }
         if(!fromMapUpdate) {
             loadPlayer = loadLastMapOrDefault();
@@ -530,24 +530,53 @@ function WorldRenderer() {
         this.playerController.player = this.playerObject;
         this.restoreRoomSong();
     }
-    this.stopMusic = () => {
-        stopMusic();
+    this.stopMusic = callback => {
+        fadeOutSongs(OVERWORLD_MUSIC_FADE_TIME,callback);
+    }
+    this.playSong = songName => {
+        if(!musicNodes[songName]) {
+            let didRunCustomLoader = ranCustomLoader;
+            this.stopMusic(()=>{
+                const extraTime = !didRunCustomLoader ? faderTime / 2 : 0;
+                const fadeIn = () => {
+                    musicNodes[songName].volumeControl.gain.setValueAtTime(0.001,audioContext.currentTime);
+                    musicNodes[songName].volumeControl.gain.linearRampToValueAtTime(
+                        1.0,
+                        audioContext.currentTime+
+                        ((OVERWORLD_MUSIC_FADE_TIME+extraTime)/1000)
+                    );
+                }
+                if(extraTime) {
+                    setTimeout(()=>{
+                        playMusic(songName);
+                        fadeIn();
+                    },extraTime);
+                } else {
+                    playMusic(songName);
+                    fadeIn();
+                }
+            });
+        }
     }
     this.restoreRoomSong = () => {
         const roomSong = this.renderMap.roomSong ?
             this.renderMap.roomSong : this.renderMap.songParent ?
                 worldMaps[this.renderMap.songParent].roomSong : null;
         if(!roomSong) {
-            stopMusic();
+            this.stopMusic();
             return;
         }
-        if(!musicNodes[roomSong]) {
-            stopMusic();
-            playMusic(roomSong);
-        }
+        this.playSong(roomSong);
     }
 
     this.updateMap = function(newMapName,data={}) {
+        const runLoadCode = ranCustomLoader;
+        const startedLocked = playerMovementLocked;
+        if(runLoadCode) {
+            this.lockPlayerMovement();
+            drawLoadingText();
+            pauseRenderer();
+        }
         if(this.renderMap) {
             data.sourceRoom = this.renderMap.name;
         }
@@ -587,13 +616,9 @@ function WorldRenderer() {
             this.decals[y] = newDecalRow;
         }
 
-        if(ranCustomLoader) {
-            let startedLocked = playerMovementLocked;
-            this.lockPlayerMovement();
-            drawLoadingText();
-            stopRenderer(true);
+        if(runLoadCode) {
             this.customLoader(()=>{
-                startRenderer();
+                resumeRenderer();
                 playerMovementLocked = startedLocked;
             },true);
         }
