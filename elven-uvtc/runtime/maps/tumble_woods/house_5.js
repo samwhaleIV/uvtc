@@ -32,5 +32,5 @@ addMap({
     name: "house_5",
     doors: [
         "to_tumble_woods"
-    ],
+    ]
 });

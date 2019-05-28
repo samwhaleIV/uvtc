@@ -31,14 +31,76 @@ function WorldRenderer() {
         if(lastMap) {
             this.updateMap(lastMap);
             let lp = GlobalState.data["last_player_pos"];
-            if(lp && this.playerObject) {
-                this.moveObject(this.playerObject.ID,lp.x,lp.y);
-                this.playerObject.xOffset = lp.xo;
-                this.playerObject.yOffset = lp.yo;
-                this.playerObject.updateDirection(lp.d);
+            if(lp) {
+                return () => {
+                    if(this.playerObject) {
+                        this.moveObject(this.playerObject.ID,lp.x,lp.y);
+                        this.playerObject.xOffset = lp.xo;
+                        this.playerObject.yOffset = lp.yo;
+                        this.playerObject.updateDirection(lp.d);
+                    }
+                }
             }
         } else {
             this.updateMap(FIRST_MAP_ID);
+        }
+        return null;
+    }
+    let ranCustomLoader = false;
+    this.customLoader = (callback,fromMapUpdate) => {
+        let loadPlayer = null;
+        const finishedLoading = () => {
+            callback();
+            this.updateMapEnd();
+            if(!fromMapUpdate) {
+                if(loadPlayer) {
+                    loadPlayer();
+                }
+                ranCustomLoader = true;
+            }
+        }
+        if(!fromMapUpdate) {
+            loadPlayer = loadLastMapOrDefault();
+        }
+        let requiredSongs = this.renderMap.requiredSongs ?
+            this.renderMap.requiredSongs : this.renderMap.songParent ?
+                worldMaps[this.renderMap.songParent].requiredSongs : null;
+
+        const roomSong = this.renderMap.roomSong ?
+            this.renderMap.roomSong : this.renderMap.songParent ?
+                worldMaps[this.renderMap.songParent].roomSong : null;
+
+        if(!requiredSongs && roomSong) {
+            requiredSongs = [roomSong];
+        }
+
+        if(requiredSongs) {
+            let loadedSongs = 0;
+            const songNames = {};
+            const totalSongs = requiredSongs.length;
+            const callbackIfReady = () => {
+                if(loadedSongs === totalSongs) {
+                    audioBufferAddedCallback = null;
+                    finishedLoading();
+                }
+            }
+            audioBufferAddedCallback = name => {
+                if(songNames[name]) {
+                    loadedSongs++;
+                    callbackIfReady();
+                }
+            };
+            requiredSongs.forEach(song => {
+                songNames[song] = true;
+                if(audioBuffers[song]) {
+                    loadedSongs++;
+                } else {
+                    loadSongOnDemand(song);
+                }
+            });
+            callbackIfReady();
+        } else {
+            finishedLoading();
         }
     }
     this.restoreState = (ignorePositionData=false) => {
@@ -447,6 +509,33 @@ function WorldRenderer() {
         this.renderMap.background[getIdx(x,y)] = value;
     }
 
+    this.updateMapEnd = function() {
+        if(this.map.load) {
+            this.map.load(this);
+        }
+        if(this.map.getCameraStart) {
+            this.camera = this.map.getCameraStart(this);
+        }
+        this.playerController.player = this.playerObject;
+        this.restoreRoomSong();
+    }
+    this.stopMusic = () => {
+        stopMusic();
+    }
+    this.restoreRoomSong = () => {
+        const roomSong = this.renderMap.roomSong ?
+            this.renderMap.roomSong : this.renderMap.songParent ?
+                worldMaps[this.renderMap.songParent].roomSong : null;
+        if(!roomSong) {
+            stopMusic();
+            return;
+        }
+        if(!musicNodes[roomSong]) {
+            stopMusic();
+            playMusic(roomSong);
+        }
+    }
+
     this.updateMap = function(newMapName,data={}) {
         if(this.renderMap) {
             data.sourceRoom = this.renderMap.name;
@@ -486,16 +575,18 @@ function WorldRenderer() {
             this.objectsLookup[y] = newRow;
             this.decals[y] = newDecalRow;
         }
-        if(this.map.load) {
-            this.map.load(this);
-        }
-        if(this.map.getCameraStart) {
-            this.camera = this.map.getCameraStart(this);
-        }
 
-        this.playerController.player = this.playerObject;
+        if(ranCustomLoader) {
+            let startedLocked = playerMovementLocked;
+            this.lockPlayerMovement();
+            drawLoadingText();
+            stopRenderer(true);
+            this.customLoader(()=>{
+                startRenderer();
+                playerMovementLocked = startedLocked;
+            },true);
+        }
     }
-
 
     let horizontalTiles, verticalTiles, horizontalOffset, verticalOffset, verticalTileSize, horizontalTileSize, halfHorizontalTiles, halfVerticalTiles;
 
@@ -604,8 +695,6 @@ function WorldRenderer() {
             duration
         );
     }
-
-    loadLastMapOrDefault();
 
     this.fixedCameraOverride = false;
 

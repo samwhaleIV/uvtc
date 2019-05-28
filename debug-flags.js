@@ -2,6 +2,7 @@ const ENV_FLAGS = {
     FAST_AS_FUCK_TRANSITIONS: true,
     CONTROLLER_DISABLED: false,
     DO_STEAM_SETUP: false,
+    MUSIC_FILE_FORMAT: "ogg",
     CUSTOM_GLOBAL_STATE: {
         jimMoved: true,
         jimsDirection: "up",

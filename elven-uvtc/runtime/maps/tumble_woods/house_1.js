@@ -28,6 +28,7 @@ addMap({
     doors: [
         "to_main"
     ],
+    songParent: "house_1"
 });
 addMap({
     WorldState: function(world,data) {
@@ -58,6 +59,7 @@ addMap({
     doors: [
         "to_main"
     ],
+    songParent: "house_1"
 });
 addMap({
     WorldState: function(world,data) {
@@ -89,6 +91,7 @@ addMap({
     doors: [
         "to_main"
     ],
+    songParent: "house_1"
 });
 addMap({
     WorldState: function(world,data) {

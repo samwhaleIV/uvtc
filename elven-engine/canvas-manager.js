@@ -443,18 +443,19 @@ const render = (function(){
     }
 })();
 
-function stopRenderer() {
+function stopRenderer(doNotStripRendererState) {
     if(!rendererState) {
         console.warn("Warning: The renderer is already stopped and cannot be stopped further.");
         return;
     }
     window.cancelAnimationFrame(animationFrame);
-    rendererState = null;
+    if(!doNotStripRendererState) {
+        rendererState = null;
+    }
     console.log("Renderer stopped");
 }
 
 function startRenderer() {
-    const wasPaused = paused;
     paused = false;
     if(!rendererState) {
         console.error("Error: Missing renderer state; the renderer cannot start.");

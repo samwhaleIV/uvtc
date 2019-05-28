@@ -97,3 +97,5 @@ const popupControlCharacters = {
 popupControlCharacters[ellipsis] = true;
 
 const SpriteAlertTimeout = 400;
+
+const MUSIC_FILE_FORMAT = ENV_FLAGS.MUSIC_FILE_FORMAT || "ogg";

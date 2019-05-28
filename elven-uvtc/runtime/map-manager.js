@@ -41,3 +41,32 @@ function addMap(map) {
         }
     }
 }
+function establishMapLinks() {
+    for(let i = 0;i<worldMapList.length;i++) {
+        const map = worldMapList[i];
+        const songData = MusicLinkingManifest[map.name];
+        if(songData) {
+            if(songData.linkTo) {
+                let link = songData.linkTo;
+                let root;
+                while(link) {
+                    const manifest = MusicLinkingManifest[link];
+                    if(!manifest) {
+                        throw Error(`Music link manifest error: Cannot link to '${link}' @ '${map.name}'`);
+                    }
+                    if(manifest.linkTo) {
+                        link = manifest.linkTo;
+                    } else {
+                        root = MusicLinkingManifest[link];
+                        link = null;
+                    }
+                }
+                map.roomSong = root.song;
+                map.requiredSongs = songData.preloadSongs;
+            } else {
+                map.roomSong = songData.song;
+                map.requiredSongs = songData.preloadSongs;
+            }
+        }
+    }
+}

@@ -3,10 +3,14 @@ import MainMenuRenderer from "./renderers/main-menu.js";
 import BoxFaderEffect from "./renderers/components/box-fader-effect.js";
 
 drawLoadingText();
+establishMapLinks();
 
 function loadCallback() {
     setRendererState(new MainMenuRenderer());
     startRenderer();
+    if(rendererState.song) {
+        playMusic(rendererState.song);
+    }
 }
 
 setPageTitle("UVTC: Pre-alpha");

@@ -88,7 +88,6 @@ function unmuteMusic() {
         console.warn("Audio manager: Music already unmuted");
     }
 }
-
 function muteTrack(name) {
     if(musicNodes[name]) {
         musicNodes[name].volumeControl.gain.setValueAtTime(0,audioContext.currentTime);
@@ -171,7 +170,12 @@ function playMusicWithIntro(loopName,introName,withLoop=true) {
 function playMusic(name,withLoop=true) {
     const buffer = audioBuffers[name];
     if(!buffer) {
-        console.warn(`Audio manager: '${name}' is missing from audio buffers. Did we fail to load it?`);
+        if(failedBuffers[name]) {
+            console.warn(`Audio manager: '${name}' is missing from audio buffers. It failed to load at a previous time`);
+        } else {
+            console.warn(`Audio manager: '${name}' is missing from audio buffers. Did we fail to load it?`);
+        }
+
         if(!withLoop) {
             return 0;
         }
@@ -226,11 +230,22 @@ function playSound(name,duration) {
         console.warn(`Audio manager: '${name}' is missing from audio buffers. Did we fail to load it?`);
     }
 }
-
 function addBufferSource(fileName,callback,errorCallback) {
     let newName = fileName.split("/").pop();
     const newNameSplit = newName.split(".");
     newName = newNameSplit[newNameSplit.length-2];
+    if(failedBuffers[newName]) {
+        sendAudioBufferAddedCallback(newName);
+        if(errorCallback) {
+            errorCallback(fileName);
+        }
+        return;
+    }
+    const errorCallbackWithCache = () => {
+        if(errorCallback) {
+            errorCallback(fileName);
+        }
+    }
     const decode = audioData => {
         audioContext.decodeAudioData(
             audioData,
@@ -246,9 +261,7 @@ function addBufferSource(fileName,callback,errorCallback) {
                 failedBuffers[newName] = true;
                 sendAudioBufferAddedCallback(newName);
                 console.error(`Audio manager: Failure to decode '${fileName}' as an audio file`);
-                if(errorCallback) {
-                    errorCallback(fileName);
-                }
+                errorCallbackWithCache();
             }
         );
     }
@@ -273,9 +286,7 @@ function addBufferSource(fileName,callback,errorCallback) {
             console.log(`Audio manager: Failure to fetch '${fileName}' (Status code: ${this.status})`);
             failedBuffers[newName] = true;
             sendAudioBufferAddedCallback(newName);
-            if(errorCallback) {
-                errorCallback(fileName);
-            }
+            errorCallbackWithCache();
         }
     }
     request.send();

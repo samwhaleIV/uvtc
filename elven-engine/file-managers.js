@@ -47,7 +47,7 @@ function getFile(path,type,isCustom=true) {
         case FileTypes.Sound:
             return `${engineSector}/audio/${path}`;
         case FileTypes.Music:
-            return `${engineSector}/audio/music/${path}`;
+            return `${engineSector}/audio/music/${path}.${MUSIC_FILE_FORMAT}`;
         case FileTypes.Image:
             return `${engineSector}/images/${path}`;
         case FileTypes.BackgroundImage:
@@ -121,4 +121,7 @@ const ImageManager = {
             image.src = ImagePaths[i];
         }
     }
+}
+function loadSongOnDemand(fileName,fileType=MUSIC_FILE_FORMAT) {
+    SoundManager.loadOnDemand(`${customSector}/audio/music/${fileName}.${fileType}`);
 }

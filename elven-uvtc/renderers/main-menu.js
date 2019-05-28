@@ -111,6 +111,8 @@ function MainMenuRenderer() {
         this.processMove(x,y);
     }
 
+    this.song = "main-menu";
+
     this.processMove = function(mouseX,mouseY) {
         if(this.settingsPane) {
             this.settingsPane.processMove(mouseX,mouseY);

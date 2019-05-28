@@ -15,6 +15,7 @@ addMap({
     WorldState: function(world,data) {
         let frogert;
         this.load = world => {
+            stopMusic();
             if(data.fromDoorWay) {
                 switch(data.sourceRoom) {
                     case "house_1":

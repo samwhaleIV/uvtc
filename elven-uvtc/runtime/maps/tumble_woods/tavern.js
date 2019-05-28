@@ -24,5 +24,5 @@ addMap({
     name: "tavern",
     doors: [
         "to_tumble_woods"
-    ],
+    ]
 });

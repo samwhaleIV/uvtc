@@ -7,7 +7,8 @@ EssentialSounds.push(
     getFile("damage.mp3",FileTypes.Sound),
     getFile("heal.mp3",FileTypes.Sound),
     getFile("text-sound.mp3",FileTypes.Sound),
-    getFile("alert.mp3",FileTypes.Sound)
+    getFile("alert.mp3",FileTypes.Sound),
+    getFile("main-menu",FileTypes.Music)
 );
 NonEssentialSounds.push();
 ImagePaths.push(

@@ -9,7 +9,13 @@
     <meta name="theme-color" content="#000000"/>
 </head>
 <body>
+    
+    <script>
+    let startKeys = Object.keys(this);
+    startKeys = startKeys.reduce((pv,cv)=>{pv[cv]=true;return pv},{});
+    </script>
     <script src="debug-flags.js"></script>
+    <script src="elven-uvtc/audio/music/linking-manifest.js"></script>
 
     <canvas id="background-canvas" width="1" height="1"></canvas>
     <canvas id="canvas"></canvas>
@@ -17,11 +23,6 @@
     <p id="picture-mode-element"></p>
 
     <script src="steam-helper.js"></script>
-
-    <script>
-    let startKeys = Object.keys(this);
-    startKeys = startKeys.reduce((pv,cv)=>{pv[cv]=true;return pv},{});
-    </script>
 
     <!-- Begin load engine -->
     <script src="elven-engine/constants.js"></script>

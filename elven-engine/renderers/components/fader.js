@@ -103,6 +103,12 @@ function getFader() {
                 );
                 if(rendererState.fader) {
                     rendererState.transitioning = true;
+                    if(rendererState.customLoader) {
+                        rendererState.customLoader(
+                            fadeInCompleter
+                        );
+                        return;
+                    }
                     if(musicMuted) {
                         fadeInCompleter();
                         return;
