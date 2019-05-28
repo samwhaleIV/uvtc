@@ -51,6 +51,9 @@ Sorry cowboy. We're not done here yet.
 
 6. Navigate to [http://localhost/](http://localhost/) in a supported web browser.
 
+    To skip the pesty cutscenes and freely move around the world as you please, go to [http://localhost/index-debug.html](http://localhost/index-debug.html) instead.
+
+
 ## Troubleshooting
 
 - Chrome and its web policies hate game developers and will not auto play music unless you have interacted with the page. If you have changed the main-menu song and it didn't play, clicking the `controls` button on main menu should do the trick.
