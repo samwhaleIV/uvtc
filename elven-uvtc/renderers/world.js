@@ -72,6 +72,17 @@ function WorldRenderer() {
 
         if(!requiredSongs && roomSong) {
             requiredSongs = [roomSong];
+        } else if(requiredSongs && roomSong) {
+            let containsRoomSong = false;
+            for(let i = 0;i<requiredSongs.length;i++) {
+                if(requiredSongs[i] === roomSong) {
+                    containsRoomSong = true;
+                    break;
+                }
+            }
+            if(!containsRoomSong) {
+                requiredSongs = [...requiredSongs.slice(),roomSong];
+            }
         }
 
         if(requiredSongs) {

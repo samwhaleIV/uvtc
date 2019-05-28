@@ -39,7 +39,7 @@ Linking songs is a bit more involved. You're going to have to get your hands dir
 
 Sorry cowboy. We're not done here yet.
 
-1. You'll need to have [node.js](https://nodejs.org/en/) installed. Get the [current version](https://nodejs.org/dist/v12.3.1/node-v12.3.1-x64.msi) over the latest version
+1. You'll need to have [node.js](https://nodejs.org/en/) installed in order to run the application. Simply navigating to the HTML file over the `file://` protocol won't be enough because it doesn't supply MIME types. Get the [current version of node.js here](https://nodejs.org/dist/v12.3.1/node-v12.3.1-x64.msi).
 
 2. Once node.js is all setup, open a terminal and navigate to your `uvtc` root folder. In CMD, you can drag the folder into the terminal window.
 
@@ -58,6 +58,8 @@ Sorry cowboy. We're not done here yet.
 
 - Chrome and its web policies hate game developers and will not auto play music unless you have interacted with the page. If you have changed the main-menu song and it didn't play, clicking the `controls` button on main menu should do the trick.
 
-- I'll let you know when there's a commit you should probably fetch
+- If you've added a song and it just won't play, check the console to see if there are any errors. You might have made a typo somewhere in the process. E.g., the file named `song` but the link is named `snog`, and vice versa. It's overwhelmingly easy to do on accident.
+
+- I'll let you know when there's a commit you should probably fetch.
 
 - Anything else, just ask.
