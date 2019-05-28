@@ -47,9 +47,12 @@ function WorldRenderer() {
         return null;
     }
     let ranCustomLoader = false;
-    this.customLoader = (callback,fromMapUpdate) => {
+    this.customLoader = (callback,fromMapUpdate,sourceRoom) => {
+        const startTime = performance.now();
         let loadPlayer = null;
         const finishedLoading = () => {
+            const realTimeSpentLoading = performance.now() - startTime;
+            const firstTime = !ranCustomLoader;
             this.updateMapEnd();
             if(!fromMapUpdate) {
                 if(loadPlayer) {
@@ -57,7 +60,16 @@ function WorldRenderer() {
                 }
                 ranCustomLoader = true;
             }
-            callback();
+            if(firstTime || sourceRoom === this.renderMap.songParent || worldMaps[sourceRoom].songParent === this.renderMap.name) {
+                callback();
+            } else {
+                const fakeDelay = FAKE_OVERWORLD_LOAD_TIME - realTimeSpentLoading;
+                if(fakeDelay > 0) {
+                    setTimeout(callback,FAKE_OVERWORLD_LOAD_TIME);
+                } else {
+                    callback();
+                }
+            }
         }
         if(!fromMapUpdate) {
             loadPlayer = loadLastMapOrDefault();
@@ -151,7 +163,6 @@ function WorldRenderer() {
 
     this.playerController = new PlayerController(this);
 
-    let enterReleased = true;
     let playerMovementLocked = false;
 
     const playerInteractionLocked = () => {
@@ -171,6 +182,7 @@ function WorldRenderer() {
     let sDown = false;
     let aDown = false;
     let dDown = false;
+    let enterReleased = true;
 
     this.popupProgressEnabled = true;
 
@@ -528,22 +540,22 @@ function WorldRenderer() {
             this.camera = this.map.getCameraStart(this);
         }
         this.playerController.player = this.playerObject;
-        this.restoreRoomSong();
+        this.restoreRoomSong(true);
     }
     this.stopMusic = callback => {
         fadeOutSongs(OVERWORLD_MUSIC_FADE_TIME,callback);
     }
-    this.playSong = songName => {
+    this.playSong = (songName,fakeDelays=false) => {
         if(!musicNodes[songName]) {
             let didRunCustomLoader = ranCustomLoader;
             this.stopMusic(()=>{
-                const extraTime = !didRunCustomLoader ? faderTime / 2 : 0;
+                const extraTime = !didRunCustomLoader ? faderTime / 2 : FAKE_OVERWORLD_LOAD_TIME;
                 const fadeIn = () => {
                     musicNodes[songName].volumeControl.gain.setValueAtTime(0.001,audioContext.currentTime);
                     musicNodes[songName].volumeControl.gain.linearRampToValueAtTime(
                         1.0,
                         audioContext.currentTime+
-                        ((OVERWORLD_MUSIC_FADE_TIME+extraTime)/1000)
+                        OVERWORLD_MUSIC_FADE_TIME/1000
                     );
                 }
                 if(extraTime) {
@@ -558,7 +570,7 @@ function WorldRenderer() {
             });
         }
     }
-    this.restoreRoomSong = () => {
+    this.restoreRoomSong = fakeDelays => {
         const roomSong = this.renderMap.roomSong ?
             this.renderMap.roomSong : this.renderMap.songParent ?
                 worldMaps[this.renderMap.songParent].roomSong : null;
@@ -566,10 +578,11 @@ function WorldRenderer() {
             this.stopMusic();
             return;
         }
-        this.playSong(roomSong);
+        this.playSong(roomSong,fakeDelays);
     }
 
     this.updateMap = function(newMapName,data={}) {
+        enterReleased = true;
         const runLoadCode = ranCustomLoader;
         const startedLocked = playerMovementLocked;
         if(runLoadCode) {
@@ -620,7 +633,7 @@ function WorldRenderer() {
             this.customLoader(()=>{
                 resumeRenderer();
                 playerMovementLocked = startedLocked;
-            },true);
+            },true,data.sourceRoom);
         }
     }
 
