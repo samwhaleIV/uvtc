@@ -147,7 +147,7 @@ addMap({
                     break;
             }
         }
-        this.doorClicked = doorID => {
+        this.doorClicked = async doorID => {
             switch(doorID) {
                 case "to_bedroom_1":
                     world.updateMap("bedroom_1",{fromDoorWay:true});
@@ -159,6 +159,16 @@ addMap({
                     world.updateMap("bedroom_3",{fromDoorWay:true});
                     break;
                 case "to_tumble_woods":
+                    if(!world.globalState.goMeetFrogert) {
+                        if(jim) {
+                            world.lockPlayerMovement();
+                            await delay(500);
+                            await jim.sayID("AUTO_41");
+                            world.globalState.goMeetFrogert = true;
+                            world.unlockPlayerMovement();
+                            return;
+                        }
+                    }
                     world.updateMap("tumble_woods",{fromDoorWay:true});
                     break;
             }

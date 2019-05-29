@@ -113,7 +113,15 @@ function SpriteRenderer(startDirection,spriteName,footstepsName="footsteps") {
     this.onTrigger = false;
     this.lastTrigger = null;
 
+    let specialRow = null;
+
+    this.setSpecialFrame = function(frameID) {
+        currentColumn = (Math.floor(frameID / rowCount)+4) * columnWidth;
+        specialRow = frameID % rowCount * columnWidth;
+    }
+
     this.updateDirection = function(direction) {
+        specialRow = null;
         switch(direction) {
             case "down":
                 currentColumn = columnWidth * 0;
@@ -183,7 +191,7 @@ function SpriteRenderer(startDirection,spriteName,footstepsName="footsteps") {
         const destinationX = this.xOffset * width + x;
         const destinationY = this.yOffset * height + y;
 
-        const animationRow = !this.walkingOverride && walking ? 
+        const animationRow = specialRow || !this.walkingOverride && walking ? 
             Math.floor(timestamp / animationFrameTime) % rowCount * rowHeight
         : 0;
         context.drawImage(

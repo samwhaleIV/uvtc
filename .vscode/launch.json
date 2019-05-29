@@ -9,14 +9,24 @@
             "request": "launch",
             "name": "Start Web Server",
             "cwd": "${workspaceFolder}",
-            "program": "${workspaceFolder}\\web-app.js"
+            "program": "${workspaceFolder}\\web-app.js",
+            "console": "externalTerminal"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Compile Maps",
+            "cwd": "${workspaceFolder}\\map-builder",
+            "program": "${workspaceFolder}\\map-builder\\index.js",
+            "console": "externalTerminal"
         },
         {
             "type": "node",
             "request": "launch",
             "cwd": "${workspaceFolder}\\string-mdf",
             "name": "String MDF",
-            "program": "${workspaceFolder}\\string-mdf\\index.js"
+            "program": "${workspaceFolder}\\string-mdf\\index.js",
+            "console": "externalTerminal"
         }
     ]
 }

@@ -52,9 +52,12 @@ function WorldRenderer() {
             this.updateCamera(performance.now(),playerInteractionLocked());
             if(this.map.start) {
                 this.map.start(this);
+            } else {
+                this.unlockPlayerMovement();
             }
             callback();
         }
+        this.lockPlayerMovement();
         const startTime = performance.now();
         let loadPlayer = null;
         const finishedLoading = () => {
@@ -592,9 +595,7 @@ function WorldRenderer() {
     this.updateMap = function(newMapName,data={}) {
         enterReleased = true;
         const runLoadCode = ranCustomLoader;
-        const startedLocked = playerMovementLocked;
         if(runLoadCode) {
-            this.lockPlayerMovement();
             drawLoadingText();
             pauseRenderer();
         }
@@ -638,10 +639,7 @@ function WorldRenderer() {
         }
 
         if(runLoadCode) {
-            this.customLoader(()=>{
-                resumeRenderer();
-                playerMovementLocked = startedLocked;
-            },true,data.sourceRoom);
+            this.customLoader(resumeRenderer,true,data.sourceRoom);
         }
     }
 

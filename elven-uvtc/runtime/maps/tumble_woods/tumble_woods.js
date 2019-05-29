@@ -82,6 +82,12 @@ addMap({
                         frogert = world.getCharacter("frogert","down");
                     }
                     scripts.frogert_doorway(world,frogert);
+                } else if(world.globalState.awaitingBeer) {
+                    if(doorID === "to_tavern") {
+                        world.updateMap("tavern",{fromDoorWay:true});
+                    } else {
+                        world.showTextPopupID("AUTO_64");
+                    }
                 } else {
                     world.showTextPopupID("AUTO_1");
                 }

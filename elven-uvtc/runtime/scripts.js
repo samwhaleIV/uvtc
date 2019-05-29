@@ -197,5 +197,77 @@ const scripts = {
             await frogert.sayID("AUTO_40");
         }
         world.unlockPlayerMovement();
+    },
+    frogert_lets_be_friends: async (world,frogert,skipStart) => {
+        if(!skipStart) {
+            await frogert.speechID([
+                "AUTO_43",
+                "AUTO_44",
+                "AUTO_45",
+                "AUTO_46",
+                "AUTO_47"
+            ]);
+        }
+        playSound("energy");
+        await world.showInstantTextPopup("congratulations! frogert is now your friend!");
+        await frogert.speechID([
+            "AUTO_48",
+            "AUTO_49",
+            "AUTO_50"
+        ]);
+        world.globalState.awaitingBeer = true;
+    },
+    enter_frogerts_house: async (world,frogert) => {
+        world.lockPlayerMovement();
+        await delay(400);
+        await frogert.alert();
+        await delay(200);
+        await frogert.speechID([
+            "AUTO_51",
+            "AUTO_52"
+        ]);
+        let promptResult = await world.showPrompt("explain yourself","hi","be my friend","i was forced here");
+        await delay(800);
+        switch(promptResult) {
+            case 0:
+                await frogert.speechID([
+                    "AUTO_53",
+                    "AUTO_54"
+                ]);
+                const whyYouLied = await world.showPrompt("why did you lie to frogert?","i want to be his friend","i am a sociopath","just because");
+                await delay(800);
+                switch(whyYouLied) {
+                    case 0:
+                        await scripts.frogert_lets_be_friends(world,frogert);
+                        break;
+                    case 1:
+                    case 2:
+                        await frogert.speechID([
+                            "AUTO_55",
+                            "AUTO_56"
+                        ]);
+                        await scripts.frogert_lets_be_friends(world,frogert,true);
+                        break;
+                    case 2:
+                        break;
+                }
+                break;
+            case 1:
+                await scripts.frogert_lets_be_friends(world,frogert);
+                break;
+            case 2:
+                await frogert.speechID([
+                    "AUTO_57",
+                    "AUTO_58",
+                    "AUTO_59",
+                    "AUTO_60",
+                    "AUTO_61",
+                    "AUTO_62",
+                    "AUTO_63"
+                ]);
+                await scripts.frogert_lets_be_friends(world,frogert,true);
+                break;
+        }
+        world.unlockPlayerMovement();
     }
 };

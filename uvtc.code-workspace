@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "elven-uvtc\\runtime\\maps"
+		},
+		{
+			"path": "elven-uvtc\\runtime"
+		},
+		{
+			"path": "elven-uvtc\\audio\\music"
+		}
+	],
+	"settings": {}
+}
