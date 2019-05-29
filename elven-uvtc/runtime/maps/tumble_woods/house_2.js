@@ -5,7 +5,7 @@ addMap({
         }
         this.doorClicked = () => {
             const newMapData = {
-                fromDoorWay: true,
+                fromDoorWay: true
             };
             world.updateMap("tumble_woods",newMapData);
         }

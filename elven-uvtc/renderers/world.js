@@ -305,7 +305,7 @@ function WorldRenderer() {
     this.clearPrompt = () => {
         this.prompt = null;
     }
-    this.showPrompt = (question,options) => {
+    this.showPrompt = (question,...options) => {
         return new Promise(resolve => {
             this.prompt = new WorldPrompt(question,options,selectionIndex => {
                 this.clearPrompt();

@@ -68,6 +68,22 @@ addMap({
             }
         }
         this.doorClicked = doorID => {
+            if(world.globalState.metFrogert) {
+                if(doorID !== "to_house_1") {
+                    world.updateMap("house_1",{fromDoorWay:true});
+                } else if(doorID !== "to_house_2") {
+                    if(world.globalState.frogertDoorSequenceComplete) {
+                        world.updateMap("house_2",{fromDoorWay:true});
+                        return;
+                    }
+                    if(!frogert) {
+                        frogert = world.getCharacter("frogert","down");
+                    }
+                    scripts.meeting_frogert(this,frogert);
+                } else {
+                    world.showTextPopupID('you should probably go check if that frog you scared is okay first.');
+                }
+            }
             world.updateMap(doorID.substring(3),{fromDoorWay:true});
         }
         this.activeTrigger = null;

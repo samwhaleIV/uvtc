@@ -1,7 +1,15 @@
 addMap({
     WorldState: function(world,data) {
+        let frogert;
         this.load = world => {
             world.addPlayer(10,3,"down");
+            if(world.globalState.metFrogert) {
+                frogert = world.getCharacter("frogert","down");
+                world.addObject(frogert,4,6);
+                frogert.interacted = () => {
+
+                }
+            }
         }
         this.doorClicked = () => {
             const newMapData = {

@@ -68,7 +68,7 @@ for(let i = 0;i<filesToReplaceStringsFrom.length;i++) {
                     stringBuffer += '"';
                     const tokenName = `${AUTO_STRING_PREFIX}${++highestAutoID}`;
                     newStrings[tokenName] = stringBuffer;
-                    fileTextBuffer += tokenName;
+                    fileTextBuffer += `"${tokenName}"`;
                     stringBuffer = "";
                 }
             } else {
