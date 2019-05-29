@@ -48,10 +48,18 @@ function WorldRenderer() {
     }
     let ranCustomLoader = false;
     this.customLoader = (callback,fromMapUpdate,sourceRoom) => {
+        const callbackWithMapPost = () => {
+            this.updateCamera(performance.now(),playerInteractionLocked());
+            if(this.map.start) {
+                this.map.start(this);
+            }
+            callback();
+        }
         const startTime = performance.now();
         let loadPlayer = null;
         const finishedLoading = () => {
-            const realTimeSpentLoading = performance.now() - startTime;
+            const endTime = performance.now();
+            const realTimeSpentLoading = endTime - startTime;
             const firstTime = !ranCustomLoader;
             this.updateMapEnd();
             if(!fromMapUpdate) {
@@ -61,13 +69,13 @@ function WorldRenderer() {
                 ranCustomLoader = true;
             }
             if(firstTime || sourceRoom === this.renderMap.songParent || worldMaps[sourceRoom].songParent === this.renderMap.name) {
-                callback();
+                callbackWithMapPost();
             } else {
                 const fakeDelay = FAKE_OVERWORLD_LOAD_TIME - realTimeSpentLoading;
                 if(fakeDelay > 0) {
-                    setTimeout(callback,FAKE_OVERWORLD_LOAD_TIME);
+                    setTimeout(callbackWithMapPost,FAKE_OVERWORLD_LOAD_TIME);
                 } else {
-                    callback();
+                    callbackWithMapPost();
                 }
             }
         }
@@ -747,6 +755,46 @@ function WorldRenderer() {
 
     this.fixedCameraOverride = false;
 
+    this.updateCamera = function(timestamp,movementLocked) {
+        if(this.cameraController) {
+            this.cameraController(timestamp);
+        } else if((!this.renderMap.fixedCamera || this.fixedCameraOverride) && !this.cameraFrozen) {
+            let followObject = this.playerObject;
+            if(this.followObject) {
+                followObject = this.followObject;
+            }
+            if(followObject) {
+                this.camera.x = followObject.x;
+                this.camera.y = followObject.y;
+                this.camera.xOffset = followObject.xOffset;
+                this.camera.yOffset = followObject.yOffset;
+                if(followObject.isPlayer) {
+                    followObject.walkingOverride = movementLocked;
+                }
+            }
+        }
+        if(this.renderMap.useCameraPadding) {
+            const abolsuteCameraX = this.camera.x + this.camera.xOffset;
+            const absoluteCameraY = this.camera.y + this.camera.yOffset;
+
+            if(abolsuteCameraX - halfHorizontalTiles < 0) {
+                this.camera.x = halfHorizontalTiles;
+                this.camera.xOffset = 0;   
+            } else if(abolsuteCameraX + halfHorizontalTiles > this.renderMap.horizontalUpperBound) {
+                this.camera.x = this.renderMap.horizontalUpperBound - halfHorizontalTiles;
+                this.camera.xOffset = 0;
+            }
+
+            if(absoluteCameraY - halfVerticalTiles < 0) {
+                this.camera.y = halfVerticalTiles;
+                this.camera.yOffset = 0;
+            } else if(absoluteCameraY + halfVerticalTiles > this.renderMap.verticalUpperBound) {
+                this.camera.y = this.renderMap.verticalUpperBound - halfVerticalTiles;
+                this.camera.yOffset = 0;
+            }
+        }
+    }
+
     this.render = function(timestamp) {
 
         context.fillStyle = "black";
@@ -760,43 +808,7 @@ function WorldRenderer() {
                 this.playerController.renderMethod(timestamp);
             }
 
-            if(this.cameraController) {
-                this.cameraController(timestamp);
-            } else if((!this.renderMap.fixedCamera || this.fixedCameraOverride) && !this.cameraFrozen) {
-                let followObject = this.playerObject;
-                if(this.followObject) {
-                    followObject = this.followObject;
-                }
-                if(followObject) {
-                    this.camera.x = followObject.x;
-                    this.camera.y = followObject.y;
-                    this.camera.xOffset = followObject.xOffset;
-                    this.camera.yOffset = followObject.yOffset;
-                    if(followObject.isPlayer) {
-                        followObject.walkingOverride = movementLocked;
-                    }
-                }
-            }
-            if(this.renderMap.useCameraPadding) {
-                const abolsuteCameraX = this.camera.x + this.camera.xOffset;
-                const absoluteCameraY = this.camera.y + this.camera.yOffset;
-
-                if(abolsuteCameraX - halfHorizontalTiles < 0) {
-                    this.camera.x = halfHorizontalTiles;
-                    this.camera.xOffset = 0;   
-                } else if(abolsuteCameraX + halfHorizontalTiles > this.renderMap.horizontalUpperBound) {
-                    this.camera.x = this.renderMap.horizontalUpperBound - halfHorizontalTiles;
-                    this.camera.xOffset = 0;
-                }
-
-                if(absoluteCameraY - halfVerticalTiles < 0) {
-                    this.camera.y = halfVerticalTiles;
-                    this.camera.yOffset = 0;
-                } else if(absoluteCameraY + halfVerticalTiles > this.renderMap.verticalUpperBound) {
-                    this.camera.y = this.renderMap.verticalUpperBound - halfVerticalTiles;
-                    this.camera.yOffset = 0;
-                }
-            }
+            this.updateCamera(timestamp,movementLocked);
 
             let verticalTileCount = verticalTiles;
             let horizontalTileCount = horizontalTiles;

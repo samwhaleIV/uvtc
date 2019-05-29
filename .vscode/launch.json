@@ -1,0 +1,22 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Start Web Server",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}\\web-app.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}\\string-mdf",
+            "name": "String MDF",
+            "program": "${workspaceFolder}\\string-mdf\\index.js"
+        }
+    ]
+}

@@ -23,7 +23,9 @@ addMap({
                         if(!world.globalState.metFrogert) {
                             frogert = world.getCharacter("frogert","down");
                             world.addObject(frogert,15,55);
-                            scripts.meeting_frogert(world,frogert);
+                            this.start = () => {
+                                scripts.meeting_frogert(world,frogert);
+                            }
                         }
                         break;
                     case "house_2":
@@ -69,9 +71,9 @@ addMap({
         }
         this.doorClicked = doorID => {
             if(world.globalState.metFrogert) {
-                if(doorID !== "to_house_1") {
+                if(doorID === "to_house_1") {
                     world.updateMap("house_1",{fromDoorWay:true});
-                } else if(doorID !== "to_house_2") {
+                } else if(doorID === "to_house_2") {
                     if(world.globalState.frogertDoorSequenceComplete) {
                         world.updateMap("house_2",{fromDoorWay:true});
                         return;
@@ -79,10 +81,11 @@ addMap({
                     if(!frogert) {
                         frogert = world.getCharacter("frogert","down");
                     }
-                    scripts.meeting_frogert(this,frogert);
+                    scripts.frogert_doorway(world,frogert);
                 } else {
-                    world.showTextPopupID('you should probably go check if that frog you scared is okay first.');
+                    world.showTextPopupID("AUTO_1");
                 }
+                return;
             }
             world.updateMap(doorID.substring(3),{fromDoorWay:true});
         }

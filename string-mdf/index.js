@@ -22,13 +22,16 @@ const walk = function(dir) {
     });
     return results;
 }
+String.prototype.replaceAll = function(search,replacement) {
+    var target = this;
+    return target.split(search).join(replacement);
+};
 
 const filesToReplaceStringsFrom = walk(inputFolder);
 filesToReplaceStringsFrom.push(scriptFile);
 console.log(walk(inputFolder));
 
-let stringsFileLines = fs.readFileSync(stringsFilePath).toString().split("\n");
-const alreadyUsedTokens = {};
+let stringsFileLines = fs.readFileSync(stringsFilePath).toString().split("\r\n");
 let highestAutoID = 0;
 let whereToInsertIntoStrings = 1;
 for(let i = 1;i<stringsFileLines.length;i++) {
@@ -38,26 +41,24 @@ for(let i = 1;i<stringsFileLines.length;i++) {
         break;
     }
     if(line.startsWith(AUTO_STRING_PREFIX)) {
-        const ID = line.split(AUTO_STRING_PREFIX)[1];
+        const ID = Number(line.split(AUTO_STRING_PREFIX)[1]);
         if(ID > highestAutoID) {
             highestAutoID = ID;
         }
     }
-    alreadyUsedTokens[line] = true;
 }
-
-console.log(alreadyUsedTokens);
 
 const newStrings = {};
 
 for(let i = 0;i<filesToReplaceStringsFrom.length;i++) {
     const fileName = filesToReplaceStringsFrom[i];
     const startFileText = fs.readFileSync(fileName).toString();
-    const fileText = startFileText.split("");
+    const fileText = startFileText.replaceAll("\\n","\n").split("");
     let fileTextBuffer = "";
 
     let lastCharacterWasEscapeSequence = false;
     let stringBuffer = "";
+    let inRegularString = false;
     for(let i = 0;i<fileText.length;i++) {
         const character = fileText[i];
         if(stringBuffer !== "") {
@@ -67,7 +68,7 @@ for(let i = 0;i<filesToReplaceStringsFrom.length;i++) {
                 } else {
                     stringBuffer += '"';
                     const tokenName = `${AUTO_STRING_PREFIX}${++highestAutoID}`;
-                    newStrings[tokenName] = stringBuffer;
+                    newStrings[tokenName] = stringBuffer.replaceAll("\n","\\n");
                     fileTextBuffer += `"${tokenName}"`;
                     stringBuffer = "";
                 }
@@ -77,14 +78,15 @@ for(let i = 0;i<filesToReplaceStringsFrom.length;i++) {
                 }
             }
         } else {
-            if(character === "'") {
+            if(character === "'" && !inRegularString) {
                 stringBuffer += '"';
             } else {
                 fileTextBuffer += character;
             }
         }
-        if(character === "\\") {
-            lastCharacterWasEscapeSequence = true;
+        lastCharacterWasEscapeSequence = character === "\\";
+        if(character === '"') {
+            inRegularString = !inRegularString;
         }
     }
 
@@ -103,8 +105,8 @@ if(newStringEntries.length) {
         stringsFileLines.splice(whereToInsertIntoStrings,0,`    ${entry[0]}: ${entry[1]}${shouldAddComma?",":""}`);
         whereToInsertIntoStrings++;
     }
-    fs.writeFileSync(stringsFilePath,stringsFileLines.join("\n"));
+    fs.writeFileSync(stringsFilePath,stringsFileLines.join("\r\n"));
 }
 
-opn("file:///C:/Users/jedisammy4/Documents/uvtc/string-baker.html");
+//opn("file:///C:/Users/jedisammy4/Documents/uvtc/string-baker.html");
 

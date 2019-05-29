@@ -49,7 +49,7 @@ const scripts = {
     },
     meeting_frogert: async (world,frogert) => {
         world.lockPlayerMovement();
-        await delay(200);
+        await delay(500);
         world.autoCameraOff();
         await world.moveCamera(...frogert.location,700);
         frogert.updateDirection("left");
@@ -77,101 +77,109 @@ const scripts = {
         world.globalState.metFrogert = true;
     },
     frogert_doorway: async (world,frogert) => {
-        await frogert.sayID('who is it?');
+        world.lockPlayerMovement();
+        await delay(100);
+        await frogert.sayID("AUTO_2");
         let whoItIs = await world.showPrompt("who are you?","mom","your neighbor","not really sure","knock knock");
+        await delay(1000);
         await frogert.sayID([
-            'mom..?\nyou sound different.\ndid you start drinking again?',
-            'ohhh, jim? long time no see.\ncome on in!',
-            'sorry \'not really sure\', but i can\'t let strangers in.',
-            'uhh, who\'s there?'
+            "AUTO_3",
+            "AUTO_4",
+            "AUTO_5",
+            "AUTO_6"
         ][whoItIs]);
         if(whoItIs === 1) {
             world.globalState.frogertDoorSequenceComplete = true;
         } else if(whoItIs === 3) {
             whoItIs = await world.showPrompt("who are you?","mom","your neighbor","frogert");
+            await delay(1000);
             await frogert.sayID([
-                'mom..?\nmom who?',
-                'my neighbor who?',
-                'frogert. huh. are you my clone?\nfrogert who?'
+                "AUTO_7",
+                "AUTO_8",
+                "AUTO_9"
             ][whoItIs]);
             whoItIs = await world.showPrompt("punchline","let me in","i'm coming in",[
                 "your mom!",
                 "your neighbor that wants in",
                 "frogert the frog"
             ][whoItIs]);
+            await delay(1000);
             switch(whoItIs) {
                 case 0:
-                    await frogert.sayID('only if you ask nicely');
+                    await frogert.sayID("AUTO_10");
                     let askingNicely = await world.showPrompt("do you want to ask nicely?","no","yes","bye");
+                    await delay(1000);
                     switch(askingNicely) {
                         case 0:
-                            await frogert.sayID('please leave now. i don\'t have time for your rudeness.');
+                            await frogert.sayID("AUTO_11");
                             break;
                         case 1:
-                            await frogert.sayID('see, that\'s better. you may come in, now.');
+                            await frogert.sayID("AUTO_12");
                             world.globalState.frogertDoorSequenceComplete = true;
                             break;
                         case 2:
-                            await frogert.sayID('oh. okay. bye then.');
+                            await frogert.sayID("AUTO_13");
                             break;
                     }
                     break;
                 case 1:
-                    await frogert.sayID('what makes you think you can just barge on in here?');
-                    let reason = world.showPrompt('what do you want to say?',"my boldness","time constraints","i have a key to the city");
+                    await frogert.sayID("AUTO_14");
+                    let reason = await world.showPrompt(strings["AUTO_15"],"my boldness","time constraints","i have a key to the city");
+                    await delay(1000);
                     switch(reason) {
                         case 0:
                             frogert.speechID([
-                                'yeah, right. \'boldness\'',
-                                'you know who else is bold? crazy people.',
-                                'try again next time.\ni\'ve got enough of my own crazy in here.'
+                                "AUTO_16",
+                                "AUTO_17",
+                                "AUTO_18"
                             ]);
                             break;
                         case 1:
                             frogert.speechID([
-                                'alright. that\'s fair.',
-                                'you\'ve got places to be, i get it.',
-                                'really, i do.',
-                                'you can come in, now.',
+                                "AUTO_19",
+                                "AUTO_20",
+                                "AUTO_21",
+                                "AUTO_22",
                             ]);
                             world.globalState.frogertDoorSequenceComplete = true;
                             break;
                         case 2:
                             await frogert.speechID([
-                                'really? a key to the city?',
-                                'what\'s the mayors name, then?'
+                                "AUTO_23",
+                                "AUTO_24"
                             ]);
-                            let mayorName = world.showPrompt("what is the mayor's name?","john smith","me","frogert","boney elf");
-                            const notTheMayor = 'you\'re not the mayor...';
+                            let mayorName = await world.showPrompt("what is the mayor's name?","john smith","me","frogert","boney elf");
+                            await delay(1000);
+                            const notTheMayor = "AUTO_25";
                             switch(mayorName) {
                                 case 0:
                                     await frogert.speechID([
                                         notTheMayor,
-                                        'john smith? john smith at yahoo.com?',
-                                        'well you must have important things to do, john smith.',
-                                        'i\'ll let you be on your way, now.',
-                                        'i only let trusted people in my home.'
+                                        "AUTO_26",
+                                        "AUTO_27",
+                                        "AUTO_28",
+                                        "AUTO_29"
                                     ]);
                                     break;
                                 case 1:
                                     await frogert.speechID([
-                                        'hmm. you don\'t sound like the mayor.',
-                                        'in fact, we don\'t even have a mayor. we just have town meetings.',
-                                        'anyhow, i don\'t let liars into my home.'
+                                        "AUTO_30",
+                                        "AUTO_31",
+                                        "AUTO_32"
                                     ]);
                                     break;
                                 case 2:
                                     await frogert.speechID([
-                                        'alright, look wise guy. i know you\'re not frogert.',
-                                        'and i know you think you\'re sooooooo funny, but i\'m not going to let you in my home just because you can make a decent joke.'
+                                        "AUTO_33",
+                                        "AUTO_34"
                                     ])
                                     break;
                                 case 3:
                                     await frogert.speechID([
                                         notTheMayor,
-                                        'oh. you\'re that creep that lives next door.',
-                                        'i would prefer you not coming in, it took me a week to get the stench of your booze out of here last time.',
-                                        'come back when you\'ve laid off the booze.'
+                                        "AUTO_35",
+                                        "AUTO_36",
+                                        "AUTO_37"
                                     ]);
                                     break;
                             }
@@ -180,13 +188,14 @@ const scripts = {
                     break;
                 case 2:
                     await frogert.speechID([
-                        'wow. that\'s a reallllly good joke...\n*cough*',
-                        'if you want in my house you\'re gonna have to do better than that'
+                        "AUTO_38",
+                        "AUTO_39"
                     ]);
                     break;
             }
         } else if(whoItIs === 0) {
-            await frogert.sayID('well, now is not a good time, mom.\ni\'m hiding from that stranger outside, you should lookout.');
+            await frogert.sayID("AUTO_40");
         }
+        world.unlockPlayerMovement();
     }
 };

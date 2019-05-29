@@ -65,6 +65,8 @@ function applySonographToPopupFeed(popupFeed) {
 }
 function WorldPopup(pages,callback,prefix,isInstant=false) {
 
+    prefix = prefix ? prefix : "";
+
 
     const popupFeedMaxWidthPadding = -70;
     const characterSpeed = 30;
@@ -91,9 +93,10 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
         let page = pages[i];
         const newPage = [];
         page = page.replace(/\.\.\./gi,ellipsis);
+        const processedFullText = processTextForWrapping(prefix + page);
         if(isInstant) {
             newPage.push({
-                textFeed:processTextForWrapping(page),
+                textFeed:processTextForWrappingLookAhead(page,processedFullText),
                 newCharacter:null,
                 noSound:true,
                 instant:true,
@@ -103,7 +106,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
             pages[i] = newPage;
             continue;
         }
-        let textFeed = prefix ? prefix : "";
+        let textFeed = prefix;
         for(let x = 0;x<page.length;x++) {
             let speed = characterSpeed;
             let instant = false;
@@ -140,7 +143,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
                     break;
             }
             newPage.push({
-                textFeed:processTextForWrapping(textFeed),
+                textFeed:processTextForWrappingLookAhead(textFeed,processedFullText),
                 newCharacter:character,
                 noSound:true,
                 instant:instant,
@@ -242,7 +245,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
             popupY,
             popupWidth,popupHeight
         );
-        drawTextWrappingBlack(textFeed,popupX + 20,popupY + 20,popupWidth+popupFeedMaxWidthPadding,2,13,textScale);
+        drawTextWrappingLookAheadBlack(textFeed,popupX + 20,popupY + 20,popupWidth+popupFeedMaxWidthPadding,2,13,textScale);
     }
 }
 export default WorldPopup;

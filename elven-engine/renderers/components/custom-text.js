@@ -235,6 +235,85 @@ const processTextForWrapping = function(text) {
     return words;
 }
 
+const processTextForWrappingLookAhead = function(text,processedFullText) {
+    return {
+        sub: processTextForWrapping(text),
+        full: processedFullText
+    }
+}
+const textWrapTest = function(words,maxWidth,horizontalSpace,scale) {
+    let xOffset = 0;
+    const textSpacing = scale * 2;
+    let i = 0;
+    let drawingCustomColor = false;
+    let isNewLine = true;
+    const wrapRequiredTable = new Array(words.length);
+    while(i < words.length) {
+        const word = words[i];
+        if(textControlCodes[word]) {
+            if(word === "\n") {
+                xOffset = 0;
+                wrapRequiredTable[i] = true;
+                isNewLine = true;
+            } else {
+                if(drawingCustomColor) {
+                    drawingCustomColor = false;
+                } else {
+                    drawingCustomColor = true;
+                }
+            }
+        } else {
+            if(!isNewLine) {
+                xOffset += textSpacing;
+            } else {
+                isNewLine = false;
+            }
+            let wordTestWidth = 0;
+            let i2 = 0;
+            while(i2 < word.length) {
+                wordTestWidth += fontDictionary[word[i2]].width;
+                i2++;
+            }
+            wordTestWidth *= scale;
+            if(xOffset + wordTestWidth >= maxWidth) {
+                xOffset = 0;
+                wrapRequiredTable[i] = true;
+            }
+            i2 = 0;
+            while(i2 < word.length) {
+                const character = fontDictionary[word[i2]];
+                const drawWidth = character.width * scale;
+                xOffset += drawWidth;
+                if(i2 < word.length-1) {
+                    xOffset += horizontalSpace;
+                }
+                i2++;
+            }
+        }
+        if(xOffset) {
+            xOffset += horizontalSpace;
+        }
+        i++;
+    }
+    return wrapRequiredTable;
+}
+const drawTextWrappingLookAhead = function(processedText,x,y,maxWidth,horizontalSpace,verticalSpace,scale,color) {
+    const wrapRequiredTable = textWrapTest(processedText.full,maxWidth,horizontalSpace,scale);
+    const wordsAdjusted = [processedText.sub[0]];
+    for(let i = 1;i<processedText.sub.length;i++) {
+        const newLine = wrapRequiredTable[i];
+        const subWord = processedText.sub[i];
+        if(newLine) {
+            wordsAdjusted.push("\n");
+            if(subWord !== "\n") {
+                wordsAdjusted.push(subWord);
+            }
+        } else {
+            wordsAdjusted.push(subWord);
+        }
+    }
+    drawTextWrapping(wordsAdjusted,x,y,maxWidth,horizontalSpace,verticalSpace,scale,color);
+}
 function drawTextWrapping(words,x,y,maxWidth,horizontalSpace,verticalSpace,scale,color) {
     let xOffset = 0;
     let yOffset = 0;
@@ -327,6 +406,12 @@ function drawTextWrappingWhite(words,x,y,maxWidth,horizontalSpace,verticalSpace,
 }
 function drawTextWrappingBlack(words,x,y,maxWidth,horizontalSpace,verticalSpace,scale) {
     drawTextWrapping(words,x,y,maxWidth,horizontalSpace,verticalSpace,scale,"black");
+}
+function drawTextWrappingLookAheadWhite(processedText,x,y,maxWidth,horizontalSpace,verticalSpace,scale) {
+    drawTextWrappingLookAhead(processedText,x,y,maxWidth,horizontalSpace,verticalSpace,scale,"white");
+}
+function drawTextWrappingLookAheadBlack(processedText,x,y,maxWidth,horizontalSpace,verticalSpace,scale) {
+    drawTextWrappingLookAhead(processedText,x,y,maxWidth,horizontalSpace,verticalSpace,scale,"black");
 }
 
 function drawTextWhite(text,x,y,scale) {
