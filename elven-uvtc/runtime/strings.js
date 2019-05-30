@@ -130,7 +130,7 @@ const stringLookup = {
     AUTO_61: "pals forever.",
     AUTO_62: "pals who definitely won't betray each other.",
     AUTO_63: "ever.",
-    AUTO_64: "you should be a good friend and get a beer from the BtavernB for frogert. you can come here later"
+    AUTO_64: "you should be a good friend and get a beer from the BtavernB for frogert. you can go here later."
 }
 const strings = stringLookup;
 const getString = function(ID) {

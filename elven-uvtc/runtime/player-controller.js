@@ -355,7 +355,7 @@ function PlayerController(world) {
             case kc.right:
                 dDown = false;
                 break;
-            case kc.accept:
+            default:
                 return;
         }
         const soloMovementRegister = checkForSoloMovement();

@@ -191,7 +191,7 @@ function SpriteRenderer(startDirection,spriteName,footstepsName="footsteps") {
         const destinationX = this.xOffset * width + x;
         const destinationY = this.yOffset * height + y;
 
-        const animationRow = specialRow || !this.walkingOverride && walking ? 
+        const animationRow = specialRow !== null ? specialRow : !this.walkingOverride && walking ? 
             Math.floor(timestamp / animationFrameTime) % rowCount * rowHeight
         : 0;
         context.drawImage(

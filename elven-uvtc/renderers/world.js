@@ -7,7 +7,6 @@ import ElfSpriteRenderer from "./components/world/elf-sprite.js";
 import GetOverworldCharacter from "../runtime/character-creator.js";
 
 function WorldRenderer() {
-
     Object.defineProperty(this,"globalState",{
         get: function() {
             return GlobalState.data;
@@ -76,7 +75,7 @@ function WorldRenderer() {
             } else {
                 const fakeDelay = FAKE_OVERWORLD_LOAD_TIME - realTimeSpentLoading;
                 if(fakeDelay > 0) {
-                    setTimeout(callbackWithMapPost,FAKE_OVERWORLD_LOAD_TIME);
+                    setTimeout(callbackWithMapPost,fakeDelay);
                 } else {
                     callbackWithMapPost();
                 }
@@ -288,6 +287,7 @@ function WorldRenderer() {
     this.clearTextPopup = () => {
         this.popup = null;
     }
+    this.allowKeysDuringPause = true;
 
     const showTextPopup = (pages,name=null,instant=false) => {
         return new Promise(resolve=>{
@@ -551,12 +551,12 @@ function WorldRenderer() {
             this.camera = this.map.getCameraStart(this);
         }
         this.playerController.player = this.playerObject;
-        this.restoreRoomSong(true);
+        this.restoreRoomSong();
     }
     this.stopMusic = callback => {
         fadeOutSongs(OVERWORLD_MUSIC_FADE_TIME,callback);
     }
-    this.playSong = (songName,fakeDelays=false) => {
+    this.playSong = (songName) => {
         if(!musicNodes[songName]) {
             let didRunCustomLoader = ranCustomLoader;
             this.stopMusic(()=>{
@@ -581,7 +581,7 @@ function WorldRenderer() {
             });
         }
     }
-    this.restoreRoomSong = fakeDelays => {
+    this.restoreRoomSong = () => {
         const roomSong = this.renderMap.roomSong ?
             this.renderMap.roomSong : this.renderMap.songParent ?
                 worldMaps[this.renderMap.songParent].roomSong : null;
@@ -589,15 +589,15 @@ function WorldRenderer() {
             this.stopMusic();
             return;
         }
-        this.playSong(roomSong,fakeDelays);
+        this.playSong(roomSong);
     }
 
     this.updateMap = function(newMapName,data={}) {
         enterReleased = true;
         const runLoadCode = ranCustomLoader;
         if(runLoadCode) {
-            drawLoadingText();
             pauseRenderer();
+            drawLoadingText();
         }
         if(this.renderMap) {
             data.sourceRoom = this.renderMap.name;
@@ -795,16 +795,20 @@ function WorldRenderer() {
 
     this.render = function(timestamp) {
 
-        context.fillStyle = "black";
-        context.fillRect(0,0,fullWidth,fullHeight);
-
         if(tileRenderingEnabled) {
         
             const movementLocked = playerInteractionLocked();
 
             if(!movementLocked && this.playerController.renderMethod) {
                 this.playerController.renderMethod(timestamp);
+                if(paused) {
+                    //This ensures that the world is not rendered before the loading segment plays, such as when the player changes map by a trigger.
+                    return;
+                }
             }
+
+            context.fillStyle = "black";
+            context.fillRect(0,0,fullWidth,fullHeight);
 
             this.updateCamera(timestamp,movementLocked);
 

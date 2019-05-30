@@ -7,7 +7,7 @@ addMap({
                 frogert = world.getCharacter("frogert","up");
                 frogert.interacted = (x,y,direction) => {
                     if(world.globalState.awaitingBeer) {
-                        frogert.updateDirection(invertDirection(direction));
+                        frogert.updateDirection(direction);
                         frogert.sayID("AUTO_42");
                     }
                 }

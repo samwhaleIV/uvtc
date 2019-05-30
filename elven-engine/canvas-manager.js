@@ -242,8 +242,11 @@ const rewriteKeyboardEventCode = eventCode => {
     }
     return keyBindings[eventCode];
 }
+
 const keyup = event => {
-    if(paused || !rendererState) {
+    if(!rendererState) {
+        return;
+    } else if(paused && !rendererState.allowKeysDuringPause) {
         return;
     }
     routeKeyEvent(rewriteKeyboardEventCode(event.code),keyEventTypes.keyUp);
@@ -270,7 +273,9 @@ const keydown = event => {
             cycleSizeMode();
             break;
     }
-    if(paused || !rendererState) {
+    if(!rendererState) {
+        return;
+    } else if(paused && !rendererState.allowKeysDuringPause) {
         return;
     }
     routeKeyEvent(keyCode,keyEventTypes.keyDown);
@@ -505,6 +510,7 @@ function forceRender() {
         console.error("Error: Missing renderer state; the renderer cannot render.");
         return;
     }
+    console.log("Canvas handler: Forced render");
     rendererState.render(
         context,performance.now()
     );

@@ -18,4 +18,3 @@ const FIRST_MAP_ID = "bedroom_1";
 
 const OVERWORLD_MUSIC_FADE_TIME = 100;
 const FAKE_OVERWORLD_LOAD_TIME = 500;
-
