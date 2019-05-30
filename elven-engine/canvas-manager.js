@@ -120,7 +120,15 @@ function getRelativeEventLocation(event) {
     }
 }
 function touchEnabled(event) {
-    return !paused && event.isPrimary && rendererState;
+    return !paused && event.isPrimary && rendererState && !rendererState.transitioning;
+}
+function keyinputEnabled(event) {
+    if(!rendererState) {
+        return false;
+    } else if((paused && !rendererState.allowKeysDuringPause) || rendererState.transitioning) {
+        return false;
+    }
+    return true;
 }
 function setPageTitle(title) {
     document.title = title;
@@ -244,9 +252,7 @@ const rewriteKeyboardEventCode = eventCode => {
 }
 
 const keyup = event => {
-    if(!rendererState) {
-        return;
-    } else if(paused && !rendererState.allowKeysDuringPause) {
+    if(!keyinputEnabled()) {
         return;
     }
     routeKeyEvent(rewriteKeyboardEventCode(event.code),keyEventTypes.keyUp);
@@ -273,9 +279,7 @@ const keydown = event => {
             cycleSizeMode();
             break;
     }
-    if(!rendererState) {
-        return;
-    } else if(paused && !rendererState.allowKeysDuringPause) {
+    if(!keyinputEnabled()) {
         return;
     }
     routeKeyEvent(keyCode,keyEventTypes.keyDown);
@@ -425,6 +429,7 @@ const render = (function(){
             backgroundContext.fillRect(0,0,1,1);
             if(!paused) {
                 rendererState.render(timestamp);
+                rendererState.fader.render(timestamp);
             }
         }
     } else {
@@ -443,6 +448,7 @@ const render = (function(){
                     i++;
                 }
                 rendererState.render(timestamp);
+                rendererState.fader.render(timestamp);
             }
         }
     }
@@ -473,6 +479,9 @@ function startRenderer() {
 
 function setRendererState(newRendererState) {
     rendererState = newRendererState;
+    if(!rendererState.fader) {
+        rendererState.fader = getFader();
+    }
     applySizeMode(true);
     if(rendererState.processKey) {
         if(rendererState.processKeyUp) {

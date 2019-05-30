@@ -148,8 +148,6 @@ function WorldRenderer() {
 
     this.elf = ElfSpriteRenderer;
 
-    this.fader = getFader();
-
     this.camera = {
         x: 10,
         y: 10,
@@ -912,7 +910,6 @@ function WorldRenderer() {
         if(this.customRenderer) {
             this.customRenderer(timestamp);
         }
-        this.fader.render(timestamp);
     }
 }
 export default WorldRenderer;
