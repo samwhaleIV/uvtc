@@ -7,7 +7,7 @@ app.use(function(req,res,next) {
     next();
 });
 
-app.use(express.static("./"));
+app.use(express.static("../"));
 
 app.listen(port, function appStarted() {
     console.log(`App listening on port ${port}!`);
