@@ -2,11 +2,11 @@
 const audioContext = new AudioContext();
 
 const volumeNode = audioContext.createGain();
-volumeNode.gain.setValueAtTime(soundGain||3/4,audioContext.currentTime);
+volumeNode.gain.setValueAtTime(soundGain,audioContext.currentTime);
 volumeNode.connect(audioContext.destination);
 
 const musicVolumeNode = audioContext.createGain();
-musicVolumeNode.gain.setValueAtTime(musicNodeGain||0.2,audioContext.currentTime);
+musicVolumeNode.gain.setValueAtTime(musicNodeGain,audioContext.currentTime);
 musicVolumeNode.connect(audioContext.destination);
 
 const musicOutputNode = musicVolumeNode;
