@@ -10,9 +10,11 @@
 
 5. Click the `fetch origin` button to verify the files downloaded correctly.
 
+6. You will also need to clone a repo for the engine. This follows the same previous steps. [Click me to open the engine repo in the GitHub application](x-github-client://openRepo/https://github.com/mistopportunity/elven-engine). You must place this repo so that it is in the same directory as your uvtc folder, but not inside it. For instance, `documents/elven-engine` and `documents/uvtc`, but not `documents/uvtc/elven-engine`.
+
 I recommend that you sign into GitHub so if you need to send commits or pull requests. I will add you as a trusted contributor.
 
-You will need to periodically use the fetch origin button to keep your repo up to date. If you make a commit with new songs, this will help us both. This generally is immediate once the files are uploaded and doesn't have the same delays that GitHub's hosted version does.
+You will need to periodically use the fetch origin button to keep your repos up to date. If you make a commit with new songs, this will help us both. This generally is immediate once the files are uploaded and doesn't have the same delays that GitHub's hosted version does.
 
 
 ## Adding new songs to the game files
@@ -49,9 +51,9 @@ Sorry cowboy. We're not done here yet.
 
 5. When the installation process is done, you will be able to run the command `npm run-script web` to start the server
 
-6. Navigate to [http://localhost/](http://localhost/) in a supported web browser.
+6. Navigate to [http://localhost/uvtc/index.html](http://localhost/uvtc/index.html) in a supported web browser.
 
-    To skip the pesty cutscenes and freely move around the world as you please, go to [http://localhost/index-debug.html](http://localhost/index-debug.html) instead.
+    To skip the pesty cutscenes and freely move around the world as you please, go to [http://localhost/uvtc/index-debug.html](http://localhost/uvtc/index-debug.html) instead.
 
 
 ## Troubleshooting
