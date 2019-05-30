@@ -109,6 +109,9 @@ function getFader() {
                 rendererState = new rendererState.fader.transitionRenderer(
                     ...rendererState.fader.transitionParameters
                 );
+                if(!rendererState.fader) {
+                    rendererState.fader = getFader();
+                }
                 if(rendererState.fader) {
                     rendererState.transitioning = true;
                     if(rendererState.customLoader) {
@@ -178,6 +181,8 @@ function getFader() {
                     } else {
                         fadeInCompleter();
                     }
+                } else {
+                    console.error("Transition error: Renderer state is missing a fader");
                 }
             } else {
                 console.error("Error: Missing fader transition state");

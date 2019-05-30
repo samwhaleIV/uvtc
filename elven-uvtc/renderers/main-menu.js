@@ -22,9 +22,6 @@ function MainMenuRenderer() {
     let showHoverSpecialEffect = false;
 
     this.processKey = function(key) {
-        if(this.transitioning) {
-            return;
-        }
         if(this.settingsPane) {
             this.settingsPane.processKey(key);
             return;
@@ -37,9 +34,6 @@ function MainMenuRenderer() {
         }
     }
     this.processKeyUp = function(key) {
-        if(this.transitioning) {
-            return;
-        }
         if(this.settingsPane) {
             this.settingsPane.processKeyUp(key);
             return;
@@ -51,9 +45,6 @@ function MainMenuRenderer() {
 
     this.processClick = function(x,y) {
         showHoverSpecialEffect = true;
-        if(this.transitioning) {
-            return;
-        }
         if(this.settingsPane) {
             this.settingsPane.processClick(x,y);
         }
@@ -64,9 +55,6 @@ function MainMenuRenderer() {
 
     this.processClickEnd = function(x,y) {
         showHoverSpecialEffect = false;
-        if(this.transitioning) {
-            return;
-        }
         if(this.settingsPane) {
             this.settingsPane.processClickEnd(x,y);
             return;
@@ -201,8 +189,6 @@ function MainMenuRenderer() {
 
     const playButtonLocation = getPlaceholderLocation();
 
-    this.fader = getFader();
-
     this.render = function(timestamp) {
         context.fillStyle = "black";
         context.fillRect(0,0,fullWidth,fullHeight);
@@ -307,7 +293,6 @@ function MainMenuRenderer() {
             this.settingsPane.render(timestamp);
         }
 
-        this.fader.render(timestamp);
     }
 }
 export default MainMenuRenderer;
