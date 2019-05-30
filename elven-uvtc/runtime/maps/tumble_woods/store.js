@@ -11,8 +11,10 @@ addMap({
                     break;
             }
         }
+        let didTrigger = false;
         this.triggerActivated = (triggerID,direction) => {
-            if(triggerID === 1 && direction === "up") {
+            if(triggerID === 1 && direction === "up" && !didTrigger) {
+                didTrigger = true;
                 world.updateMap("tumble_woods",{fromDoorWay:true});
             }
         }

@@ -26,6 +26,9 @@ addMap({
             }
         }
         this.triggerActivated = triggerID => {
+          
+        }
+        this.triggerDeactivated = triggerID => {
             
         }
     },

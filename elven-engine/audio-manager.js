@@ -231,6 +231,7 @@ function stopMusic() {
 }
 
 function playSound(name,duration) {
+    console.log(name,duration);
     const buffer = audioBuffers[name];
     if(buffer) {
         const bufferSourceNode = audioContext.createBufferSource();

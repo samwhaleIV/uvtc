@@ -135,6 +135,7 @@ addMap({
                 world.addObject(jim,18,10);
             }
         }
+        let didTriggerEnterTrigger = false;
         this.triggerActivated = (triggerID,direction) => {
             switch(triggerID) {
                 case 1:
@@ -142,7 +143,10 @@ addMap({
                         return;
                     }
                     if(!world.globalState.playedEnterTrigger) {
-                        scripts.how_to_press_enter(world,jim);
+                        if(!didTriggerEnterTrigger) {
+                            didTriggerEnterTrigger = true;
+                            scripts.how_to_press_enter(world,jim);
+                        }
                     }
                     break;
             }
