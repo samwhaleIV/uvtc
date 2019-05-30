@@ -42,9 +42,6 @@ function createRainbowGradient() {
     return gradient;
 }
 
-const internalWidth = 800;
-const internalHeight = 600;
-
 const heightByWidth = internalHeight / internalWidth;
 let widthByHeight = internalWidth / internalHeight;
 
@@ -89,15 +86,22 @@ const pictureModeElement = document.getElementById("picture-mode-element");
 const sizeModes = {
     fit: {
         name: "fit",
+        classicName: "fill",
         displayName: "box fill"
     },
     stretch: {
         name: "stretch",
+        classicName: "stretch",
         displayName: "fill"
     },
     center: {
         name: "center",
+        classicName: "1:1 scale",
         displayName: "box 1:1"
+    },
+    classic: {
+        name: "classic",
+        displayName: "none"
     }
 }
 
@@ -310,81 +314,116 @@ function applySizeMode(forced=false) {
         sizeApplicationDeferred = true;
         return;
     }
-    let sizeMode;
-    if(rendererState.forcedSizeMode) {
-        sizeMode = rendererState.forcedSizeMode;
-        if(canvasSizeMode === sizeModes.center.name && rendererState.forcedSizeMode === sizeModes.fit.name) {
-            sizeMode = sizeModes.center.name;
-        } else if(canvasSizeMode === sizeModes.fit.name && rendererState.forcedSizeMode === sizeModes.center.name) {
-            sizeMode = sizeModes.fit.name;
+    if(rendererState.forcedSizeMode === sizeModes.classic.name) {
+        canvas.width = internalWidth;
+        canvas.height = internalHeight;
+        switch(canvasSizeMode) {
+            default:
+            case "fit":
+                if(window.innerWidth / window.innerHeight > widthByHeight) {
+                    const newWidth = window.innerHeight * widthByHeight;
+                    canvas.style.height = window.innerHeight + "px";
+                    canvas.style.width = newWidth + "px";
+                    canvas.style.top = "0px";
+                    canvas.style.left = (window.innerWidth / 2) - (newWidth / 2) + "px";
+                } else {
+                    const newHeight = window.innerWidth * heightByWidth;
+                    canvas.style.width = window.innerWidth + "px";
+                    canvas.style.height = newHeight + "px";
+                    canvas.style.top = ((window.innerHeight / 2) - (newHeight / 2)) + "px";
+                    canvas.style.left = "0px";
+                }
+                break;
+            case "stretch":
+                canvas.style.width = "100%";
+                canvas.style.height = "100%";
+                canvas.style.left = "0";
+                canvas.style.top = "0";
+                break;
+            case "center":
+                canvas.style.width = canvas.width + "px";
+                canvas.style.height = canvas.height + "px";
+                canvas.style.left = ((window.innerWidth / 2) - (canvas.width / 2)) + "px";
+                canvas.style.top = "4vh";
+                break;
         }
     } else {
-        sizeMode = canvasSizeMode;
-    }
-    if(sizeMode === sizeModes.stretch.name &&
-        (
-            window.innerWidth / window.innerHeight > maximumWidthToHeightRatio ||
-            window.innerHeight / window.innerWidth > maximumHeightToWidthRatio
-        ) && !rendererState.disableAdapativeFill
-    ) {
-        sizeMode = sizeModes.fit.name;
-    }
-    switch(sizeMode) {
-        case sizeModes.fit.name:
-            applyLowResolutionTextAdapations();
-            canvas.width = internalWidth;
-            canvas.height = internalHeight;
-            if(window.innerWidth / window.innerHeight > widthByHeight) {
-                const newWidth = window.innerHeight * widthByHeight;
-
-                canvas.style.height = window.innerHeight + "px";
-                canvas.style.width = newWidth + "px";
-
-                canvas.style.top = "0px";
-                canvas.style.left = (window.innerWidth / 2) - (newWidth / 2) + "px";
-            } else {
-                const newHeight = window.innerWidth * heightByWidth;
-
-                canvas.style.width = window.innerWidth + "px";
-                canvas.style.height = newHeight + "px";
-
-                canvas.style.top = ((window.innerHeight / 2) - (newHeight / 2)) + "px";
-                canvas.style.left = "0px";
+        let sizeMode;
+        if(rendererState.forcedSizeMode) {
+            sizeMode = rendererState.forcedSizeMode;
+            if(canvasSizeMode === sizeModes.center.name && rendererState.forcedSizeMode === sizeModes.fit.name) {
+                sizeMode = sizeModes.center.name;
+            } else if(canvasSizeMode === sizeModes.fit.name && rendererState.forcedSizeMode === sizeModes.center.name) {
+                sizeMode = sizeModes.fit.name;
             }
-            break;
-        default:
-        case sizeModes.stretch.name:
-            let zoomDivider = rendererState ? rendererState.zoomDivider || defaultFullScreenZoom : defaultFullScreenZoom;
-            if(window.innerWidth >= maxHorizontalResolution) {
-                zoomDivider = (window.innerWidth / maxHorizontalResolution) * defaultFullScreenZoom;
-                applyHighResolutionTextAdaptions();
-            } else if(window.innerWidth < smallScaleSnapPoint) {
-                zoomDivider = smallFullScreenZoom;
+        } else {
+            sizeMode = canvasSizeMode;
+        }
+        if(sizeMode === sizeModes.stretch.name &&
+            (
+                window.innerWidth / window.innerHeight > maximumWidthToHeightRatio ||
+                window.innerHeight / window.innerWidth > maximumHeightToWidthRatio
+            ) && !rendererState.disableAdapativeFill
+        ) {
+            sizeMode = sizeModes.fit.name;
+        }
+        switch(sizeMode) {
+            case sizeModes.fit.name:
                 applyLowResolutionTextAdapations();
-            } else if(window.innerWidth < mediumScaleSnapPoint) {
-                zoomDivider = mediumFullScreenZoom;
-                applyMediumResolutionTextAdapations();
-            } else {
-                applyHighResolutionTextAdaptions();
-            }
-
-            canvas.width = (window.innerWidth/zoomDivider)
-            canvas.height = (window.innerHeight/zoomDivider);
-
-            canvas.style.width = window.innerWidth + "px";
-            canvas.style.height = window.innerHeight + "px";
-            canvas.style.left = "0px";
-            canvas.style.top = "0px";
-            break;
-        case sizeModes.center.name:
-            applyLowResolutionTextAdapations();
-            canvas.width = internalWidth;
-            canvas.height = internalHeight;
-            canvas.style.width = canvas.width + "px";
-            canvas.style.height = canvas.height + "px";
-            canvas.style.left = ((window.innerWidth / 2) - (canvas.width / 2)) + "px";
-            canvas.style.top = "4vh";
-            break;
+                canvas.width = internalWidth;
+                canvas.height = internalHeight;
+                if(window.innerWidth / window.innerHeight > widthByHeight) {
+                    const newWidth = window.innerHeight * widthByHeight;
+    
+                    canvas.style.height = window.innerHeight + "px";
+                    canvas.style.width = newWidth + "px";
+    
+                    canvas.style.top = "0px";
+                    canvas.style.left = (window.innerWidth / 2) - (newWidth / 2) + "px";
+                } else {
+                    const newHeight = window.innerWidth * heightByWidth;
+    
+                    canvas.style.width = window.innerWidth + "px";
+                    canvas.style.height = newHeight + "px";
+    
+                    canvas.style.top = ((window.innerHeight / 2) - (newHeight / 2)) + "px";
+                    canvas.style.left = "0px";
+                }
+                break;
+            default:
+            case sizeModes.stretch.name:
+                let zoomDivider = rendererState ? rendererState.zoomDivider || defaultFullScreenZoom : defaultFullScreenZoom;
+                if(window.innerWidth >= maxHorizontalResolution) {
+                    zoomDivider = (window.innerWidth / maxHorizontalResolution) * defaultFullScreenZoom;
+                    applyHighResolutionTextAdaptions();
+                } else if(window.innerWidth < smallScaleSnapPoint) {
+                    zoomDivider = smallFullScreenZoom;
+                    applyLowResolutionTextAdapations();
+                } else if(window.innerWidth < mediumScaleSnapPoint) {
+                    zoomDivider = mediumFullScreenZoom;
+                    applyMediumResolutionTextAdapations();
+                } else {
+                    applyHighResolutionTextAdaptions();
+                }
+    
+                canvas.width = (window.innerWidth/zoomDivider)
+                canvas.height = (window.innerHeight/zoomDivider);
+    
+                canvas.style.width = window.innerWidth + "px";
+                canvas.style.height = window.innerHeight + "px";
+                canvas.style.left = "0px";
+                canvas.style.top = "0px";
+                break;
+            case sizeModes.center.name:
+                applyLowResolutionTextAdapations();
+                canvas.width = internalWidth;
+                canvas.height = internalHeight;
+                canvas.style.width = canvas.width + "px";
+                canvas.style.height = canvas.height + "px";
+                canvas.style.left = ((window.innerWidth / 2) - (canvas.width / 2)) + "px";
+                canvas.style.top = "4vh";
+                break;
+        }
     }
     setSizeConstants();
     rainbowGradient = createRainbowGradient();
@@ -395,6 +434,7 @@ function applySizeMode(forced=false) {
 }
 function cycleSizeMode() {
     let newMode = defaultSizeMode;
+    let displayNameType =  rendererState.forcedSizeMode === sizeModes.classic.name ? "classicName" : "displayName";
     switch(canvasSizeMode) {
         default:
         case sizeModes.fit.name:
@@ -410,7 +450,7 @@ function cycleSizeMode() {
     if(pictureModeElementTimeout) {
         clearTimeout(pictureModeElementTimeout);
     }
-    pictureModeElement.textContent = sizeModes[newMode].displayName;
+    pictureModeElement.textContent = sizeModes[newMode][displayNameType];
     pictureModeElementTimeout = setTimeout(()=>{
         pictureModeElement.textContent = "";
         pictureModeElementTimeout = null;
