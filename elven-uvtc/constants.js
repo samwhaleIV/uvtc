@@ -2,6 +2,9 @@
 const internalWidth = 800;
 const internalHeight = 600;
 
+const soundGain = 3 / 4;
+const musicNodeGain = 0.5;
+
 const hoverPadding = 2.5;
 const doubleHoverPadding = hoverPadding + hoverPadding; 
 const flatHoverPadding = Math.floor(hoverPadding);
