@@ -23,7 +23,6 @@ function applySonographToPopupFeed(popupFeed) {
             case ellipsis:
             case "*":
             case "-":
-            case "Z":
             case " ":
             case ",":
             case ".":
