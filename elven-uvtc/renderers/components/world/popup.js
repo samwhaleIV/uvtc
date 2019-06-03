@@ -113,11 +113,6 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
             let delay = 0;
             textFeed += character;
             switch(character) {
-                default:
-                    if(character === character.toUpperCase()) {
-                        continue;
-                    }
-                    break;
                 case ellipsis:
                     delay = ellipsisDelay;
                     break;
@@ -244,7 +239,11 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
             popupY,
             popupWidth,popupHeight
         );
-        drawTextWrappingLookAheadBlack(textFeed,popupX + 20,popupY + 20,popupWidth+popupFeedMaxWidthPadding,2,13,textScale);
+        BitmapText.drawTextWrappingLookAheadBlack(
+            textFeed,popupX + 20,popupY + 20,
+            popupWidth+popupFeedMaxWidthPadding,
+            1,0,2
+        );
     }
 }
 export default WorldPopup;

@@ -1,12 +1,22 @@
 const CharacterColors = {
-    "jim": textColorLookup["B"],
-    "frogert": textColorLookup["G"],
-    "wimpy red elf": textColorLookup["R"],
-    "red elfette": textColorLookup["R"],
-    "boney elf": textColorLookup["Q"],
-    "wizard elf": textColorLookup["P"],
-    "headless elf": textColorLookup["O"],
-    "jester elf": textColorLookup["Y"]
+    "jim": "blue",
+    "frogert": "green",
+    "wimpy red elf": "red",
+    "red elfette": "red",
+    "boney elf": "deeppink",
+    "wizard elf": "blueviolet",
+    "headless elf": "deeporange",
+    "jester elf": "goldenrod"
+}
+const CharacterDisplayNames = {
+    "jim": "Jim",
+    "frogert": "Frogert",
+    "wimpy red elf": "Wimpy Red Elf",
+    "red elfette": "Red Elfette",
+    "boney elf": "Boney Elf",
+    "wizard elf": "Wizard Elf",
+    "headless elf": "Headless Elf",
+    "jester elf": "Jester Elf"
 }
 const colorLookup = {}
 Object.entries(textColorLookup).forEach(entry => {
@@ -27,7 +37,11 @@ const getColorCode = characterName => {
 }
 const getPrefix = characterName => {
     const colorCode = getColorCode(characterName);
-    return `${colorCode}${characterName}:${colorCode} `;
+    let displayName = CharacterDisplayNames[characterName];
+    if(!displayName) {
+        displayName = characterName;
+    }
+    return `${colorCode}${displayName}:${colorCode} `;
 }
 const getPrefixMask = (character,maskedName) => {
     if(!character.characterName) {

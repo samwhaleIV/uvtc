@@ -56,6 +56,7 @@ const processRawStrings = function() {
                 case "!":
                 case " ":
                     if(word) {
+                        word = word.toLowerCase();
                         if(!wordSyllableMaps[word] && !allWordsLookup[word]) {
                             allWords.push(word);
                             console.log(word);
@@ -68,7 +69,11 @@ const processRawStrings = function() {
 
             lastCharacter = character;
         }
-        if(word && !wordSyllableMaps[word] && !allWordsLookup[word]) {
+        if(!word){
+            return;
+        }
+        word = word.toLowerCase();
+        if(!wordSyllableMaps[word] && !allWordsLookup[word]) {
             allWords.push(word);
             console.log(word);
         }

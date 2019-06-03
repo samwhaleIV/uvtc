@@ -6,6 +6,7 @@ drawLoadingText();
 establishMapLinks();
 
 function loadCallback() {
+    BitmapText.verifyBitmap();
     setRendererState(new MainMenuRenderer());
     startRenderer();
     if(rendererState.song) {
@@ -31,4 +32,3 @@ if(ENV_FLAGS.FAST_AS_FUCK_TRANSITIONS) {
     setFaderDuration(1000);
     setMusicFadeDuration(1000);
 }
-
