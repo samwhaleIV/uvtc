@@ -125,11 +125,11 @@ function MainMenuRenderer() {
     const floatingElfRatio = floatingElfImage.height / floatingElfImage.width;
     const bannerImageRatio = bannerImage.height / bannerImage.width;
 
-    const bannerYOffset = 50;
-    const centerYOffset = bannerYOffset;
+    let bannerYOffset;
+    let centerYOffset;
 
     const siloImageRatio = siloImage.height / siloImage.width;
-    const stencilBackground = new RotatingBackground("spiral-menu",centerYOffset);
+    const stencilBackground = new RotatingBackground("spiral-menu");
     stencilBackground.rotationTime = 10000;
     stencilBackground.clockwise = true;
 
@@ -237,6 +237,10 @@ function MainMenuRenderer() {
         return timeNormal / 2;
     }
     this.render = function(timestamp) {
+        bannerYOffset = fullHeight * 0.05;
+        centerYOffset = bannerYOffset - fullHeight * 0.025;
+        stencilBackground.centerYOffset = centerYOffset;
+
         context.fillStyle = "black";
         context.fillRect(0,0,fullWidth,fullHeight);
         this.background.render(timestamp);

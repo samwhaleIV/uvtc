@@ -1,5 +1,6 @@
 function RotatingBackground(imageName,yOffset=0) {
     this.startHeight = fullHeight ? fullHeight : window.innerHeight;
+    this.centerYOffset = yOffset;
     const image = imageDictionary[`backgrounds/${imageName}`];
     const imageWidth = image.width;
     const imageHeight = image.height;
@@ -7,7 +8,7 @@ function RotatingBackground(imageName,yOffset=0) {
     this.clockwise = false;
     this.timeOffset = 0;
     this.render = timestamp => {
-        const centerY = halfHeight + (yOffset*(fullHeight/this.startHeight));
+        const centerY = halfHeight + (this.centerYOffset*(fullHeight/this.startHeight));
         timestamp = timestamp - this.timeOffset;
         context.save();
         context.translate(halfWidth,centerY);
