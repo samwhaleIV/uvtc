@@ -18,6 +18,8 @@ ImagePaths.push(
     getFile("ui/status-roll.png",FileTypes.Image),
     getFile("ui/silo.png",FileTypes.Image),
     getFile("ui/elfmart.png",FileTypes.Image),
+    getFile("ui/menu-elf.png",FileTypes.Image),
+    getFile("ui/banner.png",FileTypes.Image),
     getFile("ui/settings.png",FileTypes.Image),
     getFile("world-tileset.png",FileTypes.Image),
     getFile("sprites/player.png",FileTypes.Image),

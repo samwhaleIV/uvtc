@@ -14,6 +14,8 @@ const SettingsPaneRenderer = new (function(){
         return friendlyName;
     }
 
+    const colorCode = inverseTextColorLookup.red;
+
     let wrappedKeyBindText;
     const reloadKeyBindDescription = () => {
         const x = (y,z) => {
@@ -41,7 +43,7 @@ const SettingsPaneRenderer = new (function(){
                 return;
             }
             let friendlyName = getFriendlyKeyName(the_key_of_the_keyboard);
-            friendlyName = `R${friendlyName}R`;
+            friendlyName = `${colorCode}${friendlyName}${colorCode}`;
             finalData[schema.index] = `${friendlyName} - ${schema.name}`;
         });
         wrappedKeyBindText = processTextForWrapping(finalData.join("\n"));
@@ -118,7 +120,7 @@ const SettingsPaneRenderer = new (function(){
         if(keyBindBuffer[keyCode] || hasModifier) {
             playSound("damage");
             wrappedKeyBindText = processTextForWrapping(
-                hasModifier ? "illegal key modifier!" : `R${getFriendlyKeyName(keyCode)}R is already used!`
+                hasModifier ? "illegal key modifier!" : `${colorCode}${getFriendlyKeyName(keyCode)}${colorCode} is already used!`
             );
             keyErrorTimeout = setTimeout(updateKeyBindRequest,600);
             return;
@@ -138,7 +140,7 @@ const SettingsPaneRenderer = new (function(){
         }
         playSound("energy");
         wrappedKeyBindText = processTextForWrapping(
-            `press key for R${bindOrder[keyBindInputIndex].name}R`
+            `press key for ${colorCode}${bindOrder[keyBindInputIndex].name}${colorCode}`
         );
     }
 
@@ -229,7 +231,7 @@ const SettingsPaneRenderer = new (function(){
         }
         hoverType = hoverTypes.none;
     }
-    this.render = timestamp => {
+    this.render = () => {
         context.fillStyle = "rgba(50,50,50,0.98)";
         context.fillRect(20,20,fullWidth-40,fullHeight-40);
 

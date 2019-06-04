@@ -643,7 +643,7 @@ function WorldRenderer() {
 
     let horizontalTiles, verticalTiles, horizontalOffset, verticalOffset, verticalTileSize, horizontalTileSize, halfHorizontalTiles, halfVerticalTiles;
 
-    this.disableAdapativeFill = true;
+    this.disableAdaptiveFill = true;
 
     this.updateSize = function() {
 
