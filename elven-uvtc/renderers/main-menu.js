@@ -125,7 +125,7 @@ function MainMenuRenderer() {
     const floatingElfRatio = floatingElfImage.height / floatingElfImage.width;
     const bannerImageRatio = bannerImage.height / bannerImage.width;
 
-    const bannerYOffset = 40;
+    const bannerYOffset = 50;
     const centerYOffset = bannerYOffset;
 
     const siloImageRatio = siloImage.height / siloImage.width;
@@ -278,7 +278,7 @@ function MainMenuRenderer() {
             "white",
             "play",
             Math.floor(halfWidth-playTextTest.width),
-            Math.floor(halfHeight-playTextTest.height) + 45,
+            Math.floor(halfHeight-playTextTest.height) + 5 + centerYOffset,
         4,4);
 
         const elfWidth = fullWidth * 0.05;
@@ -327,6 +327,13 @@ function MainMenuRenderer() {
             renderHoverEffectElf(floatingElf4);
         }
         renderFloatingElf(floatingElf4,-getBouncingTimeNormal(timestamp,bounceVariation4)+0.24);
+
+        const fontSize = 26/1920*fullWidth;
+        context.font = `${fontSize}px segoe ui light`;
+        context.textAlign = "end";
+        context.fillStyle = "white";
+        const offsetFactor = fontSize / 26;
+        context.fillText(VERSION_STRING,fullWidth-offsetFactor*15,fullHeight-offsetFactor*25);
 
         if(this.settingsPane) {
             this.settingsPane.render();
