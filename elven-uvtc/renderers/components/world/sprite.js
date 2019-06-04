@@ -177,19 +177,21 @@ function SpriteRenderer(startDirection,spriteName,footstepsName="footsteps") {
     });
 
     this.render = function(timestamp,x,y,width,height) {
+        const startX = this.x, startY = this.y;
         if(this.renderLogic) {
             this.renderLogic(timestamp);
+        }
+        if(this.hidden) {
+            return;
         }
         if(showingAlert) {
             context.drawImage(
                 alertSprite,x,y-height,width,height
             );
         }
-        if(this.hidden) {
-            return;
-        }
-        const destinationX = this.xOffset * width + x;
-        const destinationY = this.yOffset * height + y;
+
+        const destinationX = this.xOffset * width + x + (this.x - startX) * width;
+        const destinationY = this.yOffset * height + y + (this.y - startY) * height;
 
         const animationRow = specialRow !== null ? specialRow : !this.walkingOverride && walking ? 
             Math.floor(timestamp / animationFrameTime) % rowCount * rowHeight
