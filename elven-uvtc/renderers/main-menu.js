@@ -329,11 +329,11 @@ function MainMenuRenderer() {
         renderFloatingElf(floatingElf4,-getBouncingTimeNormal(timestamp,bounceVariation4)+0.24);
 
         const fontSize = 26/1920*fullWidth;
-        context.font = `${fontSize}px segoe ui light`;
+        context.font = `${fontSize}px Roboto`;
         context.textAlign = "end";
         context.fillStyle = "white";
         const offsetFactor = fontSize / 26;
-        context.fillText(VERSION_STRING,fullWidth-offsetFactor*15,fullHeight-offsetFactor*25);
+        context.fillText(VERSION_STRING,fullWidth-offsetFactor*10,fullHeight-offsetFactor*25);
 
         if(this.settingsPane) {
             this.settingsPane.render();
