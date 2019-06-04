@@ -127,6 +127,11 @@ const SettingsPaneRenderer = new (function(){
         }
         keyBindBuffer[keyCode] = bindOrder[keyBindInputIndex].key;
         keyBindInputIndex++;
+        if(keyBindInputIndex >= bindOrder.length) {
+            playSound("energy-reverse");
+        } else {
+            playSound("energy");
+        }
         updateKeyBindRequest();
     };
     const updateKeyBindRequest = () => {
@@ -135,10 +140,8 @@ const SettingsPaneRenderer = new (function(){
             reloadKeyBindDescription();
             unsubscribeTrueKeyEvents();
             changeBindsText = CHANGE_CONTROLS;
-            playSound("energy-reverse");
             return;
         }
-        playSound("energy");
         wrappedKeyBindText = processTextForWrapping(
             `press key for ${colorCode}${bindOrder[keyBindInputIndex].name}${colorCode}`
         );
