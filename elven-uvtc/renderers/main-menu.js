@@ -236,10 +236,7 @@ function MainMenuRenderer() {
         }
         return timeNormal / 2;
     }
-
-    let startTime = performance.now();
     this.render = function(timestamp) {
-        timestamp = timestamp - startTime;
         context.fillStyle = "black";
         context.fillRect(0,0,fullWidth,fullHeight);
         this.background.render(timestamp);
