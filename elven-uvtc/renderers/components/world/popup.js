@@ -66,8 +66,6 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
 
     prefix = prefix ? prefix : "";
 
-
-    const popupFeedMaxWidthPadding = -70;
     const characterSpeed = 30;
     const spaceSpeed = 30;
 
@@ -240,9 +238,9 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
             popupWidth,popupHeight
         );
         BitmapText.drawTextWrappingLookAheadBlack(
-            textFeed,popupX + 20,popupY + 20,
-            popupWidth+popupFeedMaxWidthPadding,
-            1,0,2
+            textFeed,popupX + 15,popupY + 15,
+            popupWidth-15,
+            2
         );
     }
 }
