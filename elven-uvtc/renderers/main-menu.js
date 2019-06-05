@@ -2,6 +2,7 @@ import WorldRenderer from "../renderers/world.js";
 import SettingsPaneRenderer from "../renderers/settings-pane.js";
 import RotatingBackground from "../renderers/components/rotating-background.js";
 import ChapterPane from "./chapter-pane.js";
+import AudioPane from "./audio-pane.js";
 
 function MainMenuRenderer() {
 
@@ -58,6 +59,10 @@ function MainMenuRenderer() {
         }
         this.processMove(x,y);
     }
+    this.clearOverlayWithSound = (x,y) => {
+        playSound("reverse-click");
+        this.clearOverlay(x,y);
+    }
 
     this.processClickEnd = function(x,y) {
         showHoverSpecialEffect = false;
@@ -68,14 +73,11 @@ function MainMenuRenderer() {
         switch(hoverType) {
             case hoverTypes.elf1:
                 playSound("click");
-                alert("Audio settings page not set up yet - sue me!");
+                this.overlayPane = new AudioPane(this.clearOverlayWithSound,this);
                 break;
             case hoverTypes.elf2:
                 this.overlayPane = SettingsPaneRenderer;
-                SettingsPaneRenderer.exit = (x,y) => {
-                    playSound("reverse-click");
-                    this.clearOverlay(x,y);
-                };
+                SettingsPaneRenderer.exit = this.clearOverlayWithSound;
                 playSound("click");
                 break;
             case hoverTypes.elf3:
@@ -217,6 +219,26 @@ function MainMenuRenderer() {
         }
         return timeNormal / 2;
     }
+    
+    const backgroundImage = imageDictionary["backgrounds/chapter-select"];
+    const invertedBackgroundImage = imageDictionary["backgrounds/chapter-select-invert"];
+    const backgroundScrollRate = 30000;
+    const bSize = backgroundImage.width;
+    this.renderBackground = (timestamp,inverted) => {
+        const image = inverted ? invertedBackgroundImage : backgroundImage;
+        const tNormal = timestamp % backgroundScrollRate / backgroundScrollRate / 2;
+        context.drawImage(
+            image,
+            0,0,bSize,bSize,
+            0,0-(largestDimension*tNormal*2),largestDimension,largestDimension
+        );
+        context.drawImage(
+            image,
+            0,0,bSize,bSize,
+            0,largestDimension*(1-tNormal*2),largestDimension,largestDimension
+        );
+    }
+
     this.render = function(timestamp) {
         bannerYOffset = fullHeight * 0.05;
         centerYOffset = bannerYOffset - fullHeight * 0.025;

@@ -20,6 +20,20 @@ ImageManager.loadImages(loadCallback);
 SoundManager.loadSounds(loadCallback);
 SoundManager.loadNonEssentialSounds();
 
+(function(){
+    const wasMuted = musicMuted || soundMuted;
+    if(musicMuted) {
+        setMusicVolume(0);
+    }
+    if(soundMuted) {
+        setSoundVolume(0);
+    }
+    if(wasMuted) {
+        saveVolumeChanges();
+    }
+})();
+restoreVolumeChanges();
+
 //setFaderOutSound("swish-1");
 //setFaderInSound("swish-2");
 setFaderEffectsRenderer(new BoxFaderEffect());

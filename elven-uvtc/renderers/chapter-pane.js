@@ -73,7 +73,7 @@ function ChapterPane(callback,parent) {
                 let timeOffset = 0;
                 faderEffectsRenderer.fillInLayer = {
                     render: timestamp => {
-                        this.renderBackground(timestamp-timeOffset,true);
+                        parent.renderBackground(timestamp-timeOffset,true);
                     }
                 }
                 faderEffectsRenderer.pauseCallbackOnce = () => {
@@ -107,11 +107,6 @@ function ChapterPane(callback,parent) {
         }
     }
 
-    const backgroundImage = imageDictionary["backgrounds/chapter-select"];
-    const invertedBackgroundImage = imageDictionary["backgrounds/chapter-select-invert"];
-    const backgroundScrollRate = 30000;
-    const bSize = backgroundImage.width;
-
     this.renderCenterImage = size => {
         const halfSize = size / 2;
         const image = this.currentImage;
@@ -119,21 +114,6 @@ function ChapterPane(callback,parent) {
             image,
             0,0,image.width,image.height,
             halfWidth-halfSize,halfHeight-halfSize,size,size
-        );
-    }
-
-    this.renderBackground = (timestamp,inverted) => {
-        const image = inverted ? invertedBackgroundImage : backgroundImage;
-        const tNormal = timestamp % backgroundScrollRate / backgroundScrollRate / 2;
-        context.drawImage(
-            image,
-            0,0,bSize,bSize,
-            0,0-(largestDimension*tNormal*2),largestDimension,largestDimension
-        );
-        context.drawImage(
-            image,
-            0,0,bSize,bSize,
-            0,largestDimension*(1-tNormal*2),largestDimension,largestDimension
         );
     }
 
@@ -221,7 +201,7 @@ function ChapterPane(callback,parent) {
         context.globalCompositeOperation = "destination-out";
         drawRectangle(centerButton,"black");
         context.globalCompositeOperation = "destination-over";
-        this.renderBackground(timestamp);
+        parent.renderBackground(timestamp);
         context.restore();
 
 
