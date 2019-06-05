@@ -222,6 +222,8 @@ function MainMenuRenderer() {
         centerYOffset = bannerYOffset - fullHeight * 0.025;
         stencilBackground.centerYOffset = centerYOffset;
 
+        const renderNormal = fullWidth / 1920;
+
         context.fillStyle = "black";
         context.fillRect(0,0,fullWidth,fullHeight);
         this.background.render(timestamp);
@@ -314,7 +316,7 @@ function MainMenuRenderer() {
         context.fillText(VERSION_STRING,fullWidth-offsetFactor*10,fullHeight-offsetFactor*25);
 
         if(this.overlayPane) {
-            this.overlayPane.render(timestamp,40,20,fullWidth-80,fullHeight-70);
+            this.overlayPane.render(timestamp,renderNormal*40,renderNormal*20,fullWidth-renderNormal*80,fullHeight-renderNormal*70);
         }
 
         const logoSize = fullWidth * 0.075;
