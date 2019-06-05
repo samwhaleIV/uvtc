@@ -142,10 +142,12 @@ function ChapterPane(callback,parent) {
         }
         const delta = timestamp - startTime;
         if(delta < warpInTime) {
+            const startHeight = height;
+            const startWidth = width;
             height = delta / warpInTime * height;
             width = delta / warpInTime * width;
-            x = halfWidth - width / 2;
-            y = halfHeight - height / 2;
+            x = (x + startWidth / 2) - width / 2;
+            y = (y + startHeight / 2) - height / 2;
         } else if(fadeOutStart) {
             context.save();
             let alpha = 1 - ((timestamp - fadeOutStart) / fadeOutTime);
