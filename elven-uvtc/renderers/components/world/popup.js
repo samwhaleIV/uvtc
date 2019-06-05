@@ -238,9 +238,9 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
             popupWidth,popupHeight
         );
         BitmapText.drawTextWrappingLookAheadBlack(
-            textFeed,popupX + 15,popupY + 15,
-            popupWidth-15,
-            2
+            textFeed,popupX + 20,popupY + 20,
+            popupWidth-32,
+            4
         );
     }
 }

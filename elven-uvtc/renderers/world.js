@@ -644,17 +644,17 @@ function WorldRenderer() {
     let horizontalTiles, verticalTiles, horizontalOffset, verticalOffset, verticalTileSize, horizontalTileSize, halfHorizontalTiles, halfVerticalTiles;
 
     this.disableAdaptiveFill = true;
+    this.noScale = true;
 
     this.updateSize = function() {
 
         let adjustedTileSize = WorldTileSize;
-
         if(fullWidth < smallScaleSnapPoint) {
             adjustedTileSize *= 1.5;
-        } else if(fullWidth < mediumScaleSnapPoint && fullWidth < maxHorizontalResolution) {
+        } else if(fullWidth < mediumScaleSnapPoint) {
             adjustedTileSize *= 2;
-        } else if(fullWidth >= maxHorizontalResolution) {
-            adjustedTileSize *= 2;
+        } else {
+            adjustedTileSize *= 2.5;
         }
 
         adjustedTileSize = Math.floor(adjustedTileSize);
