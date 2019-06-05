@@ -54,7 +54,6 @@ const SettingsPaneRenderer = new (function(){
     const exit = (x,y) => {
         if(this.exit) {
             this.exit(x,y);
-            playSound("reverse-click");
         }
         showHoverSpecialEffect = false;
     }

@@ -1,6 +1,7 @@
 import WorldRenderer from "../renderers/world.js";
 import SettingsPaneRenderer from "../renderers/settings-pane.js";
 import RotatingBackground from "../renderers/components/rotating-background.js";
+import ChapterPane from "./chapter-pane.js";
 
 function MainMenuRenderer() {
 
@@ -19,8 +20,8 @@ function MainMenuRenderer() {
     let showHoverSpecialEffect = false;
 
     this.processKey = function(key) {
-        if(this.settingsPane) {
-            this.settingsPane.processKey(key);
+        if(this.overlayPane) {
+            this.overlayPane.processKey(key);
             return;
         }
         switch(key) {
@@ -31,8 +32,8 @@ function MainMenuRenderer() {
         }
     }
     this.processKeyUp = function(key) {
-        if(this.settingsPane) {
-            this.settingsPane.processKeyUp(key);
+        if(this.overlayPane) {
+            this.overlayPane.processKeyUp(key);
             return;
         }
         switch(key) {
@@ -42,18 +43,26 @@ function MainMenuRenderer() {
 
     this.processClick = function(x,y) {
         showHoverSpecialEffect = true;
-        if(this.settingsPane) {
-            this.settingsPane.processClick(x,y);
+        if(this.overlayPane) {
+            this.overlayPane.processClick(x,y);
         }
         this.processMove(x,y);
     }
 
-    this.settingsPane = null;
+    this.overlayPane = null;
+
+    this.clearOverlay = (x,y) => {
+        this.overlayPane = null;
+        if(isNaN(x) || isNaN(y)) {
+            return;
+        }
+        this.processMove(x,y);
+    }
 
     this.processClickEnd = function(x,y) {
         showHoverSpecialEffect = false;
-        if(this.settingsPane) {
-            this.settingsPane.processClickEnd(x,y);
+        if(this.overlayPane) {
+            this.overlayPane.processClickEnd(x,y);
             return;
         }
         switch(hoverType) {
@@ -62,26 +71,22 @@ function MainMenuRenderer() {
                 alert("Audio settings page not set up yet - sue me!");
                 break;
             case hoverTypes.elf2:
-                this.settingsPane = SettingsPaneRenderer;
+                this.overlayPane = SettingsPaneRenderer;
                 SettingsPaneRenderer.exit = (x,y) => {
-                    this.settingsPane = null;
-                    if(isNaN(x) || isNaN(y)) {
-                        return;
-                    }
-                    this.processMove(x,y);
-                }
+                    playSound("reverse-click");
+                    this.clearOverlay(x,y);
+                };
                 playSound("click");
                 break;
             case hoverTypes.elf3:
                 playSound("click");
-                alert("Chapters not set up yet - sue me!");
+                this.overlayPane = new ChapterPane(this.clearOverlay,this);
                 break;
             case hoverTypes.elf4:
                 playSound("click");
                 alert("Credits? UhHhhHhHhHh.. Thankful for..\nBoney Elf.\nThat's all.");
                 break;
             case hoverTypes.play:
-                playSound("click");
                 this.fader.fadeOut(WorldRenderer);
                 faderEffectsRenderer.fillInLayer = stencilBackground;
                 let startTime = 0;
@@ -100,8 +105,8 @@ function MainMenuRenderer() {
     this.song = "main-menu";
 
     this.processMove = function(mouseX,mouseY) {
-        if(this.settingsPane) {
-            this.settingsPane.processMove(mouseX,mouseY);
+        if(this.overlayPane) {
+            this.overlayPane.processMove(mouseX,mouseY);
             return;
         }
         if(contains(mouseX,mouseY,playButtonLocation)) {
@@ -137,15 +142,6 @@ function MainMenuRenderer() {
         stencilBackground.startHeight = fullHeight;
     }
 
-    const getPlaceholderLocation = () => {
-        return {
-            x: -1,
-            y: -1,
-            width: 0,
-            height: 0
-        }
-    }
-
     const playButtonLocation = getPlaceholderLocation();
     const playTextTest = drawTextTest("play",4);
     playTextTest.width /= 2;
@@ -169,21 +165,6 @@ function MainMenuRenderer() {
         floatingElf2[property] = value;
         floatingElf3[property] = value;
         floatingElf4[property] = value;
-    }
-
-    const renderHoverEffect = (x,y,width,height) => {
-        const halfRadius = width / 2;
-        const gradient = context.createRadialGradient(
-            x,y,
-            0,
-            x,y,
-            halfRadius
-        );
-        gradient.addColorStop(0,"cyan");
-        gradient.addColorStop(0.95,"rgba(0,0,0,0.5)");
-        gradient.addColorStop(1,"rgba(0,0,0,0)");
-        context.fillStyle = gradient;
-        context.fillRect(x-halfRadius,y-halfRadius,width,height);
     }
     const renderHoverEffectElf = renderObject => {
         renderHoverEffect(renderObject.x+renderObject.width/2,renderObject.y+renderObject.height/2,renderObject.width*2,renderObject.height*2);
@@ -249,13 +230,6 @@ function MainMenuRenderer() {
             bannerImage,0,0,bannerImage.width,bannerImage.height,
             halfWidth-bannerImageWidth/2,bannerYOffset,
             bannerImageWidth,bannerImageWidth*bannerImageRatio
-        );
-        const logoSize = fullWidth * 0.075;
-        context.drawImage(
-            elfmartImage,0,0,elfmartImage.width,elfmartImage.height,
-            10,
-            fullHeight-logoSize-10,
-            logoSize,logoSize
         );
         playButtonLocation.width = fullWidth * 0.25;
         if(hoverType === hoverTypes.play) {
@@ -339,9 +313,17 @@ function MainMenuRenderer() {
         const offsetFactor = fontSize / 26;
         context.fillText(VERSION_STRING,fullWidth-offsetFactor*10,fullHeight-offsetFactor*25);
 
-        if(this.settingsPane) {
-            this.settingsPane.render();
+        if(this.overlayPane) {
+            this.overlayPane.render(timestamp,40,20,fullWidth-80,fullHeight-70);
         }
+
+        const logoSize = fullWidth * 0.075;
+        context.drawImage(
+            elfmartImage,0,0,elfmartImage.width,elfmartImage.height,
+            10,
+            fullHeight-logoSize-10,
+            logoSize,logoSize
+        );
 
     }
 }

@@ -239,7 +239,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
         );
         BitmapText.drawTextWrappingLookAheadBlack(
             textFeed,popupX + 20,popupY + 20,
-            popupWidth-32,
+            popupWidth-30,
             4
         );
     }
