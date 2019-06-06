@@ -20,13 +20,15 @@ function ChapterPane(callback,parent) {
 
     this.leaving = false;
 
+    this.fadeOutEnd = null;
+
     this.exit = () => {
         if(callback) {
             fadeOutStart = performance.now();
             this.leaving = true;
-            setTimeout(()=>{
+            this.fadeOutEnd = () => {
                 callback(lastRelativeX,lastRelativeY);
-            },fadeOutTime+100);
+            }
         }
     }
 
@@ -149,8 +151,12 @@ function ChapterPane(callback,parent) {
             x = (x + startWidth / 2) - width / 2;
             y = (y + startHeight / 2) - height / 2;
         } else if(fadeOutStart) {
-            context.save();
             let alpha = 1 - ((timestamp - fadeOutStart) / fadeOutTime);
+            if(alpha <= 0) {
+                this.fadeOutEnd();
+                return;
+            }
+            context.save();
             if(alpha < 0) {
                 alpha = 0;
             }

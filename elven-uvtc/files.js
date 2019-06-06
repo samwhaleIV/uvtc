@@ -33,5 +33,6 @@ ImagePaths.push(
     getFile("sprites/jim.png",FileTypes.Image),
     getFile("sprites/footsteps.png",FileTypes.Image),
     getFile("stars-menu.png",FileTypes.BackgroundImage),
-    getFile("spiral-menu.png",FileTypes.BackgroundImage)
+    getFile("spiral-menu.png",FileTypes.BackgroundImage),
+    getFile("spiral-large.png",FileTypes.BackgroundImage)
 );

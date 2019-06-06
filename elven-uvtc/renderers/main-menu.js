@@ -72,13 +72,10 @@ function MainMenuRenderer() {
         }
         switch(hoverType) {
             case hoverTypes.elf1:
-                playSound("click");
-                this.overlayPane = new AudioPane(this.clearOverlayWithSound,this);
+                this.overlayPane = new AudioPane(this.clearOverlay,this);
                 break;
             case hoverTypes.elf2:
-                this.overlayPane = SettingsPaneRenderer;
-                SettingsPaneRenderer.exit = this.clearOverlayWithSound;
-                playSound("click");
+                this.overlayPane = new SettingsPaneRenderer(this.clearOverlay,this);
                 break;
             case hoverTypes.elf3:
                 playSound("click");

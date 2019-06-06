@@ -1,5 +1,10 @@
 function AudioPane(callback,parent) {
 
+    let fadeInStart = null;
+    let fadeOutStart = null;
+    const fadeInTime = 300;
+    this.transitioning = true;
+
     let musicVolumeNormal = getMusicVolume();
     let soundVolumeNormal = getSoundVolume();
 
@@ -34,7 +39,7 @@ function AudioPane(callback,parent) {
     const sliderImage = imageDictionary["ui/menu-elf-slide"];
     const sliderImageRatio = sliderImage.height / sliderImage.width;
 
-    this.leaving = false;
+    this.transitioning = false;
 
     let hoverTypes = {
         none:0,
@@ -47,12 +52,16 @@ function AudioPane(callback,parent) {
 
     this.exit = () => {
         if(callback) {
-            callback(lastRelativeX,lastRelativeY);
+            this.transitioning = true;
+            fadeOutStart = performance.now();
+            this.fadeOutEnd = () => {
+                callback(lastRelativeX,lastRelativeY);
+            }
         }
     }
 
     this.processKey = function(key) {
-        if(this.leaving) {
+        if(this.transitioning) {
             return;
         }
         switch(key) {
@@ -64,7 +73,7 @@ function AudioPane(callback,parent) {
         }
     }
     this.processKeyUp = function(key) {
-        if(this.leaving) {
+        if(this.transitioning) {
             return;
         }
         switch(key) {
@@ -75,7 +84,7 @@ function AudioPane(callback,parent) {
     this.capturing = null;
 
     this.processClick = function(x,y) {
-        if(this.leaving) {
+        if(this.transitioning) {
             return;
         }
         switch(hoverType) {
@@ -92,7 +101,7 @@ function AudioPane(callback,parent) {
     }
     this.processClickEnd = function(x,y) {
         this.capturing = null;
-        if(this.leaving) {
+        if(this.transitioning) {
             return;
         }
         switch(hoverType) {
@@ -118,7 +127,7 @@ function AudioPane(callback,parent) {
         this.processMove(x,y);
     }
     this.processMove = function(x,y) {
-        if(this.leaving) {
+        if(this.transitioning) {
             return;
         }
         if(this.capturing !== null) {
@@ -148,7 +157,30 @@ function AudioPane(callback,parent) {
 
 
     this.render = (timestamp,x,y,width,height) => {
-        const widthNormal = fullWidth / 1920;
+        let restorationRequired = false;
+        if(fadeOutStart) {
+            const fadeOutDelta = (timestamp - fadeOutStart) / fadeInTime;
+            if(fadeOutDelta >= 1) {
+                this.fadeOutEnd();
+                return;
+            }
+            restorationRequired = true;
+            context.save();
+            context.globalAlpha = 1 - fadeOutDelta;
+        } else {
+            if(!fadeInStart) {
+                fadeInStart = timestamp;
+            }
+            const fadeInDelta = (timestamp - fadeInStart) / fadeInTime;
+            if(fadeInDelta < 1) {
+                context.save();
+                context.globalAlpha = fadeInDelta;
+                restorationRequired = true;
+            } else {
+                this.transitioning = false;
+            }
+        }
+
         context.save();
         context.globalCompositeOperation = "destination-out";
         context.fillStyle = "white";
@@ -225,6 +257,10 @@ function AudioPane(callback,parent) {
             sliderImage,0,0,sliderImage.width,sliderImage.height,
             elfSlider2.x,elfSlider2.y,elfWidth,elfHeight
         );
+
+        if(restorationRequired) {
+            context.restore();
+        }
     }
 }
 
