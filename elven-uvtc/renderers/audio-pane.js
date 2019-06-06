@@ -190,16 +190,21 @@ function AudioPane(callback,parent) {
         context.restore();
 
 
-        const fullSliderWidth = halfWidth;
+        let fullSliderWidth = halfWidth;
+
+        if(fullSliderWidth < 600) {
+            fullSliderWidth = fullWidth - 150;
+        }
+
         const sliderHeight = 60;
         const halfSliderHeight = sliderHeight / 2;
 
-        slider1.x = Math.floor(halfWidth / 2);
+        slider1.x = Math.floor(halfWidth - fullSliderWidth / 2);
         slider1.y = Math.floor(height * 0.33 - halfSliderHeight);
         slider1.width = fullSliderWidth;
         slider1.height = sliderHeight;
 
-        slider2.x = Math.floor(slider1.x);
+        slider2.x = slider1.x;
         slider2.y = Math.floor(height * 0.66 - halfSliderHeight);
         slider2.width = fullSliderWidth;
         slider2.height = sliderHeight;
