@@ -104,14 +104,14 @@ function SettingsPaneRenderer(callback,parent) {
         let backgroundColor;
         let bottomText;
         if(button.awaiting) {
-            bottomText = "press key...";
+            bottomText = "press...";
             backgroundColor = "white";
             topColor = "black";
         } else if(button.pressed) {
             if(button.keyName) {
                 bottomText = button.keyName;
             } else {
-                bottomText = "";
+                bottomText = "NONE";
             }
             topColor = "white";
             backgroundColor = keyNameColor;
@@ -120,7 +120,7 @@ function SettingsPaneRenderer(callback,parent) {
             topColor = "white";
             backgroundColor = "black";
         } else {
-            bottomText = "";
+            bottomText = "NONE";
             topColor = "white";
             backgroundColor = "black";
         }
