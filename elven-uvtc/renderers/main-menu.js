@@ -3,6 +3,7 @@ import SettingsPaneRenderer from "../renderers/controls-pane.js";
 import RotatingBackground from "../renderers/components/rotating-background.js";
 import ChapterPane from "./chapter-pane.js";
 import AudioPane from "./audio-pane.js";
+import CreditsRenderer from "./credits.js";
 
 function MainMenuRenderer() {
 
@@ -64,6 +65,19 @@ function MainMenuRenderer() {
         this.clearOverlay(x,y);
     }
 
+    this.leaveWithFillInLayer = (rendererType,...parameters) => {
+        this.fader.fadeOut(rendererType,...parameters);
+        faderEffectsRenderer.fillInLayer = stencilBackground;
+        let startTime = 0;
+        faderEffectsRenderer.pauseCallbackOnce = () => {
+            startTime = performance.now();
+        }
+        faderEffectsRenderer.callbackOnce = () => {
+            faderEffectsRenderer.callbackOnce
+            stencilBackground.timeOffset = rendererState.fader.start - startTime;
+        }
+    }
+
     this.processClickEnd = function(x,y) {
         showHoverSpecialEffect = false;
         if(this.overlayPane) {
@@ -83,19 +97,10 @@ function MainMenuRenderer() {
                 break;
             case hoverTypes.elf4:
                 playSound("click");
-                alert("Credits? UhHhhHhHhHh.. Thankful for..\nBoney Elf.\nThat's all.");
+                this.leaveWithFillInLayer(CreditsRenderer);
                 break;
             case hoverTypes.play:
-                this.fader.fadeOut(WorldRenderer);
-                faderEffectsRenderer.fillInLayer = stencilBackground;
-                let startTime = 0;
-                faderEffectsRenderer.pauseCallbackOnce = () => {
-                    startTime = performance.now();
-                }
-                faderEffectsRenderer.callbackOnce = () => {
-                    faderEffectsRenderer.callbackOnce
-                    stencilBackground.timeOffset = rendererState.fader.start - startTime;
-                }
+                this.leaveWithFillInLayer(WorldRenderer);
                 break;
         }
         this.processMove(x,y);
