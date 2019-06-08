@@ -76,6 +76,7 @@ const CreditsData = [
     namedLine("Coolest elf","Boney Elf"),
     namedLine("Is this elf even an elf?","Boney Elf"),
     namedLine("Most mentiond elf","... Boney Elf"),
+    lineBreak(),
 
     heavyLine("DIRECTORS"),
     centeredLine("Samuel Robinson"),
