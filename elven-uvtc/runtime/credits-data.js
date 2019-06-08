@@ -10,7 +10,7 @@ function RenderTitleLine(line,x,y) {
     const image = imageDictionary["ui/banner"]
     const height = 80;
     const width = image.width / image.height * height;
-    context.drawImage(image,0,0,image.width,image.height,halfWidth-width/2,y-height/2,width,height);
+    context.drawImage(image,0,0,image.width,image.height,halfWidth-width/2,Math.floor(y-height/2),width,height);
 }
 function RenderCenteredLine(text,x,y,width) {
     context.fillStyle = "white";

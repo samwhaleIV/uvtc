@@ -54,7 +54,7 @@ function CreditsRenderer() {
         dataRowEnd = Math.min(dataRowEnd,dataRowCount);
 
         for(let y = dataRowStart;y<dataRowEnd;y++) {
-            const heightDifference = CreditsData[y](x,yOffset,width);
+            const heightDifference = CreditsData[y](x,Math.floor(yOffset),width);
             if(heightDifference) {
                 yOffset += heightDifference;
             } else {
