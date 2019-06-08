@@ -89,6 +89,7 @@ function WorldUIRenderer(world) {
             popup.processClick(x,y);
             return;
         }
+        this.processMove(x,y);
     }
     this.processClickEnd = (x,y) => {
         if(transitioning) {
