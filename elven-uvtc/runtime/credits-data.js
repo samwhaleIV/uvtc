@@ -1,62 +1,53 @@
-const LineTypes = {
-    title: 0,
-    centered: 1,
-    named: 2,
-    break: 3
+function RenderTitleLine(imageName,y,lineHeight) {
+    const image = imageDictionary[imageName];
+    const width = image.width / image.height * lineHeight;
+    context.drawImage(image,0,0,image.width,image.height,halfWidth-width/2,y,width,lineHeight);
 }
-
-
-function RenderTitleLine(line,x,y) {
-    const image = imageDictionary["ui/banner"]
-    const height = 80;
-    const width = image.width / image.height * height;
-    context.drawImage(image,0,0,image.width,image.height,halfWidth-width/2,Math.floor(y-height/2),width,height);
-}
-function RenderCenteredLine(text,x,y,width) {
+function RenderCenteredLine(text,y) {
     context.fillStyle = "white";
     context.textAlign = "center";
     context.textBaseline = "middle";
     context.font = "28px Roboto";
-    context.fillText(text,halfWidth,y,width);
+    context.fillText(text,halfWidth,y);
 }
-function RenderNamedLine(role,name,x,y,width) {
+function RenderNamedLine(role,name,y) {
     context.font = "28px Roboto";
     context.textAlign = "end";
     context.fillStyle = "#c8c8c8";
-    context.fillText(role,halfWidth-5,y,width);
+    context.fillText(role,halfWidth-5,y);
     context.textAlign = "start";
     context.fillStyle = "white";
-    context.fillText(name,halfWidth+5,y,width);
+    context.fillText(name,halfWidth+5,y);
 }
-function RenderLineBreak(x,y,width) {
+function RenderLineBreak() {
     //Do nothing
 }
-function RenderHeavyLine(text,x,y,width) {
+function RenderHeavyLine(text,y) {
     context.fillStyle = "white";
     context.textAlign = "center";
     context.textBaseline = "middle";
     context.font = "Bold 32px Arial";
-    context.fillText(text,halfWidth,y,width);
+    context.fillText(text,halfWidth,y);
 }
 
-function titleLine(title) {
-    return (x,y,width) => RenderTitleLine(title,x,y,width);
+function titleLine(imageName) {
+    return (y,lineHeight) => RenderTitleLine(imageName,y,lineHeight);
 }
 function centeredLine(text) {
-    return (x,y,width) => RenderCenteredLine(text,x,y,width);
+    return (y,lineHeight) => RenderCenteredLine(text,y,lineHeight);
 }
 function lineBreak() {
-    return (x,y,width) => RenderLineBreak(x,y,width);
+    return (y,lineHeight) => RenderLineBreak(y,lineHeight);
 }
 function namedLine(role,name) {
-    return (x,y,width) => RenderNamedLine(role,name,x,y,width);
+    return (y,lineHeight) => RenderNamedLine(role,name,y,lineHeight);
 }
 function heavyLine(text) {
-    return (x,y,width) => RenderHeavyLine(text,x,y,width);
+    return (y,lineHeight) => RenderHeavyLine(text,y,lineHeight);
 }
 
 const CreditsData = [
-    titleLine(),
+    titleLine("ui/banner"),
     lineBreak(),
 
     heavyLine("LEAD CAST"),

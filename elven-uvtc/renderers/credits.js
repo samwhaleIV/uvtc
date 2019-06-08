@@ -1,12 +1,12 @@
 import CreditsData from "../runtime/credits-data.js";
 
 function CreditsRenderer() {
-    const pixelsPerSecond = 50;
+    const pixelsPerSecond = 60;
     const lineHeight = 80;
     const doubleLineHeight = lineHeight + lineHeight;
     const dataRowCount = CreditsData.length;
 
-    let lastFrame = null;
+    let lastFrame = performance.now();
     this.start = timestamp => {
         lastFrame = timestamp;
     }
@@ -14,6 +14,7 @@ function CreditsRenderer() {
     const yEnd = dataRowCount * lineHeight;
 
     this.song = "pos_loop";
+    this.noPixelScale = true;
 
     let reachedEnd = false;
     this.render = timestamp => {
@@ -25,13 +26,6 @@ function CreditsRenderer() {
         lastFrame = timestamp;
         if(reachedEnd) {
             yPosition = yEnd - halfHeight - doubleLineHeight;
-        }
-        let width = 500, x;
-        if(fullWidth < width) {
-            width = fullWidth;
-            x = 0;
-        } else {
-            x = halfWidth - width / 2;
         }
 
         context.fillStyle = "white";
@@ -54,7 +48,7 @@ function CreditsRenderer() {
         dataRowEnd = Math.min(dataRowEnd,dataRowCount);
 
         for(let y = dataRowStart;y<dataRowEnd;y++) {
-            const heightDifference = CreditsData[y](x,Math.floor(yOffset),width);
+            const heightDifference = CreditsData[y](Math.floor(yOffset),lineHeight);
             if(heightDifference) {
                 yOffset += heightDifference;
             } else {

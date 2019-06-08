@@ -92,11 +92,9 @@ function MainMenuRenderer() {
                 this.overlayPane = new SettingsPaneRenderer(this.clearOverlay,this);
                 break;
             case hoverTypes.elf3:
-                playSound("click");
                 this.overlayPane = new ChapterPane(this.clearOverlay,this);
                 break;
             case hoverTypes.elf4:
-                playSound("click");
                 this.leaveWithFillInLayer(CreditsRenderer);
                 break;
             case hoverTypes.play:
