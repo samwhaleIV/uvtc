@@ -200,8 +200,8 @@ function MainMenuRenderer() {
         );
         context.restore();
     }
-    
-    this.noScale = true;
+
+    this.noPixelScale = true;
 
     const baseBounceTime = 50000;
     const bounceVariation1 = baseBounceTime - 2932;

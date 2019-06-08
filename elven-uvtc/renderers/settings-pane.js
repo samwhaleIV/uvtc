@@ -218,7 +218,9 @@ function SettingsPaneRenderer(callback,parent) {
         return new Promise(resolve => {
             this.trueKeyUp = key => {
                 unsubscribeTrueKeyEvents();
-                this.trueKeyUp = null;
+                this.trueKeyUp = () => {
+                    return;
+                };
                 resolve(key);
             }
             subscribeToTrueKeyEvents();

@@ -87,6 +87,7 @@ function AudioPane(callback,parent) {
         if(this.transitioning) {
             return;
         }
+        this.processMove(x,y);
         switch(hoverType) {
             case hoverTypes.elfSlider1:
             case hoverTypes.slider1:
@@ -97,7 +98,6 @@ function AudioPane(callback,parent) {
                 this.capturing = hoverTypes.slider2;
                 break;
         }
-        this.processMove(x,y);
     }
     this.processClickEnd = function(x,y) {
         this.capturing = null;
@@ -191,21 +191,26 @@ function AudioPane(callback,parent) {
 
 
         let fullSliderWidth = halfWidth;
+        let sliderHeight = 60;
+        let elfWidth = 70;
 
-        if(fullSliderWidth < 600) {
+        if(fullSliderWidth < internalWidth) {
             fullSliderWidth = fullWidth - 150;
         }
+        if(fullHeight < internalHeight) {
+            sliderHeight = 50;
+            elfWidth = 60;
+        }
 
-        const sliderHeight = 60;
         const halfSliderHeight = sliderHeight / 2;
 
         slider1.x = Math.floor(halfWidth - fullSliderWidth / 2);
-        slider1.y = Math.floor(height * 0.33 - halfSliderHeight);
+        slider1.y = Math.floor(height * 0.33);
         slider1.width = fullSliderWidth;
         slider1.height = sliderHeight;
 
         slider2.x = slider1.x;
-        slider2.y = Math.floor(height * 0.66 - halfSliderHeight);
+        slider2.y = Math.floor(height * 0.66);
         slider2.width = fullSliderWidth;
         slider2.height = sliderHeight;
 
@@ -236,7 +241,6 @@ function AudioPane(callback,parent) {
         context.fillText("music",labelTextX,slider1.y-halfSliderHeight);
         context.fillText("sound",labelTextX,slider2.y-halfSliderHeight);
 
-        const elfWidth = 80;
         const elfHeight = sliderImageRatio * elfWidth;
 
         const elfYOffset = elfHeight / 2 - halfSliderHeight;
