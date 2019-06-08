@@ -33,7 +33,7 @@ const MusicLinkingManifest = {
         song: "tumble_town"
     },
     "house_1": {
-        song: "cabin"
+        song: "cabinTEST"
     },
     "house_2": {
         linkTo: "house_1"
