@@ -1,6 +1,6 @@
 import RotatingBackground from "./components/rotating-background.js";
 
-function SettingsPaneRenderer(callback,parent) {
+function ControlsPaneRenderer(callback,parent) {
 
     let fadeInStart = null;
     let fadeOutStart = null;
@@ -325,7 +325,7 @@ function SettingsPaneRenderer(callback,parent) {
     const background = new RotatingBackground("spiral-large");
     background.rotationTime = 20000;
 
-    this.render = timestamp => {
+    this.render = (timestamp,x,y,width,height) => {
         let restorationRequired = false;
         if(fadeOutStart) {
             const fadeOutDelta = (timestamp - fadeOutStart) / fadeInTime;
@@ -350,7 +350,13 @@ function SettingsPaneRenderer(callback,parent) {
             }
         }
 
+        context.save();
+        context.globalCompositeOperation = "destination-out";
+        context.fillStyle = "white";
+        context.fillRect(x,y,width,height);
+        context.globalCompositeOperation = "destination-over";
         background.render(timestamp);
+        context.restore();
 
         const controlsLabelX = halfWidth;
         let buttonAreaWidth = 500;
@@ -440,4 +446,4 @@ function SettingsPaneRenderer(callback,parent) {
         }
     }
 }
-export default SettingsPaneRenderer;
+export default ControlsPaneRenderer;

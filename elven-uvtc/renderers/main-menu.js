@@ -1,5 +1,5 @@
 import WorldRenderer from "../renderers/world.js";
-import SettingsPaneRenderer from "../renderers/settings-pane.js";
+import SettingsPaneRenderer from "../renderers/controls-pane.js";
 import RotatingBackground from "../renderers/components/rotating-background.js";
 import ChapterPane from "./chapter-pane.js";
 import AudioPane from "./audio-pane.js";
@@ -335,7 +335,10 @@ function MainMenuRenderer() {
         context.fillText(VERSION_STRING,fullWidth-offsetFactor*10,fullHeight-offsetFactor*25);
 
         if(this.overlayPane) {
-            this.overlayPane.render(timestamp,renderNormal*40,renderNormal*20,fullWidth-renderNormal*80,fullHeight-renderNormal*70);
+            const margin = renderNormal * 20;
+            const extraBottomSpace = margin + renderNormal*50;
+
+            this.overlayPane.render(timestamp,margin,margin,fullWidth-margin-margin,fullHeight-extraBottomSpace);
         }
 
         const logoSize = fullWidth * 0.075;

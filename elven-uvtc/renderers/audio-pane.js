@@ -194,10 +194,10 @@ function AudioPane(callback,parent) {
         let sliderHeight = 60;
         let elfWidth = 70;
 
-        if(fullSliderWidth < internalWidth) {
-            fullSliderWidth = fullWidth - 150;
+        if(fullSliderWidth <= internalWidth - 150) {
+            fullSliderWidth = internalWidth - 150;
         }
-        if(fullHeight < internalHeight) {
+        if(fullHeight <= internalHeight) {
             sliderHeight = 50;
             elfWidth = 60;
         }
