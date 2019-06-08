@@ -326,6 +326,7 @@ function ControlsPaneRenderer(callback,parent) {
     background.rotationTime = 20000;
 
     this.render = (timestamp,x,y,width,height) => {
+        const halfWidth = Math.floor(width / 2);
         let restorationRequired = false;
         if(fadeOutStart) {
             const fadeOutDelta = (timestamp - fadeOutStart) / fadeInTime;
@@ -358,7 +359,7 @@ function ControlsPaneRenderer(callback,parent) {
         background.render(timestamp);
         context.restore();
 
-        const controlsLabelX = halfWidth;
+        const controlsLabelX = x + halfWidth;
         let buttonAreaWidth = 500;
         if(buttonAreaWidth > fullWidth-40) {
             buttonAreaWidth = fullWidth - 40;
@@ -368,7 +369,7 @@ function ControlsPaneRenderer(callback,parent) {
         let halfButtonAreaWidth = buttonAreaWidth / 2;
         let quarterButtonAreaWidth = buttonAreaWidth / 4;
 
-        const buttonAreaX = Math.round(halfWidth - buttonAreaWidth / 2);
+        const buttonAreaX = Math.round(controlsLabelX - buttonAreaWidth / 2);
         const buttonAreaY = Math.round(halfHeight - buttonAreaHeight / 2) + 40;
         buttonAreaHeight = Math.round(buttonAreaHeight);
         buttonAreaWidth = Math.round(buttonAreaWidth);

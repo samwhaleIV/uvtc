@@ -157,6 +157,7 @@ function AudioPane(callback,parent) {
 
 
     this.render = (timestamp,x,y,width,height) => {
+        const halfWidth = width / 2;
         let restorationRequired = false;
         if(fadeOutStart) {
             const fadeOutDelta = (timestamp - fadeOutStart) / fadeInTime;
@@ -204,7 +205,7 @@ function AudioPane(callback,parent) {
 
         const halfSliderHeight = sliderHeight / 2;
 
-        slider1.x = Math.floor(halfWidth - fullSliderWidth / 2);
+        slider1.x = Math.floor(x + halfWidth - fullSliderWidth / 2);
         slider1.y = Math.floor(height * 0.33);
         slider1.width = fullSliderWidth;
         slider1.height = sliderHeight;

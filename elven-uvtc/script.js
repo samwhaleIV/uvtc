@@ -43,6 +43,6 @@ if(ENV_FLAGS.FAST_AS_FUCK_TRANSITIONS) {
     setMusicFadeDuration(60);
 } else {
     setFaderDelay(600);
-    setFaderDuration(2000);
+    setFaderDuration(1700);
     setMusicFadeDuration(1000);
 }

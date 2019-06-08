@@ -5,6 +5,7 @@ import WorldPrompt from "./components/world/prompt.js";
 import GlobalState from "../runtime/global-state.js";
 import ElfSpriteRenderer from "./components/world/elf-sprite.js";
 import GetOverworldCharacter from "../runtime/character-creator.js";
+import WorldUIRenderer from "./world-ui.js";
 
 function WorldRenderer() {
     Object.defineProperty(this,"globalState",{
@@ -194,7 +195,18 @@ function WorldRenderer() {
 
     this.popupProgressEnabled = true;
 
+    this.escapeMenu = new WorldUIRenderer(this);
+    this.escapeMenuShown = false;
+    this.escapeMenuDisabled = false;
+    const escapeMenuDisabled = () => {
+        return this.escapeMenuDisabled || playerInteractionLocked();
+    }
+
     this.processKey = function(key) {
+        if(this.escapeMenuShown) {
+            this.escapeMenu.processKey(key);
+            return;
+        }
         if(this.prompt) {
             switch(key) {
                 case kc.accept:
@@ -256,7 +268,29 @@ function WorldRenderer() {
         }
     }
     this.processKeyUp = function(key) {
+        if(this.escapeMenuShown) {
+            this.escapeMenu.processKeyUp(key);
+            return;
+        }
         switch(key) {
+            case kc.cancel:
+                if(wDown) {
+                    this.processKeyUp(kc.up);
+                }
+                if(aDown) {
+                    this.processKeyUp(kc.left);
+                }
+                if(sDown) {
+                    this.processKeyUp(kc.down);
+                }
+                if(dDown) {
+                    this.processKeyUp(kc.right);
+                }
+                this.escapeMenuShown = true;
+                this.escapeMenu.show(()=>{
+                    this.escapeMenuShown = false;
+                });
+                break;
             case kc.accept:
                 enterReleased = true;
                 break;
@@ -275,12 +309,23 @@ function WorldRenderer() {
         }
         this.playerController.processKeyUp(key);
     }
-    this.processMove = function(mouseX,mouseY) {
+    this.processMove = function(x,y) {
+        if(this.escapeMenuShown) {
+            this.escapeMenu.processMove(x,y);
+            return;
+        }
     }
-    this.processClick = function(mouseX,mouseY) {
+    this.processClick = function(x,y) {
+        if(this.escapeMenuShown) {
+            this.escapeMenu.processClick(x,y);
+            return;
+        }
     }
-    this.processClickEnd = function(mouseX,mouseY) {
-        this.processMove(mouseX,mouseY);
+    this.processClickEnd = function(x,y) {
+        if(this.escapeMenuShown) {
+            this.escapeMenu.processClickEnd(x,y);
+            return;
+        }
     }
     this.clearTextPopup = () => {
         this.popup = null;
@@ -644,7 +689,7 @@ function WorldRenderer() {
     let horizontalTiles, verticalTiles, horizontalOffset, verticalOffset, verticalTileSize, horizontalTileSize, halfHorizontalTiles, halfVerticalTiles;
 
     this.disableAdaptiveFill = true;
-    this.noScale = true;
+    this.noPixelScale = true;
 
     this.updateSize = function() {
 
@@ -909,6 +954,9 @@ function WorldRenderer() {
         }
         if(this.customRenderer) {
             this.customRenderer(timestamp);
+        }
+        if(this.escapeMenuShown) {
+            this.escapeMenu.render(timestamp);
         }
     }
 }

@@ -1,6 +1,6 @@
-import WorldRenderer from "../renderers/world.js";
-import SettingsPaneRenderer from "../renderers/controls-pane.js";
-import RotatingBackground from "../renderers/components/rotating-background.js";
+import WorldRenderer from "./world.js";
+import ControlsPaneRenderer from "./controls-pane.js";
+import RotatingBackground from "./components/rotating-background.js";
 import ChapterPane from "./chapter-pane.js";
 import AudioPane from "./audio-pane.js";
 import CreditsRenderer from "./credits.js";
@@ -89,7 +89,7 @@ function MainMenuRenderer() {
                 this.overlayPane = new AudioPane(this.clearOverlay,this);
                 break;
             case hoverTypes.elf2:
-                this.overlayPane = new SettingsPaneRenderer(this.clearOverlay,this);
+                this.overlayPane = new ControlsPaneRenderer(this.clearOverlay,this);
                 break;
             case hoverTypes.elf3:
                 this.overlayPane = new ChapterPane(this.clearOverlay,this);
