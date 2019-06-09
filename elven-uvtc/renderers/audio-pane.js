@@ -33,6 +33,8 @@ function AudioPane(callback,parent) {
     let elfSlider1 = getPlaceholderLocation();
     let elfSlider2 = getPlaceholderLocation();
 
+    let exitLabel = getPlaceholderLocation();
+
     const sliderOnColor = "#EF0067";
     const sliderOffColor = "#1E1E1E";
 
@@ -46,7 +48,8 @@ function AudioPane(callback,parent) {
         slider1: 1,
         slider2: 2,
         elfSlider1: 3,
-        elfSlider2: 4
+        elfSlider2: 4,
+        exitLabel: 5
     };
     let hoverType = hoverTypes.none;
 
@@ -115,6 +118,9 @@ function AudioPane(callback,parent) {
                 );
                 saveVolumeChanges();
                 break;
+            case hoverTypes.exitLabel:
+                this.exit();
+                break;
         }
         this.processMove(x,y);
     }
@@ -142,6 +148,8 @@ function AudioPane(callback,parent) {
             hoverType = hoverTypes.slider1;
         } else if(contains(x,y,slider2)) {
             hoverType = hoverTypes.slider2;
+        } else if(contains(x,y,exitLabel)) {
+            hoverType = hoverTypes.exitLabel;
         } else {
             hoverType = hoverTypes.none;
         }
@@ -259,6 +267,8 @@ function AudioPane(callback,parent) {
             sliderImage,0,0,sliderImage.width,sliderImage.height,
             elfSlider2.x,elfSlider2.y,elfWidth,elfHeight
         );
+
+        exitLabel = renderExitButton(x,y,hoverType===hoverTypes.exitLabel,false);
 
         if(restorationRequired) {
             context.restore();

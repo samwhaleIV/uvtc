@@ -7,12 +7,14 @@ function ChapterPane(callback,parent) {
     let leftButton = getPlaceholderLocation();
     let rightButton = getPlaceholderLocation();
     let centerButton = getPlaceholderLocation();
+    let exitLabel = getPlaceholderLocation();
 
     const hoverTypes = {
         none: 0,
         leftButton: 1,
         centerButton: 2,
-        rightButton: 3
+        rightButton: 3,
+        exitLabel: 4
     };
     let hoverType = hoverTypes.none;
 
@@ -61,6 +63,9 @@ function ChapterPane(callback,parent) {
             return;
         }
         switch(hoverType) {
+            case hoverTypes.exitLabel:
+                this.exit();
+                break;
             case hoverTypes.leftButton:
                 if(this.leftButtonText === exitText) {
                     this.exit();
@@ -111,6 +116,8 @@ function ChapterPane(callback,parent) {
             hoverType = hoverTypes.centerButton;
         } else if(contains(x,y,rightButton)) {
             hoverType = hoverTypes.rightButton;
+        } else if(contains(x,y,exitLabel)) {
+            hoverType = hoverTypes.exitLabel;
         } else {
             hoverType = hoverTypes.none;
         }
@@ -231,19 +238,19 @@ function ChapterPane(callback,parent) {
         const leftButtonCenterX = halfWidth - imageSize;
         const rightButtonCenterX = halfWidth + imageSize;
 
-        leftButton.x = leftButtonCenterX - halfButtonWidth;
-        leftButton.y = halfHeight - halfButtonHeight;
-        rightButton.x = rightButtonCenterX - halfButtonWidth;
+        leftButton.x = Math.floor(leftButtonCenterX - halfButtonWidth);
+        leftButton.y = Math.floor(halfHeight - halfButtonHeight);
+        rightButton.x = Math.floor(rightButtonCenterX - halfButtonWidth);
         rightButton.y = leftButton.y;
-        leftButton.width = sideButtonWidth;
-        leftButton.height = sideButtonHeight;
-        rightButton.width = sideButtonWidth;
-        rightButton.height = sideButtonHeight;
+        leftButton.width = Math.floor(sideButtonWidth);
+        leftButton.height = Math.floor(sideButtonHeight);
+        rightButton.width = leftButton.width;
+        rightButton.height = leftButton.height;
 
-        centerButton.height = centerButtonHeight;
-        centerButton.width = centerButtonWidth;
-        centerButton.y = halfHeight - centerButton.height / 2;
-        centerButton.x = halfWidth - centerButton.width / 2;
+        centerButton.height = Math.floor(centerButtonHeight);
+        centerButton.width = Math.floor(centerButtonWidth);
+        centerButton.y = Math.floor(halfHeight - centerButton.height / 2);
+        centerButton.x = Math.floor(halfWidth - centerButton.width / 2);
 
         context.save();
         context.globalCompositeOperation = "destination-out";
@@ -252,7 +259,7 @@ function ChapterPane(callback,parent) {
         context.globalCompositeOperation = "source-over";
         this.renderCenterImage(imageSize);
         if(hoverType === hoverTypes.centerButton) {
-            renderHoverEffect(halfWidth,halfHeight,hoverSize,hoverSize);
+            renderButtonHover(centerButton.x,centerButton.y,centerButton.width,centerButton.height);
         }
         context.globalCompositeOperation = "destination-out";
         drawRectangle(centerButton,"black");
@@ -260,17 +267,16 @@ function ChapterPane(callback,parent) {
         parent.renderBackground(timestamp);
         context.restore();
 
-
         if(this.leftButtonText) {
             if(hoverType === hoverTypes.leftButton) {
-                renderHoverEffect(leftButtonCenterX,halfHeight,hoverSize,hoverSize);
+                renderButtonHover(leftButton.x,leftButton.y,leftButton.width,leftButton.height);
             }
             drawRectangle(leftButton,"black");
         }
 
         if(this.rightButtonText) {
             if(hoverType === hoverTypes.rightButton) {
-                renderHoverEffect(rightButtonCenterX,halfHeight,hoverSize,hoverSize);
+                renderButtonHover(rightButton.x,rightButton.y,rightButton.width,rightButton.height);
             }
             drawRectangle(rightButton,"black");
         }
@@ -293,6 +299,8 @@ function ChapterPane(callback,parent) {
         context.fillText(this.chapterSubTitle,halfWidth,robotoOffset+subtitleBoxCenterY);
         context.font = `${widthNormal*48}px Roboto`;
         context.fillText(this.chapterTitle,halfWidth,halfHeight - imageSize / 2 - subtitleLayerHeight);
+
+        exitLabel = renderExitButton(x,y,hoverType===hoverTypes.exitLabel,false);
         
         if(fadeOutStart) {
             context.restore();

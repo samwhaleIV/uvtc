@@ -47,7 +47,17 @@ function ControlsPaneRenderer(callback,parent) {
     const leftButton = getPlaceholderLocation();
     const rightButton = getPlaceholderLocation();
     const pictureButton = getPlaceholderLocation();
-    const exitLabel = getPlaceholderLocation();
+    let exitLabel = getPlaceholderLocation();
+
+    const hoverLookup = {
+        1: acceptButton,
+        2: backButton,
+        3: upButton,
+        4: downButton,
+        5: leftButton,
+        6: rightButton,
+        7: pictureButton
+    };
 
     const keyButtons = {
         acceptButton: acceptButton,
@@ -83,7 +93,7 @@ function ControlsPaneRenderer(callback,parent) {
     rightButton.association = kc.right;
     pictureButton.association = kc.picture_mode;
 
-    const keyNameColor = "#FF006E";
+    const keyNameColor = CONSISTENT_PINK;
     const backgroundColor = "rgba(89,89,89,0.25)";
 
     Object.entries(keyBindings).forEach(keyBind => {
@@ -364,7 +374,6 @@ function ControlsPaneRenderer(callback,parent) {
         let buttonAreaHeight = buttonAreaWidth - 100;
 
         let halfButtonAreaWidth = buttonAreaWidth / 2;
-        let quarterButtonAreaWidth = buttonAreaWidth / 4;
 
         const buttonAreaX = Math.round(controlsLabelX - buttonAreaWidth / 2);
         const buttonAreaY = Math.round(halfHeight - buttonAreaHeight / 2) + 40;
@@ -422,6 +431,12 @@ function ControlsPaneRenderer(callback,parent) {
         downButton.width = quarterButtonWidth;
         leftButton.width = quarterButtonWidth;
 
+
+        const hoverLookupResult = hoverLookup[hoverType];
+        if(hoverLookupResult) {
+            renderButtonHover(hoverLookupResult.x,hoverLookupResult.y,hoverLookupResult.width,hoverLookupResult.height);
+        }
+
         context.font = "26px Roboto";
         renderButton(acceptButton);
         renderButton(backButton);
@@ -439,6 +454,11 @@ function ControlsPaneRenderer(callback,parent) {
         context.textAlign = "center";
         context.fillText("C O N T R O L S",controlsLabelX,buttonAreaY-40);
         context.restore();
+
+        if(!listeningToKeyEvents) {
+            exitLabel = renderExitButton(x,y,hoverType===hoverTypes.exitLabel,true);
+        }
+
         if(restorationRequired) {
             context.restore();
         }

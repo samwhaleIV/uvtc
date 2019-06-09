@@ -12,8 +12,8 @@ function WorldUIRenderer(world) {
     const blurImage = imageDictionary["ui/escape-blur"];
     const hoverFX = imageDictionary["ui/escape-menu-fx"];
 
-    const iconPart1Width = 65;
-    const iconPart2Width = 57;
+    const iconPart1Width = 64;
+    const iconPart2Width = 58;
 
     const partOneRatio = iconPart1Width / iconImage.height;
     const partTwoRatio = iconPart2Width / iconImage.height;
@@ -48,27 +48,27 @@ function WorldUIRenderer(world) {
     const internalIconMap = {
         elfmart: {
             hoverID: 1,
-            x: 1,
+            x: 2,
             y: 1,
-            width: 32,
+            width: 28,
             height: 32
         },
         settings: {
-            width: 31,
+            width: 32,
             height: 10,
-            x: 34,
+            x: 33,
             y: 1,
             hoverID: 2
         },
         mainMenu: {
-            width: 32,
+            width: 33,
             height: 23,
-            x: 34,
+            x: 33,
             y: 11,
             hoverID: 3
         },
         moves: {
-            x: 66,
+            x: 65,
             y: 4,
             width: 30,
             height: 27,
@@ -104,6 +104,7 @@ function WorldUIRenderer(world) {
         if(hoverType) {
             switch(hoverType) {
                 case internalIconMap.elfmart.hoverID:
+                    exit();
                     break;
                 case internalIconMap.settings.hoverID:
                     break;
