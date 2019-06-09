@@ -1,8 +1,16 @@
 import WorldRenderer from "../renderers/world.js";
 import GlobalState from "../runtime/global-state.js";
 import Chapters from "../runtime/chapter-data.js";
+import UIPrompt from "./components/ui-prompt.js";
+import ChapterManager from "../runtime/chapter-manager.js";
 
 function ChapterPane(callback,parent) {
+
+    let prompt = null;
+    const clearPrompt = () => {
+        prompt = null;
+        this.processMove(lastRelativeX,lastRelativeY);
+    }
 
     let leftButton = getPlaceholderLocation();
     let rightButton = getPlaceholderLocation();
@@ -40,9 +48,17 @@ function ChapterPane(callback,parent) {
         if(this.leaving) {
             return;
         }
+        if(prompt && prompt.shown) {
+            prompt.processKey(key);
+            return;
+        }
     }
     this.processKeyUp = function(key) {
         if(this.leaving) {
+            return;
+        }
+        if(prompt && prompt.shown) {
+            prompt.processKeyUp(key);
             return;
         }
         switch(key) {
@@ -55,11 +71,19 @@ function ChapterPane(callback,parent) {
         if(this.leaving) {
             return;
         }
+        if(prompt && prompt.shown) {
+            prompt.processClick(x,y);
+            return;
+        }
         this.processMove(x,y);
     }
     const exitText = "exit";
     this.processClickEnd = function(x,y) {
         if(this.leaving) {
+            return;
+        }
+        if(prompt && prompt.shown) {
+            prompt.processClickEnd(x,y);
             return;
         }
         switch(hoverType) {
@@ -75,19 +99,77 @@ function ChapterPane(callback,parent) {
                 }
                 break;
             case hoverTypes.centerButton:
-                parent.fader.fadeOut(WorldRenderer);
-                let startTime = 0;
-                let timeOffset = 0;
-                faderEffectsRenderer.fillInLayer = {
-                    render: timestamp => {
-                        parent.renderBackground(timestamp-timeOffset,true);
+                const loadWorld = () => {
+                    ChapterManager.setChapter(this.chapterNumber);
+                    parent.fader.fadeOut(WorldRenderer);
+                    let startTime = 0;
+                    let timeOffset = 0;
+                    faderEffectsRenderer.fillInLayer = {
+                        render: timestamp => {
+                            parent.renderBackground(timestamp-timeOffset,true);
+                        }
+                    }
+                    faderEffectsRenderer.pauseCallbackOnce = () => {
+                        startTime = performance.now();
+                    }
+                    faderEffectsRenderer.callbackOnce = () => {
+                        timeOffset = rendererState.fader.start - startTime;
                     }
                 }
-                faderEffectsRenderer.pauseCallbackOnce = () => {
-                    startTime = performance.now();
-                }
-                faderEffectsRenderer.callbackOnce = () => {
-                    timeOffset = rendererState.fader.start - startTime;
+
+                const highestChapter = GlobalState.data.highestChapterFinished || 0;
+                if(this.chapterNumber > highestChapter + 1) {
+                    prompt = new UIPrompt("You must finish the previous chapter before you can play this chapter!",{
+                        text: "Okay",
+                        callback: clearPrompt
+                    });
+                    prompt.show();
+                } else {
+                    if(GlobalState.data.activeChapter === this.chapterNumber) {
+                        prompt = new UIPrompt("You are already in progress on this chapter. Do you want to start over?",{
+                            text: "Yes",
+                            callback: () => {
+                                clearPrompt();
+                                loadWorld();
+                            }
+                        },{
+                            text: "No",
+                            callback: () => {
+                                if(GlobalState.data.tippedAboutMenu) {
+                                    clearPrompt();
+                                } else {
+                                    const newPrompt = new UIPrompt("Tip: Use the play button on the main menu to continue your current chapter.",{
+                                        text: "Got it",
+                                        callback: clearPrompt
+                                    },{
+                                        text: "Don't tell me again",
+                                        callback: () => {
+                                            GlobalState.data.tippedAboutMenu = true;
+                                            clearPrompt();
+                                        }
+                                    });
+                                    newPrompt.show();
+                                    prompt = newPrompt;
+                                }
+                            }
+                        });
+                        prompt.show();
+                    } else {
+                        if(GlobalState.data.activeChapter) {
+                            prompt = new UIPrompt("You are already in progress on a chapter. Do you want to lose your progress and start this chapter?",{
+                                text: "Yes, that's fine",
+                                callback: () => {
+                                    clearPrompt();
+                                    loadWorld();
+                                }
+                            },{
+                                text: "No, keep my current chapter",
+                                callback: clearPrompt
+                            });
+                        } else {
+                            loadWorld();
+                        }
+                    }
                 }
                 break;
             case hoverTypes.rightButton:
@@ -108,6 +190,10 @@ function ChapterPane(callback,parent) {
     }
     this.processMove = function(x,y) {
         if(this.leaving) {
+            return;
+        }
+        if(prompt && prompt.shown) {
+            prompt.processMove(x,y);
             return;
         }
         if(contains(x,y,leftButton)) {
@@ -183,11 +269,10 @@ function ChapterPane(callback,parent) {
         this.chapterNumber = chapterNumber;
     }
 
-    if(GlobalState.data.currentChapter) {
-        this.changeChapterPage(GlobalState.data.currentChapter);
+    if(GlobalState.data.activeChapter) {
+        this.changeChapterPage(GlobalState.data.activeChapter);
     } else {
         this.changeChapterPage(1);
-        GlobalState.data.currentChapter = 1;
     }
 
     this.centerButtonText = "P  L  A  Y";
@@ -304,6 +389,10 @@ function ChapterPane(callback,parent) {
         
         if(fadeOutStart) {
             context.restore();
+        }
+
+        if(prompt) {
+            prompt.render(timestamp);
         }
     }
 }

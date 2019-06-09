@@ -5,6 +5,8 @@ import ElvesFillIn from "./components/world/elves-fill-in.js";
 
 function WorldUIRenderer(world) {
 
+    let alert = null;
+
     const iconImage = imageDictionary["ui/escape-menu"];
     const iconImageRatio = iconImage.width / iconImage.height;
     const iconImageRatioInverse = iconImage.height / iconImage.width;
@@ -32,6 +34,7 @@ function WorldUIRenderer(world) {
     let popup = null;
     let transitioning = true;
     const exit = () => {
+        alert = null;
         transitioning = true;
         loadStart = null;
         leaveStart = performance.now();
@@ -118,6 +121,8 @@ function WorldUIRenderer(world) {
                 case internalIconMap.moves.hoverID:
                     break;
                 case internalIconMap.help.hoverID:
+                    world.saveState(true);
+                    world.showAlert("Your progress has been saved!");
                     break;
             }
         }
@@ -182,6 +187,7 @@ function WorldUIRenderer(world) {
         context.fillRect(0,0,fullWidth,fullHeight);
     }
     this.show = callback => {
+        alert = null;
         leaving = false;
         transitioning = true;
         leavingCallback = callback;

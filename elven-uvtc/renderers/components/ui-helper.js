@@ -17,6 +17,8 @@ const renderButton = (button,withHover,text,textXOffset,textYOffset,specialEffec
         3
     );
 }
+const MENU_BUTTON_FONT = "21px Roboto";
+const UI_ALERT_FONT = "21px Arial";
 const CONSISTENT_PINK = "#FF006E";
 const renderButtonHover = (x,y,width,height) => {
     context.fillStyle = CONSISTENT_PINK;
@@ -25,8 +27,8 @@ const renderButtonHover = (x,y,width,height) => {
 const renderExitButton = (x,y,withHover,invert) => {
     x += 5;
     y += 5;
-    let width = 240;
-    let height = 90;
+    let width = 230;
+    let height = 80;
     if(fullWidth <= internalWidth) {
         width = 100;
         height = 80;
@@ -38,11 +40,11 @@ const renderExitButton = (x,y,withHover,invert) => {
     }
     context.fillStyle = backgroundColor;
     context.fillRect(x,y,width,height);
-    context.font = "24px Roboto";
+    context.font = MENU_BUTTON_FONT;
     context.fillStyle = foregroundColor;
     context.textAlign = "center";
     context.textBaseline = "middle";
-    context.fillText("Exit",x+width/2,y+height/2+3);
+    context.fillText("Exit",x+width/2,y+height/2+2);
     return {
         x: x,
         y: y,

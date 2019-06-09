@@ -5,6 +5,8 @@ import ChapterPane from "./chapter-pane.js";
 import AudioPane from "./audio-pane.js";
 import CreditsRenderer from "./credits.js";
 import GlobalState from "../runtime/global-state.js";
+import ChapterManager from "../runtime/chapter-manager.js";
+import Chapters from "../runtime/chapter-data.js";
 
 function MainMenuRenderer() {
 
@@ -99,6 +101,14 @@ function MainMenuRenderer() {
                 this.leaveWithFillInLayer(CreditsRenderer);
                 break;
             case hoverTypes.play:
+                if(!GlobalState.data.activeChapter) {
+                    const nextChapter = GlobalState.data.highestChapterFinished + 1;
+                    if(nextChapter <= Chapters.length) {
+                        ChapterManager.setChapter(nextChapter);
+                    } else {
+                        ChapterManager.setChapter(1);
+                    }
+                }
                 this.leaveWithFillInLayer(WorldRenderer);
                 break;
         }

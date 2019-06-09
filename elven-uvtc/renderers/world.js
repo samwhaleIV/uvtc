@@ -6,8 +6,17 @@ import GlobalState from "../runtime/global-state.js";
 import ElfSpriteRenderer from "./components/world/elf-sprite.js";
 import GetOverworldCharacter from "../runtime/character-creator.js";
 import WorldUIRenderer from "./world-ui.js";
+import UIAlert from "./components/ui-alert.js";
 
 function WorldRenderer() {
+    const alertTime = 1000;
+    let alert = null;
+    this.showAlert = (message,duration=alertTime) => {
+        alert = new UIAlert(message.toLowerCase(),duration);
+    }
+    this.clearAlert = () => {
+        alert = null;
+    }
     Object.defineProperty(this,"globalState",{
         get: function() {
             return GlobalState.data;
@@ -957,6 +966,11 @@ function WorldRenderer() {
         }
         if(this.escapeMenuShown) {
             this.escapeMenu.render(timestamp);
+        }
+        if(alert) {
+            if(!alert.render(timestamp)) {
+                alert = null;
+            }
         }
     }
 }
