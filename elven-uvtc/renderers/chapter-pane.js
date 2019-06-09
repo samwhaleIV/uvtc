@@ -272,7 +272,16 @@ function ChapterPane(callback,parent) {
     if(GlobalState.data.activeChapter) {
         this.changeChapterPage(GlobalState.data.activeChapter);
     } else {
-        this.changeChapterPage(1);
+        let highestChapter = GlobalState.data.highestChapterFinished;
+        if(highestChapter) {
+            highestChapter++;
+            if(highestChapter > Chapters.length) {
+                highestChapter = Chapters.length;
+            }
+            this.changeChapterPage(highestChapter);
+        } else {
+            this.changeChapterPage(1);
+        }
     }
 
     this.centerButtonText = "P  L  A  Y";
