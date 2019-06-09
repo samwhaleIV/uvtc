@@ -17,6 +17,7 @@ ImagePaths.push(
     getFile("chapter-select-invert.png",FileTypes.BackgroundImage),
     getFile("ui/silo.png",FileTypes.Image),
     getFile("corrupt.png",FileTypes.BackgroundImage),
+    getFile("ui/error.png",FileTypes.Image),
     getFile("ui/escape-menu.png",FileTypes.Image),
     getFile("ui/escape-blur.png",FileTypes.Image),
     getFile("ui/escape-menu-fx.png",FileTypes.Image),

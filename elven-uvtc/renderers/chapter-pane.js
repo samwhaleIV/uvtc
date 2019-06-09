@@ -1,4 +1,6 @@
 import WorldRenderer from "../renderers/world.js";
+import GlobalState from "../runtime/global-state.js";
+import Chapters from "../runtime/chapter-data.js";
 
 function ChapterPane(callback,parent) {
 
@@ -36,20 +38,15 @@ function ChapterPane(callback,parent) {
         if(this.leaving) {
             return;
         }
-        switch(key) {
-            case kc.open:
-                break;
-            case kc.cancel:
-                this.exit();
-                break;
-        }
     }
     this.processKeyUp = function(key) {
         if(this.leaving) {
             return;
         }
         switch(key) {
-            default:break;
+            case kc.cancel:
+                this.exit();
+                break;
         }
     }
     this.processClick = function(x,y) {
@@ -67,6 +64,9 @@ function ChapterPane(callback,parent) {
             case hoverTypes.leftButton:
                 if(this.leftButtonText === exitText) {
                     this.exit();
+                } else if(this.leftButtonText) {
+                    playSound("click");
+                    this.chapterBack();
                 }
                 break;
             case hoverTypes.centerButton:
@@ -86,10 +86,17 @@ function ChapterPane(callback,parent) {
                 }
                 break;
             case hoverTypes.rightButton:
-                playSound("energy-reverse");
-                break;
-            default:
-                this.exit();
+                if(this.rightButtonText === exitText) {
+                    this.exit();
+                    break;
+                } else if(this.rightButtonText) {
+                    if(this.chapterNumber === Chapters.length) {
+                        playSound("energy");
+                    } else {
+                        playSound("click");
+                    }
+                    this.chapterForward();
+                }
                 break;
         }
         this.processMove(x,y);
@@ -129,12 +136,53 @@ function ChapterPane(callback,parent) {
         context.fillRect(x-halfRadius,y-halfRadius,width,height);
     }
 
-    this.currentImage = imageDictionary["ui/chapters/1"];
-    this.chapterTitle = "Chapter 1";
-    this.chapterSubTitle = "Makin' my way round town";
+    this.chapterForward = () => {
+        const newChapter = this.chapterNumber + 1;
+        if(newChapter > Chapters.length) {
+            return;
+        }
+        this.changeChapterPage(newChapter);
+    }
+    this.chapterBack = () => {
+        const newChapter = this.chapterNumber - 1;
+        if(newChapter < 1) {
+            return;
+        }
+        this.changeChapterPage(newChapter);
+    }
+    
+    this.changeChapterPage = chapterNumber => {
+        if(chapterNumber > Chapters.length) {
+            throw Error("Chapter number greater than chapter count");
+        }
+        let chapterImage = imageDictionary[`ui/chapters/${chapterNumber}`];
+        if(!chapterImage) {
+            chapterImage = imageDictionary["ui/error"];
+        }
+        const finalChapter = chapterNumber === Chapters.length;
+        this.currentImage = chapterImage;
+        this.chapterTitle = finalChapter ? "Final Chapter" : `Chapter ${chapterNumber}`;
+        this.chapterSubTitle = Chapters[chapterNumber-1].title;
+        if(chapterNumber === 1) {
+            this.leftButtonText = "";
+        } else {
+            this.leftButtonText = `chapter ${chapterNumber-1}`;
+        }
+        if(finalChapter) {
+            this.rightButtonText = "";
+        } else {
+            this.rightButtonText = `chapter ${chapterNumber+1}`;
+        }
+        this.chapterNumber = chapterNumber;
+    }
 
-    this.leftButtonText = exitText;
-    this.rightButtonText = "next chapter";
+    if(GlobalState.data.currentChapter) {
+        this.changeChapterPage(GlobalState.data.currentChapter);
+    } else {
+        this.changeChapterPage(1);
+        GlobalState.data.currentChapter = 1;
+    }
+
     this.centerButtonText = "P  L  A  Y";
 
     let startTime;
@@ -213,15 +261,19 @@ function ChapterPane(callback,parent) {
         context.restore();
 
 
-        if(hoverType === hoverTypes.leftButton) {
-            renderHoverEffect(leftButtonCenterX,halfHeight,hoverSize,hoverSize);
+        if(this.leftButtonText) {
+            if(hoverType === hoverTypes.leftButton) {
+                renderHoverEffect(leftButtonCenterX,halfHeight,hoverSize,hoverSize);
+            }
+            drawRectangle(leftButton,"black");
         }
-        drawRectangle(leftButton,"black");
 
-        if(hoverType === hoverTypes.rightButton) {
-            renderHoverEffect(rightButtonCenterX,halfHeight,hoverSize,hoverSize);
+        if(this.rightButtonText) {
+            if(hoverType === hoverTypes.rightButton) {
+                renderHoverEffect(rightButtonCenterX,halfHeight,hoverSize,hoverSize);
+            }
+            drawRectangle(rightButton,"black");
         }
-        drawRectangle(rightButton,"black");
 
         context.font = `${widthNormal*24}px Roboto`;
         context.textAlign = "center";

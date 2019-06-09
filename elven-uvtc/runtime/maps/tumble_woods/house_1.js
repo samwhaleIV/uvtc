@@ -96,6 +96,8 @@ addMap({
 addMap({
     WorldState: function(world,data) {
         let jim;
+        const bookcase1Prefix = "ȴEdgy Bookcase:ȴ ";
+        const bookcase2Prefix = "ȴNaugthy Bookcase:ȴ ";
         this.load = world => {
             if(data.fromDoorWay) {
                 switch(data.sourceRoom) {
@@ -200,11 +202,11 @@ addMap({
                     break;
                 case 13:
                     await world.showTextPopupID("bookcase_6_1");
-                    world.showNamedTextPopupID("bookcase_6_2","Bedgy bookcase:B ");
+                    world.showNamedTextPopupID("bookcase_6_2",bookcase1Prefix);
                     break;
                 case 14:
                     await world.showTextPopupID("bookcase_7_1");
-                    world.showNamedTextPopupID("bookcase_7_2","Bnaugthy bookcase:B ");
+                    world.showNamedTextPopupID("bookcase_7_2",bookcase2Prefix);
                     break;
                 case 15:
                     break;

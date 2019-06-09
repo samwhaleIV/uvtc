@@ -291,9 +291,6 @@ function ControlsPaneRenderer(callback,parent) {
             case hoverTypes.exitLabel:
                 exit();
                 break;
-            default:
-                exit();
-                break;
         }
         this.processMove(x,y);
     }

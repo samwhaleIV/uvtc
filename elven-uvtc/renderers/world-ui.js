@@ -1,11 +1,13 @@
 import ControlsPaneRenderer from "./controls-pane.js";
 import AudioPaneRenderer from "./audio-pane.js";
 import MainMenuRenderer from "./main-menu.js";
+import ElvesFillIn from "./components/world/elves-fill-in.js";
 
 function WorldUIRenderer(world) {
 
     const iconImage = imageDictionary["ui/escape-menu"];
     const iconImageRatio = iconImage.width / iconImage.height;
+    const iconImageRatioInverse = iconImage.height / iconImage.width;
 
     const blurImage = imageDictionary["ui/escape-blur"];
     const hoverFX = imageDictionary["ui/escape-menu-fx"];
@@ -107,17 +109,9 @@ function WorldUIRenderer(world) {
                     break;
                 case internalIconMap.mainMenu.hoverID:
                     playSound("click");
-                    const pattern = context.createPattern(
-                        imageDictionary["backgrounds/corrupt"],
-                        "repeat"
-                    );
-                    faderEffectsRenderer.fillInLayer = {
-                        render: () => {
-                            context.fillStyle = pattern;
-                            context.fillRect(0,0,fullWidth,fullHeight);
-                        }
-                    };
+                    faderEffectsRenderer.fillInLayer = new ElvesFillIn();
                     transitioning = true;
+                    world.saveState(true);
                     world.fader.fadeOut(MainMenuRenderer);
                     break;
                 case internalIconMap.moves.hoverID:
@@ -199,11 +193,15 @@ function WorldUIRenderer(world) {
         if(timeNormal < 0) {
             timeNormal = 0;
         }
-        const height = 250;
-        const padding = 30;
+        let height = 250;
+        let padding = 30;
+        if(height * iconImageRatio > fullWidth-100) {
+            height = (fullWidth-100) * iconImageRatioInverse;
+            padding = 20;
+        }
         const backgroundHeight = height + padding + padding;
         context.fillStyle = "rgba(0,0,0,0.87)";
-        const yBase = halfHeight-height/2;
+        const yBase = Math.floor(halfHeight-height/2);
         if(timeNormal >= 1) {
             context.drawImage(blurImage,0,0,blurImage.width,blurImage.height,0,0,fullWidth,fullHeight);
             context.fillRect(0,yBase-padding,fullWidth,backgroundHeight);

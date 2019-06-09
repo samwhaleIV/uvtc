@@ -64,20 +64,15 @@ function AudioPane(callback,parent) {
         if(this.transitioning) {
             return;
         }
-        switch(key) {
-            case kc.open:
-                break;
-            case kc.cancel:
-                this.exit();
-                break;
-        }
     }
     this.processKeyUp = function(key) {
         if(this.transitioning) {
             return;
         }
         switch(key) {
-            default:break;
+            case kc.cancel:
+                this.exit();
+                break;
         }
     }
 
@@ -119,9 +114,6 @@ function AudioPane(callback,parent) {
                     getVolumeNormal(x,slider2.x,slider2.width)
                 );
                 saveVolumeChanges();
-                break;
-            default:
-                this.exit();
                 break;
         }
         this.processMove(x,y);

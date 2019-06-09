@@ -1,4 +1,6 @@
 import CreditsData from "../runtime/credits-data.js";
+import MainMenuRenderer from "./main-menu.js";
+import ElvesFillIn from "./components/world/elves-fill-in.js";
 
 function CreditsRenderer() {
     const pixelsPerSecond = 60;
@@ -17,6 +19,14 @@ function CreditsRenderer() {
     this.noPixelScale = true;
 
     let reachedEnd = false;
+
+    this.processKey = () => {};
+    this.processKeyUp = key => {
+        if(key === kc.cancel) {
+            faderEffectsRenderer.fillInLayer = new ElvesFillIn();
+            this.fader.fadeOut(MainMenuRenderer);
+        }
+    }
     this.render = timestamp => {
         context.fillStyle = "black";
         context.fillRect(0,0,fullWidth,fullHeight);
