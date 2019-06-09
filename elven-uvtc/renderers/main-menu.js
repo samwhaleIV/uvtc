@@ -102,7 +102,7 @@ function MainMenuRenderer() {
                 break;
             case hoverTypes.play:
                 if(!GlobalState.data.activeChapter) {
-                    const nextChapter = GlobalState.data.highestChapterFinished + 1;
+                    const nextChapter = (GlobalState.data.highestChapterFinished||0) + 1;
                     if(nextChapter <= Chapters.length) {
                         ChapterManager.setChapter(nextChapter);
                     } else {
