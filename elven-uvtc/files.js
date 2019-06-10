@@ -25,7 +25,7 @@ ImagePaths.push(
     getFile("ui/menu-elf.png",FileTypes.Image),
     getFile("ui/menu-elf-slide.png",FileTypes.Image),
     getFile("ui/banner.png",FileTypes.Image),
-    getFile("ui/settings.png",FileTypes.Image),
+    getFile("ui/moves.png",FileTypes.Image),
     getFile("world-tileset.png",FileTypes.Image),
     getFile("sprites/player.png",FileTypes.Image),
     getFile("sprites/elves.png",FileTypes.Image),

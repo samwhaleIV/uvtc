@@ -5,8 +5,6 @@ import ElvesFillIn from "./components/world/elves-fill-in.js";
 
 function WorldUIRenderer(world) {
 
-    let alert = null;
-
     const iconImage = imageDictionary["ui/escape-menu"];
     const iconImageRatio = iconImage.width / iconImage.height;
     const iconImageRatioInverse = iconImage.height / iconImage.width;
@@ -28,13 +26,10 @@ function WorldUIRenderer(world) {
 
     const transitionTime = 200;
 
-    let hoverType = null;
-
     let leavingCallback = null;
     let popup = null;
     let transitioning = true;
     const exit = () => {
-        alert = null;
         transitioning = true;
         loadStart = null;
         leaveStart = performance.now();
@@ -85,6 +80,15 @@ function WorldUIRenderer(world) {
             hoverID: 5
         }
     }
+    const hoverTypes = {
+        elfmart: internalIconMap.elfmart.hoverID,
+        settings: internalIconMap.settings.hoverID,
+        mainMenu: internalIconMap.mainMenu.hoverID,
+        moves: internalIconMap.moves.hoverID,
+        help: internalIconMap.help.hoverID
+    };
+    
+    let hoverType = null;
     
     this.processClick = (x,y) => {
         if(transitioning) {
@@ -169,6 +173,81 @@ function WorldUIRenderer(world) {
             popup.processKey(key);
             return;
         }
+        switch(key) {
+            case kc.up:
+            case kc.down:
+            case kc.left:
+            case kc.right:
+                break;
+            default:
+                return;
+        }
+        switch(hoverType) {
+            default:
+                hoverType = hoverTypes.elfmart;
+                break;
+            case hoverTypes.elfmart:
+                switch(key) {
+                    case kc.left:
+                    case kc.up:
+                        hoverType = hoverTypes.help;
+                        break;
+                    case kc.down:
+                    case kc.right:
+                        hoverType = hoverTypes.settings;
+                        break;
+                }
+                break;
+            case hoverTypes.settings:
+                switch(key) { 
+                    case kc.up:
+                    case kc.left:
+                        hoverType = hoverTypes.elfmart;
+                        break;
+                    case kc.right:
+                    case kc.down:
+                        hoverType = hoverTypes.mainMenu;
+                        break;
+                }
+                break;
+            case hoverTypes.mainMenu:
+                switch(key) {
+                    case kc.left:
+                    case kc.up:
+                        hoverType = hoverTypes.settings;
+                        break;
+                    case kc.down:
+                    case kc.right:
+                        hoverType = hoverTypes.moves;
+                        break;
+                }
+                break;
+            case hoverTypes.moves:
+                switch(key) {
+                    case kc.up:
+                    case kc.left:
+                        hoverType = hoverTypes.mainMenu;
+                        break;
+                    case kc.down:
+                    case kc.right:
+                        hoverType = hoverTypes.help;
+                        hoverType = hoverTypes.help;
+                        break;
+                }
+                break;
+            case hoverTypes.help:
+                switch(key) {
+                    case kc.up:
+                    case kc.left:
+                        hoverType = hoverTypes.moves;
+                        break;
+                    case kc.down:
+                    case kc.right:
+                        hoverType = hoverTypes.elfmart;
+                        break;
+                }
+                break;
+        }
     }
     this.processKeyUp = key => {
         if(transitioning) {
@@ -178,7 +257,13 @@ function WorldUIRenderer(world) {
             popup.processKeyUp(key);
             return;
         }
-        if(key === kc.cancel) {
+        if(key === kc.accept) {
+            if(!hoverType) {
+                hoverType = hoverTypes.elfmart;
+            } else {
+                this.processClickEnd(-1,-1);
+            }
+        } else if(key === kc.cancel) {
             exit();
         }
     }
@@ -187,13 +272,11 @@ function WorldUIRenderer(world) {
         context.fillRect(0,0,fullWidth,fullHeight);
     }
     this.show = callback => {
-        alert = null;
         leaving = false;
         transitioning = true;
         leavingCallback = callback;
         loadStart = performance.now();
         loading = true;
-        hoverType = null;
         //Do something that transitions then sets transitioning to false
     }
     this.renderParts = timeNormal => {

@@ -3,8 +3,11 @@ import GlobalState from "../runtime/global-state.js";
 import Chapters from "../runtime/chapter-data.js";
 import UIPrompt from "./components/ui-prompt.js";
 import ChapterManager from "../runtime/chapter-manager.js";
+import MovesManager from "../runtime/moves-manager.js";
 
 function ChapterPane(callback,parent) {
+
+    const movesIcon = imageDictionary["ui/moves"];
 
     let prompt = null;
     const clearPrompt = () => {
@@ -210,13 +213,26 @@ function ChapterPane(callback,parent) {
     }
 
     this.renderCenterImage = size => {
-        const halfSize = size / 2;
+        let halfSize = size / 2;
         const image = this.currentImage;
+        const x = Math.floor(halfWidth - halfSize);
+        const y = Math.floor(halfHeight - halfSize);
         context.drawImage(
             image,
             0,0,image.width,image.height,
-            halfWidth-halfSize,halfHeight-halfSize,size,size
+            x,y,size,size
         );
+        if(this.moveProgress !== null) {
+            size = size / 5;
+            size = Math.ceil(size / 32)*32;
+
+            context.drawImage(
+                movesIcon,
+                this.moveProgress*32,this.moveCount*32,32,32,
+                x,y,size,size
+            );
+
+        }
     }
 
     const renderHoverEffect = (x,y,width,height) => {
@@ -243,6 +259,8 @@ function ChapterPane(callback,parent) {
         }
         this.changeChapterPage(newChapter);
     }
+
+    this.moveProgress = null;
     
     this.changeChapterPage = chapterNumber => {
         if(chapterNumber > Chapters.length) {
@@ -267,6 +285,15 @@ function ChapterPane(callback,parent) {
             this.rightButtonText = `chapter ${chapterNumber+1}`;
         }
         this.chapterNumber = chapterNumber;
+        const unlockableCount = MovesManager.chapterMoveCount(chapterNumber);
+        if(unlockableCount) {
+            const progress = MovesManager.chapterMovesUnlocked(chapterNumber);
+            this.moveProgress = progress;
+            this.moveCount = unlockableCount-1;
+        } else {
+            this.moveProgress = null;
+            this.moveCount = null;
+        }
     }
 
     if(GlobalState.data.activeChapter) {
@@ -317,8 +344,6 @@ function ChapterPane(callback,parent) {
         const robotoOffset = 2.5 * widthNormal;
 
         const imageSize = widthNormal * 565;
-
-        const hoverSize = widthNormal * 200;
 
         const sideButtonWidth = imageSize * 0.5;
         const heightNormal = sideButtonWidth / 240

@@ -711,10 +711,7 @@ function WorldRenderer() {
             adjustedTileSize *= 2.5;
         }
 
-        adjustedTileSize = Math.floor(adjustedTileSize);
-        if(adjustedTileSize % 2 !== 0) {
-            adjustedTileSize++;
-        }
+        adjustedTileSize = Math.ceil(adjustedTileSize/16)*16;
 
         horizontalTileSize = adjustedTileSize;
         verticalTileSize = adjustedTileSize;

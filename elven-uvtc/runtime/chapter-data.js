@@ -1,21 +1,50 @@
 const Chapters = [
     {
-        title: "Making my way 'round town"
+        title: "Making my way 'round town",
+        unlockableMoves: [
+            "Iced Whiskey",
+            "Red Apple",
+            "Return to Sender"
+        ]
     },
     {
-        title: "Christmas is cancelled"
+        title: "Christmas is cancelled",
+        unlockableMoves: [
+            "Poison Apple",
+            "Submission",
+            "Jingle Bells"
+        ]
     },
     {
-        title: "Tumble town fallen"
+        title: "Tumble town fallen",
+        unlockableMoves: [
+            "Wooden Sword",
+            "Wooden Shield",
+            "Cry"
+        ]
     },
     {
-        title: "Goldilocks"
+        title: "Goldilocks",
+        unlockableMoves: [
+            "Midus Touch",
+            "Hot Porridge",
+            "Stress Eating"
+        ]
     },
     {
-        title: "Spies like us"
+        title: "Spies like us",
+        unlockableMoves: [
+            "Banish",
+            "Trust",
+            "Treason"
+        ]
     },
     {
-        title: "With a little help from my friends"
+        title: "With a little help from my friends",
+        unlockableMoves: [
+            "Friendship",
+            "Vitamins"
+        ]
     },
     {
         title: "A long way from home"
