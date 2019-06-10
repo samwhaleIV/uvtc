@@ -283,6 +283,9 @@ function WorldRenderer() {
         }
         switch(key) {
             case kc.cancel:
+                if(escapeMenuDisabled()) {
+                    return;
+                }
                 if(wDown) {
                     this.processKeyUp(kc.up);
                 }

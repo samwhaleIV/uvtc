@@ -209,7 +209,7 @@ const scripts = {
             ]);
         }
         playSound("energy");
-        await world.showInstantTextPopup("congratulations! frogert is now your friend!");
+        await world.showInstantTextPopup("Congratulations! Frogert is now your friend!");
         await frogert.speechID([
             "AUTO_48",
             "AUTO_49",
