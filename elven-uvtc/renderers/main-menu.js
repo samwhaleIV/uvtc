@@ -355,7 +355,8 @@ function MainMenuRenderer() {
             this.overlayPane.render(timestamp,margin,margin,fullWidth-margin-margin,fullHeight-extraBottomSpace);
         }
 
-        const logoSize = fullWidth * 0.075;
+        let logoSize = fullWidth * 0.075;
+        logoSize = Math.ceil(logoSize/32)*32;
         context.drawImage(
             elfmartImage,0,0,elfmartImage.width,elfmartImage.height,
             10,

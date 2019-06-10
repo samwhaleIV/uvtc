@@ -12,7 +12,7 @@ const stringLookup = {
     bathtub_1: "It's important to wash... yourself.",
     bookcase_4: "This bookcase doesn't have very many books on it.",
     bookcase_5_1: "This bookcase has a few intersting books on it.",
-    bookcase_5_2: "One book is called \"the cat lady manifesto\"",
+    bookcase_5_2: "One book is called 'the cat lady manifesto'",
     bookcase_5_3: "ȸIf I loved my children as much as I love my cats, I'd have children.ȸ",
     bookcase_6_1: "This bookcase is trying to be an edgy reflection of society.",
     bookcase_6_2: "Is it working?",
