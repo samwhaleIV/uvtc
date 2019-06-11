@@ -15,6 +15,13 @@ ImagePaths.push(
     getFile("ui/chapters/1.png",FileTypes.Image),
     getFile("chapter-select.png",FileTypes.BackgroundImage),
     getFile("chapter-select-invert.png",FileTypes.BackgroundImage),
+
+    getFile("checkered.png",FileTypes.BackgroundImage),
+    getFile("checkered-dark.png",FileTypes.BackgroundImage),
+    getFile("wimpy-red.png",FileTypes.BackgroundImage),
+    getFile("tiny-arm.png",FileTypes.BackgroundImage),
+    getFile("boney.png",FileTypes.BackgroundImage),
+
     getFile("ui/silo.png",FileTypes.Image),
     getFile("corrupt.png",FileTypes.BackgroundImage),
     getFile("ui/error.png",FileTypes.Image),

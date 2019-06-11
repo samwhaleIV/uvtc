@@ -1,13 +1,18 @@
 "use strict";
 import MainMenuRenderer from "./renderers/main-menu.js";
 import BoxFaderEffect from "./renderers/components/box-fader-effect.js";
+import BattleScreenRenderer from "./renderers/battle-screen.js";
 
 drawLoadingText();
 establishMapLinks();
 
 function loadCallback() {
     BitmapText.verifyBitmap();
-    setRendererState(new MainMenuRenderer());
+    if(ENV_FLAGS.BATTLE_RENDERER) {
+        setRendererState(new BattleScreenRenderer());
+    } else {
+        setRendererState(new MainMenuRenderer());
+    }
     startRenderer();
     if(rendererState.song) {
         playMusic(rendererState.song);
