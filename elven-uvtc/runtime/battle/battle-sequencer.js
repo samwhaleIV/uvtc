@@ -16,10 +16,7 @@ const clearKeys = object => {
 }
 
 const informSubscribers = (subscriptions,...parameters) => {
-    Object.values(subscriptions).forEach(subscriber=>{
-        console.log(subscriber);
-        subscriber(...parameters);
-    });
+    Object.values(subscriptions).forEach(subscriber=>subscriber(...parameters));
 }
 
 const addEvent = (object,eventName) => {
@@ -245,10 +242,10 @@ function bindToBattleScreen(sequencer,renderer) {
 
     function bindDouble(type,method) {
         playerWatches[`add${type}`](
-            method("right",true)
+            (...parameters)=>method("right",true)(...parameters)
         );
         opponentWatches[`add${type}`](
-            (...parameters)=>method(...parameters)("left",false)
+            (...parameters)=>method("left",false)(...parameters)
         );
     }
     bindDouble("HealthAdded",(_,isPlayer)=>()=>{

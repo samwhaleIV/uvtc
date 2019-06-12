@@ -4,7 +4,7 @@ import BattleSequencer from "../runtime/battle/battle-sequencer.js";
 function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
     this.noPixelScale = true;
     
-    this.style = StyleManifest["Tiny Arm Elf"];
+    this.style = StyleManifest["Wimpy Red Elf"];
     this.background = this.style.getBackground();
     this.foreground = null;
     this.leftName = null;
