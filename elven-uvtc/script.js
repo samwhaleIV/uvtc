@@ -2,6 +2,7 @@
 import MainMenuRenderer from "./renderers/main-menu.js";
 import BoxFaderEffect from "./renderers/components/box-fader-effect.js";
 import BattleScreenRenderer from "./renderers/battle-screen.js";
+import { FakeOpponentSequencer } from "./runtime/battle/opponent-sequencer.js";
 
 drawLoadingText();
 establishMapLinks();
@@ -9,7 +10,12 @@ establishMapLinks();
 function loadCallback() {
     BitmapText.verifyBitmap();
     if(ENV_FLAGS.BATTLE_RENDERER) {
-        setRendererState(new BattleScreenRenderer());
+        setRendererState(
+            new BattleScreenRenderer(
+            () => alert("You fucking won, GG"),
+            () => alert("You fucking lost, GG"),
+            new FakeOpponentSequencer()
+        ));
     } else {
         setRendererState(new MainMenuRenderer());
     }

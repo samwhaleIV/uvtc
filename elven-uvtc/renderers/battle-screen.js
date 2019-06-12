@@ -1,21 +1,53 @@
 import StyleManifest from "../runtime/battle/style-manifest.js";
+import BattleSequencer from "../runtime/battle/battle-sequencer.js";
 
-function BattleScreenRenderer() {
+function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
+    this.noPixelScale = true;
+    
+    this.style = StyleManifest["Tiny Arm Elf"];
+    this.background = this.style.getBackground();
+    this.foreground = null;
+    this.leftName = null;
+    this.rightName = null;
+
+    this.leftHealth = null;
+    this.rightHealth = null;
+    this.leftHealthNormal = null;
+    this.rightHealthNormal = null;
+
+    this.playerMoves = [];
+    this.marqueeText = null;
+    this.fullText = null;
+
+    this.leftStatuses = [];
+    this.rightStatuses = [];
+
+    this.flashHealthAdded = isPlayer => {
+    };
+    this.flashHealthDropped = isPlayer => {
+    };
+    this.someoneDied = isPlayer => {
+    };
+    this.showFullText = text => {
+    };
+    this.clearFullText = () => {
+    };
+    this.getAction = async () => {
+        return null;
+    };
+
+    this.sequencer = new BattleSequencer(winCallback,loseCallback,...sequencerParameters);
+    this.sequencer.bindToBattleScreen(this);
 
     const hoverTypes = {
         none: 0
     };
     let hoverType = null;
 
-
-    this.noPixelScale = true;
-
     this.processMove = (x,y) => {
-
     }
 
     this.processClick = (x,y) => {
-
         this.processMove(x,y);
     }
     this.processClickEnd = () => {
@@ -23,13 +55,9 @@ function BattleScreenRenderer() {
         }
     }
 
-    this.style = StyleManifest["Tiny Arm Elf"];
-    this.background = this.style.getBackground();
-
     let startTime = null;
     const circleTraceTime = 300;
     const circleFillTime = 500;
-
     const backgroundSaturateTime = 300;
     const saturatePopExponent = 4; //Higher numbers are more abrupt
 
@@ -43,6 +71,10 @@ function BattleScreenRenderer() {
         context.beginPath();
         context.arc(halfWidth,halfHeight,radius,0,PI2);
         context.fill();
+    }
+
+    this.renderInterface = () => {
+
     }
 
     this.render = timestamp => {
@@ -66,7 +98,6 @@ function BattleScreenRenderer() {
                 context.restore();
             }
         }
-
         if(traceNormal > 1) {
             const fillNormal = (startDelta-circleTraceTime) / circleFillTime;
             if(fillNormal > 1) {
@@ -96,7 +127,10 @@ function BattleScreenRenderer() {
             context.arc(halfWidth,halfHeight,radius,0,PI2*traceNormal);
             context.stroke();
         }
-
+        if(this.foreground) {
+            this.foreground.render(timestamp);
+        }
+        this.renderInterface(timestamp);
     }
 }
 export default BattleScreenRenderer;
