@@ -16,7 +16,7 @@ const clearKeys = object => {
 }
 
 const informSubscribers = (subscriptions,...parameters) => {
-    Object.values(subscriptions).forEach(subscriber=>{
+    Object.keys(subscriptions).forEach(subscriber=>{
         subscriber(...parameters);
     });
 }
@@ -127,7 +127,7 @@ const getBattleEntity = (name,health,isPlayer) => {
         }
         const healthDifference = entityHealth - startHealth;
         watch.fireHealthAdded(healthDifference);
-        watch.fireHealthChanged(entityHealth,entityHealth/entityMaxHealth);
+        watch.fireHealthChanged(entityHealth,entityHealth/entityMaxHealth,healthDifference);
     }
     const negativeHealthChange = amount => {
         const startHealth = entityHealth;
@@ -140,7 +140,7 @@ const getBattleEntity = (name,health,isPlayer) => {
         }
         const healthDifference = entityHealth - startHealth;
         watch.fireHealthDropped(-healthDifference);
-        ewatch.fireHealthChanged(entityHealth,entityHealth/entityMaxHealth);
+        ewatch.fireHealthChanged(entityHealth,entityHealth/entityMaxHealth,healthDifference);
     }
     const changeHealth = (amount,positive) => {
         if(typeof amount !== NUMBER_TYPE) {
@@ -279,10 +279,21 @@ function bindToBattleScreen(sequencer,renderer) {
     sequencer.runtimeBinds.clearFullText = renderer.clearFullText;
 
     sequencer.addPlayerMovesChanged(newMoves=>{
-        sequencer.playerMoves = newMoves;
+        renderer.playerMoves = newMoves;
     });
 
-    //todo, load data from opponent sequencer into the renderer
+    renderer.playerMoves = sequencer.playerMoves;
+    renderer.rightHealth = sequencer.player.health;
+    renderer.leftHealth =  sequencer.opponent.health;
+
+    renderer.leftHealthNormal =  1;
+    renderer.rightHealthNormal = 1;
+
+    renderer.rightStatuses = sequencer.player.statuses;
+    renderer.leftStatutes =  sequencer.opponent.statuses;
+
+    renderer.leftName =  sequencer.opponent.name;
+    renderer.rightName = sequencer.player.name;
 
     sequencer.runtimeBinds.getAction = renderer.getAction;
 }
