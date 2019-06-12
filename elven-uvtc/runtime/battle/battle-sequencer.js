@@ -16,7 +16,8 @@ const clearKeys = object => {
 }
 
 const informSubscribers = (subscriptions,...parameters) => {
-    Object.keys(subscriptions).forEach(subscriber=>{
+    Object.values(subscriptions).forEach(subscriber=>{
+        console.log(subscriber);
         subscriber(...parameters);
     });
 }
@@ -24,7 +25,7 @@ const informSubscribers = (subscriptions,...parameters) => {
 const addEvent = (object,eventName) => {
     const watchers = {};
     object[`add${eventName}`] = subscriber => {
-        watchers[subscriber] = true;
+        watchers[subscriber] = subscriber;
     };
     object[`remove${eventName}`] = subscriber => {
         delete watchers[subscriber];
@@ -140,7 +141,7 @@ const getBattleEntity = (name,health,isPlayer) => {
         }
         const healthDifference = entityHealth - startHealth;
         watch.fireHealthDropped(-healthDifference);
-        ewatch.fireHealthChanged(entityHealth,entityHealth/entityMaxHealth,healthDifference);
+        watch.fireHealthChanged(entityHealth,entityHealth/entityMaxHealth,healthDifference);
     }
     const changeHealth = (amount,positive) => {
         if(typeof amount !== NUMBER_TYPE) {
@@ -188,7 +189,7 @@ const getBattleEntity = (name,health,isPlayer) => {
             return entityHealth;
         },
         set: function(value) {
-            setHealth(value);
+            entity.setHealth(value);
         }
     });
 
@@ -247,28 +248,27 @@ function bindToBattleScreen(sequencer,renderer) {
             method("right",true)
         );
         opponentWatches[`add${type}`](
-            (...parameters)=>void method(...parameters)("left",false)
+            (...parameters)=>method(...parameters)("left",false)
         );
     }
-    bindDouble("HealthAdded",()=>(_,isPlayer)=>{
+    bindDouble("HealthAdded",(_,isPlayer)=>()=>{
         renderer.flashHealthAdded(isPlayer);
     });
-    bindDouble("Died",()=>(_,isPlayer)=>{
+    bindDouble("Died",(_,isPlayer)=>()=>{
         renderer.someoneDied(isPlayer);
     });
-    bindDouble("HealthDropped",()=>(_,isPlayer)=>{
+    bindDouble("HealthDropped",(_,isPlayer)=>()=>{
         renderer.flashHealthDropped(isPlayer);
     });
-    bindDouble("HealthChanged",(health,healthNormal)=>{
-        direction => {
+    bindDouble("HealthChanged",direction=>(health,healthNormal)=> {
             renderer[`${direction}Health`] = health;
             renderer[`${direction}HealthNormal`] = healthNormal;
-        };
-    });
-    bindDouble("StatusesChanged",statuses=>direction=>{
+        }
+    );
+    bindDouble("StatusesChanged",direction=>statuses=>{
         renderer[`${direction}Statuses`] = statuses;
     });
-    bindDouble("NameChanged",newName=>direction=>{
+    bindDouble("NameChanged",direction=>newName=>{
         renderer[`${direction}Name`] = newName;
     });
     sequencer.runtimeBinds.setMarqueeText = text => {

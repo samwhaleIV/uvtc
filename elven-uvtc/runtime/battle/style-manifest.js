@@ -75,7 +75,6 @@ const StyleManifest = {
         rightBoxHealth: "#222222",
 
         holeRingColor: "rgba(255,128,128,0.3)",
-
         getBackground: function() {
             return new (function(){
                 const scrollingBackground = new ScrollingBackground("checkered-dark",0);

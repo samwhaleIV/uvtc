@@ -23,8 +23,10 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
     this.rightStatuses = [];
 
     this.flashHealthAdded = isPlayer => {
+        playSound("heal");
     };
     this.flashHealthDropped = isPlayer => {
+        playSound("damage");
     };
     this.someoneDied = isPlayer => {
     };
@@ -61,9 +63,11 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
     const backgroundSaturateTime = 300;
     const saturatePopExponent = 4; //Higher numbers are more abrupt
 
+    const outerRingRadius = 3;
+
     const renderOuterRing = radius => {
         context.fillStyle = this.style.holeRingColor;
-        context.arc(halfWidth,halfHeight,radius+3,0,PI2);
+        context.arc(halfWidth,halfHeight,radius+outerRingRadius,0,PI2);
         context.fill();
     }
     const renderInnerRing = radius => {
@@ -73,8 +77,115 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
         context.fill();
     }
 
-    this.renderInterface = () => {
+    const statusRollImage = imageDictionary["ui/status-roll"];
 
+    const renderHealthIcon = (x,y,width,height,value) => {
+        context.drawImage(statusRollImage,32*value,0,32,32,x,y,width,height);
+    }
+
+    const renderStatusArea = (x,y,width,height,rightAlignment) => {
+        const healthBarHeight = height/2;
+        const statusAreaBorderWidth = 7;
+        const textNameScale = 5;
+
+        const doubleBorderWidth = statusAreaBorderWidth + statusAreaBorderWidth;
+
+        context.shadowBlur = 4; 
+        context.shadowColor = "rgba(0,0,0,0.25)";
+
+        let boxBorderColor, boxColor, boxHealthColor, name, statuses, healthCount, healthNormal;
+        if(!rightAlignment) {
+            boxBorderColor = this.style.leftBoxBorder;
+            boxColor = this.style.leftBoxColor;
+            boxHealthColor = this.style.leftBoxHealth;
+            name = this.leftName;
+            statuses = this.leftStatuses;
+            healthCount = this.leftHealth;
+            healthNormal = this.leftHealthNormal;
+        } else {
+            boxBorderColor = this.style.rightBoxBorder;
+            boxColor = this.style.rightBoxColor;
+            boxHealthColor = this.style.rightBoxHealth;
+            name = this.rightName;
+            statuses = this.rightStatuses;
+            healthCount = this.rightHealth;
+            healthNormal = this.rightHealthNormal;
+        }
+
+        context.fillStyle = boxBorderColor;
+        context.fillRect(x,y,width,height);
+        context.shadowBlur = 0;
+
+        const healthBarY = y+height-healthBarHeight;
+
+        context.fillStyle = "white";
+        context.fillRect(x,healthBarY,width,healthBarHeight);
+
+        context.fillStyle = boxHealthColor;
+        let healthX;
+        let healthWidth = width * healthNormal;
+        if(healthNormal > 1) {
+            healthWidth = width;
+        }
+        if(rightAlignment) {
+            healthX = x + width - healthWidth;
+        } else {
+            healthX = x;
+        }
+        context.fillRect(healthX,healthBarY,healthWidth,healthBarHeight);
+
+        context.fillStyle = boxColor;
+        const innerAreaHeight = height-doubleBorderWidth;
+        const innerAreaY = y+statusAreaBorderWidth;
+        const innerAreaX = x+statusAreaBorderWidth;
+        const innerAreaWidth = width-doubleBorderWidth;
+        context.fillRect(
+            innerAreaX,
+            innerAreaY,
+            innerAreaWidth,
+            innerAreaHeight
+        );
+
+        let imageX;
+        const imageHeight = innerAreaHeight-doubleBorderWidth;
+        if(rightAlignment) {
+            imageX = innerAreaX + statusAreaBorderWidth;
+        } else {
+            imageX = innerAreaX + innerAreaWidth - statusAreaBorderWidth - imageHeight;
+        }
+        renderHealthIcon(
+            imageX,
+            innerAreaY+statusAreaBorderWidth,
+            imageHeight,
+            imageHeight,
+            healthCount
+        );
+
+        const textHeight = BitmapText.drawTextTest(name,textNameScale).height+statusAreaBorderWidth;
+
+        context.fillStyle = "black";
+
+        //Get ready for this one... LMAO
+        const textBackgroundWidth = innerAreaWidth-doubleBorderWidth-statusAreaBorderWidth-imageHeight;
+        const textBackgroundX = !rightAlignment ? innerAreaX+statusAreaBorderWidth : innerAreaX + doubleBorderWidth + imageHeight;
+
+        context.fillRect(
+            textBackgroundX,
+            innerAreaY+statusAreaBorderWidth,
+            textBackgroundWidth,
+            Math.round(textHeight+statusAreaBorderWidth)
+        );
+
+
+        BitmapText.drawTextWhite(name,textBackgroundX+statusAreaBorderWidth,innerAreaY+doubleBorderWidth,textNameScale);
+
+
+    }
+
+    const renderInterface = () => {
+        renderStatusArea(50,50,500,150,false);
+        renderStatusArea(50,250,500,150,true);
+        //renderStatusArea(fullHeight-50-300,fullWidth-50-200,300,200,false);
     }
 
     this.render = timestamp => {
@@ -130,7 +241,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
         if(this.foreground) {
             this.foreground.render(timestamp);
         }
-        this.renderInterface(timestamp);
+        renderInterface(timestamp);
     }
 }
 export default BattleScreenRenderer;

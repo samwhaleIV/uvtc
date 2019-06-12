@@ -21,7 +21,7 @@ ImagePaths.push(
     getFile("wimpy-red.png",FileTypes.BackgroundImage),
     getFile("tiny-arm.png",FileTypes.BackgroundImage),
     getFile("boney.png",FileTypes.BackgroundImage),
-
+    getFile("ui/status-roll.png",FileTypes.Image),
     getFile("ui/silo.png",FileTypes.Image),
     getFile("corrupt.png",FileTypes.BackgroundImage),
     getFile("ui/error.png",FileTypes.Image),
