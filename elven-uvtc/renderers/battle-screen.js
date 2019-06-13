@@ -1,8 +1,26 @@
 import StyleManifest from "../runtime/battle/style-manifest.js";
 import BattleSequencer from "../runtime/battle/battle-sequencer.js";
 import RenderStatus from "./components/battle/status.js";
+import RenderMove from "./components/battle/move.js";
 
 function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
+    let moveLookup;
+
+    const hoverTypes = {
+        none: 0,
+        moveLeft: 1,
+        moveCenter: 2,
+        moveRight: 3
+    };
+    let hoverType = hoverTypes.none;
+
+    const moveCenter = getPlaceholderLocation();
+    const moveLeft = getPlaceholderLocation();
+    const moveRight = getPlaceholderLocation();
+    moveCenter.hoverType = hoverTypes.moveCenter;
+    moveLeft.hoverType = hoverTypes.moveLeft;
+    moveRight.hoverType = hoverTypes.moveRight;
+
     this.noPixelScale = true;
     this.disableAdaptiveFill = false;
     
@@ -17,7 +35,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
     this.leftHealthNormal = null;
     this.rightHealthNormal = null;
 
-    this.playerMoves = [];
+    let playerMoves = [];
     this.marqueeText = null;
     this.fullText = null;
 
@@ -36,19 +54,62 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
     };
     this.clearFullText = () => {
     };
-    this.getAction = async () => {
-        return null;
+    let playerActionResolver = null;
+    const playerActionPromise = () => {
+        return new Promise(resolve=>{
+            playerActionResolver = resolve;
+        });
     };
+    this.getAction = async () => {
+        return playerActionPromise();
+    };
+    this.updatePlayerMoves = newMoves => {
+        playerMoves = newMoves;
+        const newMoveCount = newMoves.length;
+        switch(newMoveCount) {
+            case 0:
+                moveLookup = {};
+                moveLeft.index = -1;
+                moveCenter.index = -1;
+                moveRight.index = -1;
+                break;
+            default:
+                throw Error(`Invalid player move count. We can only display for 1 and 3, not ${newMoveCount}.`);
+            case 1:
+                moveLookup = {
+                    0: moveCenter
+                };
+                moveLeft.index = -1;
+                moveCenter.index = 0;
+                moveRight.index = -1;
+                break;
+            case 3:
+                moveLookup = {
+                    0: moveLeft,
+                    1: moveCenter,
+                    2: moveRight
+                };
+                moveLeft.index = 0;
+                moveCenter.index = 1;
+                moveRight.index = 2;
+                break;
+        }
+    }
 
     this.sequencer = new BattleSequencer(winCallback,loseCallback,...sequencerParameters);
     this.sequencer.bindToBattleScreen(this);
 
-    const hoverTypes = {
-        none: 0
-    };
-    let hoverType = null;
 
     this.processMove = (x,y) => {
+        if(contains(x,y,moveCenter)) {
+            hoverType = hoverTypes.moveCenter;
+        } else if(contains(x,y,moveLeft)) {
+            hoverType = hoverTypes.moveLeft;
+        } else if(contains(x,y,moveRight)) {
+            hoverType = hoverTypes.moveRight;
+        } else {
+            hoverType = hoverTypes.none;
+        }
     }
 
     this.processClick = (x,y) => {
@@ -56,13 +117,40 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
     }
     this.processClickEnd = () => {
         switch(hoverType) {
+            case hoverTypes.moveCenter:
+                if(moveCenter.index < 0) {
+                    break;
+                }
+                if(playerActionResolver) {
+                    playerActionResolver(moveCenter.index);
+                    playerActionResolver = null;
+                }
+                break;
+            case hoverTypes.moveLeft:
+                if(moveLeft.index < 0) {
+                    break;
+                }
+                if(playerActionResolver) {
+                    playerActionResolver(moveLeft.index);
+                    playerActionResolver = null;
+                }
+                break;
+            case hoverTypes.moveRight:
+                if(moveRight.index < 0) {
+                    break;
+                }
+                if(playerActionResolver) {
+                    playerActionResolver(moveRight.index);
+                    playerActionResolver = null;
+                }
+                break;
         }
     }
 
     let startTime = null;
-    const circleTraceTime = 300;
-    const circleFillTime = 500;
-    const backgroundSaturateTime = 300;
+    const circleTraceTime = 1200;
+    const circleFillTime = 600;
+    const backgroundSaturateTime = 1700;
     const saturatePopExponent = 4; //Higher numbers are more abrupt
 
     const centerCircleOffset = 20;
@@ -70,6 +158,9 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
     const outerRingRadius = 4;
 
     const renderOuterRing = radius => {
+        if(this.style.noOuterRing) {
+            return;
+        }
         context.fillStyle = this.style.holeRingColor;
         context.arc(halfWidth,halfHeight+centerCircleOffset,radius+outerRingRadius,0,PI2);
         context.fill();
@@ -122,6 +213,28 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
                 textX,
                 textY
             );
+        }
+        const moveMargin = 15;
+        let i = 0;
+        const moveHeight = height - 50-10;
+        const moveY = y + 45;
+        let xOffset = x + width / 2 - (playerMoves.length * (moveHeight + moveMargin)-moveMargin) / 2;
+        while(i<playerMoves.length) {
+            const moveLocation = moveLookup[i];
+            moveLocation.x = xOffset;
+            moveLocation.y = moveY;
+            moveLocation.width = moveHeight;
+            moveLocation.height = moveHeight;
+            RenderMove(
+                playerMoves[i],
+                xOffset,
+                moveY,
+                moveHeight,
+                moveHeight,
+                hoverType === moveLocation.hoverType
+            );
+            xOffset += moveHeight + moveMargin;
+            i++;
         }
     }
 
@@ -280,7 +393,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
             true
         );
 
-        const movesAreaHeight = verticalStatusArea.size * 2;
+        const movesAreaHeight = Math.floor(verticalStatusArea.size * 2);
         let movesAreaWidth = width;
         const maxWidth = Math.floor(fullWidth * 0.75);
         if(movesAreaWidth > maxWidth) {
@@ -349,7 +462,6 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
                 context.stroke();
                 context.save();
                 context.globalAlpha = fillNormal;
-                context.fillStyle = "white";
                 context.fill();
                 context.restore();
             }

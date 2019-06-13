@@ -8,6 +8,7 @@ const BAD_START_HEALTH = "Tried to create a battle entity with less than 1 healt
 const STATUS_IS_STRING_ERROR = "New status must be a object, not the name";
 const NAME_IS_NOT_STRING = "Entity names must be strings";
 const FALLBACK_NAME = "Thing";
+const RETURN_DIRECTIVE = "return";
 
 const clearKeys = object => {
     Object.keys(object).forEach(key => {
@@ -275,11 +276,9 @@ function bindToBattleScreen(sequencer,renderer) {
     sequencer.runtimeBinds.showFullText = renderer.showFullText;
     sequencer.runtimeBinds.clearFullText = renderer.clearFullText;
 
-    sequencer.addPlayerMovesChanged(newMoves=>{
-        renderer.playerMoves = newMoves;
-    });
+    sequencer.addPlayerMovesChanged(renderer.updatePlayerMoves);
+    renderer.updatePlayerMoves(sequencer.playerMoves);
 
-    renderer.playerMoves = sequencer.playerMoves;
     renderer.rightHealth = sequencer.player.health;
     renderer.leftHealth =  sequencer.opponent.health;
 
@@ -294,14 +293,16 @@ function bindToBattleScreen(sequencer,renderer) {
 
     sequencer.runtimeBinds.getAction = renderer.getAction;
 }
-
+const isBadPlayerAction = playerAction => {
+    return !playerAction && playerAction !== 0;
+}
 async function runBattleEvents(sequencer,events) {
     const eventCount = events.length;
     for(let i = 0;i<eventCount;i++) {
         const event = events[i];
         await fireBattleEvent(sequencer,event);
         const playerAction = await sequencer.getAction();
-        if(!playerAction) {
+        if(isBadPlayerAction(playerAction)) {
             invalidPlayerAction(playerAction);
         } else if(typeof playerAction !== OBJECT_TYPE) {
             invalidPlayerAction(playerAction);
@@ -328,11 +329,13 @@ async function logicalBattleSequencer(sequencer) {
     }
     do {
         const playerAction = await sequencer.getAction();
-        if(!action) {
+        if(isBadPlayerAction(playerAction)) {
             invalidPlayerAction(playerAction);
         }
-
-        await processPlayerAction(sequencer,playerAction);
+        const directive = await processPlayerAction(sequencer,playerAction);
+        if(directive === RETURN_DIRECTIVE) {
+            continue;
+        }
 
         const opponentEvents = await opponentSequencer.getTurnEvents();
         await runBattleEvents(sequencer,opponentEvents);
@@ -405,7 +408,7 @@ function BattleSequencer(winCallback,loseCallback,opponentSequencer) {
         runtimeBinds.setMarqueeText(text);
     };
     this.getAction = async () => {
-        await this.runtimeBinds.getAction();
+        return this.runtimeBinds.getAction();
     };
 
     this.runtimeBinds = runtimeBinds;
@@ -432,10 +435,15 @@ function BattleSequencer(winCallback,loseCallback,opponentSequencer) {
         bindToBattleScreen(this,renderer);
     }
 
+    let started = false;
     this.startBattle = () => {
+        if(started) {
+            throw Error("Battle was already started");
+        }
+        started = true;
         logicalBattleSequencer(this);
     }
 
-    Object.freeze(this);
+    Object.seal(this);
 }
 export default BattleSequencer;

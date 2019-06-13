@@ -74,6 +74,8 @@ const StyleManifest = {
         rightBoxColor: "#C3C3C3",
         rightBoxHealth: "#222222",
 
+        noOuterRing: true,
+
         holeRingColor: "rgba(255,128,128,0.3)",
         getBackground: function() {
             return new (function(){
@@ -85,7 +87,7 @@ const StyleManifest = {
                     scrollingBackground.render(timestamp);
                     context.save();
                     context.globalCompositeOperation = "overlay";
-                    context.globalAlpha = "0.8";
+                    context.globalAlpha = "0.9";
                     rotatingBackground.render(timestamp);
                     context.restore();
                 }
