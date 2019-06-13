@@ -17,7 +17,7 @@ const renderButton = (button,withHover,text,textXOffset,textYOffset,specialEffec
         3
     );
 }
-const MENU_BUTTON_FONT = "21px Roboto";
+const MENU_BUTTON_FONT = "100 21px Roboto";
 const UI_ALERT_FONT = "21px Arial";
 const CONSISTENT_PINK = "#FF006E";
 const renderButtonHover = (x,y,width,height) => {

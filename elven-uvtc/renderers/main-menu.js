@@ -342,7 +342,7 @@ function MainMenuRenderer() {
         renderFloatingElf(floatingElf4,-getBouncingTimeNormal(timestamp,bounceVariation4)+0.24);
 
         const fontSize = 26/1920*fullWidth;
-        context.font = `${fontSize}px Roboto`;
+        context.font = `100 ${fontSize}px Roboto`;
         context.textAlign = "end";
         context.fillStyle = "white";
         const offsetFactor = fontSize / 26;

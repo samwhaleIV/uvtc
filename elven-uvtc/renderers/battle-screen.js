@@ -4,9 +4,9 @@ import RenderStatus from "./components/battle/status.js";
 
 function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
     this.noPixelScale = true;
-    this.disableAdaptiveFill = true;
+    this.disableAdaptiveFill = false;
     
-    this.style = StyleManifest["Boney Elf"];
+    this.style = StyleManifest["Tiny Arm Elf"];
     this.background = this.style.getBackground();
     this.foreground = null;
     this.leftName = null;
@@ -65,17 +65,19 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
     const backgroundSaturateTime = 300;
     const saturatePopExponent = 4; //Higher numbers are more abrupt
 
+    const centerCircleOffset = 20;
+
     const outerRingRadius = 4;
 
     const renderOuterRing = radius => {
         context.fillStyle = this.style.holeRingColor;
-        context.arc(halfWidth,halfHeight,radius+outerRingRadius,0,PI2);
+        context.arc(halfWidth,halfHeight+centerCircleOffset,radius+outerRingRadius,0,PI2);
         context.fill();
     }
     const renderInnerRing = radius => {
         context.fillStyle = "black";
         context.beginPath();
-        context.arc(halfWidth,halfHeight,radius,0,PI2);
+        context.arc(halfWidth,halfHeight+centerCircleOffset,radius,0,PI2);
         context.fill();
     }
 
@@ -86,17 +88,51 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
     }
 
     const renderMovesArea = (x,y,width,height) => {
+        context.fillStyle = "rgba(255,255,255,0.93)";
+        context.fillRect(x,y,width,height);
+        context.fillStyle = "white";
 
+        const textAreaX = x+20;
+        const textAreaY = y-30;
+        const textAreaWidth = width - 40;
+        const textAreaHeight = 60;
+        context.fillRect(textAreaX,textAreaY,textAreaWidth,textAreaHeight);
+
+        if(this.marqueeText) {
+            context.textAlign = "center";
+            context.textBaseline = "middle";
+            context.font = "300 24px Roboto";
+
+            const textX = textAreaX + textAreaWidth/2;
+            const textY = textAreaY + textAreaHeight/2;
+            const textWidth = context.measureText(this.marqueeText).width;
+            const halfTextWidth = textWidth/2;
+            const textPadding = 5;
+            context.fillStyle = "black";
+            context.fillRect(
+                Math.round(textX-halfTextWidth-textPadding-textPadding),
+                Math.ceil(textAreaY+textPadding),
+                Math.floor(textWidth+textPadding+textPadding+textPadding+textPadding),
+                textAreaHeight-textPadding-textPadding
+            );
+
+            context.fillStyle = "white";
+            context.fillText(
+                this.marqueeText,
+                textX,
+                textY
+            );
+        }
     }
 
     const renderStatusArea = (x,y,width,height,rightAlignment) => {
         let statusAreaBorderWidth = 7;
         let textNameScale;
         if(greaterWidth) {
-            textNameScale = Math.floor(height / 31);
+            textNameScale = Math.floor(height / 26);
             statusAreaBorderWidth = Math.floor(height / 20);
         } else {
-            textNameScale = Math.floor(width / 110);
+            textNameScale = Math.floor(width / 100);
             statusAreaBorderWidth = Math.floor(width / 60);
         }
         if(textNameScale < 1) {
@@ -243,13 +279,21 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
             verticalStatusArea.size,
             true
         );
+
+        const movesAreaHeight = verticalStatusArea.size * 2;
+        let movesAreaWidth = width;
+        const maxWidth = Math.floor(fullWidth * 0.75);
+        if(movesAreaWidth > maxWidth) {
+            movesAreaWidth = maxWidth;
+        }
+        renderMovesArea(Math.round(x+width/2-movesAreaWidth/2),y+height-movesAreaHeight,movesAreaWidth,movesAreaHeight);
     }
 
     const renderInterface = () => {
-        const boxMargin = 20;
+        const boxMargin = 40;
         const boxSize = smallestDimension - boxMargin - boxMargin;
         if(greaterWidth) {
-            const width = fullWidth - 200;
+            const width = fullWidth * 0.7;
             renderInterfaceElements(
                 Math.round(halfWidth - width/2),
                 boxMargin,
@@ -301,11 +345,11 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
 
                 context.fillStyle = "black";
                 context.beginPath();
-                context.arc(halfWidth,halfHeight,radius,0,PI2);
+                context.arc(halfWidth,halfHeight+centerCircleOffset,radius,0,PI2);
                 context.stroke();
                 context.save();
                 context.globalAlpha = fillNormal;
-                context.fillStlye = "white";
+                context.fillStyle = "white";
                 context.fill();
                 context.restore();
             }
@@ -313,7 +357,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
             context.fillStyle = "black";
             context.lineWidth = 1;
             context.beginPath();
-            context.arc(halfWidth,halfHeight,radius,0,PI2*traceNormal);
+            context.arc(halfWidth,halfHeight+centerCircleOffset,radius,0,PI2*traceNormal);
             context.stroke();
         }
         if(this.foreground) {

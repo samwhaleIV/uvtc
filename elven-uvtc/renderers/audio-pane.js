@@ -234,7 +234,7 @@ function AudioPane(callback,parent) {
         context.fillRect(slider1.x,slider1.y-sliderHeight,labelWidth,sliderHeight);
         context.fillRect(slider2.x,slider2.y-sliderHeight,labelWidth,sliderHeight);
         context.fillStyle = "white";
-        context.font = "24px Roboto";
+        context.font = "100 24px Roboto";
         context.textAlign = "center";
         context.textBaseline = "middle";
 

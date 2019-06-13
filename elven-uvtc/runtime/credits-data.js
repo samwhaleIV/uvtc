@@ -7,11 +7,11 @@ function RenderCenteredLine(text,y) {
     context.fillStyle = "white";
     context.textAlign = "center";
     context.textBaseline = "middle";
-    context.font = "28px Roboto";
+    context.font = "100 28px Roboto";
     context.fillText(text,halfWidth,y);
 }
 function RenderNamedLine(role,name,y) {
-    context.font = "28px Roboto";
+    context.font = "100 28px Roboto";
     context.textAlign = "end";
     context.fillStyle = "#c8c8c8";
     context.fillText(role,halfWidth-5,y);

@@ -400,13 +400,16 @@ function ChapterPane(callback,parent) {
             drawRectangle(rightButton,"black");
         }
 
-        context.font = `${widthNormal*24}px Roboto`;
+        const fontSize = widthNormal * 23;
+
+        context.font = `100 ${fontSize}px Roboto`;
         context.textAlign = "center";
         context.textBaseline = "middle";
         context.fillStyle = "white";
 
         context.fillText(this.leftButtonText,leftButtonCenterX,halfHeight+robotoOffset);
         context.fillText(this.rightButtonText,rightButtonCenterX,halfHeight+robotoOffset);
+        context.font = `300 ${fontSize}px Roboto`;
         context.fillText(this.centerButtonText,halfWidth,halfHeight+robotoOffset);
 
         const subtitleWidth = context.measureText(this.chapterSubTitle).width;
@@ -416,7 +419,7 @@ function ChapterPane(callback,parent) {
         context.fillRect(halfWidth-20-subtitleWidth/2,subtitleBoxCenterY-subtitleLayerHeight/2,subtitleWidth+40,subtitleLayerHeight);
         context.fillStyle = "white";
         context.fillText(this.chapterSubTitle,halfWidth,robotoOffset+subtitleBoxCenterY);
-        context.font = `${widthNormal*48}px Roboto`;
+        context.font = `300 ${widthNormal*48}px Roboto`;
         context.fillText(this.chapterTitle,halfWidth,halfHeight - imageSize / 2 - subtitleLayerHeight);
 
         exitLabel = renderExitButton(x,y,hoverType===hoverTypes.exitLabel,false);
