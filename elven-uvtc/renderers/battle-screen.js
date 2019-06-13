@@ -1,10 +1,12 @@
 import StyleManifest from "../runtime/battle/style-manifest.js";
 import BattleSequencer from "../runtime/battle/battle-sequencer.js";
+import RenderStatus from "./components/battle/status.js";
 
 function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
     this.noPixelScale = true;
+    this.disableAdaptiveFill = true;
     
-    this.style = StyleManifest["Wimpy Red Elf"];
+    this.style = StyleManifest["Boney Elf"];
     this.background = this.style.getBackground();
     this.foreground = null;
     this.leftName = null;
@@ -63,7 +65,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
     const backgroundSaturateTime = 300;
     const saturatePopExponent = 4; //Higher numbers are more abrupt
 
-    const outerRingRadius = 3;
+    const outerRingRadius = 4;
 
     const renderOuterRing = radius => {
         context.fillStyle = this.style.holeRingColor;
@@ -83,10 +85,25 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
         context.drawImage(statusRollImage,32*value,0,32,32,x,y,width,height);
     }
 
+    const renderMovesArea = (x,y,width,height) => {
+
+    }
+
     const renderStatusArea = (x,y,width,height,rightAlignment) => {
-        const healthBarHeight = height/2;
-        const statusAreaBorderWidth = 7;
-        const textNameScale = 5;
+        let statusAreaBorderWidth = 7;
+        let textNameScale;
+        if(greaterWidth) {
+            textNameScale = Math.floor(height / 31);
+            statusAreaBorderWidth = Math.floor(height / 20);
+        } else {
+            textNameScale = Math.floor(width / 110);
+            statusAreaBorderWidth = Math.floor(width / 60);
+        }
+        if(textNameScale < 1) {
+            textNameScale = 1;
+        }
+
+        const healthBarHeight = Math.ceil(height / 2);
 
         const doubleBorderWidth = statusAreaBorderWidth + statusAreaBorderWidth;
 
@@ -94,15 +111,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
         context.shadowColor = "rgba(0,0,0,0.25)";
 
         let boxBorderColor, boxColor, boxHealthColor, name, statuses, healthCount, healthNormal;
-        if(!rightAlignment) {
-            boxBorderColor = this.style.leftBoxBorder;
-            boxColor = this.style.leftBoxColor;
-            boxHealthColor = this.style.leftBoxHealth;
-            name = this.leftName;
-            statuses = this.leftStatuses;
-            healthCount = this.leftHealth;
-            healthNormal = this.leftHealthNormal;
-        } else {
+        if(rightAlignment) {
             boxBorderColor = this.style.rightBoxBorder;
             boxColor = this.style.rightBoxColor;
             boxHealthColor = this.style.rightBoxHealth;
@@ -110,6 +119,14 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
             statuses = this.rightStatuses;
             healthCount = this.rightHealth;
             healthNormal = this.rightHealthNormal;
+        } else {
+            boxBorderColor = this.style.leftBoxBorder;
+            boxColor = this.style.leftBoxColor;
+            boxHealthColor = this.style.leftBoxHealth;
+            name = this.leftName;
+            statuses = this.leftStatuses;
+            healthCount = this.leftHealth;
+            healthNormal = this.leftHealthNormal;
         }
 
         context.fillStyle = boxBorderColor;
@@ -153,6 +170,43 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
         } else {
             imageX = innerAreaX + innerAreaWidth - statusAreaBorderWidth - imageHeight;
         }
+
+        const textHeight = BitmapText.drawTextTest(name,textNameScale).height+statusAreaBorderWidth;
+
+        context.fillStyle = "black";
+
+        //Get ready for this one... LMAO
+        const textBackgroundWidth = innerAreaWidth-doubleBorderWidth-statusAreaBorderWidth-imageHeight;
+        const textBackgroundX = rightAlignment ?  innerAreaX + doubleBorderWidth + imageHeight : innerAreaX+statusAreaBorderWidth;
+        const textBackgroundHeight = Math.round(textHeight+statusAreaBorderWidth);
+        const textBackgroundY = innerAreaY+statusAreaBorderWidth
+
+        context.fillRect(
+            textBackgroundX,
+            textBackgroundY,
+            textBackgroundWidth,
+            textBackgroundHeight
+        );
+
+
+        BitmapText.drawTextWhite(name,textBackgroundX+statusAreaBorderWidth,innerAreaY+doubleBorderWidth,textNameScale);
+
+        const statusHeight = innerAreaHeight - textHeight - doubleBorderWidth - doubleBorderWidth;
+
+        const statusY = textBackgroundY + textBackgroundHeight + statusAreaBorderWidth;
+
+        let i = 0;
+        while(i<statuses.length) {
+            RenderStatus(
+                statuses[i],
+                textBackgroundX + i * (statusHeight+statusAreaBorderWidth),
+                statusY,
+                statusHeight,
+                statusHeight
+            );
+            i++;
+        }
+
         renderHealthIcon(
             imageX,
             innerAreaY+statusAreaBorderWidth,
@@ -161,31 +215,55 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
             healthCount
         );
 
-        const textHeight = BitmapText.drawTextTest(name,textNameScale).height+statusAreaBorderWidth;
+    }
 
-        context.fillStyle = "black";
+    const getFractionalArea = (basePos,baseSize,pos,size) => {
+        return {
+            pos: basePos + Math.round(pos * baseSize),
+            size: Math.round(baseSize * size)
+        };
+    }
 
-        //Get ready for this one... LMAO
-        const textBackgroundWidth = innerAreaWidth-doubleBorderWidth-statusAreaBorderWidth-imageHeight;
-        const textBackgroundX = !rightAlignment ? innerAreaX+statusAreaBorderWidth : innerAreaX + doubleBorderWidth + imageHeight;
+    const renderInterfaceElements = (x,y,width,height) => {
+        const verticalStatusArea = getFractionalArea(y,height,0,0.15);
+        const horizontalLeftArea = getFractionalArea(x,width,0,0.45)
+        const horizontalRightArea = getFractionalArea(x,width,0.55,0.45);
 
-        context.fillRect(
-            textBackgroundX,
-            innerAreaY+statusAreaBorderWidth,
-            textBackgroundWidth,
-            Math.round(textHeight+statusAreaBorderWidth)
+        renderStatusArea(
+            horizontalLeftArea.pos,
+            verticalStatusArea.pos,
+            horizontalLeftArea.size,
+            verticalStatusArea.size,
+            false
         );
-
-
-        BitmapText.drawTextWhite(name,textBackgroundX+statusAreaBorderWidth,innerAreaY+doubleBorderWidth,textNameScale);
-
-
+        renderStatusArea(
+            horizontalRightArea.pos,
+            verticalStatusArea.pos,
+            horizontalRightArea.size,
+            verticalStatusArea.size,
+            true
+        );
     }
 
     const renderInterface = () => {
-        renderStatusArea(50,50,500,150,false);
-        renderStatusArea(50,250,500,150,true);
-        //renderStatusArea(fullHeight-50-300,fullWidth-50-200,300,200,false);
+        const boxMargin = 20;
+        const boxSize = smallestDimension - boxMargin - boxMargin;
+        if(greaterWidth) {
+            const width = fullWidth - 200;
+            renderInterfaceElements(
+                Math.round(halfWidth - width/2),
+                boxMargin,
+                width,
+                boxSize
+            );
+        } else {
+            renderInterfaceElements(
+                boxMargin,
+                Math.round(halfHeight-boxSize/2),
+                boxSize,
+                boxSize
+            );
+        }
     }
 
     this.render = timestamp => {
@@ -193,7 +271,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
             startTime = timestamp;
         }
         const startDelta = timestamp - startTime;
-        const radius = 200;
+        const radius = smallestDimension * 0.22;
         const traceNormal = startDelta / circleTraceTime;
         if(this.background) {
             const saturateNormal = startDelta / backgroundSaturateTime;

@@ -10,7 +10,7 @@ const getDynamicFillBackground = image => {
         const heightToWidth = image.width / image.height;
         const widthToHeight = image.height / image.width;
         this.render = () => {
-            if(fullWidth > fullHeight) {
+            if(greaterWidth) {
                 const height = fullWidth*widthToHeight;
                 context.drawImage(
                     image,
@@ -22,7 +22,7 @@ const getDynamicFillBackground = image => {
                 context.drawImage(
                     image,
                     0,0,imageWidth,imageHeight,
-                    halfWidth-width/2,fullHeight,width,fullHeight
+                    halfWidth-width/2,0,width,fullHeight
                 );
             }
         }

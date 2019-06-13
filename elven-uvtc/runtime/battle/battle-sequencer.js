@@ -287,7 +287,7 @@ function bindToBattleScreen(sequencer,renderer) {
     renderer.rightHealthNormal = 1;
 
     renderer.rightStatuses = sequencer.player.statuses;
-    renderer.leftStatutes =  sequencer.opponent.statuses;
+    renderer.leftStatuses =  sequencer.opponent.statuses;
 
     renderer.leftName =  sequencer.opponent.name;
     renderer.rightName = sequencer.player.name;
