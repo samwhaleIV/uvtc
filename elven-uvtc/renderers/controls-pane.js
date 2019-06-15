@@ -145,12 +145,12 @@ function ControlsPaneRenderer(callback,parent) {
 
         context.textBaseline = "bottom";
         context.fillStyle = topColor;
-        context.font = "100 26px Roboto";
+        context.font = "100 22px Roboto";
         context.fillText(button.title,buttonCenterX,buttonCenterY-2);
 
         context.textBaseline = "top";
         context.fillStyle = keyNameColor;
-        context.font = "300 26px Roboto";
+        context.font = "300 22px Roboto";
         context.fillText(bottomText,buttonCenterX,buttonCenterY+2);
     }
 
@@ -447,12 +447,12 @@ function ControlsPaneRenderer(callback,parent) {
         renderButton(rightButton);
         renderButton(pictureButton);
 
-        context.font = "100 36px Roboto";
         context.save();
         context.globalCompositeOperation = "difference";
         context.fillStyle = "white";
         context.textBaseline = "bottom";
         context.textAlign = "center";
+        context.font = "100 36px Roboto";
         context.fillText("C O N T R O L S",controlsLabelX,buttonAreaY-40);
         context.restore();
 
