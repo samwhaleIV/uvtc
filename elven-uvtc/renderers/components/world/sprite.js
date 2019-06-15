@@ -1,13 +1,26 @@
+const SPRITE_WIDTH = 16;
+const SPRITE_HEIGHT = 16;
+
+const ELF_WIDTH = 9;
+const ELF_HEIGHT = 20;
+
+const ELF_WIDTH_RATIO = ELF_HEIGHT / ELF_WIDTH;
+const ELF_TO_WORLD_SCALE = ELF_WIDTH / WorldTextureSize;
+
+const FOOTSTEPS_SPRITE_NAME = "footsteps";
+
 function PlayerRenderer(startDirection) {
     SpriteRenderer.call(this,startDirection,"player");
     this.isPlayer = true;
 }
-function SpriteRenderer(startDirection,spriteName,footstepsName="footsteps") {
-    const sprite = imageDictionary[`sprites/${spriteName}`];
-    const footStepsSprite = imageDictionary[`sprites/${footstepsName}`];
+function SpriteRenderer(startDirection,spriteName,isElf) {
+    isElf = isElf ? true : false;
 
-    const columnWidth = 16;
-    const rowHeight = 16;
+    const sprite = imageDictionary[`sprites/${spriteName}`];
+    const footStepsSprite = imageDictionary[`sprites/${FOOTSTEPS_SPRITE_NAME}`];
+
+    const columnWidth = isElf ? ELF_WIDTH : SPRITE_WIDTH;
+    const rowHeight = isElf ? ELF_HEIGHT : SPRITE_HEIGHT;
     const rowCount = 4;
 
     let walking = false;
@@ -176,30 +189,75 @@ function SpriteRenderer(startDirection,spriteName,footstepsName="footsteps") {
         }
     });
 
-    this.render = function(timestamp,x,y,width,height) {
-        const startX = this.x, startY = this.y;
-        if(this.renderLogic) {
+    this.skipRenderLogic = true;
+
+    const processRenderLogicForFrame = function(timestamp) {
+        if(this.skipRenderLogic) {
+            this.skipRenderLogic = false;
+        } else if(this.renderLogic) {
             this.renderLogic(timestamp);
         }
-        if(this.hidden) {
-            return;
-        }
-        if(showingAlert) {
+    }
+
+    if(isElf) {
+        this.render = function(timestamp,x,y,width,height) {
+            const startX = this.x, startY = this.y;
+            processRenderLogicForFrame();
+            if(this.hidden) {
+                return;
+            }
+
+            const renderWidth = width * ELF_TO_WORLD_SCALE;
+            const renderHeight = ELF_WIDTH_RATIO * renderWidth;
+
+            const renderXOffset = width / 4;
+            const renderYOffset = renderHeight / 4;
+
+            const destinationX = (this.xOffset * width + x + (this.x - startX) * width) + renderXOffset
+            const destinationY = (this.yOffset * height + y + (this.y - startY) * height) - renderYOffset;
+
+            const animationRow = specialRow !== null ? specialRow : !this.walkingOverride && walking ? 
+                Math.floor(timestamp / animationFrameTime) % rowCount * rowHeight
+            : 0;
+
             context.drawImage(
-                alertSprite,x,y-height,width,height
+                sprite,currentColumn,animationRow,columnWidth,rowHeight,
+                destinationX,destinationY,
+                Math.round(renderWidth),
+                Math.round(renderHeight)
+            );
+
+            if(showingAlert) {
+                context.drawImage(
+                    alertSprite,destinationX+renderWidth/2-width/2,destinationY-height,width,height
+                );
+            }
+        }
+    } else {
+        this.render = function(timestamp,x,y,width,height) {
+            const startX = this.x, startY = this.y;
+            processRenderLogicForFrame();
+            if(this.hidden) {
+                return;
+            }
+            const destinationX = this.xOffset * width + x + (this.x - startX) * width;
+            const destinationY = this.yOffset * height + y + (this.y - startY) * height;
+
+            if(showingAlert) {
+                context.drawImage(
+                    alertSprite,destinationX,destinationY-height,width,height
+                );
+            }
+    
+            const animationRow = specialRow !== null ? specialRow : !this.walkingOverride && walking ? 
+                Math.floor(timestamp / animationFrameTime) % rowCount * rowHeight
+            : 0;
+            context.drawImage(
+                sprite,currentColumn,animationRow,columnWidth,rowHeight,destinationX,destinationY,width,height
             );
         }
-
-        const destinationX = this.xOffset * width + x + (this.x - startX) * width;
-        const destinationY = this.yOffset * height + y + (this.y - startY) * height;
-
-        const animationRow = specialRow !== null ? specialRow : !this.walkingOverride && walking ? 
-            Math.floor(timestamp / animationFrameTime) % rowCount * rowHeight
-        : 0;
-        context.drawImage(
-            sprite,currentColumn,animationRow,columnWidth,rowHeight,destinationX,destinationY,width,height
-        );
     }
+
 
 }
 export default SpriteRenderer;

@@ -1,7 +1,7 @@
 import ControlsPaneRenderer from "./controls-pane.js";
 import AudioPaneRenderer from "./audio-pane.js";
 import MainMenuRenderer from "./main-menu.js";
-import ElvesFillIn from "./components/world/elves-fill-in.js";
+import ElvesFillIn from "./components/elves-fill-in.js";
 
 function WorldUIRenderer(world) {
 

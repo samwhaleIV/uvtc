@@ -1,6 +1,6 @@
 import CreditsData from "../runtime/credits-data.js";
 import MainMenuRenderer from "./main-menu.js";
-import ElvesFillIn from "./components/world/elves-fill-in.js";
+import ElvesFillIn from "./components/elves-fill-in.js";
 
 function CreditsRenderer() {
     const pixelsPerSecond = 60;

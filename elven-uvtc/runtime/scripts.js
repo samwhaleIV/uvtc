@@ -61,8 +61,8 @@ const scripts = {
         frogert.speed *= 1.25;
         world.followObject = frogert;
         world.autoCameraOn();
-        frogert.move({x:4});
-        await delay(1500);
+        await frogert.move({x:4},{y:4},{x:4},{y:-4});
+        await delay(500);
         frogert.updateDirection("up");
         await delay(400);
         frogert.hidden = true;

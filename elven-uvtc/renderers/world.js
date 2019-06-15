@@ -3,7 +3,6 @@ import { PlayerRenderer, SpriteRenderer } from "./components/world/sprite.js";
 import WorldPopup from "./components/world/popup.js";
 import WorldPrompt from "./components/world/prompt.js";
 import GlobalState from "../runtime/global-state.js";
-import ElfSpriteRenderer from "./components/world/elf-sprite.js";
 import GetOverworldCharacter from "../runtime/character-creator.js";
 import WorldUIRenderer from "./world-ui.js";
 import UIAlert from "./components/ui-alert.js";
@@ -155,8 +154,6 @@ function WorldRenderer() {
     }
     this.sprite = SpriteRenderer;
     this.getCharacter = (name,direction) => GetOverworldCharacter(this,name,direction);
-
-    this.elf = ElfSpriteRenderer;
 
     this.camera = {
         x: 10,
@@ -814,6 +811,10 @@ function WorldRenderer() {
                 followObject = this.followObject;
             }
             if(followObject) {
+                if(followObject.renderLogic) {
+                    followObject.skipRenderLogic = true;
+                    followObject.renderLogic(timestamp);
+                }
                 this.camera.x = followObject.x;
                 this.camera.y = followObject.y;
                 this.camera.xOffset = followObject.xOffset;

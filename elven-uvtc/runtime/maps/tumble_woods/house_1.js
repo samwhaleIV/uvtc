@@ -168,7 +168,7 @@ addMap({
                     if(!world.globalState.goMeetFrogert) {
                         if(jim) {
                             world.lockPlayerMovement();
-                            await delay(500);
+                            await jim.alert();
                             await jim.sayID("AUTO_41");
                             world.globalState.goMeetFrogert = true;
                             world.unlockPlayerMovement();

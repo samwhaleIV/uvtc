@@ -15,7 +15,6 @@ ImagePaths.push(
     getFile("ui/chapters/1.png",FileTypes.Image),
     getFile("chapter-select.png",FileTypes.BackgroundImage),
     getFile("chapter-select-invert.png",FileTypes.BackgroundImage),
-
     getFile("checkered.png",FileTypes.BackgroundImage),
     getFile("checkered-dark.png",FileTypes.BackgroundImage),
     getFile("wimpy-red.png",FileTypes.BackgroundImage),
@@ -35,7 +34,7 @@ ImagePaths.push(
     getFile("ui/moves.png",FileTypes.Image),
     getFile("world-tileset.png",FileTypes.Image),
     getFile("sprites/player.png",FileTypes.Image),
-    getFile("sprites/elves.png",FileTypes.Image),
+    getFile("sprites/wimpy-red-elf.png",FileTypes.Image),
     getFile("sprites/frogert.png",FileTypes.Image),
     getFile("sprites/alert.png",FileTypes.Image),
     getFile("sprites/jim.png",FileTypes.Image),
