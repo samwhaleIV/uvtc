@@ -191,7 +191,7 @@ function SpriteRenderer(startDirection,spriteName,isElf) {
 
     this.skipRenderLogic = true;
 
-    const processRenderLogicForFrame = function(timestamp) {
+    const processRenderLogicForFrame = timestamp => {
         if(this.skipRenderLogic) {
             this.skipRenderLogic = false;
         } else if(this.renderLogic) {
