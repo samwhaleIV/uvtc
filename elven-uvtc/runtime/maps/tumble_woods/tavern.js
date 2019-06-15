@@ -4,11 +4,7 @@ addMap({
         this.load = world => {
             world.addPlayer(10,3,"down");
             if(world.globalState.metFrogert) {
-                frogert = world.getCharacter("frogert","down");
-                world.addObject(frogert,4,6);
-                frogert.interacted = () => {
-
-                }
+                //do FROGERT SHIT
             }
         }
         this.doorClicked = () => {
