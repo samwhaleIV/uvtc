@@ -362,21 +362,17 @@ function WorldRenderer() {
     this.showNamedTextPopupID = (ID,name) => showTextPopup([getString(ID)],name);
     this.showNamedTextPopupsID = (IDs,name) => showTextPopup(IDs.map(getString),name);
     this.showNamedTextPopup = (page,name) => showTextPopup([page],name);
-    this.showNamedTextPopups = (pages,name) => showTextPopup(pages,name);
-    this.showInstantTextPopupID = (ID,noSound) => {
-        if(!noSound) {
-            playSound("energy");
-        }
+
+    this.showInstantTextPopupI = ID => showTextPopup([getString(ID)]);
+    this.showInstantTextPopupIDSound = ID => {
+        playSound("energy");
         return showTextPopup([getString(ID)]);
     };
-    this.showInstantTextPopupsID = IDs => showTextPopup(IDs.map(getString),null,true);
-    this.showInstantTextPopup = (page,noSound) => {
-        if(!noSound) {
-            playSound("energy");
-        }
+    this.showInstantTextPopup = page => showTextPopup([page],null,true);
+    this.showInstantTextPopupSound = page => {
+        playSound("energy");
         return showTextPopup([page],null,true);
-    };
-    this.showInstantTextPopups = pages => showTextPopup(pages,null,true);
+    }
 
     this.clearPrompt = () => {
         this.prompt = null;

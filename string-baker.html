@@ -30,7 +30,8 @@
     const nextWord = function(event) {
         wordIndex++;
         const word = wordFeed.textContent;
-        wordSyllableMaps[word] = makeSyllableMap(word.length,Number(event.key));
+        const syllableNumber = event.key === "q" ? word.length : Number(event.key);
+        wordSyllableMaps[word] = makeSyllableMap(word.length,syllableNumber);
         wordFeed.textContent = neededWords[wordIndex];
         if(wordIndex >= neededWords.length) {
             document.body.innerHTML = `const wordSyllableMaps=${JSON.stringify(wordSyllableMaps)};`

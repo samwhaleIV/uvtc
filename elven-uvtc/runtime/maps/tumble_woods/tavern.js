@@ -24,7 +24,7 @@ addMap({
                         world.globalState.shiverWantsToGiveAGift = false;
                         world.movesManager.unlockMove("Iced Whiskey");
                         await shiver.sayID("AUTO_65");
-                        await world.showInstantTextPopup("You received the move ȴIced Whiskey!ȴ");
+                        await world.showInstantTextPopupSound("You received the move ȴIced Whiskey!ȴ");
                     }
 
                     if(world.globalState.burrGotBeer && world.globalState.shiverGotBeer) {
@@ -42,7 +42,7 @@ addMap({
                         }
                         world.globalState.shiverGotBeer = true;
                         world.globalState.gotBeer = false;
-                        await world.showInstantTextPopup("You gave your beer to Shiver.");
+                        await world.showInstantTextPopupSound("You gave your beer to Shiver.");
                         await shiver.sayID("AUTO_125");
                         if(world.globalState.burrGotBeer && world.globalState.shiverGotBeer) {
                             moveUnlockSegment();
@@ -68,7 +68,7 @@ addMap({
                         }
                         world.globalState.burrGotBeer = true;
                         world.globalState.gotBeer = false;
-                        await world.showInstantTextPopup("You gave your beer to Burr.");
+                        await world.showInstantTextPopupSound("You gave your beer to Burr.");
                         await burr.sayID("AUTO_126");
                         if(world.globalState.burrGotBeer && world.globalState.shiverGotBeer) {
                             world.globalState.shiverWantsToGiveAGift = true;
@@ -106,7 +106,7 @@ addMap({
                                             await mascara.speechID([
                                                 "AUTO_77"
                                             ]);
-                                            await world.showInstantTextPopup("You received a beer!");
+                                            await world.showInstantTextPopupSound("You received a beer!");
                                             world.globalState.gotBeer = true;
                                         } else {
                                             world.globalState.chairDrankBeerKnown = true;
@@ -118,7 +118,7 @@ addMap({
                                                 "AUTO_82",
                                                 "AUTO_83"
                                             ]);
-                                            await world.showInstantTextPopup("You received a beer!");
+                                            await world.showInstantTextPopupSound("You received a beer!");
                                             world.globalState.gotBeer = true;
                                         }
 
@@ -131,7 +131,7 @@ addMap({
                                         switch(forAChair) {
                                             case 0:
                                                 await mascara.sayID("AUTO_85");
-                                                await world.showInstantTextPopup("You received a beer!");
+                                                await world.showInstantTextPopupSound("You received a beer!");
                                                 world.globalState.gotBeer = true;
                                                 break;
                                             case 1:
@@ -146,7 +146,7 @@ addMap({
                                                     "AUTO_89",
                                                     "AUTO_90"
                                                 ]);
-                                                await world.showInstantTextPopup("You received a beer!");
+                                                await world.showInstantTextPopupSound("You received a beer!");
                                                 world.globalState.gotBeer = true;
                                                 break;
                                         }
@@ -156,7 +156,7 @@ addMap({
                                         } else {
                                             await mascara.sayID("AUTO_92");
                                         }
-                                        await world.showInstantTextPopup("You received a beer!");
+                                        await world.showInstantTextPopupSound("You received a beer!");
                                         world.globalState.gotBeer = true;
                                     }
                                     break;
@@ -171,11 +171,11 @@ addMap({
                         case 1:
                             if(world.globalState.friendsWithMascara) {
                                 await mascara.sayID("AUTO_95");
-                                await world.showInstantTextPopup("Congratulations! Mascara is still your friend!");
+                                await world.showInstantTextPopupSound("Congratulations! Mascara is still your friend!");
                             } else {
                                 world.globalState.friendsWithMascara = true;
                                 await mascara.sayID("AUTO_96");
-                                await world.showInstantTextPopup("Congratulations! Mascara is now your friend!");
+                                await world.showInstantTextPopupSound("Congratulations! Mascara is now your friend!");
                                 await mascara.sayID("AUTO_97");
                             }
                             break;
@@ -194,9 +194,9 @@ addMap({
                     if(world.globalState.chairDrankBeer && world.globalState.gotBeer) {
                         world.globalState.gotBeer = false;
                         await world.showTextPopupID("AUTO_101");
-                        await world.showInstantTextPopup("You really should not give this chair beer.",true);
+                        await world.showInstantTextPopup("You really should not give this chair beer.");
                         await world.showTextPopupID("AUTO_102");
-                        await world.showInstantTextPopup("The chair stole the beer from you and drank it all in one sip.",true);
+                        await world.showInstantTextPopup("The chair stole the beer from you and drank it all in one sip.");
                         await world.showTextPopupID("AUTO_103");
                     } else if(world.globalState.gotBeer) {
                         world.globalState.chairDrankBeer = true;
@@ -207,7 +207,7 @@ addMap({
                             "AUTO_105",
                             "AUTO_106"
                         ]);
-                        await world.showInstantTextPopup("... Clearly you've made a terrible mistake.",true);
+                        await world.showInstantTextPopup("... Clearly you've made a terrible mistake.");
                     } else {
                         world.globalState.chairAskedForABeer = true;
                         world.globalState.gotBeer = false;

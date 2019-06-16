@@ -64,7 +64,7 @@ const stringLookup = {
     jims_help_8: "...",
     jims_help_9: "What? You already figured it out?",
     jims_help_10: "Well, it's nice to meet you. My name is Jim.",
-    you_can_never_leave: "You can't leave tumble woods yet! You have important things to do!",
+    you_can_never_leave: "You can't leave ȹTumble Townȹ yet! You have important things to do!",
     stranger_danger: "Ahh! Stranger danger! Get away from me!",
     AUTO_1: "You should probably go check if that frog you scared is okay first.",
     AUTO_2: "Who is it?",
@@ -193,7 +193,20 @@ const stringLookup = {
     AUTO_125: "Aweee yeah! What a boss!",
     AUTO_126: "Hey! Thanks a lot dude.",
     AUTO_127: "You're awesome! You got us beers out of the goodness of your heart! Come over here, I've got something for your troubles.",
-    AUTO_128: "... alright. You should go, now."
+    AUTO_128: "... alright. You should go, now.",
+    AUTO_129: "...",
+    AUTO_130: "This isn't poison is it?",
+    AUTO_131: "Well, that's a risk I'm willing to take. I'm just sooo thirsty.",
+    AUTO_132: "Ahhhhhhhhh",
+    AUTO_133: "That hit the spot.",
+    AUTO_134: "Thanks again, 'friend.'",
+    AUTO_135: "Speaking of friends, you should probably go meet more members of the town, don't you think?",
+    AUTO_136: "My other next door neighbor besides you and Jim is ȴIce Man.ȴ He knows a lot about fighting or something.",
+    AUTO_137: "Alright. Now leave me in peace to get about as drunk as possible for a frog.",
+    AUTO_138: "Did you met teh ȴIce Manȴ yeh? i promes 'es not es intimidorting as he sound.",
+    AUTO_139: "Wow! You actually came back with beer. I wasn't so sure that you would.",
+    AUTO_140: "... it took long enough.",
+    AUTO_141: "Now, please bring it over here. I'm so parched I can barely move."
 }
 const strings = stringLookup;
 const getString = function(ID) {

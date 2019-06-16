@@ -7,7 +7,7 @@ addMap({
             if(world.globalState.frogertDoorSequenceComplete) {
                 frogert = world.getCharacter("frogert","up");
                 world.addObject(frogert,4,5);
-                if(world.globalState.gotBeer) {
+                if(world.globalState.gotBeer || world.globalState.frogertGotHisBeer) {
                     frogert.interacted = (x,y,direction) => {
                         if(world.globalState.frogertGotHisBeer) {
                             frogert.updateDirection(direction);

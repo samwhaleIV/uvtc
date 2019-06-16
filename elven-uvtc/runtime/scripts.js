@@ -208,7 +208,7 @@ const scripts = {
                 "AUTO_47"
             ]);
         }
-        await world.showInstantTextPopup("Congratulations! Frogert is now your friend!");
+        await world.showInstantTextPopupSound("Congratulations! Frogert is now your friend!");
         await frogert.speechID([
             "AUTO_48",
             "AUTO_49",
@@ -270,9 +270,40 @@ const scripts = {
         world.unlockPlayerMovement();
     },
     frogert_downs_some_beer: async (world,frogert) => {
+        world.lockPlayerMovement();
+        world.globalState.gotBeer = false;
+        world.globalState.frogertGotHisBeer = true;
+        await world.showInstantTextPopupSound("You handed the beer to frogert!");
+        await frogert.sayID("AUTO_129");
+        await world.showInstantTextPopup("Frogert is inspecting the beer.");
+        await frogert.sayID("AUTO_130");
+        await world.showPrompt("is this beer poison?","uhh no","sometimes","technically yes");
+        await delay(1500);
+        await frogert.sayID("AUTO_131");
+        await world.showInstantTextPopup("Frogert drank the entire beer.");
+        await world.showInstantTextPopup("Does everyone in this town have an alchohol problem or something?");
+        await frogert.speechID([
+            "AUTO_132",
+            "AUTO_133",
+            "AUTO_134",
+            "AUTO_135",
+            "AUTO_136",
+            "AUTO_137"
+        ]);
+        world.unlockPlayerMovement();
     },
     frogert_is_grateful_for_beer: async (world,frogert) => {
+        world.lockPlayerMovement();
+        await frogert.sayID("AUTO_138")
+        world.unlockPlayerMovement();
     },
     frogert_is_glad_you_came_back: async (world,frogert) => {
+        await frogert.alert();
+        await frogert.speechID([
+            "AUTO_139",
+            "AUTO_140",
+            "AUTO_141"
+        ]);
+        world.unlockPlayerMovement();
     }
 };
