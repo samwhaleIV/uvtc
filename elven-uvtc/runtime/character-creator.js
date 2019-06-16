@@ -5,8 +5,11 @@ const CharacterColors = {
     "red-elfette": "red",
     "boney-elf": "deeppink",
     "wizard-elf": "blueviolet",
-    "headless-elf": "deeporange",
-    "jester-elf": "goldenrod"
+    "headless-elf": "darkorange",
+    "jester-elf": "goldenrod",
+    "mascara": "deeppink",
+    "burr": "darkorange",
+    "shiver": "blueviolet"
 }
 const CharacterDisplayNames = {
     "jim": "Jim",
@@ -16,13 +19,15 @@ const CharacterDisplayNames = {
     "boney-elf": "Boney Elf",
     "wizard-elf": "Wizard Elf",
     "headless-elf": "Headless Elf",
-    "jester-elf": "Jester Elf"
+    "jester-elf": "Jester Elf",
+    "mascara": "Mascara",
+    "burr": "Burr",
+    "shiver": "Shiver"
 }
 const colorLookup = {}
 Object.entries(textColorLookup).forEach(entry => {
     colorLookup[entry[1]] = entry[0];
 });
-colorLookup["rainbow"] = "X";
 delete colorLookup[0];
 const getColorCode = characterName => {
     const color = CharacterColors[characterName];
@@ -68,7 +73,6 @@ const speakMethodID_multiple = async (world,character,messageIDs,customPrefix) =
     await world.showNamedTextPopupsID(messageIDs,prefix);
 }
 const defaultCharacterMaker = (world,direction,characterName,isElf=false) => {
-    
     const character = new world.sprite(direction,characterName,isElf);
     character.prefix = getPrefix(characterName);
     character.characterName = characterName;
@@ -85,7 +89,28 @@ const characterMakers = {
         return defaultCharacterMaker(world,direction,characterName,true);
     }
 }
-function GetOverworldCharacter(world,name,direction=null) {
+function GetOverworldCharacterSpriteless(world,name) {
+    const character = {};
+    character.prefix = getPrefix(name);
+    character.characterName = name;
+    character.say = async (message,customPrefix=null) => {
+        await speakMethod(world,character,message,customPrefix);
+    }
+    character.sayID = async (messageID,customPrefix=null) => {
+        await speakMethodID(world,character,messageID,customPrefix);
+    }
+    character.speech = async (messages,customPrefix=null) => {
+        await speakMethod_multiple(world,character,messages,customPrefix);
+    }
+    character.speechID = async (messageIDs,customPrefix=null) => {
+        await speakMethodID_multiple(world,character,messageIDs,customPrefix);
+    }
+    return character;
+}
+function GetOverworldCharacter(world,name,direction=null,spriteLess=false) {
+    if(spriteLess) {
+        return GetOverworldCharacterSpriteless(world,name);
+    }
     const characterMaker = characterMakers[name];
     if(!characterMaker) {
         throw Error(`Character '${name}' does not exist`);

@@ -70,7 +70,7 @@ addMap({
             }
         }
         this.doorClicked = doorID => {
-            if(world.globalState.metFrogert) {
+            if(world.globalState.metFrogert && !world.globalState.frogertGotHisBeer) {
                 if(doorID === "to_house_1") {
                     world.updateMap("house_1",{fromDoorWay:true});
                 } else if(doorID === "to_house_2") {
@@ -83,10 +83,18 @@ addMap({
                     }
                     scripts.frogert_doorway(world,frogert);
                 } else if(world.globalState.awaitingBeer) {
-                    if(doorID === "to_tavern") {
-                        world.updateMap("tavern",{fromDoorWay:true});
+                    if(world.globalState.gotBeer) {
+                        if(doorID === "to_tavern") {
+                            world.updateMap("tavern",{fromDoorWay:true});
+                        } else {
+                            world.showTextPopupID("AUTO_124")
+                        }
                     } else {
-                        world.showTextPopupID("AUTO_64");
+                        if(doorID === "to_tavern") {
+                            world.updateMap("tavern",{fromDoorWay:true});
+                        } else {
+                            world.showTextPopupID("AUTO_64");
+                        }
                     }
                 } else {
                     world.showTextPopupID("AUTO_1");

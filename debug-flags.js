@@ -3,5 +3,6 @@ const ENV_FLAGS = {
     CONTROLLER_DISABLED: false,
     DO_STEAM_SETUP: false,
     MUSIC_FILE_FORMAT: "ogg",
-    BATTLE_RENDERER: false
+    BATTLE_RENDERER: false,
+    NO_SONOGRAPH_WARNING: true
 }

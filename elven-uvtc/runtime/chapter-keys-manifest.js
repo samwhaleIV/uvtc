@@ -6,7 +6,18 @@ const ChapterKeysManifest = {
         "jimMoved",
         "jimsDirection",
         "metFrogert",
-        "playedEnterTrigger"
+        "playedEnterTrigger",
+        "frogertGotHisBeer",
+        "gotBeer",
+        "friendsWithMascara",
+        "chairAskedForABeer",
+        "chairDrankBeer",
+        "chairDrankBeerKnown",
+        "burrGotBeer",
+        "shiverGotBeer",
+        "shiverWantsToGiveAGift",
+        "shiverGaveGift",
+        "tavernEnterTrigger"
     ],
     2: [
 

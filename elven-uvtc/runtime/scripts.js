@@ -208,7 +208,6 @@ const scripts = {
                 "AUTO_47"
             ]);
         }
-        playSound("energy");
         await world.showInstantTextPopup("Congratulations! Frogert is now your friend!");
         await frogert.speechID([
             "AUTO_48",
@@ -269,5 +268,11 @@ const scripts = {
                 break;
         }
         world.unlockPlayerMovement();
+    },
+    frogert_downs_some_beer: async (world,frogert) => {
+    },
+    frogert_is_grateful_for_beer: async (world,frogert) => {
+    },
+    frogert_is_glad_you_came_back: async (world,frogert) => {
     }
 };

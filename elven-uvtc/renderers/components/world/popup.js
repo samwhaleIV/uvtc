@@ -53,7 +53,9 @@ function applySonographToPopupFeed(popupFeed) {
         const wordSet = wordSets[i];
         let soundMap = getSyllableMap(wordSet.word);
         if(!soundMap) {
-            console.warn(`Warning: '${wordSet.word}' is missing a sonograph`);
+            if(!ENV_FLAGS.NO_SONOGRAPH_WARNING) {
+                console.warn(`Warning: '${wordSet.word}' is missing a sonograph`);
+            }
             soundMap = [true];
         }
         for(let x = 0;x<soundMap.length;x++) {

@@ -6,6 +6,7 @@ import GlobalState from "../runtime/global-state.js";
 import GetOverworldCharacter from "../runtime/character-creator.js";
 import WorldUIRenderer from "./world-ui.js";
 import UIAlert from "./components/ui-alert.js";
+import MovesManager from "../runtime/moves-manager.js";
 
 function WorldRenderer() {
     const alertTime = 1000;
@@ -153,7 +154,9 @@ function WorldRenderer() {
         loadLastMapOrDefault();
     }
     this.sprite = SpriteRenderer;
-    this.getCharacter = (name,direction) => GetOverworldCharacter(this,name,direction);
+    this.getCharacter = (name,direction) => GetOverworldCharacter(this,name,direction,false);
+    this.getStaticCharacter = name => GetOverworldCharacter(this,name,null,true);
+    this.movesManager = MovesManager;
 
     this.camera = {
         x: 10,
@@ -360,9 +363,19 @@ function WorldRenderer() {
     this.showNamedTextPopupsID = (IDs,name) => showTextPopup(IDs.map(getString),name);
     this.showNamedTextPopup = (page,name) => showTextPopup([page],name);
     this.showNamedTextPopups = (pages,name) => showTextPopup(pages,name);
-    this.showInstantTextPopupID = ID => showTextPopup([getString(ID)]);
+    this.showInstantTextPopupID = (ID,noSound) => {
+        if(!noSound) {
+            playSound("energy");
+        }
+        return showTextPopup([getString(ID)]);
+    };
     this.showInstantTextPopupsID = IDs => showTextPopup(IDs.map(getString),null,true);
-    this.showInstantTextPopup = page => showTextPopup([page],null,true);
+    this.showInstantTextPopup = (page,noSound) => {
+        if(!noSound) {
+            playSound("energy");
+        }
+        return showTextPopup([page],null,true);
+    };
     this.showInstantTextPopups = pages => showTextPopup(pages,null,true);
 
     this.clearPrompt = () => {
