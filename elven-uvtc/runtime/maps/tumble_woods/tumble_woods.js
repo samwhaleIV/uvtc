@@ -15,7 +15,6 @@ addMap({
     WorldState: function(world,data) {
         let frogert;
         this.load = world => {
-            stopMusic();
             if(data.fromDoorWay) {
                 switch(data.sourceRoom) {
                     case "house_1":
@@ -105,7 +104,7 @@ addMap({
         }
         this.activeTrigger = null;
         this.triggerActivated = (ID,direction) => {
-            if(this.activeTrigger === ID) {
+            if(this.activeTrigger !== null) {
                 return;
             }
             switch(ID) {

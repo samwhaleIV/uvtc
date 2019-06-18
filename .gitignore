@@ -264,9 +264,7 @@ win32 ia32.7z
 win32 x64.7z
 
 store assets
-elven-uvtc/runtime/maps/data/
 map-builder/input/
-map-dev/
 test-song.mp3
 
 elven-engine/
