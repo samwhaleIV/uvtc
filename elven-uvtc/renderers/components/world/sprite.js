@@ -202,7 +202,7 @@ function SpriteRenderer(startDirection,spriteName,isElf) {
     if(isElf) {
         this.render = function(timestamp,x,y,width,height) {
             const startX = this.x, startY = this.y;
-            processRenderLogicForFrame();
+            processRenderLogicForFrame(timestamp);
             if(this.hidden) {
                 return;
             }
@@ -236,7 +236,7 @@ function SpriteRenderer(startDirection,spriteName,isElf) {
     } else {
         this.render = function(timestamp,x,y,width,height) {
             const startX = this.x, startY = this.y;
-            processRenderLogicForFrame();
+            processRenderLogicForFrame(timestamp);
             if(this.hidden) {
                 return;
             }
