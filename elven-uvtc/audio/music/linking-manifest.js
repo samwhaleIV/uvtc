@@ -24,7 +24,7 @@ const MusicLinkingManifest = {
         song: "tavern"
     },
     "store": {
-        song: null
+        song: "store"
     },
     "mail": {
         song: null
