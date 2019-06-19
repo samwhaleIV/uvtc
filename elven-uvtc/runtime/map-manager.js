@@ -1,5 +1,6 @@
 const worldMapList = [];
 const worldMaps = {};
+
 function addMap(map) {
 
     worldMapList.push(map);

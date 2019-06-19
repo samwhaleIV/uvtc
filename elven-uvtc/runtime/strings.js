@@ -140,7 +140,7 @@ const stringLookup = {
     AUTO_72: "You gave Shiver a beer but what about meeee? Go get another one!",
     AUTO_73: "I would really appreciate you going and getting us some beers. I don't have much to give you but I will spread good word about you.",
     AUTO_74: "Hello, how can I help you?",
-    AUTO_75: "Ahh. Beer. Now THAT I can help you with.",
+    AUTO_75: "Ahh. Alchohol. Now THAT I can help you with.",
     AUTO_76: "You still have the other beer I gave you. How about drinking that one first?",
     AUTO_77: "Do you have a drinking problem too? This is going on your tab.",
     AUTO_78: "What happened to the other beer I gave you?",

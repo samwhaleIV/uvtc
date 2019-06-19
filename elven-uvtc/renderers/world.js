@@ -8,6 +8,11 @@ import WorldUIRenderer from "./world-ui.js";
 import UIAlert from "./components/ui-alert.js";
 import MovesManager from "../runtime/moves-manager.js";
 
+const songIntroLookup = {};
+SongsWithIntros.forEach(song => {
+    songIntroLookup[song] = song + MUSIC_INTRO_SUFFIX;
+});
+
 function WorldRenderer() {
     const alertTime = 1000;
     let alert = null;
@@ -98,6 +103,10 @@ function WorldRenderer() {
             this.renderMap.requiredSongs : this.renderMap.songParent ?
                 worldMaps[this.renderMap.songParent].requiredSongs : null;
 
+        if(requiredSongs) {
+            requiredSongs = requiredSongs.slice();
+        }
+
         const roomSong = this.renderMap.roomSong ?
             this.renderMap.roomSong : this.renderMap.songParent ?
                 worldMaps[this.renderMap.songParent].roomSong : null;
@@ -113,13 +122,18 @@ function WorldRenderer() {
                 }
             }
             if(!containsRoomSong) {
-                requiredSongs = [...requiredSongs.slice(),roomSong];
+                requiredSongs.push(roomSong);
             }
         }
-
         if(requiredSongs) {
             let loadedSongs = 0;
             const songNames = {};
+            requiredSongs.forEach(song => {
+                const introSong = songIntroLookup[song];
+                if(introSong) {
+                    requiredSongs.push(introSong);
+                }
+            });
             const totalSongs = requiredSongs.length;
             const callbackIfReady = () => {
                 if(loadedSongs === totalSongs) {
@@ -135,7 +149,7 @@ function WorldRenderer() {
             };
             requiredSongs.forEach(song => {
                 songNames[song] = true;
-                if(audioBuffers[song]) {
+                if(audioBuffers[song] || failedBuffers[song]) {
                     loadedSongs++;
                 } else {
                     loadSongOnDemand(song);
@@ -617,27 +631,40 @@ function WorldRenderer() {
     this.stopMusic = callback => {
         fadeOutSongs(OVERWORLD_MUSIC_FADE_TIME,callback);
     }
-    this.playSong = (songName) => {
+    this.playSong = songName => {
         if(!musicNodes[songName]) {
             let didRunCustomLoader = ranCustomLoader;
             this.stopMusic(()=>{
                 const extraTime = !didRunCustomLoader ? faderTime / 2 : FAKE_OVERWORLD_LOAD_TIME;
+                let songIntro = null;
                 const fadeIn = () => {
-                    musicNodes[songName].volumeControl.gain.setValueAtTime(0.001,audioContext.currentTime);
-                    musicNodes[songName].volumeControl.gain.linearRampToValueAtTime(
+                    let fadeInTarget;
+                    if(songIntro !== null) {
+                        fadeInTarget = songIntro;
+                    } else {
+                        fadeInTarget = songName;
+                    }
+                    musicNodes[fadeInTarget].volumeControl.gain.setValueAtTime(0.001,audioContext.currentTime);
+                    musicNodes[fadeInTarget].volumeControl.gain.linearRampToValueAtTime(
                         1.0,
                         audioContext.currentTime+
                         OVERWORLD_MUSIC_FADE_TIME/1000
                     );
                 }
-                if(extraTime) {
-                    setTimeout(()=>{
+                const enter_sandman = songName => {
+                    const intro = songIntroLookup[songName];
+                    if(intro && audioBuffers[intro]) {
+                        songIntro = intro;
+                        playMusicWithIntro(songName,intro);
+                    } else {
                         playMusic(songName);
-                        fadeIn();
-                    },extraTime);
-                } else {
-                    playMusic(songName);
+                    }
                     fadeIn();
+                }
+                if(extraTime) {
+                    setTimeout(enter_sandman,extraTime,songName);
+                } else {
+                    enter_sandman(songName);
                 }
             });
         }

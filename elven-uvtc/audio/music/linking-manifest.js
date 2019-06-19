@@ -19,6 +19,26 @@
     such as where we might opt in not to have one. I.e, for an important story moment.
 */
 
+//This string should be... Well. I guess it's kinda obvious. Never mind.
+const MUSIC_INTRO_SUFFIX = "_intro";
+
+//Put the root song names here and they are assumed to have their '<name> + <intro suffix>' files in the music folder just as any other song
+//This is NOT used for songs that will play anywhere other than the over. Battles, menus, etc. will use something else.
+//Be sure not to include the intro suffix string or your files are gonna have to be named like 'song_intro_intro'
+const SongsWithIntros = [
+    "your_song_name_here",
+    "a_song_name_that_is_the_same_as_the_one_linked_in_the_manifests"
+];
+const BattleMusicLinkingManifest = {
+    "These aren't used yet and therefore can't be tested, but this is where they will go": "SORRY",
+
+    "(but basically the format will go something like this":")",
+
+    "<battle name>": "<song name>",
+    "wimpy-red-elf": "wimpy_wimpy"
+
+    //And for the intro, 'wimpy_wimpy' is added to SongsWithIntros and 'wimpy_wimpy_intro' is assumed to exist.
+};
 const MusicLinkingManifest = {
     "tavern": {
         song: "tavern"
