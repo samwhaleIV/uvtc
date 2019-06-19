@@ -85,7 +85,7 @@ addMap({
                 case 8:
                     //mascara interacted
                     await mascara.sayID("AUTO_74");
-                    const reason = await world.showPrompt("what are you here for?","beer","friendship","my wife left me","all of the above");
+                    const reason = await world.showPrompt("what are you here for?","relief","friendship","my wife left me","all of the above");
                     world.lockPlayerMovement();
                     await delay(1000);
                     world.unlockPlayerMovement();

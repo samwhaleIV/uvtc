@@ -17,7 +17,6 @@ function UIPrompt(message,accept,cancel) {
     this.processKey = key => {
     }
     this.processMove = (x,y) => {
-        console.log(x,y);
         if(contains(x,y,acceptButton)) {
             hoverType = hoverTypes.accept;
         } else if(cancel && contains(x,y,cancelButton)) {

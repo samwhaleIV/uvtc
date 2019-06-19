@@ -218,7 +218,6 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
             return;
         }
         const largeText = fullWidth > 600;
-        const textScale = largeText ? largeTextScale : smallTextScale;
 
         const popupWidth = halfWidth > 700 ? halfWidth : fullWidth < 700 ? fullWidth - 20 : 700 - 20;
 
