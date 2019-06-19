@@ -10,7 +10,11 @@ const ELF_TO_WORLD_SCALE = ELF_WIDTH / WorldTextureSize;
 const FOOTSTEPS_SPRITE_NAME = "footsteps";
 
 function PlayerRenderer(startDirection) {
-    SpriteRenderer.call(this,startDirection,"player");
+    if(ENV_FLAGS.ELF_PLAYER_HACK) {
+        SpriteRenderer.call(this,startDirection,"wimpy-red-elf",true);
+    } else {
+        SpriteRenderer.call(this,startDirection,"player",false);
+    }
     this.isPlayer = true;
 }
 function SpriteRenderer(startDirection,spriteName,isElf) {
@@ -22,6 +26,9 @@ function SpriteRenderer(startDirection,spriteName,isElf) {
     const columnWidth = isElf ? ELF_WIDTH : SPRITE_WIDTH;
     const rowHeight = isElf ? ELF_HEIGHT : SPRITE_HEIGHT;
     const rowCount = 4;
+
+    const footstepWidth = 16;
+    const footstepHeight = 16;
 
     let walking = false;
     let currentColumn = 0;
@@ -60,7 +67,7 @@ function SpriteRenderer(startDirection,spriteName,isElf) {
     this.firstPosition = true;
     this.worldPositionUpdated = function(oldX,oldY,newX,newY,world) {
         if(!this.firstPosition) {
-            const decalSourceX = this.direction === "up" || this.direction === "down" ? 0 : columnWidth;
+            const decalSourceX = this.direction === "up" || this.direction === "down" ? 0 : footstepWidth;
             const xOffset = this.xOffset;
             const yOffset = this.yOffset;
             const newFootStep = {
@@ -72,7 +79,7 @@ function SpriteRenderer(startDirection,spriteName,isElf) {
                     context.drawImage(
                         footStepsSprite,
                         decalSourceX,0,
-                        columnWidth,rowHeight,
+                        footstepWidth,footstepHeight,
                         x+horizontalOffset,y+verticalOffset,
                         width,height
                     );
