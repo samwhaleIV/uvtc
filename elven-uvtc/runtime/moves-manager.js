@@ -1,12 +1,17 @@
 import GlobalState from "./global-state.js";
 import { Moves, MovesList } from "./battle/moves.js";
 import Chapters from "./chapter-data.js";
+import RenderMove from "../renderers/components/battle/move.js";
+
+MovesList.forEach(move => {
+    move.render = (x,y,size,hover,textless) => RenderMove(move,x,y,size,hover,textless);
+});
 
 const getDefaultSlots = () => {
     return {
-        1: Moves.None,
-        2: Moves.None,
-        3: Moves.None
+        1: "None",
+        2: "None",
+        3: "None"
     };
 }
 
@@ -22,11 +27,16 @@ if(!GlobalState.data.moveSlots) {
 }
 
 const MovesManager = new (function(){
+    this.resetMoveSlots = () => {
+        GlobalState.data.moveSlots.logic = getDefaultSlots();
+        GlobalState.data.moveSlots.fear = getDefaultSlots();
+        GlobalState.data.moveSlots.malice = getDefaultSlots();
+    }
     this.setSlot = (type,slotID,moveName) => {
         GlobalState.data.moveSlots[type][slotID] = moveName;
     }
     this.getSlot = (type,slotID) => {
-        return GlobalState.data.moveSlots[type][slotID];
+        return Moves[GlobalState.data.moveSlots[type][slotID]];
     }
     this.lockMove = moveName => {
         delete GlobalState.data.unlockedMoves[moveName];

@@ -1,11 +1,37 @@
 import { MOVE_SOURCE_WIDTH } from "../../renderers/components/battle/move.js";
 
 const MovesList = [
-    {name:"None",description:"This isn't a real move. It doesn't do anything at all."},
-    {name:"Logic"},
-    {name:"Malice"},
-    {name:"Fear"},
-    {name:"Iced Whiskey"},
+    {
+        name:"None",
+        description:"This isn't a real move. It doesn't do anything at all.",
+        type:"ui"
+    },
+    {
+        name:"Skip",
+        description:"Skip what's happening right now so you can continue kicking ass.",
+        type: "ui"
+    },
+    {
+        name:"Logic",
+        type:"ui"
+    },
+    {
+        name:"Malice",
+        type:"ui"
+    },
+    {
+        name:"Fear",
+        type:"ui"
+    },
+    {
+        name:"Wimpy Punch",
+        description:"Is this really the best you can do?",
+        type:"malice"
+    },
+    {
+        name:"Iced Whiskey",
+        type:"logic"
+    },
     {name:"Red Apple"},
     {name:"Return to Sender"},
     {name:"Poison Apple"},
@@ -15,7 +41,7 @@ const MovesList = [
     {name:"Wooden Shield"},
     {name:"Cry"},
     {name:"Midus Touch"},
-    {name: "Hot Porridge"},
+    {name:"Hot Porridge"},
     {name:"Stress Eating"},
     {name:"Banish"},
     {name:"Trust"},

@@ -38,10 +38,11 @@ function WorldUIRenderer(world) {
         leaving = true;
         playSound("reverse-click");
     }
-    const clearPanel = () => {
+    const clearPanel = noSound => {
         panel = null;
-        this.processMove(lastRelativeX,lastRelativeY);
-        playSound("reverse-click");
+        if(!noSound) {
+            playSound("reverse-click");
+        }
     }
 
     const iconMap = getPlaceholderLocation();
@@ -338,29 +339,28 @@ function WorldUIRenderer(world) {
         }
     }
     this.render = timestamp => {
+        if(loading) {
+            const progress = (timestamp - loadStart) / transitionTime;
+            if(progress >= 1) {
+                playSound("click");
+                loading = false;
+                transitioning = false;
+            }
+            this.renderParts(progress);
+        } else if(leaving) {
+            const progress = (timestamp - leaveStart) / transitionTime;
+            if(progress >= 1) {
+                if(leavingCallback) {
+                    leavingCallback();
+                }
+                return;
+            }
+            this.renderParts(1-progress);
+        } else {
+            this.renderParts(1);
+        }
         if(panel) {
             panel.render(timestamp,0,0,fullWidth,fullHeight);
-        } else {
-            if(loading) {
-                const progress = (timestamp - loadStart) / transitionTime;
-                if(progress >= 1) {
-                    playSound("click");
-                    loading = false;
-                    transitioning = false;
-                }
-                this.renderParts(progress);
-            } else if(leaving) {
-                const progress = (timestamp - leaveStart) / transitionTime;
-                if(progress >= 1) {
-                    if(leavingCallback) {
-                        leavingCallback();
-                    }
-                    return;
-                }
-                this.renderParts(1-progress);
-            } else {
-                this.renderParts(1);
-            }
         }
     }
 }

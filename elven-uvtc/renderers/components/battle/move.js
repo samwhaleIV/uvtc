@@ -32,18 +32,18 @@ function RenderMove(move,x,y,size,hover,textless) {
         const halfSize = size / 2;
         const centerX = x + halfSize;
         const centerY = y + halfSize;
-        context.font = "24px Arial";
+        context.font = "18px Arial";
         context.textAlign = "center";
         context.textBaseline = "middle";
         const textWidth = context.measureText(move.name).width;
-        const paddedTextWidth = textWidth + 20;
-        const paddedTextHeight = 24;
+        const paddedTextWidth = textWidth + 22;
+        const paddedTextHeight = 38;
         context.fillStyle = "white";
         context.fillRect(
-            centerX-paddedTextWidth/2,
-            centerY-paddedTextHeight/2,
-            paddedTextWidth,
-            paddedTextHeight
+            Math.round(centerX-paddedTextWidth/2),
+            Math.round(centerY-paddedTextHeight/2),
+            Math.round(paddedTextWidth),
+            Math.round(paddedTextHeight)
         );
         context.fillStyle = "black";
         context.fillText(move.name,centerX,centerY);
