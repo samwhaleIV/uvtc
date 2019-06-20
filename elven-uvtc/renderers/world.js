@@ -7,6 +7,8 @@ import GetOverworldCharacter from "../runtime/character-creator.js";
 import WorldUIRenderer from "./world-ui.js";
 import UIAlert from "./components/ui-alert.js";
 import MovesManager from "../runtime/moves-manager.js";
+import MovePreview from "./components/world/move-preview.js";
+import Moves from "../runtime/battle/moves.js";
 
 const songIntroLookup = {};
 SongsWithIntros.forEach(song => {
@@ -172,6 +174,57 @@ function WorldRenderer() {
     this.getStaticCharacter = name => GetOverworldCharacter(this,name,null,true);
     this.movesManager = MovesManager;
 
+    this.someoneIsNowYourFriend = (character,customString) => {
+        if(customString) {
+            const message = customString.replace("{NAME}",character.coloredName);
+            return this.showInstantTextPopupSound(message);
+        } else {
+            return this.showInstantTextPopupSound(`Congratulations! ${character.coloredName} is now your friend!`);
+        }
+    }
+
+    const moveNameColor = inverseTextColorLookup["red"];
+
+    this.unlockMove = moveName => {
+        return new Promise(async resolve => {
+            const alreadyHasMove = this.movesManager.hasMove(moveName);
+            if(!alreadyHasMove) {
+                this.movesManager.unlockMove(moveName);
+            }
+            this.pushCustomRenderer(new MovePreview(moveName,()=>{
+                if(this.popup) {
+                    const popupY = this.popup.startY - 10;
+                    return {
+                        y: 10,
+                        x: 10,
+                        width: fullWidth - 10,
+                        height: popupY - 10
+                    }
+                } else {
+                    return {
+                        x:10,y:10,width:fullWidth-10,height:fullHeight-10
+                    }
+                }
+            }));
+            await this.showInstantTextPopupSound(`You received the move ${moveNameColor}${moveName}!${moveNameColor}`);
+            if(!alreadyHasMove) {
+                const move = Moves[moveName];
+                let description = move.description;
+                let type = move.type;
+                if(description) {
+                    if(type) {
+                        type = type.substring(0,1).toUpperCase() + type.substring(1);
+                        description = `${moveNameColor}${type}:${moveNameColor} ${description}`;
+                    }
+                    playSound("click");
+                    await this.showInstantTextPopup(description);
+                }
+            }
+            playSound("click");
+            this.popCustomRenderer();
+        });
+    }
+
     this.camera = {
         x: 10,
         y: 10,
@@ -192,6 +245,33 @@ function WorldRenderer() {
     this.popup = null;
     this.prompt = null;
     this.customRenderer = null;
+
+    const customRendererStack = [];
+    this.pushCustomRenderer = customRenderer => {
+        if(!customRenderer.render) {
+            console.warn(`Custom renderer '${String(customRenderer)}' does not have a render method!`);
+            return;
+        }
+        customRendererStack.push(customRenderer);
+        this.customRenderer = customRenderer;
+    }
+    this.popCustomRenderer = () => {
+        if(customRendererStack.length >= 1) {
+            customRendererStack.pop();
+            const stackSize = customRendererStack.length;
+            if(stackSize >= 1) {
+                this.customRenderer = customRendererStack[stackSize-1];
+            } else {
+                this.customRenderer = null;
+            }
+        }
+    }
+    this.popCustomRendererStack = () => {
+        this.customRenderer = null;
+        while(customRendererStack.length) {
+            customRendererStack.pop();
+        }
+    }
 
     this.playerController = new PlayerController(this);
 
@@ -377,7 +457,7 @@ function WorldRenderer() {
     this.showNamedTextPopupsID = (IDs,name) => showTextPopup(IDs.map(getString),name);
     this.showNamedTextPopup = (page,name) => showTextPopup([page],name);
 
-    this.showInstantTextPopupI = ID => showTextPopup([getString(ID)]);
+    this.showInstantTextPopupID = ID => showTextPopup([getString(ID)]);
     this.showInstantTextPopupIDSound = ID => {
         playSound("energy");
         return showTextPopup([getString(ID)]);
@@ -999,7 +1079,7 @@ function WorldRenderer() {
             this.popup.render(timestamp);
         }
         if(this.customRenderer) {
-            this.customRenderer(timestamp);
+            this.customRenderer.render(timestamp);
         }
         if(this.escapeMenuShown) {
             this.escapeMenu.render(timestamp);

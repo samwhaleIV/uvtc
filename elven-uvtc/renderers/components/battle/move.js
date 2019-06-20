@@ -1,27 +1,40 @@
 const MOVE_SOURCE_WIDTH = 32;
 const MOVE_SOURCE_HEIGHT = 32;
 
-function RenderMove(move,x,y,size,hover) {
+function RenderMove(move,x,y,size,hover,textless) {
     if(hover) {
-        context.fillStyle = CONSISTENT_PINK;
-        const paddedSize = size + flatDoubleHoverPadding;
+        context.fillStyle = typeof hover !== "boolean" ? hover : CONSISTENT_PINK;
+        const paddedSize = size + 6;
         context.fillRect(
-            x-flatHoverPadding,
-            y-flatHoverPadding,
+            x-3,
+            y-3,
             paddedSize,
             paddedSize
         );
     }
-    context.drawImage(
-        imageDictionary["battle/moves"],
-        move.sourceX,0,MOVE_SOURCE_WIDTH,MOVE_SOURCE_HEIGHT,
-        x,y,size,size
-    );
-    if(move.name) {
+
+    let image = imageDictionary["battle/moves"];
+    if(!image || move.sourceX > image.width) {
+        image = imageDictionary["ui/error"];
+        context.drawImage(
+            image,0,0,image.width,image.height,
+            x,y,size,size
+        );
+    } else {
+        context.drawImage(
+            imageDictionary["battle/moves"],
+            move.sourceX,0,MOVE_SOURCE_WIDTH,MOVE_SOURCE_HEIGHT,
+            x,y,size,size
+        );
+    }
+
+    if(!textless && move.name) {
         const halfSize = size / 2;
         const centerX = x + halfSize;
         const centerY = y + halfSize;
-        context.font = "18px Arial";
+        context.font = "24px Arial";
+        context.textAlign = "center";
+        context.textBaseline = "middle";
         const textWidth = context.measureText(move.name).width;
         const paddedTextWidth = textWidth + 20;
         const paddedTextHeight = 24;

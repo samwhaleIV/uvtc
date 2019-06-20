@@ -212,6 +212,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
             }
         }
     }
+    this.startY = 0;
     this.render = function(timestamp) {
         if(terminated) {
             return;
@@ -222,6 +223,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
         const popupHeight = fullHeight < 290 ? fullHeight - 20 : 270;
         const popupY = fullHeight - 10 - popupHeight;
         const popupX = Math.round(halfWidth - popupWidth / 2);
+        this.startY = popupY;
 
         context.fillStyle = "black";
         context.fillRect(

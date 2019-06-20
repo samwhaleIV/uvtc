@@ -62,10 +62,13 @@ function AudioPane(callback,parent) {
             }
         }
     }
-
+    let cancelDown = false;
     this.processKey = function(key) {
         if(this.transitioning) {
             return;
+        }
+        if(key === kc.cancel) {
+            cancelDown = true;
         }
     }
     this.processKeyUp = function(key) {
@@ -74,6 +77,7 @@ function AudioPane(callback,parent) {
         }
         switch(key) {
             case kc.cancel:
+                cancelDown = false;
                 this.exit();
                 break;
         }
@@ -268,7 +272,7 @@ function AudioPane(callback,parent) {
             elfSlider2.x,elfSlider2.y,elfWidth,elfHeight
         );
 
-        exitLabel = renderExitButton(x,y,hoverType===hoverTypes.exitLabel,false);
+        exitLabel = renderExitButton(x,y,hoverType===hoverTypes.exitLabel,false,cancelDown);
 
         if(restorationRequired) {
             context.restore();

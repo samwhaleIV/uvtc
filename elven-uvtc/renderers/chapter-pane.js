@@ -46,7 +46,7 @@ function ChapterPane(callback,parent) {
             }
         }
     }
-
+    let cancelDown = false;
     this.processKey = function(key) {
         if(this.leaving) {
             return;
@@ -54,6 +54,9 @@ function ChapterPane(callback,parent) {
         if(prompt && prompt.shown) {
             prompt.processKey(key);
             return;
+        }
+        if(key === kc.cancel) {
+            cancelDown = true;
         }
     }
     this.processKeyUp = function(key) {
@@ -66,6 +69,7 @@ function ChapterPane(callback,parent) {
         }
         switch(key) {
             case kc.cancel:
+                cancelDown = false;
                 this.exit();
                 break;
         }
@@ -422,7 +426,7 @@ function ChapterPane(callback,parent) {
         context.font = `300 ${widthNormal*48}px Roboto`;
         context.fillText(this.chapterTitle,halfWidth,halfHeight - imageSize / 2 - subtitleLayerHeight);
 
-        exitLabel = renderExitButton(x,y,hoverType===hoverTypes.exitLabel,false);
+        exitLabel = renderExitButton(x,y,hoverType===hoverTypes.exitLabel,false,cancelDown);
         
         if(fadeOutStart) {
             context.restore();

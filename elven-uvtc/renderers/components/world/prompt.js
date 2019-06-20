@@ -49,6 +49,8 @@ function WorldPrompt(text,selections,callback) {
     const largeTextScale = 4;
     const smallTextScale = 3;
 
+    this.startY = 0;
+
     this.render = function() {
         if(terminated) {
             return;
@@ -60,6 +62,7 @@ function WorldPrompt(text,selections,callback) {
         const popupHeight = fullHeight < 290 ? fullHeight - 20 : 270;
 
         const popupY = fullHeight - 10 - popupHeight;
+        this.startY = popupY;
         const popupX = Math.round(
             halfWidth - popupWidth / 2
         );

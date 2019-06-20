@@ -1,7 +1,7 @@
 import { MOVE_SOURCE_WIDTH } from "../../renderers/components/battle/move.js";
 
 const MovesList = [
-    {name:"None"},
+    {name:"None",description:"This isn't a real move. It doesn't do anything at all."},
     {name:"Logic"},
     {name:"Malice"},
     {name:"Fear"},

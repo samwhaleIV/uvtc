@@ -48,6 +48,14 @@ const getPrefix = characterName => {
     }
     return `${colorCode}${displayName}:${colorCode} `;
 }
+const getColoredName = characterName => {
+    const colorCode = getColorCode(characterName);
+    let displayName = CharacterDisplayNames[characterName];
+    if(!displayName) {
+        displayName = characterName;
+    }
+    return `${colorCode}${displayName}${colorCode}`;
+}
 const getPrefixMask = (character,maskedName) => {
     if(!character.characterName) {
         throw Error(`A character with a masked name must also have a real name. Everyone needs a true identity`);
@@ -93,6 +101,7 @@ function GetOverworldCharacterSpriteless(world,name) {
     const character = {};
     character.prefix = getPrefix(name);
     character.characterName = name;
+    character.coloredName = getColoredName(name);
     character.say = async (message,customPrefix=null) => {
         await speakMethod(world,character,message,customPrefix);
     }
@@ -131,6 +140,7 @@ function GetOverworldCharacter(world,name,direction=null,spriteLess=false) {
     character.move = async (...steps) => {
         await world.moveSprite(character.ID,steps);
     }
+    character.coloredName = getColoredName(name);
     return character;
 }
 export default GetOverworldCharacter;

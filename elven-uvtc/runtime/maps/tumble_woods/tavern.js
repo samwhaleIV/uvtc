@@ -24,7 +24,7 @@ addMap({
                         world.globalState.shiverWantsToGiveAGift = false;
                         world.movesManager.unlockMove("Iced Whiskey");
                         await shiver.sayID("AUTO_65");
-                        await world.showInstantTextPopupSound("You received the move ȴIced Whiskey!ȴ");
+                        await world.unlockMove("Iced Whiskey");
                     }
 
                     if(world.globalState.burrGotBeer && world.globalState.shiverGotBeer) {
@@ -171,11 +171,11 @@ addMap({
                         case 1:
                             if(world.globalState.friendsWithMascara) {
                                 await mascara.sayID("AUTO_95");
-                                await world.showInstantTextPopupSound("Congratulations! Mascara is still your friend!");
+                                await world.someoneIsNowYourFriend(mascara,"Congratulations! {NAME} is still your friend!");
                             } else {
                                 world.globalState.friendsWithMascara = true;
                                 await mascara.sayID("AUTO_96");
-                                await world.showInstantTextPopupSound("Congratulations! Mascara is now your friend!");
+                                await world.someoneIsNowYourFriend(mascara);
                                 await mascara.sayID("AUTO_97");
                             }
                             break;

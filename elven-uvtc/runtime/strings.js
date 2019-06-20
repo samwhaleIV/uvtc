@@ -1,5 +1,5 @@
 const stringLookup = {
-    bookcase_1: "There's a lot of books on this shelf.",
+    bookcase_1: "There are a lot of books on this shelf.",
     bed_1: "A sleeping bag on a hardwood floor, a fine luxury.",
     bookcase_2: "Lots of books here... A lot of them seem to mention some kind of card game?",
     bookcase_3: "This bookcase demonstrates that it's okay to be small. Way to go bookcase!",
@@ -175,8 +175,8 @@ const stringLookup = {
     AUTO_107: "Hey. If you bring me back a beer, I'll let you in on a secret.",
     AUTO_108: "Rule number 1 of talking to chairs- Uh, wait. How are you talking to me? I'm a chair!",
     AUTO_109: "GET AWAY FROM ME, WITCH!",
-    AUTO_110: "When people come here they never sit at this tables. I blame the chairs. They're just so...",
-    AUTO_111: "frigid. hehe.",
+    AUTO_110: "When people come here they never sit at these tables. I blame the chairs. They're just so...",
+    AUTO_111: "Frigid. Hehe.",
     AUTO_112: "...",
     AUTO_113: "Okaaay, fine. Maaaybe it's my puns.",
     AUTO_114: "Hey. You should sit on me. I won't bite. I promise.",

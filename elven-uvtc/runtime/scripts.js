@@ -208,7 +208,7 @@ const scripts = {
                 "AUTO_47"
             ]);
         }
-        await world.showInstantTextPopupSound("Congratulations! Frogert is now your friend!");
+        await world.someoneIsNowYourFriend(frogert);
         await frogert.speechID([
             "AUTO_48",
             "AUTO_49",
