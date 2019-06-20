@@ -2,5 +2,6 @@ const ENV_FLAGS = {
     FAST_AS_FUCK_TRANSITIONS: false,
     CONTROLLER_DISABLED: false,
     MUSIC_FILE_FORMAT: "ogg",
-    DO_STEAM_SETUP: false
+    DO_STEAM_SETUP: false,
+    NO_SONOGRAPH_WARNING: true
 }

@@ -25,11 +25,17 @@ const MovesManager = new (function(){
     this.setSlot = (type,slotID,moveName) => {
         GlobalState.data.moveSlots[type][slotID] = moveName;
     }
+    this.getSlot = (type,slotID) => {
+        return GlobalState.data.moveSlots[type][slotID];
+    }
     this.lockMove = moveName => {
         delete GlobalState.data.unlockedMoves[moveName];
     }
     this.unlockMove = moveName => {
         GlobalState.data.unlockedMoves[moveName] = true;
+    }
+    this.hasMove = moveName => {
+        return GlobalState.data.unlockedMoves[moveName] ? true : false;
     }
     this.getUnlockedMoves = () => {
         const softCopy = {};

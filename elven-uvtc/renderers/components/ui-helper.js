@@ -24,7 +24,7 @@ const renderButtonHover = (x,y,width,height) => {
     context.fillStyle = CONSISTENT_PINK;
     context.fillRect(x-2,y-2,width+4,height+4);
 }
-const renderExitButton = (x,y,withHover,invert) => {
+const renderExitButton = (x,y,withHover,invert,showKeyPress=false) => {
     x += 5;
     y += 5;
     let width = 230;
@@ -33,8 +33,15 @@ const renderExitButton = (x,y,withHover,invert) => {
         width = 100;
         height = 80;
     }
-    const backgroundColor = invert ? "white" : "black";
-    const foregroundColor = invert ? "black" : "white";
+    let backgroundColor;
+    let foregroundColor;
+    if(showKeyPress) {
+        backgroundColor = CONSISTENT_PINK;
+        foregroundColor = "white";
+    } else {
+        backgroundColor = invert ? "white" : "black";
+        foregroundColor = invert ? "black" : "white";
+    }
     if(withHover) {
         renderButtonHover(x,y,width,height);
     }

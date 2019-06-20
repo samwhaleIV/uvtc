@@ -2,6 +2,8 @@ import ControlsPaneRenderer from "./controls-pane.js";
 import AudioPaneRenderer from "./audio-pane.js";
 import MainMenuRenderer from "./main-menu.js";
 import ElvesFillIn from "./components/elves-fill-in.js";
+import WorldSettingsRenderer from "./world-settings.js";
+import MovesPaneRenderer from "./moves-pane.js";
 
 function WorldUIRenderer(world) {
 
@@ -27,7 +29,7 @@ function WorldUIRenderer(world) {
     const transitionTime = 200;
 
     let leavingCallback = null;
-    let popup = null;
+    let panel = null;
     let transitioning = true;
     const exit = () => {
         transitioning = true;
@@ -36,11 +38,11 @@ function WorldUIRenderer(world) {
         leaving = true;
         playSound("reverse-click");
     }
-    const clearPopup = () => {
-        popup = null;
+    const clearPanel = () => {
+        panel = null;
+        this.processMove(lastRelativeX,lastRelativeY);
+        playSound("reverse-click");
     }
-    const controlsPane = new ControlsPaneRenderer(clearPopup,this);
-    const audioPane = new AudioPaneRenderer(clearPopup,this);
 
     const iconMap = getPlaceholderLocation();
     const internalIconMap = {
@@ -94,8 +96,8 @@ function WorldUIRenderer(world) {
         if(transitioning) {
             return;
         }
-        if(popup) {
-            popup.processClick(x,y);
+        if(panel) {
+            panel.processClick(x,y);
             return;
         }
         this.processMove(x,y);
@@ -104,8 +106,8 @@ function WorldUIRenderer(world) {
         if(transitioning) {
             return;
         }
-        if(popup) {
-            popup.processClickEnd(x,y);
+        if(panel) {
+            panel.processClickEnd(x,y);
             return;
         }
         if(hoverType) {
@@ -114,6 +116,8 @@ function WorldUIRenderer(world) {
                     exit();
                     break;
                 case internalIconMap.settings.hoverID:
+                        playSound("click");
+                    panel = new WorldSettingsRenderer(clearPanel);
                     break;
                 case internalIconMap.mainMenu.hoverID:
                     playSound("click");
@@ -123,6 +127,8 @@ function WorldUIRenderer(world) {
                     world.fader.fadeOut(MainMenuRenderer);
                     break;
                 case internalIconMap.moves.hoverID:
+                    playSound("click");
+                    panel = new MovesPaneRenderer(clearPanel);
                     break;
                 case internalIconMap.help.hoverID:
                     world.saveState(true);
@@ -135,8 +141,8 @@ function WorldUIRenderer(world) {
         if(transitioning) {
             return;
         }
-        if(popup) {
-            popup.processMove(x,y);
+        if(panel) {
+            panel.processMove(x,y);
             return;
         }
         if(contains(x,y,iconMap)) {
@@ -169,8 +175,8 @@ function WorldUIRenderer(world) {
         if(transitioning) {
             return;
         }
-        if(popup) {
-            popup.processKey(key);
+        if(panel) {
+            panel.processKey(key);
             return;
         }
         switch(key) {
@@ -253,8 +259,8 @@ function WorldUIRenderer(world) {
         if(transitioning) {
             return;
         }
-        if(popup) {
-            popup.processKeyUp(key);
+        if(panel) {
+            panel.processKeyUp(key);
             return;
         }
         if(key === kc.accept) {
@@ -332,8 +338,8 @@ function WorldUIRenderer(world) {
         }
     }
     this.render = timestamp => {
-        if(popup) {
-            popup.render(timestamp,0,0,fullWidth,fullHeight);
+        if(panel) {
+            panel.render(timestamp,0,0,fullWidth,fullHeight);
         } else {
             if(loading) {
                 const progress = (timestamp - loadStart) / transitionTime;

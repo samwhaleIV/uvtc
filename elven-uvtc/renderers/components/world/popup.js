@@ -71,9 +71,6 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
     const characterSpeed = 30;
     const spaceSpeed = 30;
 
-    const largeTextScale = 4;
-    const smallTextScale = 3;
-
     const hyphenDelay = 300;
     const commaDelay = 300;
     const periodDelay = 500;
@@ -160,6 +157,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
             if(lookAhead) {
                 if(lookAhead.instant) {
                     if(!pageValue.delay && !pageValue.noSound) {
+                        stopSound("text-sound");
                         playSound("text-sound");
                     }
                     timeoutMethod();
@@ -170,6 +168,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
                 timeout = setTimeout(timeoutMethod,pageValue.delay);
             } else {
                 if(!pageValue.noSound) {
+                    stopSound("text-sound");
                     playSound("text-sound");
                 }
                 timeout = setTimeout(timeoutMethod,pageValue.noSound ? pageValue.speed / 2 : pageValue.speed);
@@ -217,7 +216,6 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
         if(terminated) {
             return;
         }
-        const largeText = fullWidth > 600;
 
         const popupWidth = halfWidth > 700 ? halfWidth : fullWidth < 700 ? fullWidth - 20 : 700 - 20;
 
@@ -239,8 +237,9 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
             popupWidth,popupHeight
         );
         BitmapText.drawTextWrappingLookAheadBlack(
-            textFeed,popupX + 20,popupY + 20,
-            popupWidth-30,
+            textFeed,popupX + 20,
+            popupY + 20,
+            popupWidth-40,
             4
         );
     }
