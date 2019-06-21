@@ -24,7 +24,8 @@ function drawMoveNameWrapping(move,x,y,size) {
 }
 
 function RenderMove(move,x,y,size,hover,textless) {
-    let startBlur = context.shadowBlur = 0;
+    let startBlur = context.shadowBlur;
+    context.shadowBlur = 0;
     if(hover) {
         context.fillStyle = typeof hover !== "boolean" ? hover : CONSISTENT_PINK;
         const paddedSize = size + 6;
@@ -67,7 +68,11 @@ function RenderMove(move,x,y,size,hover,textless) {
             drawMoveNameWrapping(move,x,y,size);
         } else {
             const paddedTextHeight = 38;
-            context.shadowBlur = SHADOW_BLUR_AMOUNT;
+            if(!move.noTextBlur) {
+                context.shadowBlur = SHADOW_BLUR_AMOUNT;
+            } else {
+                context.shadowBlur = 0;
+            }
             context.fillStyle = "white";
             context.fillRect(
                 Math.round(centerX-paddedTextWidth/2),

@@ -10,6 +10,7 @@ const MovesList = [
         name: "Nothing",
         description: "What is it good for? Absolutely nothing.",
         type:"ui",
+        noTextBlur: true,
         process: (user,target) => {
             return {
                 type: "text",
@@ -19,12 +20,14 @@ const MovesList = [
     },
     {
         name: "Back",
-        type: "ui"
+        type: "ui",
+        noTextBlur: false
     },
     {
         name:"Skip",
         description:"Skip what's happening right now so you can continue kicking ass.",
-        type: "ui"
+        type: "ui",
+        noTextBlur: false
     },
     {
         name:"Logic",

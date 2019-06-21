@@ -3,7 +3,7 @@ const ENV_FLAGS = {
     CONTROLLER_DISABLED: false,
     DO_STEAM_SETUP: false,
     MUSIC_FILE_FORMAT: "ogg",
-    BATTLE_RENDERER: true,
+    BATTLE_RENDERER: false,
     NO_SONOGRAPH_WARNING: false,
-    ELF_PLAYER_HACK: true
+    ELF_PLAYER_HACK: false
 }
