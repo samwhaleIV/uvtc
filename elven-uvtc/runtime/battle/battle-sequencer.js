@@ -386,21 +386,29 @@ async function fireBattleEvent(sequencer,event) {
             sequencer.hangingSpeech = false;
         }
         switch(event.type) {
+            case "player-move":
             case "opponent-move":
                 const move = event.move;
-                await processMove(
-                    move,
-                    sequencer.opponent,
-                    sequencer.player,
-                    sequencer
-                );
+                let user, target;
+                if(event.type === "player-move") {
+                    user = sequencer.player;
+                    target = sequencer.opponent;
+                } else {
+                    user = sequencer.opponent;
+                    target = sequencer.player;
+                }
+                await processMove(move,user,target,sequencer);
                 break;
             case "text":
                 sequencer.setMarqueeText(event.text);
                 break;
             case "speech":
                 sequencer.hangingSpeech = true;
+                sequencer.setMarqueeText(WATING_FOR_EXTERNAL_TEXT);
                 sequencer.showFullText(event.text);
+                break;
+            case "sequencing":
+                event.process(sequencer);
                 break;
 
         }
@@ -418,8 +426,14 @@ async function logicalBattleSequencer(sequencer) {
     if(opponentSequencer.getStartEvents) {
         await runBattleEvents(sequencer,opponentSequencer.getStartEvents());
     }
-    sequencer.updatePlayerMoves(SELECTION_PANEL);
-    sequencer.setMarqueeText(SELECT_A_MOVE_TEXT);
+    const postLoopProcess = () => {
+        if(battleAlive) {
+            sequencer.updatePlayerMoves(SELECTION_PANEL);
+            sequencer.setMarqueeText(SELECT_A_MOVE_TEXT);
+        }
+        return battleAlive;
+    }
+    postLoopProcess();
     do {
         if(sequencer.hangingSpeech) {
             sequencer.clearFullText();
@@ -432,10 +446,10 @@ async function logicalBattleSequencer(sequencer) {
         if(directive === RETURN_DIRECTIVE) {
             continue;
         }
-
-        const opponentEvents = await opponentSequencer.getTurnEvents();
-        await runBattleEvents(sequencer,opponentEvents);
-
+        if(!playerDead && !opponentDead) {
+            const opponentEvents = await opponentSequencer.getTurnEvents();
+            await runBattleEvents(sequencer,opponentEvents);
+        }
         const playerDead = player.isDead;
         const opponentDead = opponent.isDead;
         if(playerDead || opponentDead) {
@@ -454,10 +468,7 @@ async function logicalBattleSequencer(sequencer) {
             }
             battleAlive = false;
         }
-        sequencer.updatePlayerMoves(SELECTION_PANEL);
-        sequencer.setMarqueeText(SELECT_A_MOVE_TEXT);
-    } while(battleAlive);
-
+    } while(postLoopProcess());
     sequencer.updatePlayerMoves([SKIP_MOVE]);
     if(endParameters.playerLost) {
         if(endParameters.stalemate) {
@@ -470,11 +481,19 @@ async function logicalBattleSequencer(sequencer) {
         } else if(opponentSequencer.getPlayerLostEvents) {
             await runBattleEvents(sequencer,opponentSequencer.getPlayerLostEvents());
         }
+        const playerAction = await sequencer.getAction();
+        if(isBadPlayerAction(playerAction)) {
+            invalidPlayerAction(playerAction);
+        }
         sequencer.loseCallback();
     } else {
         sequencer.setMarqueeText(`${sequencer.opponent.name} has been defeated!`);
         if(opponentSequencer.getPlayerWonEvents) {
             await runBattleEvents(sequencer,opponentSequencer.getPlayerWonEvents());
+        }
+        const playerAction = await sequencer.getAction();
+        if(isBadPlayerAction(playerAction)) {
+            invalidPlayerAction(playerAction);
         }
         sequencer.winCallback();
     }
