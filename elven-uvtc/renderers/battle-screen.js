@@ -3,29 +3,41 @@ import BattleSequencer from "../runtime/battle/battle-sequencer.js";
 import RenderStatus from "./components/battle/status.js";
 import RenderMove from "./components/battle/move.js";
 
+const HEALTH_FLASH_TIME = 100;
+const FULL_TEXT_TRANSITION_TIME = 200;
+const circleTraceTime = 1200;
+const circleFillTime = 600;
+const backgroundSaturateTime = 1700;
+const saturatePopExponent = 4; //Higher numbers are more abrupt
+const centerCircleOffset = 20;
+const outerRingRadius = 4;
+
 function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
     let moveLookup;
 
     const hoverTypes = {
         none: 0,
-        moveLeft: 1,
-        moveCenter: 2,
-        moveRight: 3
+        m1: 1,
+        m2: 2,
+        m3: 3,
+        m4: 4
     };
     let hoverType = hoverTypes.none;
 
-    const moveCenter = getPlaceholderLocation();
-    const moveLeft = getPlaceholderLocation();
-    const moveRight = getPlaceholderLocation();
-    moveCenter.hoverType = hoverTypes.moveCenter;
-    moveLeft.hoverType = hoverTypes.moveLeft;
-    moveRight.hoverType = hoverTypes.moveRight;
+    const m1 = getPlaceholderLocation();
+    const m2 = getPlaceholderLocation();
+    const m3 = getPlaceholderLocation();
+    const m4 = getPlaceholderLocation();
+    m1.hoverType = hoverTypes.m1;
+    m2.hoverType = hoverTypes.m2;
+    m3.hoverType = hoverTypes.m3;
+    m4.hoverType = hoverTypes.m4;
+
+    const moveRenderAreas = [m1,m2,m3,m4];
 
     this.noPixelScale = true;
     this.disableAdaptiveFill = false;
-    
-    this.style = StyleManifest["Tiny Arm Elf"];
-    this.background = this.style.getBackground();
+
     this.foreground = null;
     this.leftName = null;
     this.rightName = null;
@@ -39,20 +51,63 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
     this.marqueeText = null;
     this.fullText = null;
 
+    let leavingText = null;
+    let fullTextStart = null;
+    let fullTextLeaveStartTime = null;
+
     this.leftStatuses = [];
     this.rightStatuses = [];
 
+    let showPlayerHealthTimeout;
+    let showOpponentHealthTimeout;
+
+    let playerHealthFlashed = false;
+    let opponentHealthFlashed = false;
+
+    const flashHealth = isPlayer => {
+        if(isPlayer) {
+            clearTimeout(showPlayerHealthTimeout);
+            playerHealthFlashed = true;
+            showPlayerHealthTimeout = setTimeout(()=>{
+                playerHealthFlashed = false;
+            },HEALTH_FLASH_TIME);
+        } else {
+            clearTimeout(showOpponentHealthTimeout);
+            opponentHealthFlashed = true;
+            showOpponentHealthTimeout = setTimeout(()=>{
+                opponentHealthFlashed = false;
+            },HEALTH_FLASH_TIME);
+        }
+    }
     this.flashHealthAdded = isPlayer => {
         playSound("heal");
+        flashHealth(isPlayer);
+        if(!isPlayer) {
+            if(this.foreground && this.foreground.healthAdded) {
+                this.foreground.healthAdded();
+            }
+        }
     };
     this.flashHealthDropped = isPlayer => {
         playSound("damage");
+        flashHealth(isPlayer);
+        if(!isPlayer) {
+            if(this.foreground && this.foreground.healthDropped) {
+                this.foreground.healthDropped();
+            }
+        }
     };
     this.someoneDied = isPlayer => {
     };
     this.showFullText = text => {
+        leavingText = null;
+        fullTextLeaveStartTime = null;
+        this.fullText = processTextForWrapping(text);
     };
     this.clearFullText = () => {
+        leavingText = this.fullText;
+        this.fullText = null;
+        fullTextStart = null;
     };
     let playerActionResolver = null;
     const playerActionPromise = () => {
@@ -63,50 +118,26 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
     this.getAction = async () => {
         return playerActionPromise();
     };
+    let moveUpdateFlagged = false;
     this.updatePlayerMoves = newMoves => {
         playerMoves = newMoves;
-        const newMoveCount = newMoves.length;
-        switch(newMoveCount) {
-            case 0:
-                moveLookup = {};
-                moveLeft.index = -1;
-                moveCenter.index = -1;
-                moveRight.index = -1;
-                break;
-            default:
-                throw Error(`Invalid player move count. We can only display for 1 and 3, not ${newMoveCount}.`);
-            case 1:
-                moveLookup = {
-                    0: moveCenter
-                };
-                moveLeft.index = -1;
-                moveCenter.index = 0;
-                moveRight.index = -1;
-                break;
-            case 3:
-                moveLookup = {
-                    0: moveLeft,
-                    1: moveCenter,
-                    2: moveRight
-                };
-                moveLeft.index = 0;
-                moveCenter.index = 1;
-                moveRight.index = 2;
-                break;
-        }
+        moveUpdateFlagged = true;
     }
 
     this.sequencer = new BattleSequencer(winCallback,loseCallback,...sequencerParameters);
     this.sequencer.bindToBattleScreen(this);
+    this.sequencer.startBattle();
 
 
     this.processMove = (x,y) => {
-        if(contains(x,y,moveCenter)) {
-            hoverType = hoverTypes.moveCenter;
-        } else if(contains(x,y,moveLeft)) {
-            hoverType = hoverTypes.moveLeft;
-        } else if(contains(x,y,moveRight)) {
-            hoverType = hoverTypes.moveRight;
+        if(contains(x,y,m1)) {
+            hoverType = m1.hoverType;
+        } else if(contains(x,y,m2)) {
+            hoverType = m2.hoverType;
+        } else if(contains(x,y,m3)) {
+            hoverType = m3.hoverType;
+        } else if(contains(x,y,m4)) {
+            hoverType = m4.hoverType;
         } else {
             hoverType = hoverTypes.none;
         }
@@ -117,46 +148,23 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
     }
     this.processClickEnd = () => {
         switch(hoverType) {
-            case hoverTypes.moveCenter:
-                if(moveCenter.index < 0) {
+            case hoverTypes.m1:
+            case hoverTypes.m2:
+            case hoverTypes.m3:
+            case hoverTypes.m4:
+                if(hoverType > playerMoves.length) {
                     break;
                 }
                 if(playerActionResolver) {
-                    playerActionResolver(moveCenter.index);
+                    playerActionResolver(hoverType-1);
                     playerActionResolver = null;
                 }
-                break;
-            case hoverTypes.moveLeft:
-                if(moveLeft.index < 0) {
-                    break;
-                }
-                if(playerActionResolver) {
-                    playerActionResolver(moveLeft.index);
-                    playerActionResolver = null;
-                }
-                break;
-            case hoverTypes.moveRight:
-                if(moveRight.index < 0) {
-                    break;
-                }
-                if(playerActionResolver) {
-                    playerActionResolver(moveRight.index);
-                    playerActionResolver = null;
-                }
+                playSound("click");
                 break;
         }
     }
 
     let startTime = null;
-    const circleTraceTime = 1200;
-    const circleFillTime = 600;
-    const backgroundSaturateTime = 1700;
-    const saturatePopExponent = 4; //Higher numbers are more abrupt
-
-    const centerCircleOffset = 20;
-
-    const outerRingRadius = 4;
-
     const renderOuterRing = radius => {
         if(this.style.noOuterRing) {
             return;
@@ -178,7 +186,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
         context.drawImage(statusRollImage,32*value,0,32,32,x,y,width,height);
     }
 
-    const renderMovesArea = (x,y,width,height) => {
+    const renderMovesArea = (timestamp,x,y,width,height) => {
         context.fillStyle = "rgba(255,255,255,0.93)";
         context.fillRect(x,y,width,height);
         context.fillStyle = "white";
@@ -192,7 +200,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
         if(this.marqueeText) {
             context.textAlign = "center";
             context.textBaseline = "middle";
-            context.font = "300 24px Roboto";
+            context.font = "100 22px Roboto";
 
             const textX = textAreaX + textAreaWidth/2;
             const textY = textAreaY + textAreaHeight/2;
@@ -218,9 +226,9 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
         let i = 0;
         const moveHeight = height - 50-10;
         const moveY = y + 45;
-        let xOffset = x + width / 2 - (playerMoves.length * (moveHeight + moveMargin)-moveMargin) / 2;
+        let xOffset = Math.round(x + width / 2 - (playerMoves.length * (moveHeight + moveMargin)-moveMargin) / 2);
         while(i<playerMoves.length) {
-            const moveLocation = moveLookup[i];
+            const moveLocation = moveRenderAreas[i];
             moveLocation.x = xOffset;
             moveLocation.y = moveY;
             moveLocation.width = moveHeight;
@@ -230,16 +238,20 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
                 xOffset,
                 moveY,
                 moveHeight,
-                moveHeight,
-                hoverType === moveLocation.hoverType
+                hoverType === moveLocation.hoverType,
+                false
             );
             xOffset += moveHeight + moveMargin;
             i++;
         }
+        if(moveUpdateFlagged) {
+            moveUpdateFlagged = false;
+            this.processMove(lastRelativeX,lastRelativeY);
+        }
     }
 
     const renderStatusArea = (x,y,width,height,rightAlignment) => {
-        let statusAreaBorderWidth = 7;
+        let statusAreaBorderWidth = 8;
         let textNameScale;
         if(greaterWidth) {
             textNameScale = Math.floor(height / 26);
@@ -262,7 +274,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
         let boxBorderColor, boxColor, boxHealthColor, name, statuses, healthCount, healthNormal;
         if(rightAlignment) {
             boxBorderColor = this.style.rightBoxBorder;
-            boxColor = this.style.rightBoxColor;
+            boxColor = playerHealthFlashed ? "white" : this.style.rightBoxColor;
             boxHealthColor = this.style.rightBoxHealth;
             name = this.rightName;
             statuses = this.rightStatuses;
@@ -270,7 +282,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
             healthNormal = this.rightHealthNormal;
         } else {
             boxBorderColor = this.style.leftBoxBorder;
-            boxColor = this.style.leftBoxColor;
+            boxColor = opponentHealthFlashed ? "white" : this.style.leftBoxColor;
             boxHealthColor = this.style.leftBoxHealth;
             name = this.leftName;
             statuses = this.leftStatuses;
@@ -373,11 +385,62 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
         };
     }
 
-    const renderInterfaceElements = (x,y,width,height) => {
+    const renderInterfaceElements = (timestamp,x,y,width,height) => {
         const verticalStatusArea = getFractionalArea(y,height,0,0.15);
         const horizontalLeftArea = getFractionalArea(x,width,0,0.45)
         const horizontalRightArea = getFractionalArea(x,width,0.55,0.45);
 
+        const movesAreaHeight = Math.floor(verticalStatusArea.size * 2);
+        let movesAreaWidth = width;
+        const maxWidth = Math.floor(fullWidth * 0.75);
+        if(movesAreaWidth > maxWidth) {
+            movesAreaWidth = maxWidth;
+        }
+        if(this.fullText || leavingText) {
+            let delta, text, transitionPolarity;
+            if(leavingText) {
+                transitionPolarity = false;
+                text = leavingText;
+                if(!fullTextLeaveStartTime) {
+                    fullTextLeaveStartTime = timestamp;
+                }
+                delta = (timestamp - fullTextLeaveStartTime) / FULL_TEXT_TRANSITION_TIME;
+                if(delta < 0) {
+                    delta = 0;
+                } else if(delta > 1) {
+                    delta = 1;
+                    leavingText = null;
+                }
+            } else {
+                transitionPolarity = true;
+                text = this.fullText;
+                if(!fullTextStart) {
+                    fullTextStart = timestamp;
+                }
+                delta = (timestamp - fullTextStart) / FULL_TEXT_TRANSITION_TIME;
+                if(delta < 0) {
+                    delta = 0;
+                } else if(delta > 1) {
+                    delta = 1;
+                }
+            }
+            const textAreaHeight = height - movesAreaHeight - verticalStatusArea.size - 80;
+            let textAreaWidth = width;
+            if(textAreaWidth > 1000) {
+                textAreaWidth = 1000;
+            }
+            const textAreaX = Math.round(x+width/2-textAreaWidth/2);
+            let textAreaY = verticalStatusArea.pos + verticalStatusArea.size + 25;
+            if(transitionPolarity) {
+                textAreaY -= fullHeight * (1-delta);
+            } else {
+                textAreaY += fullHeight * delta;
+            }
+            textAreaY = Math.round(textAreaY);
+            context.fillStyle = "rgba(0,0,0,0.9)";
+            context.fillRect(textAreaX,textAreaY,textAreaWidth,textAreaHeight);
+            BitmapText.drawTextWrappingWhite(text,textAreaX+20,textAreaY+20,textAreaWidth-40,Math.ceil(5/maxHorizontalResolution*fullWidth));
+        }
         renderStatusArea(
             horizontalLeftArea.pos,
             verticalStatusArea.pos,
@@ -392,22 +455,16 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
             verticalStatusArea.size,
             true
         );
-
-        const movesAreaHeight = Math.floor(verticalStatusArea.size * 2);
-        let movesAreaWidth = width;
-        const maxWidth = Math.floor(fullWidth * 0.75);
-        if(movesAreaWidth > maxWidth) {
-            movesAreaWidth = maxWidth;
-        }
-        renderMovesArea(Math.round(x+width/2-movesAreaWidth/2),y+height-movesAreaHeight,movesAreaWidth,movesAreaHeight);
+        renderMovesArea(timestamp,Math.round(x+width/2-movesAreaWidth/2),y+height-movesAreaHeight,movesAreaWidth,movesAreaHeight);
     }
 
-    const renderInterface = () => {
+    const renderInterface = timestamp => {
         const boxMargin = 40;
         const boxSize = smallestDimension - boxMargin - boxMargin;
         if(greaterWidth) {
             const width = fullWidth * 0.7;
             renderInterfaceElements(
+                timestamp,
                 Math.round(halfWidth - width/2),
                 boxMargin,
                 width,
@@ -415,6 +472,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
             );
         } else {
             renderInterfaceElements(
+                timestamp,
                 boxMargin,
                 Math.round(halfHeight-boxSize/2),
                 boxSize,

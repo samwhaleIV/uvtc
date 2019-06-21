@@ -217,11 +217,11 @@ function SpriteRenderer(startDirection,spriteName,isElf) {
             const renderWidth = width * ELF_TO_WORLD_SCALE;
             const renderHeight = ELF_WIDTH_RATIO * renderWidth;
 
-            const renderXOffset = width / 4;
-            const renderYOffset = renderHeight / 4;
+            const renderXOffset = (width - renderWidth) / 2;
+            const renderYOffset = height - renderHeight;
 
             const destinationX = (this.xOffset * width + x + (this.x - startX) * width) + renderXOffset
-            const destinationY = (this.yOffset * height + y + (this.y - startY) * height) - renderYOffset;
+            const destinationY = (this.yOffset * height + y + (this.y - startY) * height) + renderYOffset;
 
             const animationRow = specialRow !== null ? specialRow : !this.walkingOverride && walking ? 
                 Math.floor(timestamp / animationFrameTime) % rowCount * rowHeight
@@ -236,7 +236,7 @@ function SpriteRenderer(startDirection,spriteName,isElf) {
 
             if(showingAlert) {
                 context.drawImage(
-                    alertSprite,destinationX+renderWidth/2-width/2,destinationY-height,width,height
+                    alertSprite,x,destinationY-height,width,height
                 );
             }
         }

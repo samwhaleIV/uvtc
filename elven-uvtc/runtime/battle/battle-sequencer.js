@@ -1,3 +1,6 @@
+import Moves from "./moves.js";
+import MovesManager from "../moves-manager.js";
+
 const DEFAULT_HEALTH = 20;
 const MAX_DISPLAY_HEALTH = 100;
 const NUMBER_TYPE = typeof 0;
@@ -9,6 +12,14 @@ const STATUS_IS_STRING_ERROR = "New status must be a object, not the name";
 const NAME_IS_NOT_STRING = "Entity names must be strings";
 const FALLBACK_NAME = "Thing";
 const RETURN_DIRECTIVE = "return";
+
+const SELECTION_PANEL = [Moves["Logic"],Moves["Malice"],Moves["Fear"]];
+const SKIP_MOVE = Moves["Skip"];
+const BACK_MOVE = Moves["Back"];
+const NOTHING_MOVE = Moves["Nothing"];
+
+const SELECT_A_MOVE_TEXT = "Select a move...";
+const WATING_FOR_EXTERNAL_TEXT = "Please wait...";
 
 const clearKeys = object => {
     Object.keys(object).forEach(key => {
@@ -292,9 +303,24 @@ function bindToBattleScreen(sequencer,renderer) {
     renderer.rightName = sequencer.player.name;
 
     sequencer.runtimeBinds.getAction = renderer.getAction;
+
+    renderer.foreground = sequencer.opponentSequencer.foreground;
+    renderer.style = sequencer.opponentSequencer.style;
+    renderer.background = renderer.style.getBackground();
 }
+
+function moveResultPreprocess(result) {
+    if(!result) {
+        return [];
+    } else if(result.length) {
+        return result;
+    } else {
+        return [result];
+    }
+}
+
 const isBadPlayerAction = playerAction => {
-    return !playerAction && playerAction !== 0;
+    return isNaN(playerAction) ||  playerAction < 0;
 }
 async function runBattleEvents(sequencer,events) {
     const eventCount = events.length;
@@ -304,18 +330,83 @@ async function runBattleEvents(sequencer,events) {
         const playerAction = await sequencer.getAction();
         if(isBadPlayerAction(playerAction)) {
             invalidPlayerAction(playerAction);
-        } else if(typeof playerAction !== OBJECT_TYPE) {
+        } else if(typeof playerAction !== NUMBER_TYPE) {
             invalidPlayerAction(playerAction);
         }
     }
 }
 
+async function processMove(move,user,target,sequencer) {
+    if(user.isPlayer) {
+        sequencer.setMarqueeText(WATING_FOR_EXTERNAL_TEXT);
+        sequencer.updatePlayerMoves([SKIP_MOVE]);
+    }
+    const targetMove = move.process ? move : NOTHING_MOVE;
+    const resultEvents = moveResultPreprocess(targetMove.process(
+        user,
+        target,
+        sequencer
+    ));
+    const events = [{
+        type: "text",
+        text: `${user.name} used ${move.name}.`
+    },...resultEvents];
+    await runBattleEvents(sequencer,events);
+}
 async function processPlayerAction(sequencer,action) {
-    //use sequencer.playerMoves
-    //Todo
+    const move = sequencer.playerMoves[action];
+    if(!move) {
+        throw Error("Invalid move assumed from player action processing");
+    }
+    switch(move.name) {
+        case "Malice":
+        case "Fear":
+        case "Logic":
+            sequencer.updatePlayerMoves(sequencer[`player${move.name}Moves`]);
+            return RETURN_DIRECTIVE;
+        case "Skip":
+            break;
+        case "Back":
+            sequencer.updatePlayerMoves(SELECTION_PANEL);
+            return RETURN_DIRECTIVE;
+        default:
+            await processMove(
+                move,
+                sequencer.player,
+                sequencer.opponent,
+                sequencer
+            );
+            break;
+    }
 }
 async function fireBattleEvent(sequencer,event) {
-    //Todo
+    if(event && event.type) {
+        if(sequencer.hangingSpeech && event.type !== "speech") {
+            sequencer.clearFullText();
+            sequencer.hangingSpeech = false;
+        }
+        switch(event.type) {
+            case "opponent-move":
+                const move = event.move;
+                await processMove(
+                    move,
+                    sequencer.opponent,
+                    sequencer.player,
+                    sequencer
+                );
+                break;
+            case "text":
+                sequencer.setMarqueeText(event.text);
+                break;
+            case "speech":
+                sequencer.hangingSpeech = true;
+                sequencer.showFullText(event.text);
+                break;
+
+        }
+    } else {
+        throw Error("Invalid battle event");
+    }
 }
 
 async function logicalBattleSequencer(sequencer) {
@@ -327,7 +418,12 @@ async function logicalBattleSequencer(sequencer) {
     if(opponentSequencer.getStartEvents) {
         await runBattleEvents(sequencer,opponentSequencer.getStartEvents());
     }
+    sequencer.updatePlayerMoves(SELECTION_PANEL);
+    sequencer.setMarqueeText(SELECT_A_MOVE_TEXT);
     do {
+        if(sequencer.hangingSpeech) {
+            sequencer.clearFullText();
+        }
         const playerAction = await sequencer.getAction();
         if(isBadPlayerAction(playerAction)) {
             invalidPlayerAction(playerAction);
@@ -358,36 +454,65 @@ async function logicalBattleSequencer(sequencer) {
             }
             battleAlive = false;
         }
+        sequencer.updatePlayerMoves(SELECTION_PANEL);
+        sequencer.setMarqueeText(SELECT_A_MOVE_TEXT);
     } while(battleAlive);
 
+    sequencer.updatePlayerMoves([SKIP_MOVE]);
     if(endParameters.playerLost) {
+        if(endParameters.stalemate) {
+            sequencer.setMarqueeText("Everyone has been defeated!");
+        } else {
+            sequencer.setMarqueeText("You have been defeated!");
+        }
         if(endParameters.stalemate && opponentSequencer.getStalemateEvents) {
             await runBattleEvents(sequencer,opponentSequencer.getStalemateEvents());
-        } else {
-            if(opponentSequencer.getPlayerLostEvents) {
-                await runBattleEvents(sequencer,opponentSequencer.getPlayerLostEvents());
-            }
+        } else if(opponentSequencer.getPlayerLostEvents) {
+            await runBattleEvents(sequencer,opponentSequencer.getPlayerLostEvents());
         }
         sequencer.loseCallback();
     } else {
+        sequencer.setMarqueeText(`${sequencer.opponent.name} has been defeated!`);
         if(opponentSequencer.getPlayerWonEvents) {
             await runBattleEvents(sequencer,opponentSequencer.getPlayerWonEvents());
         }
         sequencer.winCallback();
     }
+}
 
+function getSlotMoves(slotType) {
+    const slotMoves = [];
+    for(let i = 1;i<4;i++) {
+        const move = MovesManager.getSlot(slotType,i);
+        if(move.type !== "ui") {
+            slotMoves.push(move);
+        }
+    }
+    if(!slotMoves.length) {
+        slotMoves.push(NOTHING_MOVE);
+    }
+    slotMoves.unshift(BACK_MOVE);
+    return slotMoves;
 }
 
 function BattleSequencer(winCallback,loseCallback,opponentSequencer) {
     this.player = getBattleEntity("You",DEFAULT_HEALTH,true);
-    this.opponent = getBattleEntity("Opponent",DEFAULT_HEALTH,false);
+    this.opponent = getBattleEntity(
+        opponentSequencer.getName() || "Opponent",
+        opponentSequencer.getDefaultHealth() || DEFAULT_HEALTH,
+        false
+    );
+
+    this.playerLogicMoves = getSlotMoves("logic");
+    this.playerMaliceMoves = getSlotMoves("malice");
+    this.playerFearMoves = getSlotMoves("fear");
 
     this.opponentSequencer = opponentSequencer;
 
     this.winEvents = [];
     this.loseEvents = [];
 
-    this.playerMoves = [];
+    this.playerMoves = [Moves["Skip"]];
 
     addEvent(this,"PlayerMovesChanged");
 
@@ -411,6 +536,8 @@ function BattleSequencer(winCallback,loseCallback,opponentSequencer) {
         return this.runtimeBinds.getAction();
     };
 
+    this.hangingSpeech = false;
+
     this.runtimeBinds = runtimeBinds;
 
     this.updatePlayerMoves = newMoves => {
@@ -430,6 +557,9 @@ function BattleSequencer(winCallback,loseCallback,opponentSequencer) {
         }
         loseCallback();
     };
+    this.getMove = moveName => {
+        return Moves[moveName];
+    }
 
     this.bindToBattleScreen = renderer => {
         bindToBattleScreen(this,renderer);
