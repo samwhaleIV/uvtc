@@ -404,7 +404,6 @@ async function fireBattleEvent(sequencer,event) {
                 break;
             case "speech":
                 sequencer.hangingSpeech = true;
-                sequencer.setMarqueeText(WATING_FOR_EXTERNAL_TEXT);
                 sequencer.showFullText(event.text);
                 break;
             case "sequencing":

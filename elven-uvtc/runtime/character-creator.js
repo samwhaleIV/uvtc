@@ -9,7 +9,8 @@ const CharacterColors = {
     "jester-elf": "goldenrod",
     "mascara": "deeppink",
     "burr": "darkorange",
-    "shiver": "blueviolet"
+    "shiver": "blueviolet",
+    "ice-man": "cyan"
 }
 const CharacterDisplayNames = {
     "jim": "Jim",
@@ -22,7 +23,8 @@ const CharacterDisplayNames = {
     "jester-elf": "Jester Elf",
     "mascara": "Mascara",
     "burr": "Burr",
-    "shiver": "Shiver"
+    "shiver": "Shiver",
+    "ice-man": "Ice Man"
 }
 const colorLookup = {}
 Object.entries(textColorLookup).forEach(entry => {

@@ -9,6 +9,7 @@ import UIAlert from "./components/ui-alert.js";
 import MovesManager from "../runtime/moves-manager.js";
 import MovePreview from "./components/world/move-preview.js";
 import Moves from "../runtime/battle/moves.js";
+import FrameDifRenderer from "./components/frame-dif.js";
 
 const songIntroLookup = {};
 SongsWithIntros.forEach(song => {

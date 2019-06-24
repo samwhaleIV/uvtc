@@ -157,7 +157,6 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
             if(lookAhead) {
                 if(lookAhead.instant) {
                     if(!pageValue.delay && !pageValue.noSound) {
-                        stopSound("text-sound");
                         playSound("text-sound");
                     }
                     timeoutMethod();
@@ -168,7 +167,6 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
                 timeout = setTimeout(timeoutMethod,pageValue.delay);
             } else {
                 if(!pageValue.noSound) {
-                    stopSound("text-sound");
                     playSound("text-sound");
                 }
                 timeout = setTimeout(timeoutMethod,pageValue.noSound ? pageValue.speed / 2 : pageValue.speed);

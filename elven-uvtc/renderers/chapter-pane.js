@@ -416,14 +416,14 @@ function ChapterPane(callback,parent) {
         context.fillText(this.centerButtonText,halfWidth,halfHeight+robotoOffset);
 
         const subtitleWidth = context.measureText(this.chapterSubTitle).width;
-        const subtitleLayerHeight = widthNormal * 60;
+        const subtitleLayerHeight = widthNormal * 45;
         const subtitleBoxCenterY = subtitleLayerHeight + halfHeight + imageSize / 2;
         context.fillStyle = "black";
         context.fillRect(halfWidth-20-subtitleWidth/2,subtitleBoxCenterY-subtitleLayerHeight/2,subtitleWidth+40,subtitleLayerHeight);
         context.fillStyle = "white";
         context.font = `300 ${fontSize}px Roboto`;
         context.fillText(this.chapterSubTitle,halfWidth,robotoOffset+subtitleBoxCenterY);
-        context.font = `300 ${widthNormal*48}px Roboto`;
+        context.font = `300 ${subtitleLayerHeight}px Roboto`;
         context.fillText(this.chapterTitle,halfWidth,halfHeight - imageSize / 2 - subtitleLayerHeight);
 
         exitLabel = renderExitButton(x,y,hoverType===hoverTypes.exitLabel,false,cancelDown);

@@ -8,7 +8,7 @@ function FakeOpponentSequencer() {
     this.getStalemateEvents = () => "";
     this.getTurnEvents = () => [];
     this.getDefaultHealth = () => 69;
-    this.getName = () => "Boney Elf";
+    this.getName = () => "Wimpy Red Elf";
     this.foreground = new SpriteForeground("wimpy-red-elf",true);
     this.style = StyleManifest["Boney Elf"];
 }
