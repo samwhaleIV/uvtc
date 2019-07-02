@@ -152,6 +152,7 @@ function ChapterPane(callback,parent) {
                                         text: "Don't tell me again",
                                         callback: () => {
                                             GlobalState.data.tippedAboutMenu = true;
+                                            GlobalState.save();
                                             clearPrompt();
                                         }
                                     });
