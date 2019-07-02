@@ -425,8 +425,9 @@ async function logicalBattleSequencer(sequencer) {
     if(opponentSequencer.getStartEvents) {
         await runBattleEvents(sequencer,opponentSequencer.getStartEvents());
     }
+    let lastDirective = null;
     const postLoopProcess = () => {
-        if(battleAlive) {
+        if(battleAlive && lastDirective !== RETURN_DIRECTIVE) {
             sequencer.updatePlayerMoves(SELECTION_PANEL);
             sequencer.setMarqueeText(SELECT_A_MOVE_TEXT);
         }
@@ -442,15 +443,16 @@ async function logicalBattleSequencer(sequencer) {
             invalidPlayerAction(playerAction);
         }
         const directive = await processPlayerAction(sequencer,playerAction);
+        lastDirective = directive ? directive : null;
         if(directive === RETURN_DIRECTIVE) {
             continue;
         }
+        const playerDead = player.isDead;
+        const opponentDead = opponent.isDead;
         if(!playerDead && !opponentDead) {
             const opponentEvents = await opponentSequencer.getTurnEvents();
             await runBattleEvents(sequencer,opponentEvents);
         }
-        const playerDead = player.isDead;
-        const opponentDead = opponent.isDead;
         if(playerDead || opponentDead) {
             if(playerDead && opponentDead) {
                 endParameters.stalemate = true;
