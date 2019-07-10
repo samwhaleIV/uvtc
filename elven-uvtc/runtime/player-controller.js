@@ -252,12 +252,17 @@ function PlayerController(world) {
         return true;
     }
 
-    let lastFrame = 0;
+    let lastFrame = null;
     const movementMethod = timestamp => {
+        if(!lastFrame) {
+            lastFrame = timestamp;
+        }
         const delta = timestamp - lastFrame;
         lastFrame = timestamp;
         if(delta > maxDelta) {
-            console.warn("Player controller: Dropped movement frame");
+            if(ENV_FLAGS.MOVEMENT_FRAME_WARNING) {
+                console.warn("Player controller: Dropped movement frame");
+            }
             return;
         }
         const movementDistance = delta / 1000 * tilesPerSecond;
@@ -281,7 +286,6 @@ function PlayerController(world) {
     this.renderMethod = null;
 
     const startMovementLoop = () => {
-        lastFrame = performance.now();
         loopRunning = true;
         this.renderMethod = movementMethod;
     }

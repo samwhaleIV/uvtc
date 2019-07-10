@@ -5,5 +5,6 @@ const ENV_FLAGS = {
     MUSIC_FILE_FORMAT: "ogg",
     BATTLE_RENDERER: false,
     NO_SONOGRAPH_WARNING: false,
-    ELF_PLAYER_HACK: false
+    ELF_PLAYER_HACK: false,
+    MOVEMENT_FRAME_WARNING: true
 }
