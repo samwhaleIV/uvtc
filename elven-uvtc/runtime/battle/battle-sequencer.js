@@ -21,6 +21,11 @@ const NOTHING_MOVE = Moves["Nothing"];
 const SELECT_A_MOVE_TEXT = "Select a move...";
 const WATING_FOR_EXTERNAL_TEXT = "Please wait...";
 
+const BATTLE_ALREADY_STARTED = "Battle was already started!";
+const INVALID_STATUS_TYPE = "Status name must be a string!";
+const INVALID_PLAYER_ACTION = "Invalid move assumed from player action processing!";
+const INVALID_BATTLE_EVENT = "Invalid battle event";
+
 const clearKeys = object => {
     Object.keys(object).forEach(key => {
         delete object[key];
@@ -50,7 +55,7 @@ const getStatusName = status => {
         statusName = status.name;
     }
     if(typeof statusName !== STRING_TYPE) {
-        throw "Status name must be a string!";
+        throw Error(INVALID_STATUS_TYPE);
     }
     return statusName;
 }
@@ -356,7 +361,7 @@ async function processMove(move,user,target,sequencer) {
 async function processPlayerAction(sequencer,action) {
     const move = sequencer.playerMoves[action];
     if(!move) {
-        throw Error("Invalid move assumed from player action processing");
+        throw Error(INVALID_PLAYER_ACTION);
     }
     switch(move.name) {
         case "Malice":
@@ -412,7 +417,7 @@ async function fireBattleEvent(sequencer,event) {
 
         }
     } else {
-        throw Error("Invalid battle event");
+        throw Error(INVALID_BATTLE_EVENT);
     }
 }
 
@@ -588,7 +593,7 @@ function BattleSequencer(winCallback,loseCallback,opponentSequencer) {
     let started = false;
     this.startBattle = () => {
         if(started) {
-            throw Error("Battle was already started");
+            throw Error(BATTLE_ALREADY_STARTED);
         }
         started = true;
         logicalBattleSequencer(this);

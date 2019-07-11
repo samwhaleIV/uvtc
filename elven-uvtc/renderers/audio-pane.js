@@ -1,3 +1,5 @@
+const SLIDER_LABEL_Y_OFFSET = 3;
+
 function AudioPane(callback,parent,inverted=false) {
 
     let fadeInStart = null;
@@ -243,8 +245,8 @@ function AudioPane(callback,parent,inverted=false) {
         context.textBaseline = "middle";
 
         const labelTextX = slider1.x+labelWidth/2;
-        context.fillText("Music",labelTextX,slider1.y-halfSliderHeight)+2;
-        context.fillText("Sound",labelTextX,slider2.y-halfSliderHeight)+2;
+        context.fillText("Music",labelTextX,slider1.y-halfSliderHeight+SLIDER_LABEL_Y_OFFSET);
+        context.fillText("Sound",labelTextX,slider2.y-halfSliderHeight+SLIDER_LABEL_Y_OFFSET);
 
         const elfHeight = sliderImageRatio * elfWidth;
 

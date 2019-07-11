@@ -1,7 +1,14 @@
 import RotatingBackground from "./components/rotating-background.js";
 import AudioPane from "./audio-pane.js";
 import ControlsPaneRenderer from "./controls-pane.js";
-import ScrollingBackground from "./components/scrolling-background.js";
+
+const BACKGROUND_MARGIN = 20;
+const DOUBLE_BACKGROUND_MARGIN = BACKGROUND_MARGIN + BACKGROUND_MARGIN;
+const ELF_HEIGHT_MODIFIER = -10;
+const LABEL_WIDTH_COEFFICIENT = 1.12;
+const AUDIO_LABEL_Y = 0.59;
+const CONTROLS_LABEL_Y = 0.5;
+const LABEL_FONT = "21px Roboto";
 
 function WorldSettingsRenderer(callback) {
 
@@ -98,36 +105,40 @@ function WorldSettingsRenderer(callback) {
     const floatingElfImageAlt = imageDictionary["ui/menu-elf-alt"];
     const floatingElfRatio = floatingElfImage.width / floatingElfImage.height;
 
-    const renderElf = (image,x,y,width,height) => {
+    const renderElf = (image,x,y,width,height,target) => {
         context.drawImage(image,0,0,image.width,image.height,x,y,width,height);
-        return {
-            x:x,y:y,width:width,height:height
-        }
+        target.x = x;
+        target.y = y;
+        target.width = width;
+        target.height = height;
     }
 
     this.render = timestamp => {
 
-        const height = fullHeight - 40;
-        const width = height - 80;
+        const backgroundX = BACKGROUND_MARGIN;
+        const backgroundY = BACKGROUND_MARGIN;
+        const backgroundWidth = fullWidth - DOUBLE_BACKGROUND_MARGIN;
+        const backgroundHeight = fullHeight - DOUBLE_BACKGROUND_MARGIN;
+        const width = backgroundHeight - DOUBLE_BACKGROUND_MARGIN - DOUBLE_BACKGROUND_MARGIN;
         const x = halfWidth - width / 2;
-        const y = 20;
+
         context.fillStyle = "white";
         context.save();
         context.globalCompositeOperation = "destination-out";
-        context.fillRect(20,20,fullWidth-40,fullHeight-40);
+        context.fillRect(backgroundX,backgroundY,backgroundWidth,backgroundHeight);
         context.globalCompositeOperation = "destination-over";
         background.render(timestamp);
         context.restore();
 
-        exitLabel = renderExitButton(20,20,hoverType===hoverTypes.exitLabel,true,cancelDown);
+        exitLabel = renderExitButton(backgroundX,backgroundY,hoverType===hoverTypes.exitLabel,true,cancelDown);
 
-        const elfHeight = height - exitLabel.y - exitLabel.height - 10;
+        const elfHeight = backgroundHeight - exitLabel.y - exitLabel.height + ELF_HEIGHT_MODIFIER;
         const elfWidth = elfHeight * floatingElfRatio;
 
-        audioButton = renderElf(floatingElfImage,x+40,fullHeight-elfHeight,elfWidth,elfHeight);
-        controlsButton = renderElf(floatingElfImageAlt,x+width-elfWidth-40,0,elfWidth,elfHeight);
+        renderElf(floatingElfImage,x+DOUBLE_BACKGROUND_MARGIN,fullHeight-elfHeight,elfWidth,elfHeight,audioButton);
+        renderElf(floatingElfImageAlt,x+width-elfWidth-DOUBLE_BACKGROUND_MARGIN,0,elfWidth,elfHeight,controlsButton);
 
-        const labelWidth = Math.floor(elfWidth * 1.12);
+        const labelWidth = Math.floor(elfWidth * LABEL_WIDTH_COEFFICIENT);
         const labelHeight = exitLabel.height;
 
         const halfLabelWidth = labelWidth / 2;
@@ -135,12 +146,12 @@ function WorldSettingsRenderer(callback) {
 
         const label1X = Math.floor(audioButton.x + audioButton.width / 2 - halfLabelWidth);
         const label2X = Math.floor(controlsButton.x + controlsButton.width / 2 - halfLabelWidth);
-        const label1Y = Math.floor(audioButton.y + audioButton.height * 0.59 - labelHeight/2);
-        const label2Y = Math.floor(controlsButton.y + controlsButton.height * 0.5 - labelHeight/2);
+        const label1Y = Math.floor(audioButton.y + audioButton.height * AUDIO_LABEL_Y - halfLabelHeight);
+        const label2Y = Math.floor(controlsButton.y + controlsButton.height * CONTROLS_LABEL_Y - halfLabelHeight);
 
         context.textAlign = "center";
         context.textBaseline = "middle";
-        context.font = "21px Roboto";
+        context.font = LABEL_FONT;
         context.fillStyle = "white";
         if(hoverType === hoverTypes.audioButton) {
             context.fillStyle = CONSISTENT_PINK;
@@ -159,7 +170,7 @@ function WorldSettingsRenderer(callback) {
 
 
         if(childPage) {
-            childPage.render(timestamp,20,20,fullWidth-40,fullHeight-40);
+            childPage.render(timestamp,backgroundX,backgroundY,backgroundWidth,backgroundHeight);
         }
     }
 }

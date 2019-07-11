@@ -8,6 +8,40 @@ import GlobalState from "../runtime/global-state.js";
 import ChapterManager from "../runtime/chapter-manager.js";
 import Chapters from "../runtime/chapter-data.js";
 
+const BACKGROUND_MARGIN = 20;
+const DOUBLE_BACKGROUND_MARGIN = BACKGROUND_MARGIN + BACKGROUND_MARGIN;
+const BACKGROUND_BOTTOM_MARGIN = 62;
+const VERSION_FONT = "100 26px Roboto";
+const VERSION_X_OFFSET = -10;
+const VERSION_Y_OFFSET = -20;
+const ELFMART_MARGIN = 10;
+const LOGO_SIZE = 128;
+const ELF_FONT_COEFFICIENT = 0.18;
+const PLAY_BUTTON_SIZE = 4;
+const PLAY_BUTTON_PADDING = 4;
+const SPIRAL_ROTATION_TIME = 10000;
+const BACKGROUND_SCROLL_RATE = 30000;
+const ELF_LABEL_Y = 0.53;
+const ELF_BOUNCE_TIME_BASE = 50000;
+const ELF_LABEL_WIDTH_COEFFICENT = 1.5;
+
+const AUDIO_TEXT = "Audio";
+const CONTROLS_TEXT = "Controls";
+const CREDITS_TEXT = "Credits";
+const CHAPTERS_TEXT = "Chapters";
+const PLAY_BUTTON_TEXT = "play";
+
+const BACKGROUND_IMAGE = "stars-menu";
+const SPIRAL_BACKGROUND = "spiral-menu";
+
+const SONG_NAME = "main-menu";
+
+//These aren't really magic numbers, they're just fixed pseudo-random
+const bounceVariation1 = ELF_BOUNCE_TIME_BASE - 2932;
+const bounceVariation2 = ELF_BOUNCE_TIME_BASE - 2321;
+const bounceVariation3 = ELF_BOUNCE_TIME_BASE - 1234;
+const bounceVariation4 = ELF_BOUNCE_TIME_BASE - 2019;
+
 function MainMenuRenderer() {
 
     const hoverTypes = {
@@ -20,7 +54,7 @@ function MainMenuRenderer() {
     };
 
     let hoverType = hoverTypes.none;
-    this.background = new RotatingBackground("stars-menu");
+    this.background = new RotatingBackground(BACKGROUND_IMAGE);
 
     this.processKey = function(key) {
         if(this.overlayPane) {
@@ -111,7 +145,7 @@ function MainMenuRenderer() {
         this.processMove(x,y);
     }
 
-    this.song = "main-menu";
+    this.song = SONG_NAME;
 
     this.processMove = function(mouseX,mouseY) {
         if(this.overlayPane) {
@@ -144,8 +178,8 @@ function MainMenuRenderer() {
     let centerYOffset;
 
     const siloImageRatio = siloImage.height / siloImage.width;
-    const stencilBackground = new RotatingBackground("spiral-menu");
-    stencilBackground.rotationTime = 10000;
+    const stencilBackground = new RotatingBackground(SPIRAL_BACKGROUND);
+    stencilBackground.rotationTime = SPIRAL_ROTATION_TIME;
     stencilBackground.clockwise = true;
 
     this.updateSize = function() {
@@ -153,7 +187,7 @@ function MainMenuRenderer() {
     }
 
     const playButtonLocation = getPlaceholderLocation();
-    const playTextTest = drawTextTest("play",4);
+    const playTextTest = drawTextTest(PLAY_BUTTON_TEXT,PLAY_BUTTON_SIZE);
     playTextTest.width /= 2;
     playTextTest.height /= 2;
 
@@ -162,10 +196,10 @@ function MainMenuRenderer() {
     const floatingElf3 = getPlaceholderLocation();
     const floatingElf4 = getPlaceholderLocation();
 
-    floatingElf1.text = "Audio";
-    floatingElf2.text = "Controls";
-    floatingElf3.text = "Chapters";
-    floatingElf4.text = "Credits";
+    floatingElf1.text = AUDIO_TEXT;
+    floatingElf2.text = CONTROLS_TEXT;
+    floatingElf3.text = CHAPTERS_TEXT;
+    floatingElf4.text = CREDITS_TEXT;
 
     let halfElfWidth;
     let halfElfHeight;
@@ -198,9 +232,9 @@ function MainMenuRenderer() {
             renderObject.height
         );
         context.fillStyle = "white";
-        const labelWidth = renderObject.width * 1.5;
+        const labelWidth = renderObject.width * ELF_LABEL_WIDTH_COEFFICENT;
         const labelHeight = labelWidth / 4;
-        const labelY = y + renderObject.height * 0.53;
+        const labelY = y + renderObject.height * ELF_LABEL_Y;
         const labelX = x + halfElfWidth - labelWidth / 2;
         context.fillRect(
             Math.floor(labelX),Math.floor(labelY),Math.floor(labelWidth),Math.floor(labelHeight)
@@ -214,12 +248,6 @@ function MainMenuRenderer() {
 
     this.noPixelScale = true;
 
-    const baseBounceTime = 50000;
-    const bounceVariation1 = baseBounceTime - 2932;
-    const bounceVariation2 = baseBounceTime - 2321;
-    const bounceVariation3 = baseBounceTime - 1234;
-    const bounceVariation4 = baseBounceTime - 2019;
-
     const getBouncingTimeNormal = (timestamp,variation) => {
         let timeNormal = timestamp / variation % 2;
         if(timeNormal > 1) {
@@ -230,11 +258,10 @@ function MainMenuRenderer() {
     
     const backgroundImage = imageDictionary["backgrounds/chapter-select"];
     const invertedBackgroundImage = imageDictionary["backgrounds/chapter-select-invert"];
-    const backgroundScrollRate = 30000;
     const bSize = backgroundImage.width;
     this.renderBackground = (timestamp,inverted) => {
         const image = inverted ? invertedBackgroundImage : backgroundImage;
-        const tNormal = timestamp % backgroundScrollRate / backgroundScrollRate / 2;
+        const tNormal = timestamp % BACKGROUND_SCROLL_RATE / BACKGROUND_SCROLL_RATE / 2;
         context.drawImage(
             image,
             0,0,bSize,bSize,
@@ -252,8 +279,6 @@ function MainMenuRenderer() {
         centerYOffset = bannerYOffset - fullHeight * 0.025;
         stencilBackground.centerYOffset = centerYOffset;
 
-        const renderNormal = fullWidth / 1920;
-
         context.fillStyle = "black";
         context.fillRect(0,0,fullWidth,fullHeight);
         this.background.render(timestamp);
@@ -263,7 +288,7 @@ function MainMenuRenderer() {
             halfWidth-bannerImageWidth/2,bannerYOffset,
             bannerImageWidth,bannerImageWidth*bannerImageRatio
         );
-        playButtonLocation.width = fullWidth * 0.25;
+        playButtonLocation.width = fullWidth / 4;
         if(hoverType === hoverTypes.play) {
             renderHoverEffect(halfWidth,halfHeight+centerYOffset,playButtonLocation.width,playButtonLocation.height);
         }
@@ -289,7 +314,7 @@ function MainMenuRenderer() {
             "play",
             Math.floor(halfWidth-playTextTest.width),
             Math.floor(halfHeight-playTextTest.height) + 5 + centerYOffset,
-        4,4);
+        PLAY_BUTTON_SIZE,PLAY_BUTTON_PADDING);
 
         const elfWidth = fullWidth * 0.05;
         
@@ -300,7 +325,7 @@ function MainMenuRenderer() {
         halfElfHeight = floatingElf1.height / 2;
 
 
-        context.font = `bold ${Math.ceil(elfWidth*0.18)}px Arial`;
+        context.font = `bold ${Math.ceil(elfWidth*ELF_FONT_COEFFICIENT)}px Arial`;
         context.textBaseline = "middle";
         context.textAlign = "center";
 
@@ -313,7 +338,7 @@ function MainMenuRenderer() {
         floatingElf3.x = rightElvesX;
         floatingElf4.x = rightElvesX;
 
-        const topElvesY = fullHeight * 0.25 - halfElfHeight + 40;
+        const topElvesY = fullHeight / 4 - halfElfHeight + 40;
         floatingElf1.y = topElvesY;
         floatingElf3.y = topElvesY;
 
@@ -326,27 +351,20 @@ function MainMenuRenderer() {
         renderFloatingElf(floatingElf3,getBouncingTimeNormal(timestamp,bounceVariation3)-0.23,hoverType === hoverTypes.elf3);
         renderFloatingElf(floatingElf4,-getBouncingTimeNormal(timestamp,bounceVariation4)+0.24,hoverType === hoverTypes.elf4);
 
-        const fontSize = 26/1920*fullWidth;
-        context.font = `100 ${fontSize}px Roboto`;
+        context.font = VERSION_FONT;
         context.textAlign = "end";
         context.fillStyle = "white";
-        const offsetFactor = fontSize / 26;
-        context.fillText(VERSION_STRING,fullWidth-offsetFactor*10,fullHeight-offsetFactor*25);
+        context.fillText(VERSION_STRING,fullWidth+VERSION_X_OFFSET,fullHeight+VERSION_Y_OFFSET);
 
         if(this.overlayPane) {
-            const margin = renderNormal * 20;
-            const extraBottomSpace = margin + renderNormal*50;
-
-            this.overlayPane.render(timestamp,margin,margin,fullWidth-margin-margin,fullHeight-extraBottomSpace);
+            this.overlayPane.render(timestamp,BACKGROUND_MARGIN,BACKGROUND_MARGIN,fullWidth-DOUBLE_BACKGROUND_MARGIN,fullHeight-BACKGROUND_BOTTOM_MARGIN);
         }
 
-        let logoSize = fullWidth * 0.075;
-        logoSize = Math.ceil(logoSize/32)*32;
         context.drawImage(
             elfmartImage,0,0,elfmartImage.width,elfmartImage.height,
-            10,
-            fullHeight-logoSize-10,
-            logoSize,logoSize
+            ELFMART_MARGIN,
+            fullHeight-LOGO_SIZE-ELFMART_MARGIN,
+            LOGO_SIZE,LOGO_SIZE
         );
 
     }
