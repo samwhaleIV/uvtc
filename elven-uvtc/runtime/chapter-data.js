@@ -5,7 +5,8 @@ const Chapters = [
             "Iced Whiskey",
             "Red Apple",
             "Return to Sender"
-        ]
+        ],
+        startMap: "bedroom_1"
     },
     {
         title: "Christmas is cancelled",

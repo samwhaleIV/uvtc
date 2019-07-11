@@ -10,6 +10,7 @@ import MovesManager from "../runtime/moves-manager.js";
 import MovePreview from "./components/world/move-preview.js";
 import Moves from "../runtime/battle/moves.js";
 import FrameDifRenderer from "./components/frame-dif.js";
+import Chapters from "../runtime/chapter-data.js";
 
 const songIntroLookup = {};
 SongsWithIntros.forEach(song => {
@@ -59,7 +60,14 @@ function WorldRenderer() {
                 }
             }
         } else {
-            this.updateMap(FIRST_MAP_ID);
+            const activeChapter = GlobalState.data.activeChapter;
+            let startMapByChapter = Chapters[activeChapter-1];
+            startMapByChapter = typeof startMapByChapter === "object" ? startMapByChapter.startMap : null;
+            const startMap = startMapByChapter ? startMapByChapter : FALLBACK_MAP_ID;
+            if(!startMapByChapter) {
+                console.warn(`World: Using a fallback map because the start map could not be found by the active chapter (${activeChapter}) of global data`);
+            }
+            this.updateMap(startMap);
         }
         return null;
     }
