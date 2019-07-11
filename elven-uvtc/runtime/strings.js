@@ -213,7 +213,7 @@ const stringLookup = {
     AUTO_145: "And who would you be?",
     AUTO_146: "Jim? You look... different. New diet?",
     AUTO_147: "You forgot your own name? Fine, whatever, don't tell me.",
-    AUTO_148: "None of my business? Look, we run a tight-knit community here. Everbody knows everybody.",
+    AUTO_148: "None of my business? Look, we run a tight-knit community here. Everybody knows everybody.",
     AUTO_149: "Ah, I see. Your name is cheater. Got it.",
     AUTO_150: "Ah. Fighting. That I can help you with.",
     AUTO_151: "Surely you must know that I am the greatest fighter in all of Tumble Town.",
