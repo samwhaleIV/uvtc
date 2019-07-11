@@ -1,5 +1,3 @@
-import BattleScreenRenderer from "../../../renderers/battle-screen.js";
-
 addMap({
     WorldState: function(world,data) {
         let iceman;
@@ -79,20 +77,17 @@ addMap({
         this.otherClicked = async type => {
             switch(type) {
                 case 8:
+                    world.lockPlayerMovement();
                     if(world.movesManager.hasSlotType("malice")) {
                         await iceman.sayID("AUTO_191");
                         await burr.sayID("AUTO_192");
                         await iceman.sayID("AUTO_193");
-                        rendererState.fader.fadeOut(BattleScreenRenderer,()=>{
-                            //you win
-                        },
-                        ()=>{
-                            //you lose
-                        },getOpponent("tutorial-burr"));
+                        world.startBattle("tutorial-burr");
                     } else {
                         await iceman.sayID("AUTO_188");
                         await informSlotting();
                     }
+                    world.unlockPlayerMovement();
                     break;
             }
         }

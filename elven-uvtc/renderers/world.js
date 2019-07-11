@@ -10,6 +10,7 @@ import MovesManager from "../runtime/moves-manager.js";
 import MovePreview from "./components/world/move-preview.js";
 import Moves from "../runtime/battle/moves.js";
 import Chapters from "../runtime/chapter-data.js";
+import BattleScreenRenderer from "./battle-screen.js";
 
 const songIntroLookup = {};
 SongsWithIntros.forEach(song => {
@@ -823,6 +824,25 @@ function WorldRenderer() {
 
     this.disableAdaptiveFill = true;
     this.noPixelScale = true;
+
+    this.startBattle = (battleID,winCallback,loseCallback) => {
+        function returnToWorld() {
+            rendererState.fader.fadeOut(WorldRenderer);
+        }
+        function win(...parameters) {
+            returnToWorld();
+            if(winCallback) {
+                winCallback(...parameters);
+            }
+        }
+        function lose(...parameters) {
+            returnToWorld();
+            if(loseCallback) {
+                loseCallback(...parameters);
+            }
+        }
+        rendererState.fader.fadeOut(BattleScreenRenderer,win,lose,getOpponent(battleID));
+    }
 
     this.updateSize = function() {
 

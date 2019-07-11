@@ -452,7 +452,7 @@ async function logicalBattleSequencer(sequencer) {
     }
     postLoopProcess();
     do {
-        clearHangingSpeech();
+        clearHangingSpeech(sequencer);
         const playerAction = await sequencer.getAction();
         if(isBadPlayerAction(playerAction)) {
             invalidPlayerAction(playerAction);
@@ -507,7 +507,7 @@ async function logicalBattleSequencer(sequencer) {
         if(opponentSequencer.getPlayerWonEvents) {
             await runBattleEvents(sequencer,opponentSequencer.getPlayerWonEvents());
         }
-        clearHangingSpeech();
+        clearHangingSpeech(sequencer);
         const playerAction = await sequencer.getAction();
         if(isBadPlayerAction(playerAction)) {
             invalidPlayerAction(playerAction);
