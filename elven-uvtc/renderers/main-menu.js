@@ -11,18 +11,16 @@ import Chapters from "../runtime/chapter-data.js";
 function MainMenuRenderer() {
 
     const hoverTypes = {
-        none: Symbol("none"),
-        play: Symbol("play"),
-        elf1: Symbol("elf1"),
-        elf2: Symbol("elf1"),
-        elf3: Symbol("elf1"),
-        elf4: Symbol("elf1")
+        none: 0,
+        play: 1,
+        elf1: 2,
+        elf2: 3,
+        elf3: 4,
+        elf4: 5
     };
 
     let hoverType = hoverTypes.none;
     this.background = new RotatingBackground("stars-menu");
-
-    let showHoverSpecialEffect = false;
 
     this.processKey = function(key) {
         if(this.overlayPane) {
@@ -47,7 +45,6 @@ function MainMenuRenderer() {
     }
 
     this.processClick = function(x,y) {
-        showHoverSpecialEffect = true;
         if(this.overlayPane) {
             this.overlayPane.processClick(x,y);
         }
@@ -82,7 +79,6 @@ function MainMenuRenderer() {
     }
 
     this.processClickEnd = function(x,y) {
-        showHoverSpecialEffect = false;
         if(this.overlayPane) {
             this.overlayPane.processClickEnd(x,y);
             return;
@@ -136,6 +132,7 @@ function MainMenuRenderer() {
             hoverType = hoverTypes.none;
         }
     }
+
     const siloImage = imageDictionary["ui/silo"];
     const elfmartImage = imageDictionary["ui/elfmart"];
     const floatingElfImage = imageDictionary["ui/menu-elf"];
@@ -179,11 +176,11 @@ function MainMenuRenderer() {
         floatingElf3[property] = value;
         floatingElf4[property] = value;
     }
-    const renderHoverEffectElf = renderObject => {
-        renderHoverEffect(renderObject.x+renderObject.width/2,renderObject.y+renderObject.height/2,renderObject.width*2,renderObject.height*2);
-    }
 
-    const renderFloatingElf = (renderObject,angle) => {
+    const renderFloatingElf = (renderObject,angle,withHover) => {
+        if(withHover) {
+            renderHoverEffect(renderObject.x+renderObject.width/2,renderObject.y+renderObject.height/2,renderObject.width*2,renderObject.height*2);
+        }
         context.save();
         context.translate(renderObject.x+renderObject.width/2,renderObject.y+renderObject.height/2);
         context.rotate(angle);
@@ -324,22 +321,10 @@ function MainMenuRenderer() {
         floatingElf2.y = bottomElvesY;
         floatingElf4.y = bottomElvesY;
 
-        if(hoverType === hoverTypes.elf1) {
-            renderHoverEffectElf(floatingElf1);
-        }
-        renderFloatingElf(floatingElf1,-getBouncingTimeNormal(timestamp,bounceVariation1)+0.23);
-        if(hoverType === hoverTypes.elf2) {
-            renderHoverEffectElf(floatingElf2);
-        }
-        renderFloatingElf(floatingElf2,getBouncingTimeNormal(timestamp,bounceVariation2)-0.24);
-        if(hoverType === hoverTypes.elf3) {
-            renderHoverEffectElf(floatingElf3);
-        }
-        renderFloatingElf(floatingElf3,getBouncingTimeNormal(timestamp,bounceVariation3)-0.23);
-        if(hoverType === hoverTypes.elf4) {
-            renderHoverEffectElf(floatingElf4);
-        }
-        renderFloatingElf(floatingElf4,-getBouncingTimeNormal(timestamp,bounceVariation4)+0.24);
+        renderFloatingElf(floatingElf1,-getBouncingTimeNormal(timestamp,bounceVariation1)+0.23,hoverType === hoverTypes.elf1);
+        renderFloatingElf(floatingElf2,getBouncingTimeNormal(timestamp,bounceVariation2)-0.24,hoverType === hoverTypes.elf2);
+        renderFloatingElf(floatingElf3,getBouncingTimeNormal(timestamp,bounceVariation3)-0.23,hoverType === hoverTypes.elf3);
+        renderFloatingElf(floatingElf4,-getBouncingTimeNormal(timestamp,bounceVariation4)+0.24,hoverType === hoverTypes.elf4);
 
         const fontSize = 26/1920*fullWidth;
         context.font = `100 ${fontSize}px Roboto`;

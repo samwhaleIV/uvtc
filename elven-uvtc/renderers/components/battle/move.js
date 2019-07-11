@@ -58,7 +58,7 @@ function RenderMove(move,x,y,size,hover,textless) {
         const halfSize = size / 2;
         const centerX = x + halfSize;
         const centerY = y + halfSize;
-        context.font = "18px Arial";
+        context.font = "16px Arial";
         context.textAlign = "center";
         context.textBaseline = "middle";
         let textWidth = context.measureText(move.name).width;

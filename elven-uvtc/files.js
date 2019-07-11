@@ -29,6 +29,7 @@ ImagePaths.push(
     getFile("ui/escape-menu-fx.png",FileTypes.Image),
     getFile("ui/elfmart.png",FileTypes.Image),
     getFile("ui/menu-elf.png",FileTypes.Image),
+    getFile("ui/menu-elf-alt.png",FileTypes.Image),
     getFile("ui/menu-elf-slide.png",FileTypes.Image),
     getFile("ui/banner.png",FileTypes.Image),
     getFile("ui/moves.png",FileTypes.Image),

@@ -1,4 +1,4 @@
-function AudioPane(callback,parent) {
+function AudioPane(callback,parent,inverted=false) {
 
     let fadeInStart = null;
     let fadeOutStart = null;
@@ -234,7 +234,7 @@ function AudioPane(callback,parent) {
         context.fillRect(slider2.x+leftWidth,slider2.y,rightWidth,sliderHeight);
 
         const labelWidth = 150;
-        context.fillStyle = "black";
+        context.fillStyle = inverted ? "rgb(15,15,15)" : "black";
         context.fillRect(slider1.x,slider1.y-sliderHeight,labelWidth,sliderHeight);
         context.fillRect(slider2.x,slider2.y-sliderHeight,labelWidth,sliderHeight);
         context.fillStyle = "white";
@@ -272,7 +272,7 @@ function AudioPane(callback,parent) {
             elfSlider2.x,elfSlider2.y,elfWidth,elfHeight
         );
 
-        exitLabel = renderExitButton(x,y,hoverType===hoverTypes.exitLabel,false,cancelDown);
+        exitLabel = renderExitButton(x,y,hoverType===hoverTypes.exitLabel,inverted,cancelDown);
 
         if(restorationRequired) {
             context.restore();

@@ -267,7 +267,7 @@ function MovesPaneRenderer(callback) {
 
         columnWidth = Math.round(columnWidth);
 
-        context.font = "100 32px Roboto";
+        context.font = "100 28px Roboto";
         context.fillStyle = ROW_TITLE_COLOR;
         context.textBaseline = "middle";
         context.textAlign = "center";
@@ -309,7 +309,7 @@ function MovesPaneRenderer(callback) {
         renderMoveSlot(row3[2],column3X,row3Y,moveSize,hoverType===hoverTypes.f3);
 
         if(selectionModal) {
-            context.font = "400 24px Roboto";
+            context.font = "100 24px Roboto";
             context.fillStyle = ROW_TITLE_COLOR;
             context.textBaseline = "middle";
             context.textAlign = "center";
