@@ -1,6 +1,9 @@
 import RotatingBackground from "./components/rotating-background.js";
+import UIPrompt from "./components/ui-prompt.js";
 
 function ControlsPaneRenderer(callback,parent) {
+
+    let prompt;
 
     let fadeInStart = null;
     let fadeOutStart = null;
@@ -155,6 +158,14 @@ function ControlsPaneRenderer(callback,parent) {
     }
 
     const exit = () => {
+        if(!backButton.keyName) {
+            prompt = new UIPrompt("You must have an active back/escape button!",{
+                text: "Okay",
+                callback: () => prompt = null
+            });
+            prompt.show();
+            return;
+        }
         if(callback) {
             this.transitioning = true;
             fadeOutStart = performance.now();
@@ -190,6 +201,10 @@ function ControlsPaneRenderer(callback,parent) {
     }
 
     this.processKey = function(key) {
+        if(prompt) {
+            prompt.processKey(key);
+            return;
+        }
         if(this.transitioning) {
             return;
         }
@@ -200,6 +215,10 @@ function ControlsPaneRenderer(callback,parent) {
     }
     this.processKeyUp = function(key) {
         if(this.transitioning) {
+            return;
+        }
+        if(prompt) {
+            prompt.processKeyUp(key);
             return;
         }
         if(listeningToKeyEvents) {
@@ -269,10 +288,18 @@ function ControlsPaneRenderer(callback,parent) {
         if(this.transitioning) {
             return;
         }
+        if(prompt) {
+            prompt.processClick(x,y);
+            return;
+        }
         this.processMove(x,y);
     }
     this.processClickEnd = function(x,y) {
         if(this.transitioning) {
+            return;
+        }
+        if(prompt) {
+            prompt.processClickEnd(x,y);
             return;
         }
         if(listeningToKeyEvents) {
@@ -308,6 +335,10 @@ function ControlsPaneRenderer(callback,parent) {
     }
     this.processMove = function(x,y) {
         if(this.transitioning) {
+            return;
+        }
+        if(prompt) {
+            prompt.processMove(x,y);
             return;
         }
         if(contains(x,y,acceptButton)) {
@@ -458,6 +489,10 @@ function ControlsPaneRenderer(callback,parent) {
 
         if(!listeningToKeyEvents) {
             exitLabel = renderExitButton(x,y,hoverType===hoverTypes.exitLabel,true);
+        }
+
+        if(prompt && prompt.shown) {
+            prompt.render();
         }
 
         if(restorationRequired) {

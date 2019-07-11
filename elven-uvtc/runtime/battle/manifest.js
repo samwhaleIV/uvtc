@@ -47,8 +47,8 @@ const getGenericBackground = (layer1Image,layer2Image) => {
     })();
 }
 
-const StyleManifest = {
-    "Tiny Arm Elf": {
+const BattleManifest = {
+    "tiny-arm-elf": {
         name: "Tiny Arm Elf",
         leftBoxBorder: "#F8529A",
         leftBoxColor: "#FF71B9",
@@ -64,7 +64,7 @@ const StyleManifest = {
             return getGenericBackground("checkered","tiny-arm");
         }
     },
-    "Wimpy Red Elf": {
+    "wimpy-red-elf": {
         name: "Wimpy Red Elf",
         leftBoxBorder: "#BF0000",
         leftBoxHealth: "#F74646",
@@ -95,7 +95,7 @@ const StyleManifest = {
         }
 
     },
-    "Boney Elf": {
+    "boney-elf": {
         name: "Boney Elf",
         leftBoxBorder: "#F8529A",
         leftBoxHealth: "#D34784",
@@ -110,6 +110,44 @@ const StyleManifest = {
         getBackground: function() {
             return getGenericBackground("checkered","boney");
         }
+    },
+    "burr": {
+        name: "Burr",
+        leftBoxColor: "#F18445",
+        leftBoxHealth: "#FFCD4F",
+        leftBoxBorder: "#AF6033",
+
+        rightBoxBorder: "#EFEFEF",
+        rightBoxColor: "rgb(240,240,240)",
+        rightBoxHealth: "#262626",
+        holeRingColor: "#262626",
+
+        getBackground: function() {
+            const scrollingBackground = new ScrollingBackground("checkered",0);
+            return {
+                render: timestamp => {
+                    scrollingBackground.render(timestamp);
+                    context.save();
+                    context.fillStyle = "#E57834";
+                    context.globalCompositeOperation = "multiply";
+                    context.fillRect(0,0,fullWidth,fullHeight);
+                    context.restore();
+                }
+            }
+        }
     }
 }
-export default StyleManifest;
+const fallbackStyle = BattleManifest["tiny-arm-elf"];
+const styleProperties = Object.keys(fallbackStyle);
+Object.values(BattleManifest).forEach(styleSet => {
+    styleProperties.forEach(propertyName => {
+        if(!styleSet[propertyName]) {
+            if(propertyName === "name") {
+                styleSet[propertyName] = "<Missing style info>";
+            } else {
+                styleSet[propertyName] = fallbackStyle[propertyName];
+            }
+        }
+    });
+});
+export default BattleManifest;

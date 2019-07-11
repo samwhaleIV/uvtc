@@ -1,5 +1,5 @@
 import PlayerController from "../runtime/player-controller.js";
-import { PlayerRenderer, SpriteRenderer } from "./components/world/sprite.js";
+import { PlayerRenderer, SpriteRenderer, ElfRenderer } from "./components/world/sprite.js";
 import WorldPopup from "./components/world/popup.js";
 import WorldPrompt from "./components/world/prompt.js";
 import GlobalState from "../runtime/global-state.js";
@@ -9,7 +9,6 @@ import UIAlert from "./components/ui-alert.js";
 import MovesManager from "../runtime/moves-manager.js";
 import MovePreview from "./components/world/move-preview.js";
 import Moves from "../runtime/battle/moves.js";
-import FrameDifRenderer from "./components/frame-dif.js";
 import Chapters from "../runtime/chapter-data.js";
 
 const songIntroLookup = {};
@@ -179,6 +178,7 @@ function WorldRenderer() {
         loadLastMapOrDefault();
     }
     this.sprite = SpriteRenderer;
+    this.elfSprite = ElfRenderer;
     this.getCharacter = (name,direction) => GetOverworldCharacter(this,name,direction,false);
     this.getStaticCharacter = name => GetOverworldCharacter(this,name,null,true);
     this.movesManager = MovesManager;
@@ -191,8 +191,6 @@ function WorldRenderer() {
             return this.showInstantTextPopupSound(`Congratulations! ${character.coloredName} is now your friend!`);
         }
     }
-
-    const moveNameColor = inverseTextColorLookup["red"];
 
     this.unlockMove = moveName => {
         return new Promise(async resolve => {
@@ -215,7 +213,7 @@ function WorldRenderer() {
                     }
                 }
             }));
-            await this.showInstantTextPopupSound(`You received the move ${moveNameColor}${moveName}!${moveNameColor}`);
+            await this.showInstantTextPopupSound(`You received the move ${moveName}!`);
             if(!alreadyHasMove) {
                 const move = Moves[moveName];
                 let description = move.description;
@@ -231,6 +229,7 @@ function WorldRenderer() {
             }
             playSound("click");
             this.popCustomRenderer();
+            resolve();
         });
     }
 

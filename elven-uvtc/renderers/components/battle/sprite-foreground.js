@@ -1,15 +1,25 @@
-import SpriteRenderer from "../world/sprite.js";
+import { SpriteRenderer, ElfRenderer } from "../world/sprite.js";
 
-function SpriteForeground(whomstve,isElf) {
+const ELVES_ARE_NOT_FAT = "Cannot create an elf sprite with custom width or height dimensions";
 
-    const sprite = new SpriteRenderer("down",whomstve,isElf);
+function SpriteForeground(whomstve,isElf,customWidth,customHeight,yOffset) {
+    let sprite;
+    if(isElf) {
+        if(isElf && (customWidth || customHeight)) {
+            throw Error(ELVES_ARE_NOT_FAT);
+        }
+        sprite = new ElfRenderer("down",whomstve);
+    } else {
+        sprite = new SpriteRenderer("down",whomstve,customWidth,customHeight);
+    }
+
     sprite.x = 0;
     sprite.y = 0;
 
     this.render = timestamp => {
         const size = Math.ceil(largestDimension / 5 / 16) * 16;
         const halfSize = size/2;
-        sprite.render(timestamp,halfWidth-halfSize,halfHeight-halfSize,size,size);
+        sprite.render(timestamp,halfWidth-halfSize,halfHeight-halfSize+yOffset*size,size,size);
     }
 }
 export default SpriteForeground;

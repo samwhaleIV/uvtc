@@ -22,7 +22,6 @@ addMap({
                     const moveUnlockSegment = async () => {
                         world.globalState.shiverGaveGift = true;
                         world.globalState.shiverWantsToGiveAGift = false;
-                        world.movesManager.unlockMove("Iced Whiskey");
                         await shiver.sayID("AUTO_65");
                         await world.unlockMove("Iced Whiskey");
                     }

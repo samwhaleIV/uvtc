@@ -1,19 +1,28 @@
 import SpriteForeground from "../../renderers/components/battle/sprite-foreground.js";
-import StyleManifest from "./style-manifest.js";
+import BattleManifest from "./manifest.js";
 
-function FakeOpponentSequencer() {
+function OpponentSequencer(opponentID,...spriteParameters) {
     this.getStartEvents = () => [];
-    this.getPlayerWonEvents = () => "";
-    this.getPlayerLostEvents = () => "";
-    this.getStalemateEvents = () => "";
+    this.getPlayerWonEvents = () => [];
+    this.getPlayerLostEvents = () => [];
+    this.getStalemateEvents = () => [];
     this.getTurnEvents = () => [];
-    this.getDefaultHealth = () => 69;
-    this.getName = () => "Wimpy Red Elf";
-    this.foreground = new SpriteForeground("wimpy-red-elf",true);
-    this.style = StyleManifest["Boney Elf"];
-}
-function OpponentSequencer() {
-    FakeOpponentSequencer.apply(this);
+    this.getDefaultHealth = () => 10;
+    this.getName = () => this.name;
+    const song = BattleMusicLinkingManifest[opponentID];
+    let songIntro = null;
+    if(song) {
+        songIntro = SongsWithIntros[song];
+        this.getSong = () => song;
+    }
+    if(songIntro) {
+        this.getSongIntro = () => songIntro;
+    }
+    this.getSong = () => null;
+    this.getSongIntro = () => null;
+
+    this.foreground = new SpriteForeground(opponentID,...spriteParameters);
+    this.style = BattleManifest[opponentID];
+    this.name = this.style.name;
 }
 export default OpponentSequencer;
-export { FakeOpponentSequencer, OpponentSequencer };

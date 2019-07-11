@@ -38,6 +38,17 @@ const MovesManager = new (function(){
     this.getSlot = (type,slotID) => {
         return Moves[GlobalState.data.moveSlots[type][slotID]];
     }
+    this.getSlots = type => {
+        return [
+            this.getSlot(type,1),
+            this.getSlot(type,2),
+            this.getSlot(type,3)
+        ];
+    }
+    this.hasSlotType = type => {
+        const slots = this.getSlots(type);
+        return slots[0].name !== "None" || slots[1].name !== "None" || slots[2].name !== "None";
+    }
     this.lockMove = moveName => {
         delete GlobalState.data.unlockedMoves[moveName];
     }

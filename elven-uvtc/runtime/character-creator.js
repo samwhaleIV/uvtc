@@ -34,7 +34,7 @@ delete colorLookup[0];
 const getColorCode = characterName => {
     const color = CharacterColors[characterName];
     if(!color) {
-        throw Error(`Text name color not found for '${characterName}`);
+        throw Error(`Text name color not found for '${characterName}'`);
     }
     const colorCode = colorLookup[color];
     if(!colorCode) {
@@ -83,7 +83,13 @@ const speakMethodID_multiple = async (world,character,messageIDs,customPrefix) =
     await world.showNamedTextPopupsID(messageIDs,prefix);
 }
 const defaultCharacterMaker = (world,direction,characterName,isElf=false) => {
-    const character = new world.sprite(direction,characterName,isElf);
+    const character = new (isElf ? world.elfSprite:world.sprite)(direction,characterName);
+    character.prefix = getPrefix(characterName);
+    character.characterName = characterName;
+    return character;
+}
+const customSizeCharacterMaker = (world,direction,characterName,width,height) => {
+    const character = new world.sprite(direction,characterName,width,height);
     character.prefix = getPrefix(characterName);
     character.characterName = characterName;
     return character;
@@ -97,6 +103,9 @@ const characterMakers = {
     },
     "wimpy-red-elf": (world,characterName,direction) => {
         return defaultCharacterMaker(world,direction,characterName,true);
+    },
+    "ice-man": (world,characterName,direction) => {
+        return defaultCharacterMaker(world,direction,characterName); 
     }
 }
 function GetOverworldCharacterSpriteless(world,name) {

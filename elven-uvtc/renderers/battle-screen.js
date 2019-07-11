@@ -1,4 +1,3 @@
-import StyleManifest from "../runtime/battle/style-manifest.js";
 import BattleSequencer from "../runtime/battle/battle-sequencer.js";
 import RenderStatus from "./components/battle/status.js";
 import RenderMove from "./components/battle/move.js";
@@ -13,7 +12,6 @@ const centerCircleOffset = 20;
 const outerRingRadius = 4;
 
 function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
-    let moveLookup;
 
     const hoverTypes = {
         none: 0,
@@ -181,6 +179,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
     }
 
     const statusRollImage = imageDictionary["ui/status-roll"];
+    const statusFill = imageDictionary["ui/status-fill"];
 
     const renderHealthIcon = (x,y,width,height,value) => {
         context.drawImage(statusRollImage,32*value,0,32,32,x,y,width,height);
@@ -317,12 +316,17 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
         const innerAreaY = y+statusAreaBorderWidth;
         const innerAreaX = x+statusAreaBorderWidth;
         const innerAreaWidth = width-doubleBorderWidth;
+
+        context.drawImage(statusFill,0,0,statusFill.width,statusFill.height,innerAreaX,innerAreaY,innerAreaWidth,innerAreaHeight);
+        context.save();
+        context.globalCompositeOperation = "multiply";
         context.fillRect(
             innerAreaX,
             innerAreaY,
             innerAreaWidth,
             innerAreaHeight
         );
+        context.restore();
 
         let imageX;
         const imageHeight = innerAreaHeight-doubleBorderWidth;

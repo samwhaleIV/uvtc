@@ -3,28 +3,35 @@ const SPRITE_HEIGHT = 16;
 
 const ELF_WIDTH = 9;
 const ELF_HEIGHT = 20;
-
-const ELF_WIDTH_RATIO = ELF_HEIGHT / ELF_WIDTH;
-const ELF_TO_WORLD_SCALE = ELF_WIDTH / WorldTextureSize;
-
 const FOOTSTEPS_SPRITE_NAME = "footsteps";
 
+function ElfRenderer(startDirection,spriteName) {
+    SpriteRenderer.call(this,startDirection,spriteName,ELF_WIDTH,ELF_HEIGHT);
+}
 function PlayerRenderer(startDirection) {
     if(ENV_FLAGS.ELF_PLAYER_HACK) {
-        SpriteRenderer.call(this,startDirection,"wimpy-red-elf",true);
+        ElfRenderer.call(this,startDirection,"wimpy-red-elf");
     } else {
-        SpriteRenderer.call(this,startDirection,"player",false);
+        SpriteRenderer.call(this,startDirection,"player");
     }
     this.isPlayer = true;
 }
-function SpriteRenderer(startDirection,spriteName,isElf) {
-    isElf = isElf ? true : false;
-
+function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumnHeight) {
     const sprite = imageDictionary[`sprites/${spriteName}`];
+    if(customColumnWidth === "auto") {
+        customColumnWidth = sprite.width;
+    }
+    if(customColumnHeight === "auto") {
+        customColumnHeight = sprite.height;
+    }
     const footStepsSprite = imageDictionary[`sprites/${FOOTSTEPS_SPRITE_NAME}`];
+    const customSize = customColumnWidth || customColumnHeight ? true : false;
 
-    const columnWidth = isElf ? ELF_WIDTH : SPRITE_WIDTH;
-    const rowHeight = isElf ? ELF_HEIGHT : SPRITE_HEIGHT;
+    const customWidthRatio = customColumnHeight / customColumnWidth;
+    const worldScaleTranslation = customColumnWidth / SPRITE_WIDTH;
+
+    const columnWidth = customColumnWidth ? customColumnWidth : SPRITE_WIDTH;
+    const rowHeight = customColumnHeight ? customColumnHeight : SPRITE_HEIGHT;
     const rowCount = 4;
 
     const footstepWidth = 16;
@@ -206,7 +213,7 @@ function SpriteRenderer(startDirection,spriteName,isElf) {
         }
     }
 
-    if(isElf) {
+    if(customSize) {
         this.render = function(timestamp,x,y,width,height) {
             const startX = this.x, startY = this.y;
             processRenderLogicForFrame(timestamp);
@@ -214,8 +221,8 @@ function SpriteRenderer(startDirection,spriteName,isElf) {
                 return;
             }
 
-            const renderWidth = width * ELF_TO_WORLD_SCALE;
-            const renderHeight = ELF_WIDTH_RATIO * renderWidth;
+            const renderWidth = width * worldScaleTranslation;
+            const renderHeight = customWidthRatio * renderWidth;
 
             const renderXOffset = (width - renderWidth) / 2;
             const renderYOffset = height - renderHeight;
@@ -268,4 +275,4 @@ function SpriteRenderer(startDirection,spriteName,isElf) {
 
 }
 export default SpriteRenderer;
-export { PlayerRenderer, SpriteRenderer };
+export { PlayerRenderer, SpriteRenderer, ElfRenderer };

@@ -11,6 +11,7 @@ import "./house_10.js";
 import "./mail.js";
 import "./store.js";
 import "./tavern.js";
+import "./tutorial_place.js";
 addMap({
     WorldState: function(world,data) {
         let frogert;

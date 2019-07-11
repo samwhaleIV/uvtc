@@ -312,6 +312,13 @@ function bindToBattleScreen(sequencer,renderer) {
     renderer.foreground = sequencer.opponentSequencer.foreground;
     renderer.style = sequencer.opponentSequencer.style;
     renderer.background = renderer.style.getBackground();
+
+    if(sequencer.opponentSequencer.getSong) {
+        renderer.song = sequencer.opponentSequencer.getSong();
+    }
+    if(sequencer.opponentSequencer.getSongIntro) {
+        renderer.songIntro = sequencer.opponentSequencer.getSongIntro();
+    }
 }
 
 function moveResultPreprocess(result) {
@@ -384,11 +391,16 @@ async function processPlayerAction(sequencer,action) {
             break;
     }
 }
+function clearHangingSpeech(sequencer) {
+    if(sequencer.hangingSpeech) {
+        sequencer.clearFullText();
+        sequencer.hangingSpeech = false;
+    }
+}
 async function fireBattleEvent(sequencer,event) {
     if(event && event.type) {
-        if(sequencer.hangingSpeech && event.type !== "speech") {
-            sequencer.clearFullText();
-            sequencer.hangingSpeech = false;
+        if(event.type !== "speech") {
+            clearHangingSpeech(sequencer);
         }
         switch(event.type) {
             case "player-move":
@@ -440,9 +452,7 @@ async function logicalBattleSequencer(sequencer) {
     }
     postLoopProcess();
     do {
-        if(sequencer.hangingSpeech) {
-            sequencer.clearFullText();
-        }
+        clearHangingSpeech();
         const playerAction = await sequencer.getAction();
         if(isBadPlayerAction(playerAction)) {
             invalidPlayerAction(playerAction);
@@ -497,6 +507,7 @@ async function logicalBattleSequencer(sequencer) {
         if(opponentSequencer.getPlayerWonEvents) {
             await runBattleEvents(sequencer,opponentSequencer.getPlayerWonEvents());
         }
+        clearHangingSpeech();
         const playerAction = await sequencer.getAction();
         if(isBadPlayerAction(playerAction)) {
             invalidPlayerAction(playerAction);

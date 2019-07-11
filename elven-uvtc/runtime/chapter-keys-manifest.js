@@ -17,7 +17,12 @@ const ChapterKeysManifest = {
         "shiverGotBeer",
         "shiverWantsToGiveAGift",
         "shiverGaveGift",
-        "tavernEnterTrigger"
+        "tavernEnterTrigger",
+        "metIceman",
+        "icemanPreambleComplete",
+        "icemanFightPreampleComplete",
+        "completedTutorialBattle",
+        "battleTutorialPreamble"
     ],
     2: [
 
