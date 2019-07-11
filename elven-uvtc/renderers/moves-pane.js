@@ -25,9 +25,6 @@ function MovesPaneRenderer(callback) {
         throw Error("Callback must be a function");
     }
 
-    let transitioning = true;
-    let loaded = false;
-
     const moveLookupOrder = ["logic","malice","fear"];
 
     let selectionModal = null;
@@ -57,7 +54,7 @@ function MovesPaneRenderer(callback) {
             this.processMove(lastRelativeX,lastRelativeY);
             playSound("reverse-click");
         } else {
-            transitioning = true;
+            callback();
         }
     }
 
@@ -91,9 +88,7 @@ function MovesPaneRenderer(callback) {
 
     let hoverType = hoverTypes.none;
     this.processClickEnd = () => {
-        if(transitioning) {
-            return;
-        }
+
         if(hoverType === hoverTypes.exitButton) {
             exit();
             return;
@@ -152,17 +147,11 @@ function MovesPaneRenderer(callback) {
     this.processClick = this.processMove;
     let cancelDown = false;
     this.processKey = key => {
-        if(transitioning) {
-            return;
-        }
         if(key === kc.cancel) {
             cancelDown = true;
         }
     }
     this.processKeyUp = key => {
-        if(transitioning) {
-            return;
-        }
         if(key === kc.cancel) {
             cancelDown = false;
             exit();
@@ -185,50 +174,7 @@ function MovesPaneRenderer(callback) {
     background.rotationTime = 2 * 60 * 1000;
     background.clockwise = true;
 
-    const transitionTime = 250;
-
-    let startTime = null;
-    let startTimeExit = null;
     this.render = timestamp => {
-        let restorationRequired = false;
-        if(transitioning) {
-            if(loaded) {
-                if(!startTimeExit) {
-                    startTimeExit = timestamp;
-                }
-                const startDelta = (timestamp - startTimeExit) / transitionTime;
-                restorationRequired = true;
-                let alpha = 1 - startDelta;
-                if(alpha < 0) {
-                    alpha = 0;
-                } else if(alpha > 1) {
-                    alpha = 1;
-                }
-                context.save();
-                context.globalAlpha = alpha;
-                if(startDelta >= 1) {
-                    callback(true);
-                }
-            } else {
-                if(!startTime) {
-                    startTime = timestamp;
-                }
-                const startDelta = (timestamp - startTime) / transitionTime;
-                restorationRequired = true;
-                let alpha = startDelta;
-                if(alpha > 1) {
-                    alpha = 1;
-                } else if(alpha < 0) {
-                    alpha = 0;
-                }
-                context.save();
-                context.globalAlpha = startDelta;
-                if(startDelta >= 1) {
-                    loaded = true;
-                    transitioning = false;
-                }
-            }
-        }
 
         background.render(timestamp);
         exitButton = renderExitButton(0,0,hoverType===hoverTypes.exitButton,false,cancelDown);
@@ -315,10 +261,6 @@ function MovesPaneRenderer(callback) {
             context.textAlign = "center";
             context.fillText(selectionModal.title,halfWidth,innerAreaY-24);
             selectionModal.render(timestamp,innerAreaX,innerAreaY,innerAreaWidth,innerAreaHeight);
-        }
-
-        if(restorationRequired) {
-            context.restore();
         }
     }
 }
