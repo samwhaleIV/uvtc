@@ -830,16 +830,16 @@ function WorldRenderer() {
             rendererState.fader.fadeOut(WorldRenderer);
         }
         function win(...parameters) {
-            returnToWorld();
             if(winCallback) {
                 winCallback(...parameters);
             }
+            returnToWorld();
         }
         function lose(...parameters) {
-            returnToWorld();
             if(loseCallback) {
                 loseCallback(...parameters);
             }
+            returnToWorld();
         }
         rendererState.fader.fadeOut(BattleScreenRenderer,win,lose,getOpponent(battleID));
     }
