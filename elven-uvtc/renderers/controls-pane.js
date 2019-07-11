@@ -100,7 +100,7 @@ function ControlsPaneRenderer(callback,parent) {
     const backgroundColor = "rgba(89,89,89,0.25)";
 
 
-    const reloadKeyBings = () => {
+    const reloadKeyBindings = () => {
         Object.values(keyButtons).forEach(keyButton => {
             delete keyButton.keyCode;
             delete keyButton.keyName;
@@ -118,7 +118,7 @@ function ControlsPaneRenderer(callback,parent) {
             }
         });
     }
-    reloadKeyBings();
+    reloadKeyBindings();
 
     const renderButton = button => {
         let topColor;
@@ -281,7 +281,7 @@ function ControlsPaneRenderer(callback,parent) {
             button.keyName = getFriendlyKeyName(keyCode);
             button.keyCode = keyCode;
             saveKeyBinds();
-            reloadKeyBings();
+            reloadKeyBindings();
         }
         internalAsync();
     }
