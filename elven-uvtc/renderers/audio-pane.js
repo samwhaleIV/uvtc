@@ -243,8 +243,8 @@ function AudioPane(callback,parent,inverted=false) {
         context.textBaseline = "middle";
 
         const labelTextX = slider1.x+labelWidth/2;
-        context.fillText("music",labelTextX,slider1.y-halfSliderHeight);
-        context.fillText("sound",labelTextX,slider2.y-halfSliderHeight);
+        context.fillText("Music",labelTextX,slider1.y-halfSliderHeight)+2;
+        context.fillText("Sound",labelTextX,slider2.y-halfSliderHeight)+2;
 
         const elfHeight = sliderImageRatio * elfWidth;
 

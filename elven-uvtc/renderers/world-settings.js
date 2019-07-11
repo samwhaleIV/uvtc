@@ -114,12 +114,12 @@ function WorldSettingsRenderer(callback) {
         context.fillStyle = "white";
         context.save();
         context.globalCompositeOperation = "destination-out";
-        context.fillRect(x,y,width,height);
+        context.fillRect(20,20,fullWidth-40,fullHeight-40);
         context.globalCompositeOperation = "destination-over";
         background.render(timestamp);
         context.restore();
 
-        exitLabel = renderExitButton(x,y,hoverType===hoverTypes.exitLabel,true,cancelDown);
+        exitLabel = renderExitButton(20,20,hoverType===hoverTypes.exitLabel,true,cancelDown);
 
         const elfHeight = height - exitLabel.y - exitLabel.height - 10;
         const elfWidth = elfHeight * floatingElfRatio;
@@ -128,19 +128,19 @@ function WorldSettingsRenderer(callback) {
         controlsButton = renderElf(floatingElfImageAlt,x+width-elfWidth-40,0,elfWidth,elfHeight);
 
         const labelWidth = Math.floor(elfWidth * 1.12);
-        const labelHeight = Math.floor(elfHeight * 0.12);
+        const labelHeight = exitLabel.height;
 
         const halfLabelWidth = labelWidth / 2;
         const halfLabelHeight = labelHeight / 2;
 
         const label1X = Math.floor(audioButton.x + audioButton.width / 2 - halfLabelWidth);
         const label2X = Math.floor(controlsButton.x + controlsButton.width / 2 - halfLabelWidth);
-        const label1Y = Math.floor(audioButton.y + audioButton.height * 0.525);
-        const label2Y = Math.floor(controlsButton.y + controlsButton.height * 0.45);
+        const label1Y = Math.floor(audioButton.y + audioButton.height * 0.59 - labelHeight/2);
+        const label2Y = Math.floor(controlsButton.y + controlsButton.height * 0.5 - labelHeight/2);
 
         context.textAlign = "center";
         context.textBaseline = "middle";
-        context.font = `${elfWidth/11}px Arial`;
+        context.font = "21px Roboto";
         context.fillStyle = "white";
         if(hoverType === hoverTypes.audioButton) {
             context.fillStyle = CONSISTENT_PINK;
