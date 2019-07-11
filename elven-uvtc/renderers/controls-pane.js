@@ -99,18 +99,26 @@ function ControlsPaneRenderer(callback,parent) {
     const keyNameColor = CONSISTENT_PINK;
     const backgroundColor = "rgba(89,89,89,0.25)";
 
-    Object.entries(keyBindings).forEach(keyBind => {
-        const keyImpulse = keyBind[1];
-        const association = keyAssociations[keyImpulse];
-        if(association) {
-            const button = keyButtons[association];
-            if(button) {
-                const keyCode = keyBind[0];
-                button.keyCode = keyCode;
-                button.keyName = getFriendlyKeyName(keyCode);
+
+    const reloadKeyBings = () => {
+        Object.values(keyButtons).forEach(keyButton => {
+            delete keyButton.keyCode;
+            delete keyButton.keyName;
+        });
+        Object.entries(keyBindings).forEach(keyBind => {
+            const keyImpulse = keyBind[1];
+            const association = keyAssociations[keyImpulse];
+            if(association) {
+                const button = keyButtons[association];
+                if(button) {
+                    const keyCode = keyBind[0];
+                    button.keyCode = keyCode;
+                    button.keyName = getFriendlyKeyName(keyCode);
+                }
             }
-        }
-    });
+        });
+    }
+    reloadKeyBings();
 
     const renderButton = button => {
         let topColor;
@@ -267,19 +275,13 @@ function ControlsPaneRenderer(callback,parent) {
             const existingBind = keyBindings[keyCode];
             if(existingBind) {
                 delete keyBindings[keyCode];
-                const association = keyAssociations[existingBind];
-                if(association) {
-                    const clearedButton = keyButtons[association];
-                    if(clearedButton) {
-                        clearedButton.keyName = null;
-                    }
-                }
             }
             keyBindings[keyCode] = button.association;
             button.awaiting = false;
             button.keyName = getFriendlyKeyName(keyCode);
             button.keyCode = keyCode;
             saveKeyBinds();
+            reloadKeyBings();
         }
         internalAsync();
     }
