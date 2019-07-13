@@ -80,7 +80,6 @@ const stringLookup = {
     AUTO_12: "See, that's better. You may come in, now.",
     AUTO_13: "Oh. Okay. Bye then.",
     AUTO_14: "What makes you think you can just barge on in here?",
-    AUTO_15: "What do you want to say?",
     AUTO_16: "Yeah, right. 'Boldness'",
     AUTO_17: "You know who else is bold? Crazy people.",
     AUTO_18: "Try again next time. I've got enough of my own crazy in here.",

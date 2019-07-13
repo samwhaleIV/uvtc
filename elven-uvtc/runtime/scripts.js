@@ -124,7 +124,7 @@ const scripts = {
                     break;
                 case 1:
                     await frogert.sayID("AUTO_14");
-                    let reason = await world.showPrompt(strings["AUTO_15"],"my boldness","time constraints","i have a key to the city");
+                    let reason = await world.showPrompt("what do you want to say?","my boldness","time constraints","i have a key to the city");
                     await delay(1000);
                     switch(reason) {
                         case 0:
