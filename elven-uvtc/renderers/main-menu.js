@@ -44,7 +44,6 @@ const bounceVariation3 = ELF_BOUNCE_TIME_BASE - 1234;
 const bounceVariation4 = ELF_BOUNCE_TIME_BASE - 2019;
 
 function MainMenuRenderer() {
-    setFaderEffectsRenderer(new BoxFaderEffect());
 
     const hoverTypes = {
         none: 0,

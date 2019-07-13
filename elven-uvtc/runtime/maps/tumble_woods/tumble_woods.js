@@ -101,6 +101,14 @@ addMap({
                 }
                 return;
             }
+            if(!world.globalState.completedTutorialBattle) {
+                if(doorID === "to_house_1" || doorID === "to_house_2" || doorID === "house_3") {
+                    world.updateMap(doorID.substring(3),{fromDoorWay:true});
+                } else {
+                    world.showTextPopupID("AUTO_216");
+                }
+                return;
+            }
             world.updateMap(doorID.substring(3),{fromDoorWay:true});
         }
         this.activeTrigger = null;

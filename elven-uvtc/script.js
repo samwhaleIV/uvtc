@@ -1,5 +1,6 @@
 "use strict";
 import MainMenuRenderer from "./renderers/main-menu.js";
+import BoxFaderEffect from "./renderers/components/box-fader-effect.js";
 
 drawLoadingText();
 establishMapLinks();
@@ -32,6 +33,7 @@ SoundManager.loadNonEssentialSounds();
     }
 })();
 restoreVolumeChanges();
+setFaderEffectsRenderer(new BoxFaderEffect());
 
 if(ENV_FLAGS.FAST_AS_FUCK_TRANSITIONS) {
     setFaderDelay(60);

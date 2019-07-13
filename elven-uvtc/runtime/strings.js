@@ -280,7 +280,8 @@ const stringLookup = {
     AUTO_212: "When will you learn, Ice Man?",
     AUTO_213: "Anyways, Burr is right. We should get going.",
     AUTO_214: "The ventilation here is terrible.",
-    AUTO_215: "Alright, off we go!"
+    AUTO_215: "Alright, off we go!",
+    AUTO_216: "You should go learn some fighting skills from Ice Man. Tumble Town can be a dangerous place."
 }
 const strings = stringLookup;
 const getString = function(ID) {
