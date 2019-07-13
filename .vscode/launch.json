@@ -7,7 +7,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Web Server",
+            "name": "Start Web Server",
             "cwd": "${workspaceFolder}",
             "program": "${workspaceFolder}\\web-app.js",
             "console": "externalTerminal"
@@ -15,7 +15,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Map Compile/Bake",
+            "name": "Compile Map Data",
             "cwd": "${workspaceFolder}\\map-builder",
             "program": "${workspaceFolder}\\map-builder\\index.js",
             "console": "externalTerminal"
@@ -24,7 +24,7 @@
             "type": "node",
             "request": "launch",
             "cwd": "${workspaceFolder}\\string-mdf",
-            "name": "Map Script Link",
+            "name": "Link Map Scripts",
             "program": "${workspaceFolder}\\string-mdf\\index.js",
             "console": "externalTerminal"
         },
@@ -32,7 +32,7 @@
             "type": "node",
             "request": "launch",
             "cwd": "${workspaceFolder}\\file-gen",
-            "name": "Link Images",
+            "name": "Link Image Files",
             "program": "${workspaceFolder}\\file-gen\\index.js",
             "console": "externalTerminal"
         }
