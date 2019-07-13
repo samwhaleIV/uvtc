@@ -24,7 +24,7 @@
             "type": "node",
             "request": "launch",
             "cwd": "${workspaceFolder}\\string-mdf",
-            "name": "Link Map Scripts",
+            "name": "Link Map and Battle Scripts",
             "program": "${workspaceFolder}\\string-mdf\\index.js",
             "console": "externalTerminal"
         },
