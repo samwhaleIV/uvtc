@@ -70,17 +70,9 @@ const speakMethod = async (world,character,message,customPrefix) => {
     const prefix = getSpeakingPrefix(character,customPrefix);
     await world.showNamedTextPopup(message,prefix);
 }
-const speakMethodID = async (world,character,messageID,customPrefix) => {
-    const prefix = getSpeakingPrefix(character,customPrefix);
-    await world.showNamedTextPopupID(messageID,prefix);
-}
 const speakMethod_multiple = async (world,character,messages,customPrefix) => {
     const prefix = getSpeakingPrefix(character,customPrefix);
     await world.showNamedTextPopups(messages,prefix);
-}
-const speakMethodID_multiple = async (world,character,messageIDs,customPrefix) => {
-    const prefix = getSpeakingPrefix(character,customPrefix);
-    await world.showNamedTextPopupsID(messageIDs,prefix);
 }
 const defaultCharacterMaker = (world,direction,characterName,isElf=false) => {
     const character = new (isElf ? world.elfSprite:world.sprite)(direction,characterName);

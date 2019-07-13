@@ -292,6 +292,7 @@ function PlayerController(world) {
     const stopMovementLoop = () => {
         this.renderMethod = null;
         loopRunning = false;
+        lastFrame = null;
         this.player.setWalking(false);
     }
 

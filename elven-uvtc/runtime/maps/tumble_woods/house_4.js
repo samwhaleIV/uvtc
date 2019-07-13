@@ -12,7 +12,7 @@ addMap({
         this.otherClicked = async type => {
             switch(type) {
                 case 8:
-                    await world.showTextPopupsID([
+                    await world.showTextPopups([
                         "There's a notecard taped to this shelf.",
                         "'Adults only'",
                         "Hmm... this might be interesting.",

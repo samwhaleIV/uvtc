@@ -194,7 +194,7 @@ addMap({
                     world.showTextPopup("This bookcase doesn't have very many books on it.");
                     break;
                 case 12:
-                    world.showTextPopupsID([
+                    world.showTextPopups([
                         "This bookcase has a few intersting books on it.",
                         "One book is called 'the cat lady manifesto'",
                         "ȸIf I loved my children as much as I love my cats, I'd have children.ȸ"
@@ -202,11 +202,11 @@ addMap({
                     break;
                 case 13:
                     await world.showTextPopup("This bookcase is trying to be an edgy reflection of society.");
-                    world.showNamedTextPopupID("Is it working?",bookcase1Prefix);
+                    world.showNamedTextPopup("Is it working?",bookcase1Prefix);
                     break;
                 case 14:
                     await world.showTextPopup("This bookcase seems to be more inappropriate than the other bookcases.");
-                    world.showNamedTextPopupID("Hey... What're you wearing?",bookcase2Prefix);
+                    world.showNamedTextPopup("Hey... What're you wearing?",bookcase2Prefix);
                     break;
                 case 15:
                     break;

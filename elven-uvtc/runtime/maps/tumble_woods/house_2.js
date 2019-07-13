@@ -46,7 +46,7 @@ addMap({
         this.otherClicked = type => {
             switch(type) {
                 case 8:
-                    world.showTextPopupsID([
+                    world.showTextPopups([
                         "There's not many books on this shelf, but there are a few interesting ones.",
                         "ȸOwning Two Pieces of Furniture for Dummiesȸ",
                         "It seems to be a book about minimalism."

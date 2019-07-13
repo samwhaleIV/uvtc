@@ -202,7 +202,7 @@ addMap({
                         world.globalState.gotBeer = false;
                         await world.showTextPopup("HAHAHAHA. YOU IDIOT.");
                         await world.showInstantTextPopup("The chair stole the beer from you and drank it all in one sip.");
-                        await world.showTextPopupsID([
+                        await world.showTextPopups([
                             "reeeeeEEEEEEEEEEEEE",
                             "REEEEEEEEEEEEEEEEEEEEEEE"
                         ]);
@@ -214,13 +214,13 @@ addMap({
                     }
                     break;
                 case 11:
-                    world.showTextPopupsID([
+                    world.showTextPopups([
                         "Rule number 1 of talking to chairs- Uh, wait. How are you talking to me? I'm a chair!",
                         "GET AWAY FROM ME, WITCH!"
                     ]);
                     break;
                 case 14:
-                    world.showTextPopupsID([
+                    world.showTextPopups([
                         "When people come here they never sit at these tables. I blame the chairs. They're just so...",
                         "Frigid. Hehe.",
                         "...",
@@ -228,7 +228,7 @@ addMap({
                     ]);
                     break;
                 case 12:
-                    world.showTextPopupsID([
+                    world.showTextPopups([
                         "Hey. You should sit on me. I won't bite. I promise.",
                         "What? You don't believe me because I said that in the first place?",
                         "And I'm not making it better for myself?",

@@ -21,7 +21,7 @@ addMap({
                     world.showTextPopup("sat_lt_2");
                     break;
                 case 11:
-                    world.showTextPopupsID(["There's a book sticking out from under the pillow.","It says something about the French revolution."]);
+                    world.showTextPopups(["There's a book sticking out from under the pillow.","It says something about the French revolution."]);
                     break;
             }
         }
