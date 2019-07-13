@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "elven-uvtc\\runtime\\maps"
+		},
+		{
+			"path": "elven-uvtc\\runtime\\battle\\opponents"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {}
+}
