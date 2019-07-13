@@ -7,6 +7,7 @@ import CreditsRenderer from "./credits.js";
 import GlobalState from "../runtime/global-state.js";
 import ChapterManager from "../runtime/chapter-manager.js";
 import Chapters from "../runtime/chapter-data.js";
+import BoxFaderEffect from "./components/box-fader-effect.js";
 
 const BACKGROUND_MARGIN = 20;
 const DOUBLE_BACKGROUND_MARGIN = BACKGROUND_MARGIN + BACKGROUND_MARGIN;
@@ -43,6 +44,7 @@ const bounceVariation3 = ELF_BOUNCE_TIME_BASE - 1234;
 const bounceVariation4 = ELF_BOUNCE_TIME_BASE - 2019;
 
 function MainMenuRenderer() {
+    setFaderEffectsRenderer(new BoxFaderEffect());
 
     const hoverTypes = {
         none: 0,

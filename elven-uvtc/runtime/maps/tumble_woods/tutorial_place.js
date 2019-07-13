@@ -34,9 +34,12 @@ addMap({
             await iceman.sayID("AUTO_175");
             await informSlotting();
             await iceman.sayID("AUTO_176");
-            await burr.sayID("AUTO_177");
-            await iceman.sayID("AUTO_178");
-            await burr.sayID("AUTO_179");
+            if(!world.globalState.icemanBattlePreamble) {
+                await burr.sayID("AUTO_177");
+                await iceman.sayID("AUTO_178");
+                await burr.sayID("AUTO_179");
+                world.globalState.icemanBattlePreamble = true;
+            }
         }
         this.load = world => {
             world.addPlayer(6,6,"right");
@@ -53,7 +56,25 @@ addMap({
             this.start = async () => {
                 world.lockPlayerMovement();
                 if(world.globalState.completedTutorialBattle) {
-                    //post tutorial shit
+                    await delay(faderTime + 1000);
+                    if(world.globalState.failedTutorialBattle) {
+                        await iceman.sayID("AUTO_203");
+                        await iceman.sayID("AUTO_204");
+                    } else {
+                        await iceman.sayID("AUTO_205");
+                        await iceman.sayID("AUTO_206");
+                    }
+                    await iceman.sayID("AUTO_207");
+                    await burr.sayID("AUTO_208");
+                    await iceman.sayID("AUTO_209");
+                    await burr.sayID("AUTO_210");
+                    await iceman.sayID("AUTO_211");
+                    await burr.sayID("AUTO_212");
+                    await iceman.sayID("AUTO_213");
+                    await iceman.sayID("AUTO_214");
+                    await delay(500);
+                    await iceman.sayID("AUTO_215");
+                    world.updateMap("house_3");
                     world.unlockPlayerMovement();
                     return;
                 }
@@ -82,7 +103,12 @@ addMap({
                         await iceman.sayID("AUTO_191");
                         await burr.sayID("AUTO_192");
                         await iceman.sayID("AUTO_193");
-                        world.startBattle("tutorial-burr");
+                        world.startBattle("tutorial-burr",()=>{
+                            world.globalState.completedTutorialBattle = true;
+                        },()=>{
+                            world.globalState.completedTutorialBattle = true;
+                            world.globalState.failedTutorialBattle = true;
+                        });
                     } else {
                         await iceman.sayID("AUTO_188");
                         await informSlotting();

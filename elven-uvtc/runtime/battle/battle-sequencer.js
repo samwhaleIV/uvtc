@@ -1,11 +1,12 @@
 import Moves from "./moves.js";
 import MovesManager from "../moves-manager.js";
 
-const DEFAULT_HEALTH = 20;
+const DEFAULT_HEALTH = 10;
 const MAX_DISPLAY_HEALTH = 100;
 const NUMBER_TYPE = typeof 0;
 const OBJECT_TYPE = typeof {};
 const STRING_TYPE = typeof "You Versus Earth - Battle Sequencer";
+const FUNCTION_TYPE = typeof (()=>void "OwO");
 const ILLEGAL_HEALTH_MODIFIER = "Illegal health modifier value. Value must be a number";
 const BAD_START_HEALTH = "Tried to create a battle entity with less than 1 health";
 const STATUS_IS_STRING_ERROR = "New status must be a object, not the name";
@@ -24,7 +25,10 @@ const WATING_FOR_EXTERNAL_TEXT = "Please wait...";
 const BATTLE_ALREADY_STARTED = "Battle was already started!";
 const INVALID_STATUS_TYPE = "Status name must be a string!";
 const INVALID_PLAYER_ACTION = "Invalid move assumed from player action processing!";
-const INVALID_BATTLE_EVENT = "Invalid battle event";
+const INVALID_BATTLE_EVENT = "Invalid battle event!";
+
+const MISSING_END_CALLBACK = "Missing sequencer end callback!";
+const INVALID_END_CALLBACK = "End callback must be of type 'function'!";
 
 const clearKeys = object => {
     Object.keys(object).forEach(key => {
@@ -244,6 +248,16 @@ const getBattleEntity = (name,health,isPlayer) => {
         }
     });
 
+    let lastMove = null;
+    Object.defineProperty(entity,"lastMove",{
+        get: function() {
+            return lastMove;
+        },
+        set: function(moveName) {
+            lastMove = moveName;
+        }
+    });
+
     entity.watch = watch;
     Object.freeze(entity);
     return entity;
@@ -335,6 +349,9 @@ const isBadPlayerAction = playerAction => {
     return isNaN(playerAction) ||  playerAction < 0;
 }
 async function runBattleEvents(sequencer,events) {
+    if(typeof events === OBJECT_TYPE && !events.length) {
+        events = [events];
+    }
     const eventCount = events.length;
     for(let i = 0;i<eventCount;i++) {
         const event = events[i];
@@ -354,6 +371,7 @@ async function processMove(move,user,target,sequencer) {
         sequencer.updatePlayerMoves([SKIP_MOVE]);
     }
     const targetMove = move.process ? move : NOTHING_MOVE;
+    user.lastMove = targetMove;
     const resultEvents = moveResultPreprocess(targetMove.process(
         user,
         target,
@@ -423,7 +441,7 @@ async function fireBattleEvent(sequencer,event) {
                 sequencer.hangingSpeech = true;
                 sequencer.showFullText(event.text);
                 break;
-            case "sequencing":
+            case "action":
                 event.process(sequencer);
                 break;
 
@@ -442,6 +460,8 @@ async function logicalBattleSequencer(sequencer) {
     if(opponentSequencer.getStartEvents) {
         await runBattleEvents(sequencer,opponentSequencer.getStartEvents());
     }
+    opponentSequencer.player = player;
+    opponentSequencer.self = opponent;
     let lastDirective = null;
     const postLoopProcess = () => {
         if(battleAlive && lastDirective !== RETURN_DIRECTIVE) {
@@ -486,6 +506,7 @@ async function logicalBattleSequencer(sequencer) {
         }
     } while(postLoopProcess());
     sequencer.updatePlayerMoves([SKIP_MOVE]);
+    const battleOutput = {};
     if(endParameters.playerLost) {
         if(endParameters.stalemate) {
             sequencer.setMarqueeText("Everyone has been defeated!");
@@ -493,26 +514,26 @@ async function logicalBattleSequencer(sequencer) {
             sequencer.setMarqueeText("You have been defeated!");
         }
         if(endParameters.stalemate && opponentSequencer.getStalemateEvents) {
-            await runBattleEvents(sequencer,opponentSequencer.getStalemateEvents());
+            await runBattleEvents(sequencer,opponentSequencer.getStalemateEvents(battleOutput));
         } else if(opponentSequencer.getPlayerLostEvents) {
-            await runBattleEvents(sequencer,opponentSequencer.getPlayerLostEvents());
+            await runBattleEvents(sequencer,opponentSequencer.getPlayerLostEvents(battleOutput));
         }
         const playerAction = await sequencer.getAction();
         if(isBadPlayerAction(playerAction)) {
             invalidPlayerAction(playerAction);
         }
-        sequencer.loseCallback();
+        sequencer.loseCallback(battleOutput);
     } else {
         sequencer.setMarqueeText(`${sequencer.opponent.name} has been defeated!`);
         if(opponentSequencer.getPlayerWonEvents) {
-            await runBattleEvents(sequencer,opponentSequencer.getPlayerWonEvents());
+            await runBattleEvents(sequencer,opponentSequencer.getPlayerWonEvents(battleOutput));
         }
         clearHangingSpeech(sequencer);
         const playerAction = await sequencer.getAction();
         if(isBadPlayerAction(playerAction)) {
             invalidPlayerAction(playerAction);
         }
-        sequencer.winCallback();
+        sequencer.winCallback(battleOutput);
     }
 }
 
@@ -530,8 +551,24 @@ function getSlotMoves(slotType) {
     slotMoves.unshift(BACK_MOVE);
     return slotMoves;
 }
-
+function missingEndCallback() {
+    throw Error(MISSING_END_CALLBACK);
+}
+function validateCallbackEvent(callback) {
+    if(!callback) {
+        console.warn(MISSING_END_CALLBACK);
+        return missingEndCallback;
+    } else if(typeof callback !== FUNCTION_TYPE) {
+        console.warn(INVALID_END_CALLBACK);
+        return missingEndCallback;
+    } else {
+        return callback;
+    }
+}
 function BattleSequencer(winCallback,loseCallback,opponentSequencer) {
+    this.winCallback = validateCallbackEvent(winCallback);
+    this.loseCallback = validateCallbackEvent(loseCallback);
+
     this.player = getBattleEntity("You",DEFAULT_HEALTH,true);
     this.opponent = getBattleEntity(
         opponentSequencer.getName() || "Opponent",
@@ -544,10 +581,6 @@ function BattleSequencer(winCallback,loseCallback,opponentSequencer) {
     this.playerFearMoves = getSlotMoves("fear");
 
     this.opponentSequencer = opponentSequencer;
-
-    this.winEvents = [];
-    this.loseEvents = [];
-
     this.playerMoves = [Moves["Skip"]];
 
     addEvent(this,"PlayerMovesChanged");
@@ -573,7 +606,6 @@ function BattleSequencer(winCallback,loseCallback,opponentSequencer) {
     };
 
     this.hangingSpeech = false;
-
     this.runtimeBinds = runtimeBinds;
 
     this.updatePlayerMoves = newMoves => {
@@ -581,18 +613,6 @@ function BattleSequencer(winCallback,loseCallback,opponentSequencer) {
         this.firePlayerMovesChanged(newMoves);
     };
 
-    this.winCallback = async () => {
-        for(let i = 0;i<this.winEvents.length;i++) {
-            await this.winEvents[i]();
-        }
-        winCallback();
-    };
-    this.loseCallback = async () => {
-        for(let i = 0;i<this.loseEvents.length;i++) {
-            await this.loseEvents[i]();
-        }
-        loseCallback();
-    };
     this.getMove = moveName => {
         return Moves[moveName];
     }
@@ -613,3 +633,4 @@ function BattleSequencer(winCallback,loseCallback,opponentSequencer) {
     Object.seal(this);
 }
 export default BattleSequencer;
+export {MAX_DISPLAY_HEALTH, DEFAULT_HEALTH };

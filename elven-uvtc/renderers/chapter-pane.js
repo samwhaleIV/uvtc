@@ -344,8 +344,6 @@ function ChapterPane(callback,parent) {
             context.globalAlpha = alpha;
         }
 
-        const widthNormal = fullWidth / 1920;
-
         const robotoOffset = 2.5 * widthNormal;
 
         const imageSize = widthNormal * 565;

@@ -11,6 +11,7 @@ import MovePreview from "./components/world/move-preview.js";
 import Moves from "../runtime/battle/moves.js";
 import Chapters from "../runtime/chapter-data.js";
 import BattleScreenRenderer from "./battle-screen.js";
+import BattleFaderEffect from "./components/battle-fader-effect.js";
 
 const songIntroLookup = {};
 SongsWithIntros.forEach(song => {
@@ -31,7 +32,7 @@ function WorldRenderer() {
             return GlobalState.data;
         }
     });
-    this.saveState = (withPositionData=true) => {
+    this.saveState = (withPositionData=true,skipGlobal=false) => {
         if(withPositionData && this.playerObject) {
             GlobalState.data["last_map"] = this.renderMap.name;
             GlobalState.data["last_player_pos"] = {
@@ -42,7 +43,9 @@ function WorldRenderer() {
                 yo: this.playerObject.yOffset,
             }
         }
-        GlobalState.save();
+        if(skipGlobal) {
+            GlobalState.save();
+        }
     };
     const loadLastMapOrDefault = () => {
         let lastMap = GlobalState.data["last_map"]; 
@@ -820,28 +823,38 @@ function WorldRenderer() {
         }
     }
 
-    let horizontalTiles, verticalTiles, horizontalOffset, verticalOffset, verticalTileSize, horizontalTileSize, halfHorizontalTiles, halfVerticalTiles;
+    let horizontalTiles,     verticalTiles,
+        horizontalOffset,    verticalOffset,
+        horizontalTileSize,  verticalTileSize, 
+        halfHorizontalTiles, halfVerticalTiles;
 
     this.disableAdaptiveFill = true;
     this.noPixelScale = true;
 
-    this.startBattle = (battleID,winCallback,loseCallback) => {
+    this.startBattle = (battleID,winCallback,loseCallback,...battleParameters) => {
+        this.saveState(true,true);
+        setFaderEffectsRenderer(new BattleFaderEffect());
+        setFaderInSound("battle-fade-in",true);
+        setFaderOutSound("battle-fade-out",true);
         function returnToWorld() {
+            setFaderInSound("battle-fade-in",true);
+            setFaderOutSound("battle-fade-out",true);
             rendererState.fader.fadeOut(WorldRenderer);
         }
-        function win(...parameters) {
+        function win(battleOutput) {
             if(winCallback) {
-                winCallback(...parameters);
+                winCallback(battleOutput);
             }
             returnToWorld();
         }
-        function lose(...parameters) {
+        function lose(battleOutput) {
             if(loseCallback) {
-                loseCallback(...parameters);
+                loseCallback(battleOutput);
             }
             returnToWorld();
         }
-        rendererState.fader.fadeOut(BattleScreenRenderer,win,lose,getOpponent(battleID));
+        const opponent = getOpponent(battleID,...battleParameters);
+        rendererState.fader.fadeOut(BattleScreenRenderer,win,lose,opponent);
     }
 
     this.updateSize = function() {

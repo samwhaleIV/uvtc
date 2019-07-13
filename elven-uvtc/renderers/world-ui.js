@@ -1,9 +1,8 @@
-import ControlsPaneRenderer from "./controls-pane.js";
-import AudioPaneRenderer from "./audio-pane.js";
 import MainMenuRenderer from "./main-menu.js";
 import ElvesFillIn from "./components/elves-fill-in.js";
 import WorldSettingsRenderer from "./world-settings.js";
 import MovesPaneRenderer from "./moves-pane.js";
+import BoxFaderEffect from "./components/box-fader-effect.js";
 
 function WorldUIRenderer(world) {
 
@@ -117,11 +116,12 @@ function WorldUIRenderer(world) {
                     exit();
                     break;
                 case internalIconMap.settings.hoverID:
-                        playSound("click");
+                    playSound("click");
                     panel = new WorldSettingsRenderer(clearPanel);
                     break;
                 case internalIconMap.mainMenu.hoverID:
                     playSound("click");
+                    setFaderEffectsRenderer(new BoxFaderEffect());
                     faderEffectsRenderer.fillInLayer = new ElvesFillIn();
                     transitioning = true;
                     world.saveState(true);

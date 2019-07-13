@@ -22,7 +22,10 @@ const ChapterKeysManifest = {
         "icemanPreambleComplete",
         "icemanFightPreampleComplete",
         "completedTutorialBattle",
-        "battleTutorialPreamble"
+        "battleTutorialPreamble",
+        "icemanBattlePreamble",
+        "failedTutorialBattle",
+        "cameBackToIceman"
     ],
     2: [
 

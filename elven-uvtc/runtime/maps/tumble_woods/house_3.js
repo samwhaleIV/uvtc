@@ -4,6 +4,7 @@ addMap({
         this.load = world => {
             world.addPlayer(4,3,"down");
             iceman = world.getCharacter("ice-man","down");
+
             const readyToFight = async () => {
                 const ready = await world.showPrompt("are you ready to learn to fight?","yes","another time") === 0;
                 await delay(700);
@@ -15,6 +16,12 @@ addMap({
             }
             iceman.interacted = async () => {
                 world.lockPlayerMovement();
+
+                if(world.globalState.completedTutorialBattle) {
+                    await iceman.sayID("AUTO_194");
+                    world.unlockPlayerMovement();
+                    return;
+                }
 
                 if(world.globalState.icemanFightPreampleComplete) {
                     await readyToFight();   
@@ -95,6 +102,25 @@ addMap({
                     delay(500);
                     iceman.sayID("AUTO_160");
                     world.unlockPlayerMovement();
+                }
+            } else if(world.globalState.completedTutorialBattle) {
+                if(!world.globalState.cameBackToIceman) {
+                    this.start = async () => {
+                        world.lockPlayerMovement();
+                        world.playerObject.updateDirection("left");
+                        world.globalState.cameBackToIceman = true;
+                        await delay(700)
+                        await iceman.sayID("AUTO_195");
+                        await iceman.sayID("AUTO_196");
+                        await iceman.sayID("AUTO_197");
+                        await iceman.sayID("AUTO_198");
+                        await rendererState.showInstantTextPopup("(Not a chance)");
+                        await iceman.sayID("AUTO_199");
+                        await iceman.sayID("AUTO_200");
+                        await iceman.sayID("AUTO_201");
+                        await iceman.sayID("AUTO_202");
+                        world.unlockPlayerMovement();
+                    }
                 }
             }
         }

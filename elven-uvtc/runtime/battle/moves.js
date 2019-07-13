@@ -2,9 +2,9 @@ import { MOVE_SOURCE_WIDTH } from "../../renderers/components/battle/move.js";
 
 const MovesList = [
     {
-        name:"None",
-        description:"This isn't a real move. It doesn't do anything at all.",
-        type:"ui"
+        name: "None",
+        description: "This isn't a real move. It doesn't do anything at all.",
+        type: "ui"
     },
     {
         name: "Nothing",
@@ -24,8 +24,8 @@ const MovesList = [
         noTextBlur: false
     },
     {
-        name:"Skip",
-        description:"Skip what's happening right now so you can continue kicking ass.",
+        name: "Skip",
+        description: "Skip what's happening right now so you can continue kicking ass.",
         type: "ui",
         noTextBlur: false
     },
@@ -49,15 +49,21 @@ const MovesList = [
             target.health -= 1;
             if(!target.isPlayer) {
                 return {
-                    type: "speech",
-                    text: "A wimpy punch? Bitch, I invented wimpy."
+                    type: "text",
+                    text: "It was mildly effective..."
                 }
             }
         }
     },
     {
-        name:"Iced Whiskey",
-        type:"logic"
+        name: "Iced Whiskey",
+        type: "logic",
+        process: (user,target) => {
+            return {
+                type: "text",
+                text: `${user.name} gave ${target.name} some whiskey`
+            }
+        }
     },
     {name:"Red Apple"},
     {name:"Return to Sender"},

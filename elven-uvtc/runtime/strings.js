@@ -258,7 +258,29 @@ const stringLookup = {
     AUTO_190: "That's... Disgusting. Or is this a pun? ha.. ha..",
     AUTO_191: "Okay Burr, you know how to fight, right?",
     AUTO_192: "Uhh, yeah. Totally dude.",
-    AUTO_193: "Okay! Great. You will be the perfect sparring partner for, uh- Well, I never got your name. ONWARDS AND UPWARDS."
+    AUTO_193: "Okay! Great. You will be the perfect sparring partner for, uh- Well, I never got your name. ONWARDS AND UPWARDS.",
+    AUTO_194: "Did you meet more people in the town yet? I'm sure they're dying to meet you!",
+    AUTO_195: "Ah. Fresh air.",
+    AUTO_196: "I'm glad I was able to help you.",
+    AUTO_197: "You proved yourself to be a great fighter back there.",
+    AUTO_198: "Maybe someday we can fight? Haha.",
+    AUTO_199: "Well, you should probably start meeting more of the townspeople.",
+    AUTO_200: "I heard the Chilis are throwing a Christmas party soon and you might put people at ease if they meet you ahead of time.",
+    AUTO_201: "The Chilis live West of the tavern in the big, tall house.",
+    AUTO_202: "They're a great couple, I'm sure they'd love to meet you.",
+    AUTO_203: "Wow. You failed your first battle against a drunk ice cream cone.",
+    AUTO_204: "A drunk ice cream cone that didn't even fight back, I should add.",
+    AUTO_205: "Wow. That battle was... Truly remarkable.",
+    AUTO_206: "I've never witnessed a battle quite like that before.",
+    AUTO_207: "Just when I thought I saw it all.",
+    AUTO_208: "Can we please leave now? I have important business to attend to.",
+    AUTO_209: "...",
+    AUTO_210: "What?",
+    AUTO_211: "Alchohol isn't important business to attend to, Burr.",
+    AUTO_212: "When will you learn, Ice Man?",
+    AUTO_213: "Anyways, Burr is right. We should get going.",
+    AUTO_214: "The ventilation here is terrible.",
+    AUTO_215: "Alright, off we go!"
 }
 const strings = stringLookup;
 const getString = function(ID) {

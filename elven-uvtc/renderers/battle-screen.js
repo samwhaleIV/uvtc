@@ -4,9 +4,9 @@ import RenderMove from "./components/battle/move.js";
 
 const HEALTH_FLASH_TIME = 100;
 const FULL_TEXT_TRANSITION_TIME = 200;
-const circleTraceTime = 1200;
-const circleFillTime = 600;
-const backgroundSaturateTime = 1700;
+const circleTraceTime = 1300;
+const circleFillTime = 500;
+const backgroundSaturateTime = 1500;
 const saturatePopExponent = 4; //Higher numbers are more abrupt
 const centerCircleOffset = 20;
 const outerRingRadius = 4;
@@ -101,6 +101,9 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
         leavingText = null;
         fullTextLeaveStartTime = null;
         this.fullText = processTextForWrapping(text);
+        setTimeout(playSound,100,"text-sound");
+        setTimeout(playSound,200,"text-sound");
+        setTimeout(playSound,300,"text-sound");
     };
     this.clearFullText = () => {
         leavingText = this.fullText;
@@ -124,7 +127,6 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
 
     this.sequencer = new BattleSequencer(winCallback,loseCallback,...sequencerParameters);
     this.sequencer.bindToBattleScreen(this);
-    this.sequencer.startBattle();
 
 
     this.processMove = (x,y) => {
@@ -138,6 +140,31 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
             hoverType = m4.hoverType;
         } else {
             hoverType = hoverTypes.none;
+        }
+    }
+
+    let enterDown = false;
+    this.processKey = key => {
+        switch(key) {
+            case kc.accept:
+                if(!enterDown) {
+                    if(playerMoves.length === 1 && playerMoves[0].name === "Skip") {
+                        if(playerActionResolver) {
+                            playerActionResolver(0);
+                            playerActionResolver = null;
+                            playSound("click");
+                        }
+                    }
+                }
+                enterDown = true;
+                break;
+        }
+    }
+    this.processKeyUp = key => {
+        switch(key) {
+            case kc.accept:
+                enterDown = false;
+                break;
         }
     }
 
@@ -487,9 +514,15 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
 
     this.render = timestamp => {
         if(!startTime) {
-            startTime = timestamp;
+            startTime = this.fader.start + faderTime / 2;
+            setTimeout(this.sequencer.startBattle,faderTime+backgroundSaturateTime);
         }
-        const startDelta = timestamp - startTime;
+        let startDelta;
+        if(timestamp < startTime) {
+            startDelta = 0;
+        } else {
+            startDelta = timestamp - startTime;
+        }
         const radius = smallestDimension * 0.22;
         const traceNormal = startDelta / circleTraceTime;
         if(this.background) {
