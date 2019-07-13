@@ -1,6 +1,7 @@
 "use strict";
 import MainMenuRenderer from "./renderers/main-menu.js";
 import BoxFaderEffect from "./renderers/components/box-fader-effect.js";
+import "./runtime/battle/opponents/manifest.js";
 
 drawLoadingText();
 establishMapLinks();

@@ -44,9 +44,10 @@
     <script src="../elven-engine/renderers/components/bitmap-text.js"></script>
     <!-- End load engine -->
 
-
     <!-- Begin expected runtime engine -->
-    <script src="elven-uvtc/files.js"></script>
+    <script>setCustomFileSector("elven-uvtc");</script>
+    <script src="elven-uvtc/audio-files.js"></script>
+    <script src="elven-uvtc/image-files.js"></script>
     <!-- End expected runtime engine -->
 
     <!-- Begin custom renderer components -->
@@ -56,14 +57,13 @@
     <!-- Begin custom runtime components -->
     <script src="word-syllable-maps.js"></script>
     <script src="map-data.js"></script>
-    <script src="elven-uvtc/runtime/strings.js"></script>
     <script src="elven-uvtc/runtime/scripts.js"></script>
     <script src="elven-uvtc/runtime/world-helper.js"></script>
 
     <script src="elven-uvtc/runtime/map-manager.js"></script>
     <script src="elven-uvtc/runtime/opponent-manager.js"></script>
 
-    <script src="elven-uvtc/map-manifest.js" type="module"></script>
+    <script src="elven-uvtc/runtime/maps/manifest.js" type="module"></script>
     <!-- End custom runtime components -->
 
     <!-- Begin expected runtime initializer -->

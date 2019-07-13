@@ -5,6 +5,7 @@ const scriptFile = "../elven-uvtc/runtime/scripts.js";
 const inputFolder = "../elven-uvtc/runtime/maps";
 const stringsFilePath = "../elven-uvtc/runtime/strings.js";
 const shadowStringsPath = "./shadow-strings.txt";
+const mapManifestPath = "../elven-uvtc/runtime/maps/manifest.js";
 
 const AUTO_STRING_PREFIX = "AUTO_";
 
@@ -15,7 +16,7 @@ const walk = function(dir) {
     list.forEach(function(file) {
         file = dir + "/" + file;
         const stat = fs.statSync(file);
-        if (stat && stat.isDirectory()) { 
+        if(stat && stat.isDirectory()) { 
             results = results.concat(walk(file));
         } else { 
             results.push(file);
@@ -31,6 +32,23 @@ String.prototype.replaceAll = function(search,replacement) {
 const filesToReplaceStringsFrom = walk(inputFolder);
 filesToReplaceStringsFrom.push(scriptFile);
 console.log(walk(inputFolder));
+
+function createMapManifest() {
+    function makeLine(fileName) {
+        return `import ".${fileName}";`;
+    }
+    const lines = [];
+    filesToReplaceStringsFrom.forEach(fileName=>{
+        if(fileName.startsWith(inputFolder)) {
+            const name = fileName.split(inputFolder)[1];
+            if(name === "/manifest.js") {
+                return;
+            }
+            lines.push(makeLine(name));
+        }
+    });
+    fs.writeFileSync(mapManifestPath,lines.join("\r\n")+"\r\n");
+}
 
 function createShadowStringsFile() {
     const strings = {};
@@ -191,5 +209,5 @@ function generateIDsInPlace() {
 }
 
 createShadowStringsFile();
+createMapManifest();
 //opn("file:///C:/Users/jedisammy4/Documents/uvtc/string-baker.html");
-
