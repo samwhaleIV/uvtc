@@ -153,6 +153,8 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
                             playerActionResolver(0);
                             playerActionResolver = null;
                             playSound("click");
+                        } else if(!this.sequencer.started) {
+                            this.sequencer.startBattle();
                         }
                     }
                 }
@@ -177,6 +179,11 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
             case hoverTypes.m2:
             case hoverTypes.m3:
             case hoverTypes.m4:
+                if(!this.sequencer.started) {
+                    playSound("click");
+                    this.sequencer.startBattle();
+                    break;
+                }
                 if(hoverType > playerMoves.length) {
                     break;
                 }
@@ -515,7 +522,13 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
     this.render = timestamp => {
         if(!startTime) {
             startTime = this.fader.start + faderTime / 2;
-            setTimeout(this.sequencer.startBattle,faderTime+backgroundSaturateTime);
+            if(!this.sequencer.started) {
+                setTimeout(()=>{
+                    if(!this.sequencer.started) {
+                        this.sequencer.startBattle();
+                    }
+                },faderTime+backgroundSaturateTime);
+            }
         }
         let startDelta;
         if(timestamp < startTime) {

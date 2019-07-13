@@ -629,6 +629,11 @@ function BattleSequencer(winCallback,loseCallback,opponentSequencer) {
         started = true;
         logicalBattleSequencer(this);
     }
+    Object.defineProperty(this,"started",{
+        get: function() {
+            return started;
+        }
+    });
 
     Object.seal(this);
 }
