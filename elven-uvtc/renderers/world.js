@@ -18,11 +18,6 @@ SongsWithIntros.forEach(song => {
     songIntroLookup[song] = song + MUSIC_INTRO_SUFFIX;
 });
 
-const getString = ID => {
-    console.warn("String ID lookup is deprecated for the time being because it was terrible.");
-    return ID;
-}
-
 function WorldRenderer() {
     const alertTime = 1000;
     let alert = null;
@@ -467,18 +462,9 @@ function WorldRenderer() {
         });
     }
     this.showTextPopup = ID => showTextPopup([getString(ID)]);
-    this.showTextPopupsID = IDs => showTextPopup(IDs.map(getString));
     this.showTextPopup = page => showTextPopup([page]);
     this.showTextPopups = pages => showTextPopup(pages);
-    this.showNamedTextPopupID = (ID,name) => showTextPopup([getString(ID)],name);
-    this.showNamedTextPopupsID = (IDs,name) => showTextPopup(IDs.map(getString),name);
     this.showNamedTextPopup = (page,name) => showTextPopup([page],name);
-
-    this.showInstantTextPopupID = ID => showTextPopup([getString(ID)]);
-    this.showInstantTextPopupIDSound = ID => {
-        playSound("energy");
-        return showTextPopup([getString(ID)]);
-    };
     this.showInstantTextPopup = page => showTextPopup([page],null,true);
     this.showInstantTextPopupSound = page => {
         playSound("energy");
