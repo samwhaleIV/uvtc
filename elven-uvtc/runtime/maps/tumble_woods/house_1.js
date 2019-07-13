@@ -16,10 +16,10 @@ addMap({
         this.otherClicked = (type,x,y) => {
             switch(type) {
                 case 8:
-                    world.showTextPopupID("bookcase_1");
+                    world.showTextPopup("There are a lot of books on this shelf.");
                     break;
                 case 9:
-                    world.showTextPopupID("bed_1");
+                    world.showTextPopup("A sleeping bag on a hardwood floor, a fine luxury.");
                     break;
             }
         }
@@ -31,7 +31,7 @@ addMap({
     songParent: "house_1"
 });
 addMap({
-    WorldState: function(world,data) {
+    WorldState: function(world) {
         this.load = world => {
             world.addPlayer(5,2,"down");
         }
@@ -41,16 +41,16 @@ addMap({
             };
             world.updateMap("house_1",newMapData);
         }
-        this.otherClicked = (type,x,y) => {
+        this.otherClicked = type => {
             switch(type) {
                 case 8:
-                    world.showTextPopupID("bookcase_2");
+                    world.showTextPopup("Lots of books here... A lot of them seem to mention some kind of card game?");
                     break;
                 case 9:
-                    world.showTextPopupID("bookcase_3");
+                    world.showTextPopup("This bookcase demonstrates that it's okay to be small. Way to go bookcase!");
                     break;
                 case 10:
-                    world.showTextPopupID("table_1");
+                    world.showTextPopup("These plastic, foldable tables have seen a lot of life. Are they for parties?");
                     break;
             }
         }
@@ -62,7 +62,7 @@ addMap({
     songParent: "house_1"
 });
 addMap({
-    WorldState: function(world,data) {
+    WorldState: function(world) {
         this.load = world => {
             world.addPlayer(5,2,"down");
         }
@@ -72,17 +72,17 @@ addMap({
             };
             world.updateMap("house_1",newMapData);
         }
-        this.otherClicked = (type,x,y) => {
+        this.otherClicked = type => {
             switch(type) {
                 case 8:
-                    world.showTextPopupID("table_2");
+                    world.showTextPopup("These tables are pretty much everywhere.");
                     break;
                 case 9:
                 case 11:
-                    world.showTextPopupID("counter_1");
+                    world.showTextPopup("This must be a kitchen... Seems to be missing a few things, though.");
                     break;
                 case 10:
-                    world.showTextPopupID("counter_2");
+                    world.showTextPopup("This is the cleanest kitchen you've seen in your entire life.");
                     break;
             }
         }
@@ -122,13 +122,13 @@ addMap({
                 if(world.globalState.jimMoved) {
                     jim.updateDirection(direction);
                     world.globalState.jimsDirection = direction;
-                    jim.sayID("jims_postop");
+                    jim.say("Let's stay in touch. Hehe.");
                     return;
                 }
                 if(direction === "left") {
                     scripts.jim_gets_the_hell_out_of_the_way(world,jim);
                 } else {
-                    jim.sayID("jims_kink");
+                    jim.say("If you whisper something in my right ear I'll get out of your way.");
                 }
             }
             if(world.globalState.jimMoved) {
@@ -169,7 +169,7 @@ addMap({
                         if(jim) {
                             world.lockPlayerMovement();
                             await jim.alert();
-                            await jim.sayID("AUTO_41");
+                            await jim.say("Oh! Before you go, could you go and meet your neighbor? He doesn't have a lot of friends. Thanks.");
                             world.globalState.goMeetFrogert = true;
                             world.unlockPlayerMovement();
                             return;
@@ -179,39 +179,39 @@ addMap({
                     break;
             }
         }
-        this.otherClicked = async (type,x,y) => {
+        this.otherClicked = async type => {
             switch(type) {
                 case 8:
-                    world.showTextPopupID("sink_1");
+                    world.showTextPopup("It's important to wash your hands!");
                     break;
                 case 9:
-                    world.showTextPopupID("toilet_1");
+                    world.showTextPopup("It's important to use toilets!");
                     break;
                 case 10:
-                    world.showTextPopupID("bathtub_1");
+                    world.showTextPopup("It's important to wash... yourself.");
                     break;
                 case 11:
-                    world.showTextPopupID("bookcase_4");
+                    world.showTextPopup("This bookcase doesn't have very many books on it.");
                     break;
                 case 12:
                     world.showTextPopupsID([
-                        "bookcase_5_1",
-                        "bookcase_5_2",
-                        "bookcase_5_3"
+                        "This bookcase has a few intersting books on it.",
+                        "One book is called 'the cat lady manifesto'",
+                        "ȸIf I loved my children as much as I love my cats, I'd have children.ȸ"
                     ]);
                     break;
                 case 13:
-                    await world.showTextPopupID("bookcase_6_1");
-                    world.showNamedTextPopupID("bookcase_6_2",bookcase1Prefix);
+                    await world.showTextPopup("This bookcase is trying to be an edgy reflection of society.");
+                    world.showNamedTextPopupID("Is it working?",bookcase1Prefix);
                     break;
                 case 14:
-                    await world.showTextPopupID("bookcase_7_1");
-                    world.showNamedTextPopupID("bookcase_7_2",bookcase2Prefix);
+                    await world.showTextPopup("This bookcase seems to be more inappropriate than the other bookcases.");
+                    world.showNamedTextPopupID("Hey... What're you wearing?",bookcase2Prefix);
                     break;
                 case 15:
                     break;
                 case 16:
-                    world.showTextPopupID("couch_1");
+                    world.showTextPopup("This couch looks too clean to sit on. Who gets a white couch anyways?");
                     break;
             }
         }

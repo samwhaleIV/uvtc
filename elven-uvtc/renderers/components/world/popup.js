@@ -1,3 +1,7 @@
+function getSyllableMap(word) {
+    word = word.toLowerCase();
+    return wordSyllableMaps[word];
+}
 function applySonographToPopupFeed(popupFeed) {
     const wordSets = [];
     let wordStart = 0, word = "";

@@ -18,6 +18,11 @@ SongsWithIntros.forEach(song => {
     songIntroLookup[song] = song + MUSIC_INTRO_SUFFIX;
 });
 
+const getString = ID => {
+    console.warn("String ID lookup is deprecated for the time being because it was terrible.");
+    return ID;
+}
+
 function WorldRenderer() {
     const alertTime = 1000;
     let alert = null;
@@ -461,7 +466,7 @@ function WorldRenderer() {
             );
         });
     }
-    this.showTextPopupID = ID => showTextPopup([getString(ID)]);
+    this.showTextPopup = ID => showTextPopup([getString(ID)]);
     this.showTextPopupsID = IDs => showTextPopup(IDs.map(getString));
     this.showTextPopup = page => showTextPopup([page]);
     this.showTextPopups = pages => showTextPopup(pages);

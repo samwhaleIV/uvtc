@@ -116,13 +116,13 @@ function GetOverworldCharacterSpriteless(world,name) {
     character.say = async (message,customPrefix=null) => {
         await speakMethod(world,character,message,customPrefix);
     }
-    character.sayID = async (messageID,customPrefix=null) => {
+    character.say = async (messageID,customPrefix=null) => {
         await speakMethodID(world,character,messageID,customPrefix);
     }
     character.speech = async (messages,customPrefix=null) => {
         await speakMethod_multiple(world,character,messages,customPrefix);
     }
-    character.speechID = async (messageIDs,customPrefix=null) => {
+    character.speech = async (messageIDs,customPrefix=null) => {
         await speakMethodID_multiple(world,character,messageIDs,customPrefix);
     }
     return character;
@@ -139,13 +139,13 @@ function GetOverworldCharacter(world,name,direction=null,spriteLess=false) {
     character.say = async (message,customPrefix=null) => {
         await speakMethod(world,character,message,customPrefix);
     }
-    character.sayID = async (messageID,customPrefix=null) => {
+    character.say = async (messageID,customPrefix=null) => {
         await speakMethodID(world,character,messageID,customPrefix);
     }
     character.speech = async (messages,customPrefix=null) => {
         await speakMethod_multiple(world,character,messages,customPrefix);
     }
-    character.speechID = async (messageIDs,customPrefix=null) => {
+    character.speech = async (messageIDs,customPrefix=null) => {
         await speakMethodID_multiple(world,character,messageIDs,customPrefix);
     }
     character.move = async (...steps) => {

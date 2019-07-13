@@ -12,19 +12,19 @@ addMap({
         this.otherClicked = type => {
             switch(type) {
                 case 8:
-                    world.showTextPopupID("indoor_tree");
+                    world.showTextPopup("An indoor tree? Finally, something unique in one of these houses.");
                     break;
                 case 9:
-                    world.showTextPopupID("nice_envo");
+                    world.showTextPopup("There's a nice atmosphere to do things at this table.");
                     break;
                 case 10:
-                    world.showTextPopupID("couch_2");
+                    world.showTextPopup("The couch has some light stains on it.");
                     break;
                 case 11:
-                    world.showTextPopupID("couch_3");
+                    world.showTextPopup("The couch is so bright it's hard to look at.");
                     break;
                 case 12:
-                    world.showTextPopupID("bright_idea");
+                    world.showTextPopup("What a bright idea putting a lamp next to two windows.");
                     break;
             }
         }

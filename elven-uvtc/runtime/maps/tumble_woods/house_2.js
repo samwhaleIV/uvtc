@@ -27,7 +27,7 @@ addMap({
                 } else {
                     frogert.interacted = (x,y,direction) => {
                         frogert.updateDirection(direction);
-                        frogert.sayID("AUTO_42");
+                        frogert.say("Go get me some beer, dude. Ah, I mean, uh, 'friend'.");
                     }
                     if(!world.globalState.awaitingBeer) {
                         this.start = () => {
@@ -47,13 +47,13 @@ addMap({
             switch(type) {
                 case 8:
                     world.showTextPopupsID([
-                        "bookcase_8_1",
-                        "bookcase_8_2",
-                        "bookcase_8_3"
+                        "There's not many books on this shelf, but there are a few interesting ones.",
+                        "ȸOwning Two Pieces of Furniture for Dummiesȸ",
+                        "It seems to be a book about minimalism."
                     ]);
                     break;
                 case 9:
-                    world.showTextPopupID("sleepingbag_1")
+                    world.showTextPopup("Hmm... Sleeping bags seem to be in style in this town.")
                     break;
             }
         }

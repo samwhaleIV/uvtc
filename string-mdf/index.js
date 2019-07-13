@@ -4,7 +4,7 @@ const opn = require("opn");
 const scriptFile = "../elven-uvtc/runtime/scripts.js";
 const inputFolder = "../elven-uvtc/runtime/maps";
 const stringsFilePath = "../elven-uvtc/runtime/strings.js";
-const shadowStringsPath = "../shadow-strings.txt";
+const shadowStringsPath = "./shadow-strings.txt";
 
 const AUTO_STRING_PREFIX = "AUTO_";
 
@@ -33,7 +33,40 @@ filesToReplaceStringsFrom.push(scriptFile);
 console.log(walk(inputFolder));
 
 function createShadowStringsFile() {
+    const strings = {};
 
+    const targetStringType = '"';
+
+    for(let i = 0;i<filesToReplaceStringsFrom.length;i++) {
+
+        const fileName = filesToReplaceStringsFrom[i];
+        const startFileText = fs.readFileSync(fileName).toString();
+        const fileText = startFileText.split("");
+    
+        let inSequence = false;
+        let stringBuffer = "";
+
+        for(let i = 0;i<fileText.length;i++) {
+            const character = fileText[i];
+            if(character === targetStringType) {
+                if(inSequence) {
+                    strings[stringBuffer] = true;
+                    stringBuffer = "";
+                    inSequence = false;
+                } else {
+                    inSequence = true;
+                }
+            } else if(inSequence) {
+                stringBuffer += character;
+            }
+        }
+        if(stringBuffer) {
+            strings[stringBuffer] = true;
+            stringBuffer = ""; 
+        }
+    }
+
+    fs.writeFileSync(shadowStringsPath,Object.keys(strings).join("|"));
 }
 
 function reverseIDs() {
@@ -53,18 +86,23 @@ function reverseIDs() {
         strings[key] = value;
     }
 
-    const IDs = Object.entries(strings);
+    const IDs = Object.entries(strings).map(entry=>{
+        const pair = [];
+        pair[0] = `"${entry[0]}"`;
+        pair[1] = entry[1];
+        return pair;
+    });
 
     for(let i = 0;i<filesToReplaceStringsFrom.length;i++) {
         const fileName = filesToReplaceStringsFrom[i];
         const startFileText = fs.readFileSync(fileName).toString();
-        let fileText = startFileText.replaceAll("\\n","\n").split("");
+        let fileText = startFileText.replaceAll("\\n","\n");
         
         IDs.forEach(entry=>{
             fileText = fileText.replaceAll(...entry)
         });
     
-        if(startFileText !== fileTex) {
+        if(startFileText !== fileText) {
             fs.writeFileSync(fileName,fileText);
         }
     }
@@ -72,8 +110,6 @@ function reverseIDs() {
 
     console.log(strings);
 }
-
-reverseIDs();
 
 function generateIDsInPlace() {
     let stringsFileLines = fs.readFileSync(stringsFilePath).toString().split("\r\n");
@@ -107,11 +143,11 @@ function generateIDsInPlace() {
         for(let i = 0;i<fileText.length;i++) {
             const character = fileText[i];
             if(stringBuffer !== "") {
-                if(character === "'") {
+                if(character === ignoreStringType) {
                     if(lastCharacterWasEscapeSequence) {
-                        stringBuffer += "'";
+                        stringBuffer += ignoreStringType;
                     } else {
-                        stringBuffer += '"';
+                        stringBuffer += targetStringType;
                         const tokenName = `${AUTO_STRING_PREFIX}${++highestAutoID}`;
                         newStrings[tokenName] = stringBuffer.replaceAll("\n","\\n");
                         fileTextBuffer += `"${tokenName}"`;
@@ -123,14 +159,14 @@ function generateIDsInPlace() {
                     }
                 }
             } else {
-                if(character === "'" && !inRegularString) {
-                    stringBuffer += '"';
+                if(character === ignoreStringType && !inRegularString) {
+                    stringBuffer += targetStringType;
                 } else {
                     fileTextBuffer += character;
                 }
             }
             lastCharacterWasEscapeSequence = character === "\\";
-            if(character === '"') {
+            if(character === targetStringType) {
                 inRegularString = !inRegularString;
             }
         }
@@ -154,6 +190,6 @@ function generateIDsInPlace() {
     }
 }
 
-
+createShadowStringsFile();
 //opn("file:///C:/Users/jedisammy4/Documents/uvtc/string-baker.html");
 

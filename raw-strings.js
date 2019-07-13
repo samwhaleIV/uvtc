@@ -22,8 +22,6 @@ const processRawStrings = function() {
     let allWords = [];
     let allWordsLookup = {};
     Object.entries(stringLookup).forEach(rawString => {
-
-        const ID = rawString[0];
         const fullString = rawString[1];
 
         let word = "";

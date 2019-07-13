@@ -12,16 +12,16 @@ addMap({
         this.otherClicked = type => {
             switch(type) {
                 case 8:
-                    world.showTextPopupID("bathtub_getaway");
+                    world.showTextPopup("This is clearly a room of luxury.");
                     break;
                 case 9:
-                    world.showTextPopupID("sat_lt_1");
+                    world.showTextPopup("Perfectly symmetrical, as all things should be.");
                     break;
                 case 10:
-                    world.showTextPopupID("sat_lt_2");
+                    world.showTextPopup("sat_lt_2");
                     break;
                 case 11:
-                    world.showTextPopupsID(["french_rev_1","french_rev_2"]);
+                    world.showTextPopupsID(["There's a book sticking out from under the pillow.","It says something about the French revolution."]);
                     break;
             }
         }

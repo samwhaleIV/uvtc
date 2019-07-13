@@ -23,7 +23,7 @@ addMap({
                 case 2:
                 case 1:
                     this.activeTrigger = ID;
-                    world.showTextPopupID("you_can_never_leave");
+                    world.showTextPopup("You can't leave ȹTumble Townȹ yet! You have important things to do!");
                     break;
 
             }

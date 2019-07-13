@@ -12,7 +12,7 @@ addMap({
         this.otherClicked = type => {
             switch(type) {
                 case 8:
-                    world.showTextPopupsID(["likes_books_1","likes_books_2"]);
+                    world.showTextPopupsID(["Wow. this person sure likes books.","You can't grab any books or else the whole house might fall apart."]);
                     break;
             }
         }

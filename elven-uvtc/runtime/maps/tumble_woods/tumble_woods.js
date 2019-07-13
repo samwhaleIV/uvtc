@@ -87,17 +87,17 @@ addMap({
                         if(doorID === "to_tavern") {
                             world.updateMap("tavern",{fromDoorWay:true});
                         } else {
-                            world.showTextPopupID("AUTO_124")
+                            world.showTextPopup("You need to get that beer back to Frogert while it's still cold. Just like a friend should.")
                         }
                     } else {
                         if(doorID === "to_tavern") {
                             world.updateMap("tavern",{fromDoorWay:true});
                         } else {
-                            world.showTextPopupID("AUTO_64");
+                            world.showTextPopup("You should be a good friend and get a beer from the ȴTavernȴ for Frogert. You can go here later.");
                         }
                     }
                 } else {
-                    world.showTextPopupID("AUTO_1");
+                    world.showTextPopup("You should probably go check if that frog you scared is okay first.");
                 }
                 return;
             }
@@ -105,7 +105,7 @@ addMap({
                 if(doorID === "to_house_1" || doorID === "to_house_2" || doorID === "house_3") {
                     world.updateMap(doorID.substring(3),{fromDoorWay:true});
                 } else {
-                    world.showTextPopupID("AUTO_216");
+                    world.showTextPopup("You should go learn some fighting skills from Ice Man. Tumble Town can be a dangerous place.");
                 }
                 return;
             }
@@ -120,7 +120,7 @@ addMap({
                 case 2:
                 case 1:
                     this.activeTrigger = ID;
-                    world.showTextPopupID("you_can_never_leave");
+                    world.showTextPopup("You can't leave ȹTumble Townȹ yet! You have important things to do!");
                     break;
 
             }

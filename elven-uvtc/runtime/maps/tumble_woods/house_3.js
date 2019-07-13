@@ -11,14 +11,14 @@ addMap({
                 if(ready) {
                     world.updateMap("tutorial_place");
                 } else {
-                    await iceman.sayID("AUTO_142");
+                    await iceman.say("Ah, okay, come talk to me when you're ready. I am the best and always will be.");
                 }
             }
             iceman.interacted = async () => {
                 world.lockPlayerMovement();
 
                 if(world.globalState.completedTutorialBattle) {
-                    await iceman.sayID("AUTO_194");
+                    await iceman.say("Did you meet more people in the town yet? I'm sure they're dying to meet you!");
                     world.unlockPlayerMovement();
                     return;
                 }
@@ -30,31 +30,31 @@ addMap({
                 }
 
                 if(!world.globalState.icemanPreambleComplete) {
-                    await iceman.speechID([
-                        "AUTO_143",
-                        "AUTO_144",
-                        "AUTO_145"
+                    await iceman.speech([
+                        "Well, you're a new face.",
+                        "Even though you have no manners, it's nice to meet you, I guess. I'm Ice Man.",
+                        "And who would you be?"
                     ]);
     
                     const name = await world.showPrompt("what is your name?","jim","i forgot","none of your business");
                     let firstMessage;
                     switch(name) {
                         case 0:
-                            firstMessage = "AUTO_146";
+                            firstMessage = "Jim? You look... different. New diet?";
                             break;
                         case 1:
-                            firstMessage = "AUTO_147";
+                            firstMessage = "You forgot your own name? Fine, whatever, don't tell me.";
                             break;
                         case 2:
-                            firstMessage = "AUTO_148";
+                            firstMessage = "None of my business? Look, we run a tight-knit community here. Everybody knows everybody.";
                             break;
                         default:
-                            firstMessage = "AUTO_149";
+                            firstMessage = "Ah, I see. Your name is cheater. Got it.";
                             break;
                     }
                     await delay(800);
-                    await iceman.sayID(firstMessage);
-                    await iceman.sayID("AUTO_189");
+                    await iceman.say(firstMessage);
+                    await iceman.say("So, what brings you uninvited into my house?");
                     world.globalState.icemanPreambleComplete = true;
                 }
                 
@@ -62,33 +62,33 @@ addMap({
                 await delay(800);
                 switch(reason) {
                     case 0:
-                        await iceman.speechID([
-                            "AUTO_150",
-                            "AUTO_151",
-                            "AUTO_152",
-                            "AUTO_153",
-                            "AUTO_154"
+                        await iceman.speech([
+                            "Ah. Fighting. That I can help you with.",
+                            "Surely you must know that I am the greatest fighter in all of Tumble Town.",
+                            "But of course you knew that.",
+                            "Everyone knows that.",
+                            "Right? You knew that? Right?"
                         ]);
                         const startTime = Date.now();
                         await world.showPrompt("indulge ice man?","*sigh* sure..");
                         const endTime = (Date.now() - startTime) / 1000;
                         if(endTime > 3) {
                             await delay(500);
-                            await iceman.sayID("AUTO_155");
+                            await iceman.say("Hmm... you hesitated. No matter.. BECAUSE I AM THE BEST AND YOU KNOW IT NOW.");
                         } else {
-                            await iceman.sayID("AUTO_156");
+                            await iceman.say("YEAH THAT'S RIGHT I AM THE BEST MHUAHAHAHAHAHAHA.");
                         }
-                        await iceman.sayID("AUTO_157");
+                        await iceman.say("Okay. Well, if you're ready, we can begin your training right now!");
                         world.globalState.icemanFightPreampleComplete = true;
                         await readyToFight();
                         break;
                     case 1:
-                        await iceman.sayID("AUTO_158");
-                        await iceman.sayID("AUTO_159");
+                        await iceman.say("Oh. Frogert? That frog has a serious drinking problem. He was probably drunk when he told you to come here.");
+                        await iceman.say("Well if you need help with anything else, like fighting, you know where to find me.");
                         break;
                     case 2:
-                        await iceman.sayID("AUTO_190");
-                        await iceman.sayID("AUTO_159");
+                        await iceman.say("That's... Disgusting. Or is this a pun? ha.. ha..");
+                        await iceman.say("Well if you need help with anything else, like fighting, you know where to find me.");
                         break;
                 }
 
@@ -100,7 +100,7 @@ addMap({
                     world.globalState.metIceman = true;
                     world.lockPlayerMovement();
                     delay(500);
-                    iceman.sayID("AUTO_160");
+                    iceman.say("Jeez. Don't you knock? I could have been doing something you might not have wanted to see.");
                     world.unlockPlayerMovement();
                 }
             } else if(world.globalState.completedTutorialBattle) {
@@ -110,15 +110,15 @@ addMap({
                         world.playerObject.updateDirection("left");
                         world.globalState.cameBackToIceman = true;
                         await delay(700)
-                        await iceman.sayID("AUTO_195");
-                        await iceman.sayID("AUTO_196");
-                        await iceman.sayID("AUTO_197");
-                        await iceman.sayID("AUTO_198");
+                        await iceman.say("Ah. Fresh air.");
+                        await iceman.say("I'm glad I was able to help you.");
+                        await iceman.say("You proved yourself to be a great fighter back there.");
+                        await iceman.say("Maybe someday we can fight? Haha.");
                         await rendererState.showInstantTextPopup("(Not a chance)");
-                        await iceman.sayID("AUTO_199");
-                        await iceman.sayID("AUTO_200");
-                        await iceman.sayID("AUTO_201");
-                        await iceman.sayID("AUTO_202");
+                        await iceman.say("Well, you should probably start meeting more of the townspeople.");
+                        await iceman.say("I heard the Chilis are throwing a Christmas party soon and you might put people at ease if they meet you ahead of time.");
+                        await iceman.say("The Chilis live West of the tavern in the big, tall house.");
+                        await iceman.say("They're a great couple, I'm sure they'd love to meet you.");
                         world.unlockPlayerMovement();
                     }
                 }
@@ -133,10 +133,10 @@ addMap({
         this.otherClicked = type => {
             switch(type) {
                 case 8:
-                    world.showTextPopupID("rudetable");
+                    world.showTextPopup("Someone didn't bring the chair back to the table. How rude!");
                     break;
                 case 9:
-                    world.showTextPopupID("sleepingbag_2");
+                    world.showTextPopup("Whoever lives here also has a sleeping bag. Do they only come in one color?");
                     break;
             }
         }
