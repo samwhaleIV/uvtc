@@ -17,7 +17,7 @@ addMap({
                         "bookcase_9_2",
                         "bookcase_9_3",
                     ]);
-                    const selection = await world.showPrompt("do you want to read an adult book?",["yes","no"]);
+                    const selection = await world.showPrompt("do you want to read an adult book?","yes","no");
                     if(selection === 0) {
                         world.showTextPopupID("bookcase_9_4_1");
                     } else {

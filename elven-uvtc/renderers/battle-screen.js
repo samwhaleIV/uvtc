@@ -3,13 +3,14 @@ import RenderStatus from "./components/battle/status.js";
 import RenderMove from "./components/battle/move.js";
 
 const HEALTH_FLASH_TIME = 100;
-const FULL_TEXT_TRANSITION_TIME = 200;
+const FULL_TEXT_TRANSITION_TIME = 300;
 const circleTraceTime = 1300;
 const circleFillTime = 500;
 const backgroundSaturateTime = 1500;
 const saturatePopExponent = 4; //Higher numbers are more abrupt
 const centerCircleOffset = 20;
 const outerRingRadius = 4;
+const forcedSpeechDelay = FULL_TEXT_TRANSITION_TIME + 200;
 
 function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
 
@@ -46,7 +47,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
     this.rightHealthNormal = null;
 
     let playerMoves = [];
-    this.marqueeText = null;
+    this.marqueeText = "Prepare to battle!";
     this.fullText = null;
 
     let leavingText = null;
@@ -150,11 +151,24 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
                 if(!enterDown) {
                     if(playerMoves.length === 1 && playerMoves[0].name === "Skip") {
                         if(playerActionResolver) {
-                            playerActionResolver(0);
-                            playerActionResolver = null;
-                            playSound("click");
+                            if(this.fullText) {
+                                if(performance.now() < fullTextStart + forcedSpeechDelay) {
+                                    playSound("click");
+                                    return;
+                                } else {
+                                    playSound("click");
+                                    playerActionResolver(0);
+                                    playerActionResolver = null;
+                                }
+                            } else {
+                                playSound("click");
+                                playerActionResolver(0);
+                                playerActionResolver = null;
+                            }
                         } else if(!this.sequencer.started) {
                             this.sequencer.startBattle();
+                        } else {
+                            playSound("click");
                         }
                     }
                 }
@@ -179,13 +193,21 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
             case hoverTypes.m2:
             case hoverTypes.m3:
             case hoverTypes.m4:
+                if(hoverType > playerMoves.length) {
+                    break;
+                }
                 if(!this.sequencer.started) {
                     playSound("click");
                     this.sequencer.startBattle();
                     break;
                 }
-                if(hoverType > playerMoves.length) {
-                    break;
+                if(this.fullText) {
+                    if(playerMoves.length === 1 && playerMoves[0].name === "Skip") {
+                        if(performance.now() < fullTextStart + forcedSpeechDelay) {
+                            playSound("click");
+                            break;
+                        }
+                    }
                 }
                 if(playerActionResolver) {
                     playerActionResolver(hoverType-1);
