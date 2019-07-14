@@ -80,7 +80,9 @@ function WorldRenderer() {
             this.updateCamera(performance.now(),playerInteractionLocked());
             if(this.map.start) {
                 if(firstTime) {
-                    setTimeout(this.map.start,faderTime+faderDelay,this);
+                    this.faderCompleted = () => {
+                        this.map.start(this);
+                    };
                 } else {
                     this.map.start(this);
                 }
