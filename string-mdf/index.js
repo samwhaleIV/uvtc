@@ -1,12 +1,14 @@
 const fs = require("fs");
-const opn = require("opn");
 
-const scriptFile = "../elven-uvtc/runtime/scripts.js";
-const inputFolder = "../elven-uvtc/runtime/maps";
-const stringsFilePath = "../elven-uvtc/runtime/strings.js";
-const shadowStringsPath = "./shadow-strings.txt";
-const mapManifestPath = "../elven-uvtc/runtime/maps/manifest.js";
-const opponentsFolder = "../elven-uvtc/runtime/battle/opponents";
+const ROOT = "../elven-uvtc/";
+const MANIFEST_FILE_NAME = "manifest.js";
+const SCRIPT_FILE = ROOT + "runtime/scripts.js";
+const MAPS_FOLDER = ROOT + "runtime/maps";
+const SHADOW_STRINGS_PATH = "./shadow-strings.txt";
+const MAP_MANIFEST_PATH = ROOT + "runtime/maps/" + MANIFEST_FILE_NAME;
+const OPPONENTS_FOLDER = ROOT + "runtime/battle/opponents";
+const OPPONENTS_MANIFEST_PATH = OPPONENTS_FOLDER + "/" + MANIFEST_FILE_NAME;
+const SHADOW_STRING_DELIMITER = "|";
 
 const walk = function(dir) {
     //https://stackoverflow.com/a/16684530
@@ -18,7 +20,7 @@ const walk = function(dir) {
         if(stat && stat.isDirectory()) { 
             results = results.concat(walk(file));
         } else {
-            if(!file.endsWith("manifest.js")) {
+            if(!file.endsWith(MANIFEST_FILE_NAME)) {
                 results.push(file);
             }
         }
@@ -30,47 +32,36 @@ String.prototype.replaceAll = function(search,replacement) {
     return target.split(search).join(replacement);
 };
 
-const filesToReplaceStringsFrom = walk(inputFolder);
-filesToReplaceStringsFrom.push(scriptFile);
 
-function createMapManifest() {
+createShadowStringsFile();
+createManifest(MAPS_FOLDER,MAP_MANIFEST_PATH);
+createManifest(OPPONENTS_FOLDER,OPPONENTS_MANIFEST_PATH);
+
+function createManifest(folderPath,manifestPath) {
     function makeLine(fileName) {
         return `import ".${fileName}";`;
     }
     const lines = [];
-    console.log(filesToReplaceStringsFrom);
-    filesToReplaceStringsFrom.forEach(fileName=>{
-        if(fileName.startsWith(inputFolder)) {
-            const name = fileName.split(inputFolder)[1];
-            lines.push(makeLine(name));
-        }
-    });
-    fs.writeFileSync(mapManifestPath,lines.join("\r\n")+"\r\n");
-}
-function createOpponentManifest() {
-    function makeLine(fileName) {
-        return `import ".${fileName}";`;
-    }
-    const lines = [];
-    const files = walk(opponentsFolder);
+    const files = walk(folderPath);
     console.log(files);
     files.forEach(fileName=>{
-        if(fileName.startsWith(opponentsFolder)) {
-            const name = fileName.split(opponentsFolder)[1];
+        if(fileName.startsWith(folderPath)) {
+            const name = fileName.split(folderPath)[1];
             lines.push(makeLine(name));
         }
     });
-    fs.writeFileSync(opponentsFolder + "/manifest.js",lines.join("\r\n")+"\r\n");
+    fs.writeFileSync(manifestPath,lines.join("\r\n")+"\r\n");
 }
 
 function createShadowStringsFile() {
+    const files = walk(MAPS_FOLDER);
+    files.push(SCRIPT_FILE);
     const strings = {};
-
     const targetStringType = '"';
 
-    for(let i = 0;i<filesToReplaceStringsFrom.length;i++) {
+    for(let i = 0;i<files.length;i++) {
 
-        const fileName = filesToReplaceStringsFrom[i];
+        const fileName = files[i];
         const startFileText = fs.readFileSync(fileName).toString();
         const fileText = startFileText.split("");
     
@@ -96,11 +87,6 @@ function createShadowStringsFile() {
             stringBuffer = ""; 
         }
     }
-
-    fs.writeFileSync(shadowStringsPath,Object.keys(strings).join("|"));
+    const fileText = Object.keys(strings).join(SHADOW_STRING_DELIMITER);
+    fs.writeFileSync(SHADOW_STRINGS_PATH,fileText);
 }
-
-createShadowStringsFile();
-createMapManifest();
-createOpponentManifest();
-//opn("file:///C:/Users/jedisammy4/Documents/uvtc/string-baker.html");

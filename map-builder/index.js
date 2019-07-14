@@ -1,16 +1,16 @@
 const fs = require("fs");
 
-const inputFolder = "./input/";
-const outputPath = "../map-data.js";
+const INPUT_FOLDER = "./input/";
+const OUTPUT_PATH = "../map-data.js";
+const OUTPUT_VARIABLE_PREFIX = "const rawMapData=";
 
-const WorldMapValueOffset = -1;
-const CollisionMapValueOffset = -4097;
-
+const MAP_VALUE_OFFSET = -1;
+const MAP_COLLISION_OFFSET = -4097;
 
 const allMapData = [];
 const compiledMapData = {};
-fs.readdirSync(inputFolder).forEach(fileName => {
-    const file = `${inputFolder}${fileName}`;
+fs.readdirSync(INPUT_FOLDER).forEach(fileName => {
+    const file = `${INPUT_FOLDER}${fileName}`;
     const fileResult = fs.readFileSync(file);
     let fileDisplayName = fileName.split(".");
     fileDisplayName.pop();
@@ -32,10 +32,10 @@ function processMapData(rawMap,name) {
     map.rows = rawMap.height;
 
     for(let i = 0;i<map.background.length;i++) {
-        map.background[i] = (map.background[i] || 1) + WorldMapValueOffset;
-        map.foreground[i] = (map.foreground[i] || 1) + WorldMapValueOffset;
+        map.background[i] = (map.background[i] || 1) + MAP_VALUE_OFFSET;
+        map.foreground[i] = (map.foreground[i] || 1) + MAP_VALUE_OFFSET;
         if(map.collision[i] !== 0) {
-            map.collision[i] = map.collision[i] + CollisionMapValueOffset;
+            map.collision[i] = map.collision[i] + MAP_COLLISION_OFFSET;
         }
     }
 
@@ -43,4 +43,4 @@ function processMapData(rawMap,name) {
 }
 
 allMapData.forEach(rawMap => processMapData(rawMap.data,rawMap.name));
-fs.writeFileSync(outputPath,`const rawMapData=${JSON.stringify(compiledMapData)}`);
+fs.writeFileSync(OUTPUT_PATH,`${OUTPUT_VARIABLE_PREFIX}${JSON.stringify(compiledMapData)}`);

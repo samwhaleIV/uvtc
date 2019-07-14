@@ -1,8 +1,9 @@
 const fs = require("fs");
-const opn = require("opn");
 
-const imagePath = "../elven-uvtc/images/";
-const imageManifestPath = "../elven-uvtc/image-files.js";
+const IMAGE_PATH = "../elven-uvtc/images/";
+const IMAGE_MANIFEST_PATH = "../elven-uvtc/image-files.js";
+const BACKGROUNDS_FOLDER_START = "backgrounds/";
+const PAINT_DOT_NET_FILE_EXTENSION = ".pdn";
 
 const walk = function(dir) {
     //https://stackoverflow.com/a/16684530
@@ -29,15 +30,15 @@ function getImageRegular(path) {
 function getImageBackground(path) {
     return `getFile("${path}",FileTypes.BackgroundImage)`;
 }
-const imageFiles = walk(imagePath);
+const imageFiles = walk(IMAGE_PATH);
 const innerLines = [];
 imageFiles.forEach(imageFile=>{
-    const path = imageFile.split(imagePath)[1].substring(1);
-    if(path.endsWith(".pdn")) {
+    const path = imageFile.split(IMAGE_PATH)[1].substring(1);
+    if(path.endsWith(PAINT_DOT_NET_FILE_EXTENSION)) {
         return;
     }
-    if(path.startsWith("backgrounds/")) {
-        const backgroundName = path.split("backgrounds/")[1];
+    if(path.startsWith(BACKGROUNDS_FOLDER_START)) {
+        const backgroundName = path.split(BACKGROUNDS_FOLDER_START)[1];
         innerLines.push(getImageBackground(backgroundName));
     } else {
         innerLines.push(getImageRegular(path));
@@ -49,4 +50,4 @@ const outputFile = [
     ...innerLines.map((line,idx)=>`    ${line}${idx===innerLines.length-1?"":","}`),
     ");"
 ];
-fs.writeFileSync(imageManifestPath,outputFile.join("\r\n")+"\r\n");
+fs.writeFileSync(IMAGE_MANIFEST_PATH,outputFile.join("\r\n")+"\r\n");
