@@ -87,7 +87,7 @@ const processRawStrings = function() {
 }
 
 function start() {
-    nextWord = function(event) {
+    processNextWord = function(event) {
         wordIndex++;
         const word = wordFeed.textContent;
         const syllableNumber = event.key === "q" ? word.length : Number(event.key);

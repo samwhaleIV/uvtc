@@ -461,11 +461,11 @@ function WorldRenderer() {
             );
         });
     }
-    this.showTextPopup = ID => showTextPopup([getString(ID)]);
-    this.showTextPopup = page => showTextPopup([page]);
-    this.showTextPopups = pages => showTextPopup(pages);
-    this.showNamedTextPopup = (page,name) => showTextPopup([page],name);
-    this.showInstantTextPopup = page => showTextPopup([page],null,true);
+    this.showTextPopup =        page =>         showTextPopup([page]);
+    this.showTextPopups =       pages =>        showTextPopup(pages);
+    this.showInstantTextPopup = page =>         showTextPopup([page],null,true);
+    this.showNamedTextPopup =   (page,name) =>  showTextPopup([page],name);
+    this.showNamedTextPopups =  (pages,name) => showTextPopup(pages,name);
     this.showInstantTextPopupSound = page => {
         playSound("energy");
         return showTextPopup([page],null,true);

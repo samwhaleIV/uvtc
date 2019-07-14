@@ -83,7 +83,7 @@ const scripts = {
         let whoItIs = await world.showPrompt("who are you?","mom","your neighbor","not really sure","knock knock");
         await delay(1000);
         await frogert.say([
-            "Mom..? You sound different. Did you start drinking again?",
+            "Mom..? You sound different. Did you start smoking again?",
             "Ohhh, Jim? Long time no see. Come on in!",
             "Sorry 'not really sure', but I can't just let strangers in without a warrant.",
             "Uhh, who's there?"
