@@ -1,7 +1,7 @@
 addMap({
     WorldState: function(world,data) {
         this.load = world => {
-            world.addPlayer(3,2,"down");
+            world.addPlayer(5,2,"down");
         }
         this.doorClicked = doorID => {
             if(doorID === "to_tumble_woods") {

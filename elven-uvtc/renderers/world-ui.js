@@ -102,6 +102,8 @@ function WorldUIRenderer(world) {
         }
         this.processMove(x,y);
     }
+    let lastSave = 0;
+    const saveTimeout = 1000;
     this.processClickEnd = (x,y) => {
         if(transitioning) {
             return;
@@ -129,11 +131,16 @@ function WorldUIRenderer(world) {
                     break;
                 case internalIconMap.moves.hoverID:
                     playSound("click");
+
                     panel = new MovesPaneRenderer(clearPanel);
                     break;
                 case internalIconMap.help.hoverID:
-                    world.saveState(true);
-                    world.showAlert("Your progress has been saved!");
+                    const now = performance.now();
+                    if(now > lastSave + saveTimeout) {
+                        world.saveState(true);
+                        world.showAlert("Your progress has been saved!");
+                        lastSave = now;
+                    }
                     break;
             }
         }
