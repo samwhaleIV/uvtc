@@ -102,9 +102,13 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
         leavingText = null;
         fullTextLeaveStartTime = null;
         this.fullText = processTextForWrapping(text);
-        setTimeout(playSound,100,"text-sound");
-        setTimeout(playSound,200,"text-sound");
-        setTimeout(playSound,300,"text-sound");
+        let startDelay = FULL_TEXT_TRANSITION_TIME;
+        if(fullTextStart !== null) {
+            startDelay = 0;
+        }
+        setTimeout(playSound,startDelay,"text-sound");
+        setTimeout(playSound,startDelay + 100,"text-sound");
+        setTimeout(playSound,startDelay + 200,"text-sound");
     };
     this.clearFullText = () => {
         leavingText = this.fullText;
@@ -153,7 +157,6 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
                         if(playerActionResolver) {
                             if(this.fullText) {
                                 if(performance.now() < fullTextStart + forcedSpeechDelay) {
-                                    playSound("click");
                                     return;
                                 } else {
                                     playSound("click");
@@ -204,7 +207,6 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
                 if(this.fullText) {
                     if(playerMoves.length === 1 && playerMoves[0].name === "Skip") {
                         if(performance.now() < fullTextStart + forcedSpeechDelay) {
-                            playSound("click");
                             break;
                         }
                     }

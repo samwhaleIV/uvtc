@@ -54,9 +54,8 @@ addMap({
             }
 
             this.start = async () => {
-                world.lockPlayerMovement();
                 if(world.globalState.completedTutorialBattle) {
-                    await delay(faderTime + 1000);
+                    await delay(600);
                     if(world.globalState.failedTutorialBattle) {
                         await iceman.say("Wow. You failed your first battle against a drunk ice cream cone.");
                         await iceman.say("A drunk ice cream cone that didn't even fight back, I should add.");

@@ -98,7 +98,6 @@ addMap({
             if(!world.globalState.metIceman) {
                 this.start = () => {
                     world.globalState.metIceman = true;
-                    world.lockPlayerMovement();
                     delay(500);
                     iceman.say("Jeez. Don't you knock? I could have been doing something you might not have wanted to see.");
                     world.unlockPlayerMovement();
@@ -106,7 +105,6 @@ addMap({
             } else if(world.globalState.completedTutorialBattle) {
                 if(!world.globalState.cameBackToIceman) {
                     this.start = async () => {
-                        world.lockPlayerMovement();
                         world.playerObject.updateDirection("left");
                         world.globalState.cameBackToIceman = true;
                         await delay(700)

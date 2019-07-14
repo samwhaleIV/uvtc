@@ -249,12 +249,8 @@ addMap({
                     break;
             }
         }
-        let activeTrigger = null;
+
         this.triggerActivated = async triggerID => {
-            if(activeTrigger) {
-                return;
-            }
-            activeTrigger = triggerID;
             switch(triggerID) {
                 case 1:
                     if(world.globalState.tavernEnterTrigger) {
@@ -272,9 +268,6 @@ addMap({
                     world.globalState.tavernEnterTrigger = true;
                     break;
             }
-        }
-        this.triggerDeactivated = () => {
-            activeTrigger = null;
         }
     },
     name: "tavern",

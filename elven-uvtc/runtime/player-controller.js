@@ -277,7 +277,7 @@ function PlayerController(world) {
         } else if(this.verticalVelocity < 0) {
             this.player.setWalking(tryMoveUp(movementDistance));
         }
-        if(this.player.onTrigger) {
+        if(this.world.map.triggerActive || this.world.map.triggerActivationMask) {
             this.player.impulseTrigger(this.world);
         }
     }

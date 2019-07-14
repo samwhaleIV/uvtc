@@ -72,8 +72,8 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
     const footStepBuffer = [];
 
     this.firstPosition = true;
-    this.worldPositionUpdated = function(oldX,oldY,newX,newY,world) {
-        if(!this.firstPosition) {
+    this.worldPositionUpdated = function(oldX,oldY,newX,newY,world,initial) {
+        if(!initial) {
             const decalSourceX = this.direction === "up" || this.direction === "down" ? 0 : footstepWidth;
             const xOffset = this.xOffset;
             const yOffset = this.yOffset;
@@ -113,32 +113,46 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
                     world.addDecal(newFootStep);
                 }
             }
-        } else {
-            this.firstPosition = false;
         }
         if(!this.isPlayer) {
             return;
         }
-        const trigger = world.getTriggerState(newX,newY);
-        const wasOnTrigger = this.onTrigger;
-        this.onTrigger = trigger ? true : false;
-        if(this.onTrigger) {
-            this.lastTrigger = trigger;
-            this.impulseTrigger(world);
-        } else if(wasOnTrigger && world.map.triggerDeactivated) {
-            world.map.triggerDeactivated(
-                wasOnTrigger
-            );
+        this.triggerState = world.getTriggerState(newX,newY);
+        this.impulseTrigger(world,initial);
+    }
+
+    this.impulseTrigger = (world,initial=false) => {
+        const trigger = this.triggerState;
+        const isOnTrigger = trigger ? true : false;
+        const triggerAlreadyPressed = world.map.triggerActive;
+
+        if(triggerAlreadyPressed && !world.map.triggerActivationMask) {
+            if(!isOnTrigger) {
+                world.map.triggerActive = false;
+                world.map.triggerActivationMask = false;
+                if(world.map.triggerDeactivated) {
+                    world.map.triggerDeactivated(world.map.lastTrigger,invertDirection(this.direction));
+                }
+            }
+        } else {
+            if(isOnTrigger) {
+                world.map.lastTrigger = trigger;
+                world.map.triggerActive = true;
+                if(initial) {
+                    world.map.triggerActivationMask = true;
+                    return;
+                }
+                if(world.map.triggerActivated) {
+                    const result = world.map.triggerActivated(trigger,invertDirection(this.direction));
+                    if(result === PENDING_CODE) {
+                        world.map.triggerActivationMask = true;
+                    } else {
+                        world.map.triggerActivationMask = false;
+                    }
+                }
+            }
         }
     }
-    this.impulseTrigger = world => {
-        world.map.triggerActivated(
-            this.lastTrigger,
-            invertDirection(this.direction)
-        );
-    }
-    this.onTrigger = false;
-    this.lastTrigger = null;
 
     let specialRow = null;
 

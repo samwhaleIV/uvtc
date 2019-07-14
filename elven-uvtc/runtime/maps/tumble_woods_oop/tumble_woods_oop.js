@@ -14,22 +14,15 @@ addMap({
         this.doorClicked = doorID => {
             
         }
-        this.activeTrigger = null;
+
         this.triggerActivated = (ID,direction) => {
-            if(this.activeTrigger !== null) {
-                return;
-            }
             switch(ID) {
                 case 2:
                 case 1:
-                    this.activeTrigger = ID;
                     world.showTextPopup("You can't leave ȹTumble Townȹ yet! You have important things to do!");
                     break;
 
             }
-        }
-        this.triggerDeactivated = () => {
-            this.activeTrigger = null;
         }
     },
     useCameraPadding: true,

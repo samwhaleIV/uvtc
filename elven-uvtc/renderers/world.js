@@ -43,7 +43,7 @@ function WorldRenderer() {
                 yo: this.playerObject.yOffset,
             }
         }
-        if(skipGlobal) {
+        if(!skipGlobal) {
             GlobalState.save();
         }
     };
@@ -55,7 +55,7 @@ function WorldRenderer() {
             if(lp) {
                 return () => {
                     if(this.playerObject) {
-                        this.moveObject(this.playerObject.ID,lp.x,lp.y);
+                        this.moveObject(this.playerObject.ID,lp.x,lp.y,true);
                         this.playerObject.xOffset = lp.xo;
                         this.playerObject.yOffset = lp.yo;
                         this.playerObject.updateDirection(lp.d);
@@ -76,10 +76,14 @@ function WorldRenderer() {
     }
     let ranCustomLoader = false;
     this.customLoader = (callback,fromMapUpdate,sourceRoom) => {
-        const callbackWithMapPost = () => {
+        const callbackWithMapPost = (firstTime=false) => {
             this.updateCamera(performance.now(),playerInteractionLocked());
             if(this.map.start) {
-                this.map.start(this);
+                if(firstTime) {
+                    setTimeout(this.map.start,faderTime+faderDelay,this);
+                } else {
+                    this.map.start(this);
+                }
             } else {
                 this.unlockPlayerMovement();
             }
@@ -100,13 +104,13 @@ function WorldRenderer() {
                 ranCustomLoader = true;
             }
             if(firstTime || sourceRoom === this.renderMap.songParent || worldMaps[sourceRoom].songParent === this.renderMap.name) {
-                callbackWithMapPost();
+                callbackWithMapPost(firstTime);
             } else {
                 const fakeDelay = FAKE_OVERWORLD_LOAD_TIME - realTimeSpentLoading;
                 if(fakeDelay > 0) {
                     setTimeout(callbackWithMapPost,fakeDelay);
                 } else {
-                    callbackWithMapPost();
+                    callbackWithMapPost(firstTime);
                 }
             }
         }
@@ -225,7 +229,7 @@ function WorldRenderer() {
                 if(description) {
                     if(type) {
                         type = type.substring(0,1).toUpperCase() + type.substring(1);
-                        description = `${moveNameColor}${type}:${moveNameColor} ${description}`;
+                        description = `${type}: ${description}`;
                     }
                     playSound("click");
                     await this.showInstantTextPopup(description);
@@ -558,7 +562,7 @@ function WorldRenderer() {
             object.x = x;
             object.y = y;
             if(object.worldPositionUpdated) {
-                object.worldPositionUpdated(x,y,x,y,this);
+                object.worldPositionUpdated(x,y,x,y,this,true);
             }
         } else if(isNaN(object.x) || !isNaN(object.y)) {
             console.error("Error: An object was supplied to the world renderer without initial coordinates");
@@ -577,7 +581,7 @@ function WorldRenderer() {
         delete this.objects[objectID];
         this.objectsLookup[object.x][object.y] = null;
     }
-    this.moveObject = function(objectID,newX,newY) {
+    this.moveObject = function(objectID,newX,newY,isInitialPosition=false) {
         const object = this.objects[objectID];
         this.objectsLookup[object.x][object.y] = null;
         const oldX = object.x;
@@ -585,7 +589,7 @@ function WorldRenderer() {
         object.x = newX;
         object.y = newY;
         if(object.worldPositionUpdated) {
-            object.worldPositionUpdated(oldX,oldY,newX,newY,this);
+            object.worldPositionUpdated(oldX,oldY,newX,newY,this,isInitialPosition);
         }
         if(this.objectsLookup[object.x][object.y]) {
             console.error("Error: An object collision has occured through the move object method");
@@ -651,7 +655,7 @@ function WorldRenderer() {
                             }
                             if(rolloverRequired) {
                                 object[offsetProperty] -= offsetRollover;
-                                world.moveObject(objectID,object.x+xChangeRollover,object.y+yChangeRollover);
+                                world.moveObject(objectID,object.x+xChangeRollover,object.y+yChangeRollover,false);
                             }
                             if(endValue === object[targetProperty]) {
                                 object[offsetProperty] = 0;

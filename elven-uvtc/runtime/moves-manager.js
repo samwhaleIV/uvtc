@@ -18,7 +18,7 @@ const getDefaultSlots = () => {
 if(!GlobalState.data.unlockedMoves) {
     GlobalState.data.unlockedMoves = {};
 }
-if(!GlobalState.data.moveSlots) {
+if(!GlobalState.data.moveSlots || typeof GlobalState.data.moveSlots.logic[1] !== typeof "You have outdated save data") {
     GlobalState.data.moveSlots = {
         logic: getDefaultSlots(),
         fear: getDefaultSlots(),

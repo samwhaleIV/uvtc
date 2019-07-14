@@ -25,3 +25,5 @@ const FALLBACK_MAP_ID = "bedroom_1";
 const OVERWORLD_MUSIC_FADE_TIME = 100;
 const FAKE_OVERWORLD_LOAD_TIME = 500;
 const VERSION_STRING = "you versus earth, v0.2";
+
+const PENDING_CODE = Symbol("Pending");
