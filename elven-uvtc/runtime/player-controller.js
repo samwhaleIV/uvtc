@@ -141,7 +141,8 @@ function PlayerController(world) {
             );
         }
 
-        if((this.world.collides(this.player.x,this.player.y-1,this.player.ID) || horizontalCollision) && this.player.yOffset < 0) {
+        if((this.world.collides(this.player.x,this.player.y-1,this.player.ID) || horizontalCollision) && this.player.yOffset <= 0) {
+            this.player.yOffset = 0;
             return false;
         }
 
@@ -153,6 +154,10 @@ function PlayerController(world) {
                 this.player.x,
                 this.player.y-1
             );
+            if(this.world.collides(this.player.x,this.player.y-1,this.player.ID)) {
+                this.player.yOffset = 0;
+                return false;
+            }
         }
         return true;
     }
@@ -173,7 +178,8 @@ function PlayerController(world) {
             );
         }
 
-        if((this.world.collides(this.player.x,this.player.y+1,this.player.ID) || horizontalCollision) && this.player.yOffset > 0) {
+        if((this.world.collides(this.player.x,this.player.y+1,this.player.ID) || horizontalCollision) && this.player.yOffset >= 0) {
+            this.player.yOffset = 0;
             return false;
         }
         this.player.yOffset += movementDistance;
@@ -184,6 +190,10 @@ function PlayerController(world) {
                 this.player.x,
                 this.player.y+1
             );
+            if(this.world.collides(this.player.x,this.player.y+1)) {
+                this.player.yOffset = 0;
+                return false;
+            }
         }
         return true;
     }
@@ -204,7 +214,8 @@ function PlayerController(world) {
             );
         }
 
-        if((this.world.collides(this.player.x-1,this.player.y,this.player.ID) || verticalCollision) && this.player.xOffset < 0) {
+        if((this.world.collides(this.player.x-1,this.player.y,this.player.ID) || verticalCollision) && this.player.xOffset <= 0) {
+            this.player.xOffset = 0;
             return false;
         }
 
@@ -216,6 +227,10 @@ function PlayerController(world) {
                 this.player.x-1,
                 this.player.y
             );
+            if(this.world.collides(this.player.x-1,this.player.y,this.player.ID)) {
+                this.player.xOffset = 0;
+                return false;
+            }
         }
         return true;
     }
@@ -236,7 +251,8 @@ function PlayerController(world) {
             );
         }
 
-        if((this.world.collides(this.player.x+1,this.player.y,this.player.ID) || verticalCollision) && this.player.xOffset > 0) {
+        if((this.world.collides(this.player.x+1,this.player.y,this.player.ID) || verticalCollision) && this.player.xOffset >= 0) {
+            this.player.xOffset = 0;
             return false;
         }
 
@@ -248,6 +264,10 @@ function PlayerController(world) {
                 this.player.x+1,
                 this.player.y
             );
+            if(this.world.collides(this.player.x+1,this.player.y,this.player.ID)) {
+                this.player.xOffset = 0;
+                return false;
+            }
         }
         return true;
     }
