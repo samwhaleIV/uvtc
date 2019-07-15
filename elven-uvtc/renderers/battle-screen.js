@@ -169,6 +169,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
                                 playerActionResolver = null;
                             }
                         } else if(!this.sequencer.started) {
+                            playSound("click");
                             this.sequencer.startBattle();
                         } else {
                             playSound("click");

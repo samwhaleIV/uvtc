@@ -121,151 +121,96 @@ function PlayerController(world) {
     this.horizontalVelocity = 0;
     this.verticalVelocity = 0;
 
-    const cornerCollisionThreshold = 0.15;
-    const inverseCornerCollisionThreshold = -cornerCollisionThreshold;
+    const cornerCollisionThreshold = 0;
+    const inverseCornerCollisionThreshold = 0;
 
-    const tryMoveUp = movementDistance => {
-        let horizontalCollision = false;
-
-        if(this.player.xOffset > cornerCollisionThreshold) {
-            horizontalCollision = this.world.collides(
-                this.player.x+1,
-                this.player.y-1,
-                this.player.ID
-            );
-        } else if(this.player.xOffset < inverseCornerCollisionThreshold) {
-            horizontalCollision = this.world.collides(
-                this.player.x-1,
-                this.player.y-1,
-                this.player.ID
-            );
-        }
-
-        if((this.world.collides(this.player.x,this.player.y-1,this.player.ID) || horizontalCollision) && this.player.yOffset <= 0) {
-            this.player.yOffset = 0;
-            return false;
-        }
-
-        this.player.yOffset -= movementDistance;
-        if(this.player.yOffset < -1) {
-            this.player.yOffset++;
-            this.world.moveObject(
-                this.player.ID,
-                this.player.x,
-                this.player.y-1
-            );
-            if(this.world.collides(this.player.x,this.player.y-1,this.player.ID)) {
-                this.player.yOffset = 0;
-                return false;
+    const getSideCollision = (target,xDifference,yDifference) => {
+        const offset = this.player[target];
+        if(yDifference) {
+            if(offset > cornerCollisionThreshold) {
+                return this.world.collides(this.player.x+1,this.player.y+yDifference,this.player.ID);
+            } else if(offset < 0) {
+                return this.world.collides(this.player.x-1,this.player.y+yDifference,this.player.ID);
+            }
+        } else if(xDifference) {
+            if(offset > inverseCornerCollisionThreshold) {
+                return this.world.collides(this.player.x+xDifference,this.player.y+1,this.player.ID);
+            } else if(offset < 0) {
+                return this.world.collides(this.player.x+xDifference,this.player.y-1,this.player.ID);
             }
         }
-        return true;
+        return false;
     }
-    const tryMoveDown = movementDistance => {
-        let horizontalCollision = false;
-
-        if(this.player.xOffset > cornerCollisionThreshold) {
-            horizontalCollision = this.world.collides(
-                this.player.x+1,
-                this.player.y+1,
-                this.player.ID
-            );
-        } else if(this.player.xOffset < inverseCornerCollisionThreshold) {
-            horizontalCollision = this.world.collides(
-                this.player.x-1,
-                this.player.y+1,
-                this.player.ID
-            );
+    const polarizedEvaluation = (value,compareTo,positiveDifference) => {
+        if(positiveDifference) {
+            return value >= compareTo;
+        } else {
+            return value <= compareTo;
         }
-
-        if((this.world.collides(this.player.x,this.player.y+1,this.player.ID) || horizontalCollision) && this.player.yOffset >= 0) {
-            this.player.yOffset = 0;
+    }
+    const polarizedOverflowEvaluation = (value,positiveDifference) => {
+        if(positiveDifference) {
+            return value > 1;
+        } else {
+            return value < -1;
+        }
+    }
+    const tryMove = (movementDistance,xDifference,yDifference) => {
+        //Welcome to Hell.
+        let positiveDifference, offsetTarget, sideTarget;
+        if(xDifference) {
+            positiveDifference = xDifference > 0;
+            offsetTarget = "xOffset";
+            sideTarget = "yOffset";
+        } else if(yDifference) {
+            positiveDifference = yDifference > 0;
+            offsetTarget = "yOffset";
+            sideTarget = "xOffset";
+        } else {
             return false;
         }
-        this.player.yOffset += movementDistance;
-        if(this.player.yOffset > 1) {
-            this.player.yOffset--;
-            this.world.moveObject(
-                this.player.ID,
-                this.player.x,
-                this.player.y+1
-            );
-            if(this.world.collides(this.player.x,this.player.y+1)) {
-                this.player.yOffset = 0;
-                return false;
+        const sideCollision = getSideCollision(sideTarget,xDifference,yDifference);
+        const valueAtThreshold = polarizedEvaluation(this.player[offsetTarget],0,positiveDifference);
+        const lookAheadCollision = this.world.collides(
+            this.player.x+xDifference,
+            this.player.y+yDifference,
+            this.player.ID
+        );
+        if((lookAheadCollision || sideCollision) && valueAtThreshold) {
+            console.log("Dead stop - Maximum position already reached");
+            this.player[offsetTarget] = 0;
+            return false;
+        }
+
+        this.player[offsetTarget] += movementDistance;
+        const spaceThresholdReached = polarizedEvaluation(this.player[offsetTarget],0,positiveDifference);
+        if((lookAheadCollision || sideCollision) && spaceThresholdReached) {
+            console.log("Dead stop - Already in XY space");
+            this.player[offsetTarget] = 0;
+            return false;    
+        }
+        const valueOverflowing = polarizedOverflowEvaluation(this.player[offsetTarget],positiveDifference);
+        if(valueOverflowing) {
+            if(positiveDifference) {
+                this.player[offsetTarget]--;
+            } else {
+                this.player[offsetTarget]++;
             }
-        }
-        return true;
-    }
-    const tryMoveLeft = movementDistance => {
-        let verticalCollision = false;
-
-        if(this.player.yOffset > cornerCollisionThreshold) {
-            verticalCollision = this.world.collides(
-                this.player.x-1,
-                this.player.y+1,
-                this.player.ID
-            );
-        } else if(this.player.yOffset < inverseCornerCollisionThreshold) {
-            verticalCollision = this.world.collides(
-                this.player.x-1,
-                this.player.y-1,
-                this.player.ID
-            );
-        }
-
-        if((this.world.collides(this.player.x-1,this.player.y,this.player.ID) || verticalCollision) && this.player.xOffset <= 0) {
-            this.player.xOffset = 0;
-            return false;
-        }
-
-        this.player.xOffset -= movementDistance;
-        if(this.player.xOffset < -1) {
-            this.player.xOffset++;
             this.world.moveObject(
                 this.player.ID,
-                this.player.x-1,
-                this.player.y
+                this.player.x+xDifference,
+                this.player.y+yDifference
             );
-            if(this.world.collides(this.player.x-1,this.player.y,this.player.ID)) {
-                this.player.xOffset = 0;
-                return false;
-            }
-        }
-        return true;
-    }
-    const tryMoveRight = movementDistance => {
-        let verticalCollision = false;
-
-        if(this.player.yOffset > cornerCollisionThreshold) {
-            verticalCollision = this.world.collides(
-                this.player.x+1,
-                this.player.y+1,
+            const newSideCollision = getSideCollision(sideTarget,xDifference,yDifference);
+            const newLookAhead = this.world.collides(
+                this.player.x+xDifference,
+                this.player.y+yDifference,
                 this.player.ID
             );
-        } else if(this.player.yOffset < inverseCornerCollisionThreshold) {
-            verticalCollision = this.world.collides(
-                this.player.x+1,
-                this.player.y-1,
-                this.player.ID
-            );
-        }
-
-        if((this.world.collides(this.player.x+1,this.player.y,this.player.ID) || verticalCollision) && this.player.xOffset >= 0) {
-            this.player.xOffset = 0;
-            return false;
-        }
-
-        this.player.xOffset += movementDistance;
-        if(this.player.xOffset > 1) {
-            this.player.xOffset--;
-            this.world.moveObject(
-                this.player.ID,
-                this.player.x+1,
-                this.player.y
-            );
-            if(this.world.collides(this.player.x+1,this.player.y,this.player.ID)) {
-                this.player.xOffset = 0;
+            const newThreshold = polarizedEvaluation(this.player[offsetTarget],0,positiveDifference);
+            if((newLookAhead || newSideCollision) && newThreshold) {
+                console.log("Dead stop - Post movement update");
+                this.player[offsetTarget] = 0;
                 return false;
             }
         }
@@ -273,7 +218,26 @@ function PlayerController(world) {
     }
 
     let lastFrame = null;
+
+    let lastXOffset = 0;
+    let lastXPolarity = false;
+
     const movementMethod = timestamp => {
+        if(ENV_FLAGS.DEBUG_MICRO_SHIFT) {
+            if(lastXOffset > this.player.xOffset) {
+                if(!lastXPolarity) {
+                    console.log("Player controller: Micro direction shift!");
+                }
+                lastXPolarity = true;
+            } else {
+                if(lastXPolarity) {
+                    console.log("Player controller: Micro direction shift!");
+                }
+                lastXPolarity = false;
+            }
+            lastXOffset = this.player.xOffset;
+            console.log(this.player.xOffset);
+        }
         if(!lastFrame) {
             lastFrame = timestamp;
         }
@@ -288,14 +252,14 @@ function PlayerController(world) {
         const movementDistance = delta / 1000 * tilesPerSecond;
 
         if(this.horizontalVelocity > 0) {
-            this.player.setWalking(tryMoveRight(movementDistance));
+            this.player.setWalking(tryMove(movementDistance,1,0));
         } else if(this.horizontalVelocity < 0) {
-            this.player.setWalking(tryMoveLeft(movementDistance));
+            this.player.setWalking(tryMove(-movementDistance,-1,0));
         }
         if(this.verticalVelocity > 0) {
-            this.player.setWalking(tryMoveDown(movementDistance));
+            this.player.setWalking(tryMove(movementDistance,0,1));
         } else if(this.verticalVelocity < 0) {
-            this.player.setWalking(tryMoveUp(movementDistance));
+            this.player.setWalking(tryMove(-movementDistance,0,-1));
         }
         if(this.world.map.triggerActive || this.world.map.triggerActivationMask) {
             this.player.impulseTrigger(this.world);
