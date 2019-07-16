@@ -22,19 +22,22 @@ addMap({
                     await treelee.say("What if I wasn't even here and you just started snooping around my house?");
                 } else {
                     await treelee.alert();
-                    await treelee.say("Do you ever get the feeling someone is breathing on your neck?");
-                    await delay(600);
-                    treelee.updateDirection(direction);
                     await delay(400);
+                    await treelee.say("Do you ever get the feeling someone is breathing on your neck?");
+                    await delay(800);
+                    treelee.updateDirection(direction);
+                    await delay(800);
                     await treelee.say("Hey. I'm Tree Lee.");
                     await delay(800);
                     treelee.updateDirection("left");
+                    await delay(1600);
+                    treelee.updateDirection("right");
                     await delay(800);
-                    treelee.say("It's a beautiful Tree, isn't it?");
-                    await delay(500);
-                    treelee.say("... Don't answer that. I already know it's a beautiful tree");
+                    await treelee.say("It's a beautiful Tree, isn't it?");
                     await delay(800);
-                    treelee.updateDirection(direction);
+                    await treelee.say("... Don't answer that. I already know it's a beautiful tree");
+                    await delay(400);
+                    treelee.updateDirection("left");
                     world.globalState.metTreeLee = true;
                 }
 

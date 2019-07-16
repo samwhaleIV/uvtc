@@ -126,7 +126,8 @@ addMap({
         getRemainingMessage: function(world) {
             const count = this.getPresentCount(world);
             const remaining = this.maxCount - count;
-            if(count === 0) {
+            playSound("energy");
+            if(remaining === 0) {
                 return "You found the last present! You found them all!";
             } else {
                 return "You found a present! " + remaining + " more to go!";

@@ -9,13 +9,13 @@ addMap({
         }
         this.load = world => {
             world.addPlayer(5,2,"down");
-            const chili = world.getCharacter("chili");
-            const chiliWife = world.getCharacter("chili-wife");
-            world.addObject(chili,7,2,"down");
-            world.addObject(chiliWife,5,5,"up");
+            const chili = world.getCharacter("chili","down");
+            const chiliWife = world.getCharacter("chili-wife","up");
+            world.addObject(chili,7,2);
+            world.addObject(chiliWife,5,5);
             if(!world.globalState.chiliIntro) {
                 this.start = async () => {
-                    await delay(300);
+                    await delay(800);
                     await chiliWife.alert();
                     await chiliWife.say("Why hello! You must be, uh, that new guy!");
                     await chili.say("Darling! I'm sure 'the new guy' has a name.");
@@ -26,20 +26,13 @@ addMap({
                     await chili.say("Excuse us! Where are our manners.");
                     await delay(300);
                     await chili.updateDirection("left");
-                    world.autoCameraOff();
-                    world.followObject = chili;
                     await chili.say("Hi. I'm Chili!");
-                    world.followObject = chiliWife;
                     await chiliWife.say(`Hello. I'm Chillene!`);
-                    world.followObject = chili;
                     await chili.say("And together we-");
                     await delay(200);
                     chili.updateDirection("down");
                     await delay(200);
-                    world.followObject = chiliWife;
                     await chiliWife.say("-are the Chilis!");
-                    world.followObject = null;
-                    world.autoCameraOn();
                     await delay(800);
                     await chili.say("Look at him darling. He's overwhelmed!");
                     await chiliWife.say("Okay perhaps our intro was a bit much.");
@@ -51,7 +44,6 @@ addMap({
                     await chili.say("We actually need a big favor from you.");
                     await chiliWife.say("Want me to explain?");
                     await chili.say("Sure babe.");
-                    world.autoCameraOff();
 
                     world.followObject = chiliWife;
                     await chiliWife.say("So we're throwing this big Christmas Party for the town soon.");
@@ -61,26 +53,26 @@ addMap({
                     world.followObject = chiliWife;
                     await chiliWife.say("Yes dear... You already know this.");
                     await chiliWife.say("We need someone to bring the red presents from around town to us so we can finish setting up the party.");
-                    await chiliWife.say("Do you think you could get them for us? It would mean a lot to us.");
-                    if(hasAllPresents) {
+                    await chiliWife.say("Do you think you could get them? It would mean a lot to us.");
+                    if(hasAllPresents()) {
                         await chiliWife.say("Oh my. You already got them all? You're a huge life saver!");
                         await chiliWife.say("Wait, you weren't stealing them were you?");
                         await world.showPrompt("are you a thief?","uhhhh","of course not!");
                         await delay(800);
                         await chiliWife.say("Well, either way, you're a real life saver! Come over here and I'll take them off your hands.");
                     } else {
-                        const result = await chiliWife.showPrompt("will you get the red presents?","sure","i am busy","get a room you two");
+                        const result = await world.showPrompt("will you get the red presents?","sure","i am busy","get a room you two");
                         await delay(800);
                         switch(result) {
-                            case 1:
+                            case 0:
                                 await chiliWife.say("That's fantastic! You're gonna be a great friend, I just know it!");
                                 await chiliWife.say("After you've collected all the presents, come talk to me or Chili and we'll take them off your hands.");
                                 break;
-                            case 2:
+                            case 1:
                                 await chiliWife.say("Hmm. Excuses excuses. I'm sure you'll come around.");
                                 await chiliWife.say("When you do, come talk to me or Chili and we will track your progress.");
                                 break;
-                            case 3:
+                            case 2:
                                 await chiliWife.say("Uh we did. Need I remind you that you came into our house, which consists of exactly one room?");
                                 await chiliWife.say("Well, when you get the presents, come talk to me our Chili and we will track your progress.");
                                 break;
@@ -89,12 +81,12 @@ addMap({
                         await chiliWife.say("There are " + presentMaxCount + " presents in total.");
                     }
                     world.followObject = null;
-                    world.autoCameraOn();
                     world.unlockPlayerMovement();
                     world.globalState.chiliIntro = true;
                 }
             }
             const interacted = async (target,direction) => {
+                target.updateDirection(direction);
                 if(world.globalState.gotAllPresents) {
                     if(world.globalState.sentSealedLetter) {
                         target.say("Wow! You sent that sealed letter? Thanks a ton. I hope our special guests arrive on time for the party!");
@@ -114,7 +106,6 @@ addMap({
                     } else {
                         const morePresentsNeeded = presentMaxCount - getPresentCount();
                         if(morePresentsNeeded === 1) {
-                            target.updateDirection(direction);
                             target.say("Looks like you only need to find one more red present! You're almost there!");
                         } else if(morePresentsNeeded === presentMaxCount) {
                             target.say("Still haven't got any red presents? Be sure to check in every house!");
