@@ -53,6 +53,9 @@ const MusicLinkingManifest = {
     "house_1": {
         song: "cabin"
     },
+    "house_1_end": {
+        linkTo: "house_1"
+    },
     "house_2": {
         linkTo: "house_1"
     },
