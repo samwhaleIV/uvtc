@@ -37,8 +37,8 @@ const ChapterManager = new (function(){
         GlobalState.save();
     }
     this.setActiveChapterCompleted = () => {
-        this.clearActiveChapter();
         GlobalState.data.highestChapterFinished = GlobalState.data.activeChapter;
+        this.clearActiveChapter();
         GlobalState.save();
     }
 })();
