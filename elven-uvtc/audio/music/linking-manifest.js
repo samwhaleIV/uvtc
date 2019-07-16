@@ -26,7 +26,6 @@ const MUSIC_INTRO_SUFFIX = "_intro";
 //This is NOT used for songs that will play anywhere other than the over. Battles, menus, etc. will use something else.
 //Be sure not to include the intro suffix string or your files are gonna have to be named like 'song_intro_intro'
 const SongsWithIntros = [
-    "cabin"
     //"burrs_battle_song" //burrs_battle_song_intro is implied - you don't have to call it burrs_battle_song, just link it to "burr" in BattleMusicLinkingManifest
 	"cabin",
 	"tavern",
