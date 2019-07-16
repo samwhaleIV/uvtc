@@ -43,7 +43,7 @@ const bounceVariation2 = ELF_BOUNCE_TIME_BASE - 2321;
 const bounceVariation3 = ELF_BOUNCE_TIME_BASE - 1234;
 const bounceVariation4 = ELF_BOUNCE_TIME_BASE - 2019;
 
-function MainMenuRenderer() {
+function MainMenuRenderer(toChapterPane=false) {
 
     const hoverTypes = {
         none: 0,
@@ -273,6 +273,10 @@ function MainMenuRenderer() {
             0,0,bSize,bSize,
             0,largestDimension*(1-tNormal*2),largestDimension,largestDimension
         );
+    }
+
+    if(toChapterPane) {
+        this.overlayPane = new ChapterPane(this.clearOverlay,this);
     }
 
     this.render = function(timestamp) {

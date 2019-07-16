@@ -80,7 +80,7 @@ addMap({
                         }
                     } else {
                         world.globalState.metLouis = true;
-                        await louis.say("Welcome to Tree-Co. Are you hear to buy my trees? They drive me MAD.");
+                        await louis.say("Welcome to Tree-Co. Are you here to buy my trees? They drive me MAD.");
                         await louis.say("My name is Louis. I sell trees. If you can answer some questions about trees, I'll give you a present.");
                         await louis.say("It's a new holiday special we're running called 'if you're smarter than a tree.'");
                         const wantToTry = await world.showPrompt("want to play?","yes","no") === 0 ? true : false;

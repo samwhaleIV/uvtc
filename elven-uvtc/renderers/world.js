@@ -8,17 +8,25 @@ import WorldUIRenderer from "./world-ui.js";
 import UIAlert from "./components/ui-alert.js";
 import MovesManager from "../runtime/moves-manager.js";
 import MovePreview from "./components/world/move-preview.js";
+import ChapterPreview from "./components/world/chapter-preview.js";
 import Moves from "../runtime/battle/moves.js";
 import Chapters from "../runtime/chapter-data.js";
 import BattleScreenRenderer from "./battle-screen.js";
 import BattleFaderEffect from "./components/battle-fader-effect.js";
 import ChapterManager from "../runtime/chapter-manager.js";
 import MainMenuRenderer from "./main-menu.js";
+import ElvesFillIn from "./components/elves-fill-in.js";
 
 const songIntroLookup = {};
 SongsWithIntros.forEach(song => {
     songIntroLookup[song] = song + MUSIC_INTRO_SUFFIX;
 });
+
+const chapterNameLookup = [
+    null,"one","two","three","four","five","six","seven","eight",
+    "nine","ten","eleven","twelve","thirteen","fourteen","fifteen",
+    "sixteen","seventeen"
+];
 
 function WorldRenderer() {
     const alertTime = 1000;
@@ -35,14 +43,19 @@ function WorldRenderer() {
         }
     });
     this.chapterComplete = async () => {
+        const chapterNumber = GlobalState.data.activeChapter;
+        this.pushCustomRenderer(new ChapterPreview(chapterNumber,this.getItemPreviewBounds));
         ChapterManager.setActiveChapterCompleted();
-        this.showAlert("Chapter completed!",1200,true);
-        await delay(1400);
-        faderEffectsRenderer.fillInLayer = {render:()=>{
-            context.fillStyle="black";
-            context.fillRect(0,0,fullWidth,fullHeight);
-        }};
-        this.fader.fadeOut(MainMenuRenderer);
+        if(chapterNumber === 17) {
+            await this.showInstantTextPopupSound(`Good job, hero. This is it. Your journey has reached its end... Or is this merely the beginning?`);
+        } else {
+            await this.showInstantTextPopupSound(`Good job, hero. You completed chapter ${chapterNameLookup[chapterNumber]}! Onwards and upwards...`);
+        }
+
+        playSound("click");
+        this.popCustomRenderer();
+        faderEffectsRenderer.fillInLayer = new ElvesFillIn();
+        this.fader.fadeOut(MainMenuRenderer,true);
     }
     this.saveState = (withPositionData=true,skipGlobal=false) => {
         if(withPositionData && this.playerObject) {
@@ -215,27 +228,29 @@ function WorldRenderer() {
         }
     }
 
+    this.getItemPreviewBounds = () => {
+        if(this.popup) {
+            const popupY = this.popup.startY - 10;
+            return {
+                y: 10,
+                x: 10,
+                width: fullWidth - 10,
+                height: popupY - 10
+            }
+        } else {
+            return {
+                x:10,y:10,width:fullWidth-10,height:fullHeight-10
+            }
+        }
+    }
+
     this.unlockMove = moveName => {
         return new Promise(async resolve => {
             const alreadyHasMove = this.movesManager.hasMove(moveName);
             if(!alreadyHasMove) {
                 this.movesManager.unlockMove(moveName);
             }
-            this.pushCustomRenderer(new MovePreview(moveName,()=>{
-                if(this.popup) {
-                    const popupY = this.popup.startY - 10;
-                    return {
-                        y: 10,
-                        x: 10,
-                        width: fullWidth - 10,
-                        height: popupY - 10
-                    }
-                } else {
-                    return {
-                        x:10,y:10,width:fullWidth-10,height:fullHeight-10
-                    }
-                }
-            }));
+            this.pushCustomRenderer(new MovePreview(moveName,this.getItemPreviewBounds));
             await this.showInstantTextPopupSound(`You received the move ${moveName}!`);
             if(!alreadyHasMove) {
                 const move = Moves[moveName];

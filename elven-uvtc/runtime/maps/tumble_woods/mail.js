@@ -30,6 +30,7 @@ addMap({
                     break;
                 case 12:
                     world.showTextPopup("You can't sit now, you have important things to do!");
+                    break;
                 case 13:
                     world.showTextPopup("This chair looks too big for you.");
                     break;
