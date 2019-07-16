@@ -734,7 +734,13 @@ function WorldRenderer() {
         fadeOutSongs(OVERWORLD_MUSIC_FADE_TIME,callback);
     }
     this.playSong = songName => {
-        if(!musicNodes[songName]) {
+        const playingSongFull = musicNodes[songName];
+        const introName = songIntroLookup[songName];
+        let playingIntro = false;
+        if(introName) {
+            playingIntro = musicNodes[introName] ? true : false;
+        }
+        if(!playingIntro && !playingSongFull) {
             let didRunCustomLoader = ranCustomLoader;
             this.stopMusic(()=>{
                 const extraTime = !didRunCustomLoader ? faderTime / 2 : FAKE_OVERWORLD_LOAD_TIME;
