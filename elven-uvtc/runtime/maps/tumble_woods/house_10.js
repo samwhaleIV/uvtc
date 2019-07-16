@@ -41,7 +41,7 @@ addMap({
                     world.followObject = null;
                     world.autoCameraOn();
                     await delay(800);
-                    await chili.say("Look at him darling. He's overwhelemed!");
+                    await chili.say("Look at him darling. He's overwhelmed!");
                     await chiliWife.say("Okay perhaps our intro was a bit much.");
                     await chiliWife.say("We're kind of the socialites of Tumble Town.");
                     await chili.say("Well, the sexy socialites.");
