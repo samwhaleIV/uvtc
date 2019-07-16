@@ -14,7 +14,6 @@ addMap({
             }
         }
         const treeCoGame = async () => {
-            world.lockPlayerMovement();
             let correct = 0;
             await louis.say("Alright! Here we go! If you get at least 3 out of 4 questions right, you get my prize! If not, you can try again.");
             await delay(300);
@@ -22,13 +21,13 @@ addMap({
             if(await question(1,"what is this place called?",2,"store","tree place","tree-co")) {
                 correct++;
             }
-            if(await question(1,"how many trees are in this room?",1,"3","8","7")) {
+            if(await question(2,"how many trees are in this room?",1,"3","8","7")) {
                 correct++;
             }
-            if(await question(1,"do apples come from trees?",0,"yes","no","not sure")) {
+            if(await question(3,"do apples come from trees?",0,"yes","no","not sure")) {
                 correct++;
             }
-            if(await question(1,"trees are an important part of:","any","paper","life","Christmas")) {
+            if(await question(4,"trees are an important part of:","any","paper","life","christmas")) {
                 correct++;
             }
 
@@ -41,8 +40,6 @@ addMap({
             } else {
                 await louis.say("Ah, man. You were so close. You can try again another time for my sweet, sweet reward.");
             }
-
-            world.unlockPlayerMovement();
         }
         this.load = world => {
             world.addPlayer(5,7,"up");
@@ -54,19 +51,20 @@ addMap({
                 case 9:
                 case 10:
                 case 11:
-                    const applesMessage = "Apples. APPLES. apples";
-                    if(world.globalState.talkedToStoreTrees) {
-                        await world.showNamedTextPopup("Why are you spending your time trying to talk to trees?","Tree");
-                        await world.showNamedTextPopup("Yeah, it's kind of weird.","Other Tree");
-                        await world.showNamedTextPopup("Hey, don't judge the dude, I like the company.","Other Other Tree");
-                        await world.showNamedTextPopup(applesMessage,"Other Other Other Tree");
-                        await world.showNamedTextPopup("This is why we don't invite you place, Other Other Other Tree...","Tree");
+                    const applesMessage = "Apples. APPLES. apples!";
+                    if(!world.globalState.talkedToStoreTrees) {
+                        await world.showNamedTextPopup("Why are you spending your time trying to talk to trees?","ȹTree:ȹ ");
+                        await world.showNamedTextPopup("Yeah, it's kind of weird.","ȹOther Tree:ȹ ");
+                        await world.showNamedTextPopup("Hey, don't judge the dude, I like the company.","ȹOther Other Tree:ȹ ");
+                        await world.showNamedTextPopup(applesMessage,"ȹOther Other Other Tree:ȹ ");
+                        await world.showNamedTextPopup("This is why we don't invite you place, ȹOther Other Other Tree...ȹ","ȹTree:ȹ ");
                         world.globalState.talkedToStoreTrees = true;
                     } else {
-                        await world.showNamedTextPopup(applesMessage,"Other Other Other Tree");
+                        await world.showNamedTextPopup(applesMessage,"ȹOther Other Other Tree:ȹ ");
                     }
                     break;
                 case 13:
+                    world.lockPlayerMovement();
                     if(world.globalState.metLouis) {
                         if(world.globalState.beatTreeCoGame) {
                             await louis.say("Hey again. Welcome to our town again. I'm sure we'll meet again, again.");
@@ -96,6 +94,7 @@ addMap({
                             await louis.say("I really hope you'll change your mind about the game.");
                         }
                     }
+                    world.unlockPlayerMovement();
                     break;
             }
         }

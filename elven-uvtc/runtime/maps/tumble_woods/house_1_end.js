@@ -15,7 +15,7 @@ addMap({
                 await jim.say("Oh.");
                 await delay(1000);
                 await jim.say("Annnnyways. I've been hearing from the town and they all had a great time meeting you!");
-                await jim.say("They're so glad you're going to a party.");
+                await jim.say("They're so glad you're going to the party.");
                 await jim.move({y:1});
                 await jim.say("I'm glad, too. Welcome to Tumble Town. You're gonna like it a whole lot here.");
                 world.chapterComplete();

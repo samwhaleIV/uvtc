@@ -24,9 +24,9 @@ const CharacterColors = {
     "tree-lee":         "blueviolet",
     "chili":            "darkorange",
     "chili-wife":       "deeppink",
-    "jam":              "black",
+    "jam":              "blue",
     "boxy":             "blueviolet",
-    "louis":            "black"
+    "louis":            "green"
 };
 const CharacterDisplayNames = {
     "jim":              "Jim",

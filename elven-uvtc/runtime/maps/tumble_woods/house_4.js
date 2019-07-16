@@ -23,19 +23,19 @@ addMap({
                     await jam.say("Hey! You're Jim's new roommate!");
                     await jam.say("I've heard such great things about you.");
                     await jam.say("W-what? He didn't even mention me?");
-                    await delay(800);
                     await delay(500);
                     jam.updateDirection(invertDirection(direction));
+                    await delay(200);
                     await world.showInstantTextPopup("Yikes. This is awkward.");
                     await delay(300);
                     await jam.say("I... Need a moment.");
-                    await delay(700);
+                    await delay(900);
                     await jam.say("AHHHHHHHHHHHHHHHHHHHH");
-                    await delay(300);
+                    await delay(500);
                     await jam.updateDirection("down");
                     await delay(500);
                     await jam.updateDirection("left");
-                    await delay(200);
+                    await delay(500);
                     await jam.say("Alright. I'm better now. Welcome to Tumble Town.");
                     world.globalState.metJam = true;
                 }
