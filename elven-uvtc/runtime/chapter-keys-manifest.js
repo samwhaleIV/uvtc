@@ -25,7 +25,23 @@ const ChapterKeysManifest = {
         "battleTutorialPreamble",
         "icemanBattlePreamble",
         "failedTutorialBattle",
-        "cameBackToIceman"
+        "cameBackToIceman",
+        "metTreeLee",
+        "metJam",
+        "chiliIntro",
+        "gotAllPresents",
+        "present1",
+        "present2",
+        "present3",
+        "present4",
+        "present5",
+        "present6",
+        "present7",
+        "hasSealedLetter",
+        "sentSealedLetter",
+        "talkedToStoreTrees",
+        "beatTreeCoGame",
+        "metLouis"
     ],
     2: [
 

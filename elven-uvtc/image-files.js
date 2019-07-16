@@ -23,6 +23,7 @@ ImagePaths.push(
     getFile("sprites/footsteps.png",FileTypes.Image),
     getFile("sprites/frogert.png",FileTypes.Image),
     getFile("sprites/ice-man.png",FileTypes.Image),
+    getFile("sprites/jam.png",FileTypes.Image),
     getFile("sprites/jim.png",FileTypes.Image),
     getFile("sprites/player.png",FileTypes.Image),
     getFile("sprites/tree-lee.png",FileTypes.Image),

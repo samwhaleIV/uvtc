@@ -3,6 +3,7 @@ const Chapters = [
         title: "Making my way 'round town",
         unlockableMoves: [
             "Iced Whiskey",
+            "Wimpy Punch",
             "Red Apple",
             "Return to Sender"
         ],

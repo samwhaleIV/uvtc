@@ -1,5 +1,6 @@
 import "./tumble_woods/house_1.js";
 import "./tumble_woods/house_10.js";
+import "./tumble_woods/house_1_end.js";
 import "./tumble_woods/house_2.js";
 import "./tumble_woods/house_3.js";
 import "./tumble_woods/house_4.js";

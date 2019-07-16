@@ -1,6 +1,8 @@
-function UIAlert(message,timeout) {
+function UIAlert(message,timeout,noSound) {
     let done = false;
-    playSound("energy");
+    if(!noSound) {
+        playSound("energy");
+    }
     let startTime = performance.now();
     this.render = timestamp => {
         if(done) {

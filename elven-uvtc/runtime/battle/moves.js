@@ -42,8 +42,8 @@ const MovesList = [
         type:"ui"
     },
     {
-        name:"Wimpy Punch",
-        description:"Is this really the best you can do?",
+        name: "Wimpy Punch",
+        description: "Hey, a punch is a punch. Does minimal damage.",
         type:"malice",
         process: (user,target) => {
             target.health -= 1;
@@ -58,6 +58,7 @@ const MovesList = [
     {
         name: "Iced Whiskey",
         type: "logic",
+        description: "Pass your opponent some nice cold whiskey.",
         process: (user,target) => {
             return {
                 type: "text",
@@ -65,8 +66,29 @@ const MovesList = [
             }
         }
     },
-    {name:"Red Apple"},
-    {name:"Return to Sender"},
+    {
+        name:"Red Apple",
+        type: "logic",
+        description: "Eat an apple and heal 1 health to yourself.",
+        process: (user,target) => {
+            user.health++;
+            return {
+                type: "text",
+                text: "An apple a day keeps the doctor away."
+            }
+        }
+    },
+    {
+        name: "Return to Sender",
+        description: "If your opponent last used a punch, you deal double its damage.",
+        type: "malice",
+        process: (user,target) => {
+            return {
+                type: "text",
+                text: "This move is not done yet. SORRY."
+            }
+        }
+    },
     {name:"Poison Apple"},
     {name:"Submission"},
     {name:"Jingle Bells"},

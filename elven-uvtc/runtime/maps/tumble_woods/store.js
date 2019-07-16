@@ -1,13 +1,101 @@
 addMap({
     WorldState: function(world,data) {
+        let louis;
+        const question = async (ID,question,correct,...options) => {
+            await world.showInstantTextPopup("Question " + ID);
+            const q1 = await world.showPrompt(question,...options);
+            await delay(500);
+            if(q1 === correct || correct === "any") {
+                await world.showInstantTextPopup("Correct!");
+                return true;
+            } else {
+                await world.showInstantTextPopup("Sorry, that's incorrect!");
+                return false;
+            }
+        }
+        const treeCoGame = async () => {
+            world.lockPlayerMovement();
+            let correct = 0;
+            await louis.say("Alright! Here we go! If you get at least 3 out of 4 questions right, you get my prize! If not, you can try again.");
+            await delay(300);
+
+            if(await question(1,"what is this place called?",2,"store","tree place","tree-co")) {
+                correct++;
+            }
+            if(await question(1,"how many trees are in this room?",1,"3","8","7")) {
+                correct++;
+            }
+            if(await question(1,"do apples come from trees?",0,"yes","no","not sure")) {
+                correct++;
+            }
+            if(await question(1,"trees are an important part of:","any","paper","life","Christmas")) {
+                correct++;
+            }
+
+            if(correct >= 3) {
+                await louis.say("You did it! You won the game!");
+                await louis.say("Thank you so much for your interest in Tree-Co.");
+                await louis.say("Now, as promised, your reward.");
+                await world.unlockMove("Red Apple");
+                world.globalState.beatTreeCoGame = true;
+            } else {
+                await louis.say("Ah, man. You were so close. You can try again another time for my sweet, sweet reward.");
+            }
+
+            world.unlockPlayerMovement();
+        }
         this.load = world => {
             world.addPlayer(5,7,"up");
+            louis = world.getStaticCharacter("louis");
         }
-        this.otherClicked = type => {
+        this.otherClicked = async type => {
             switch(type) {
                 case 8:
-                    break;
                 case 9:
+                case 10:
+                case 11:
+                    const applesMessage = "Apples. APPLES. apples";
+                    if(world.globalState.talkedToStoreTrees) {
+                        await world.showNamedTextPopup("Why are you spending your time trying to talk to trees?","Tree");
+                        await world.showNamedTextPopup("Yeah, it's kind of weird.","Other Tree");
+                        await world.showNamedTextPopup("Hey, don't judge the dude, I like the company.","Other Other Tree");
+                        await world.showNamedTextPopup(applesMessage,"Other Other Other Tree");
+                        await world.showNamedTextPopup("This is why we don't invite you place, Other Other Other Tree...","Tree");
+                        world.globalState.talkedToStoreTrees = true;
+                    } else {
+                        await world.showNamedTextPopup(applesMessage,"Other Other Other Tree");
+                    }
+                    break;
+                case 13:
+                    if(world.globalState.metLouis) {
+                        if(world.globalState.beatTreeCoGame) {
+                            await louis.say("Hey again. Welcome to our town again. I'm sure we'll meet again, again.");
+                        } else {
+                            await louis.say("Hey again! Are you here to play the Tree-Co holiday special? I think you'll love it!");
+                            const wantToPlay = await world.showPrompt("want to play the tree-co game?","yes","no") === 0 ? true : false;
+                            await delay(700);
+                            if(wantToPlay) {
+                                await treeCoGame();
+                            } else {
+                                await louis.say("You're really breaking my heart today, man! I do hope you'll change your mind someday.");
+                            }
+                        }
+                    } else {
+                        world.globalState.metLouis = true;
+                        await louis.say("Welcome to Tree-Co. Are you hear to buy my trees? They drive me MAD.");
+                        await louis.say("My name is Louis. I sell trees. If you can answer some questions about trees, I'll give you a present.");
+                        await louis.say("It's a new holiday special we're running called 'if you're smarter than a tree.'");
+                        const wantToTry = await world.showPrompt("want to play?","yes","no") === 0 ? true : false;
+                        await delay(700);
+                        if(wantToTry) {
+                            await treeCoGame();
+                        } else {
+                            await louis.say("Ah. Darn. Well if you change your mind, I'll bear here!");
+                            await louis.say("I make puns to try to put people at ease since I'm a giant brown bear...");
+                            await louis.say("I hope it helped...");
+                            await louis.say("I really hope you'll change your mind about the game.");
+                        }
+                    }
                     break;
             }
         }

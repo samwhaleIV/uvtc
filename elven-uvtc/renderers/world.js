@@ -12,6 +12,8 @@ import Moves from "../runtime/battle/moves.js";
 import Chapters from "../runtime/chapter-data.js";
 import BattleScreenRenderer from "./battle-screen.js";
 import BattleFaderEffect from "./components/battle-fader-effect.js";
+import ChapterManager from "../runtime/chapter-manager.js";
+import MainMenuRenderer from "./main-menu.js";
 
 const songIntroLookup = {};
 SongsWithIntros.forEach(song => {
@@ -21,8 +23,8 @@ SongsWithIntros.forEach(song => {
 function WorldRenderer() {
     const alertTime = 1000;
     let alert = null;
-    this.showAlert = (message,duration=alertTime) => {
-        alert = new UIAlert(message.toLowerCase(),duration);
+    this.showAlert = (message,duration=alertTime,noSound=false) => {
+        alert = new UIAlert(message.toLowerCase(),duration,noSound);
     }
     this.clearAlert = () => {
         alert = null;
@@ -32,6 +34,16 @@ function WorldRenderer() {
             return GlobalState.data;
         }
     });
+    this.chapterComplete = async () => {
+        ChapterManager.setActiveChapterCompleted();
+        this.showAlert("Chapter completed!",700+faderTime,true);
+        await delay(800);
+        faderEffectsRenderer.fillInLayer = {render:()=>{
+            context.fillStyle="black";
+            context.fillRect(0,0,fullWidth,fullHeight);
+        }};
+        this.fader.fadeOut(new MainMenuRenderer());
+    }
     this.saveState = (withPositionData=true,skipGlobal=false) => {
         if(withPositionData && this.playerObject) {
             GlobalState.data["last_map"] = this.renderMap.name;
@@ -192,6 +204,7 @@ function WorldRenderer() {
     this.getCharacter = (name,direction) => GetOverworldCharacter(this,name,direction,false);
     this.getStaticCharacter = name => GetOverworldCharacter(this,name,null,true);
     this.movesManager = MovesManager;
+    this.chapterManager = ChapterManager;
 
     this.someoneIsNowYourFriend = (character,customString) => {
         if(customString) {

@@ -1,3 +1,4 @@
+"1";"2";"3";"4";"5";"6";"7";"8";"9";"10";
 addMap({
     WorldState: function(world,data) {
         let frogert;
@@ -105,6 +106,30 @@ addMap({
                     world.showTextPopup("You can't leave ȹTumble Townȹ yet! You have important things to do!");
                     break;
 
+            }
+        }
+    },
+    presentTracker: {
+        maxCount: 7,
+        getPresentCount: function(world) {
+            let count = 0;
+            for(let i = 0;i<this.maxCount;i++) {
+                if(world.globalState["present"+(i+1)]) {
+                    count++;
+                }
+            }
+            return count;
+        },
+        hasAllPresents: function(world) {
+            return this.getPresentCount(world) === this.maxCount;
+        },
+        getRemainingMessage: function(world) {
+            const count = this.getPresentCount(world);
+            const remaining = this.maxCount - count;
+            if(count === 0) {
+                return "You found the last present! You found them all!";
+            } else {
+                return "You found a present! " + remaining + " more to go!";
             }
         }
     },

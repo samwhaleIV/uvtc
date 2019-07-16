@@ -1,105 +1,120 @@
+const CharacterMakers = {
+    "jim":              defaultCharacterMaker,
+    "frogert":          defaultCharacterMaker,
+    "wimpy-red-elf":    elfCharacterMaker,
+    "ice-man":          defaultCharacterMaker,
+    "chili-wife":       defaultCharacterMaker,
+    "chili":            defaultCharacterMaker,
+    "tree-lee":         defaultCharacterMaker,
+    "jam":              defaultCharacterMaker
+};
 const CharacterColors = {
-    "jim": "blue",
-    "frogert": "green",
-    "wimpy-red-elf": "red",
-    "red-elfette": "red",
-    "boney-elf": "deeppink",
-    "wizard-elf": "blueviolet",
-    "headless-elf": "darkorange",
-    "jester-elf": "goldenrod",
-    "mascara": "deeppink",
-    "burr": "darkorange",
-    "shiver": "blueviolet",
-    "ice-man": "cyan"
-}
+    "jim":              "blue",
+    "frogert":          "green",
+    "wimpy-red-elf":    "red",
+    "red-elfette":      "red",
+    "boney-elf":        "deeppink",
+    "wizard-elf":       "blueviolet",
+    "headless-elf":     "darkorange",
+    "jester-elf":       "goldenrod",
+    "mascara":          "deeppink",
+    "burr":             "darkorange",
+    "shiver":           "blueviolet",
+    "ice-man":          "cyan",
+    "tree-lee":         "blueviolet",
+    "chili":            "darkorange",
+    "chili-wife":       "deeppink",
+    "jam":              "black",
+    "boxy":             "blueviolet",
+    "louis":            "black"
+};
 const CharacterDisplayNames = {
-    "jim": "Jim",
-    "frogert": "Frogert",
-    "wimpy-red-elf": "Wimpy Red Elf",
-    "red-elfette": "Red Elfette",
-    "boney-elf": "Boney Elf",
-    "wizard-elf": "Wizard Elf",
-    "headless-elf": "Headless Elf",
-    "jester-elf": "Jester Elf",
-    "mascara": "Mascara",
-    "burr": "Burr",
-    "shiver": "Shiver",
-    "ice-man": "Ice Man"
-}
-const colorLookup = {}
+    "jim":              "Jim",
+    "frogert":          "Frogert",
+    "wimpy-red-elf":    "Wimpy Red Elf",
+    "red-elfette":      "Red Elfette",
+    "boney-elf":        "Boney Elf",
+    "wizard-elf":       "Wizard Elf",
+    "headless-elf":     "Headless Elf",
+    "jester-elf":       "Jester Elf",
+    "mascara":          "Mascara",
+    "burr":             "Burr",
+    "shiver":           "Shiver",
+    "ice-man":          "Ice Man",
+    "tree-lee":         "Tree Lee",
+    "chili":            "Chili",
+    "chili-wife":       "Chillene",
+    "jam":              "Jam",
+    "boxy":             "Boxy",
+    "louis":            "Louis"
+};
+const ColorLookup = {};
 Object.entries(textColorLookup).forEach(entry => {
-    colorLookup[entry[1]] = entry[0];
+    ColorLookup[entry[1]] = entry[0];
 });
-delete colorLookup[0];
-const getColorCode = characterName => {
+delete ColorLookup[0];
+function applyPopupAttributes(character,characterName) {
+    character.prefix = getPrefix(characterName);
+    character.characterName = characterName;
+}
+function defaultCharacterMaker(world,characterName,direction,isElf=false) {
+    const character = new (isElf ? world.elfSprite:world.sprite)(direction,characterName);
+    applyPopupAttributes(character,characterName);
+    return character;
+};
+function elfCharacterMaker(world,characterName,direction,isElf=false) {
+    return defaultCharacterMaker(world,characterName,direction,true);
+};
+function customSizeCharacterMaker(world,characterName,direction,width,height) {
+    const character = new world.sprite(direction,characterName,width,height);
+    applyPopupAttributes(character,characterName);
+    return character;
+};
+function getColorCode(characterName) {
     const color = CharacterColors[characterName];
     if(!color) {
         throw Error(`Text name color not found for '${characterName}'`);
     }
-    const colorCode = colorLookup[color];
+    const colorCode = ColorLookup[color];
     if(!colorCode) {
         throw Error(`Color '${color}' is an invalid text rendering color`)
     }
     return colorCode;
-}
-const getPrefix = characterName => {
+};
+function getPrefix(characterName) {
     const colorCode = getColorCode(characterName);
     let displayName = CharacterDisplayNames[characterName];
     if(!displayName) {
         displayName = characterName;
     }
     return `${colorCode}${displayName}:${colorCode} `;
-}
-const getColoredName = characterName => {
+};
+function getColoredName(characterName) {
     const colorCode = getColorCode(characterName);
     let displayName = CharacterDisplayNames[characterName];
     if(!displayName) {
         displayName = characterName;
     }
     return `${colorCode}${displayName}${colorCode}`;
-}
-const getPrefixMask = (character,maskedName) => {
+};
+function getPrefixMask(character,maskedName) {
     if(!character.characterName) {
         throw Error(`A character with a masked name must also have a real name. Everyone needs a true identity`);
     }
     const colorCode = getColorCode(character.characterName);
     return `${colorCode}${maskedName}:${colorCode} `;
-}
-const getSpeakingPrefix = (character,customPrefix) => customPrefix ? getPrefixMask(character,customPrefix) : character.prefix;
-const speakMethod = async (world,character,message,customPrefix) => {
+};
+function getSpeakingPrefix(character,customPrefix) {
+    return customPrefix ? getPrefixMask(character,customPrefix) : character.prefix;
+};
+async function speakMethod(world,character,message,customPrefix) {
     const prefix = getSpeakingPrefix(character,customPrefix);
     await world.showNamedTextPopup(message,prefix);
-}
-const speakMethod_multiple = async (world,character,messages,customPrefix) => {
+};
+async function speakMethod_multiple(world,character,messages,customPrefix) {
     const prefix = getSpeakingPrefix(character,customPrefix);
     await world.showNamedTextPopups(messages,prefix);
-}
-const defaultCharacterMaker = (world,direction,characterName,isElf=false) => {
-    const character = new (isElf ? world.elfSprite:world.sprite)(direction,characterName);
-    character.prefix = getPrefix(characterName);
-    character.characterName = characterName;
-    return character;
-}
-const customSizeCharacterMaker = (world,direction,characterName,width,height) => {
-    const character = new world.sprite(direction,characterName,width,height);
-    character.prefix = getPrefix(characterName);
-    character.characterName = characterName;
-    return character;
-}
-const characterMakers = {
-    "jim": (world,characterName,direction) => {
-        return defaultCharacterMaker(world,direction,characterName);
-    },
-    "frogert": (world,characterName,direction) => {
-        return defaultCharacterMaker(world,direction,characterName);
-    },
-    "wimpy-red-elf": (world,characterName,direction) => {
-        return defaultCharacterMaker(world,direction,characterName,true);
-    },
-    "ice-man": (world,characterName,direction) => {
-        return defaultCharacterMaker(world,direction,characterName); 
-    }
-}
+};
 function GetOverworldCharacterSpriteless(world,name) {
     const character = {};
     character.prefix = getPrefix(name);
@@ -117,7 +132,7 @@ function GetOverworldCharacter(world,name,direction=null,spriteLess=false) {
     if(spriteLess) {
         return GetOverworldCharacterSpriteless(world,name);
     }
-    const characterMaker = characterMakers[name];
+    const characterMaker = CharacterMakers[name];
     if(!characterMaker) {
         throw Error(`Character '${name}' does not exist`);
     }

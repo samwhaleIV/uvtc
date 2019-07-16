@@ -1,7 +1,46 @@
 addMap({
     WorldState: function(world,data) {
+        const clearP3 = () => {
+            const x = 15;
+            const y = 4;
+            world.changeForegroundTile(0,x,y);
+            world.changeCollisionTile(0,x,y);
+        };
+        const statusMessage = () => worldMaps.tumble_woods.presentTracker.getRemainingMessage(world);
         this.load = world => {
+            if(world.globalState.present3) {
+                clearP3();
+            }
             world.addPlayer(4,3,"down");
+            const jam = world.getCharacter("jam","left");
+            world.addObject(jam,8,5,"down");
+            jam.interacted = async (x,y,direction) => {
+                world.lockPlayerMovement();
+                jam.updateDirection(direction);
+                if(world.globalState.metJam) {
+                    await jam.say("Hey, next time you see Jim be sure to give him a piece of my mind for me.");
+                } else {
+                    await jam.say("Hey! You're Jim's new roommate!");
+                    await jam.say("I've heard such great things about you.");
+                    await jam.say("W-what? He didn't even mention me?");
+                    await delay(800);
+                    await delay(500);
+                    jam.updateDirection(invertDirection(direction));
+                    await world.showInstantTextPopup("Yikes. This is awkward.");
+                    await delay(300);
+                    await jam.say("I... Need a moment.");
+                    await delay(700);
+                    await jam.say("AHHHHHHHHHHHHHHHHHHHH");
+                    await delay(300);
+                    await jam.updateDirection("down");
+                    await delay(500);
+                    await jam.updateDirection("left");
+                    await delay(200);
+                    await jam.say("Alright. I'm better now. Welcome to Tumble Town.");
+                    world.globalState.metJam = true;
+                }
+                world.unlockPlayerMovement();
+            }
         }
         this.doorClicked = () => {
             const newMapData = {
@@ -33,7 +72,7 @@ addMap({
                 case 11:
                     world.showTextPopup("What kind of a heathen has their dryer on the left?");
                     break;
-                case 16:
+                case 17:
                     world.showTextPopup("The washer being on the right is making you very uncomfortable.");
                     break;
                 case 12:
@@ -47,6 +86,11 @@ addMap({
                     break;
                 case 15:
                     world.showTextPopup("Who would want to sleep this close to other people?");
+                    break;
+                case 16:
+                    clearP3();
+                    world.globalState.present3 = true;
+                    await world.showInstantTextPopup(statusMessage());
                     break;
             }
         }

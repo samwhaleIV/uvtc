@@ -177,7 +177,7 @@ function PlayerController(world) {
             this.player.ID
         );
         if((lookAheadCollision || sideCollision) && valueAtThreshold) {
-            console.log("Dead stop - Maximum position already reached");
+            //console.log("Dead stop - Maximum position already reached");
             this.player[offsetTarget] = 0;
             return false;
         }
@@ -185,7 +185,7 @@ function PlayerController(world) {
         this.player[offsetTarget] += movementDistance;
         const spaceThresholdReached = polarizedEvaluation(this.player[offsetTarget],0,positiveDifference);
         if((lookAheadCollision || sideCollision) && spaceThresholdReached) {
-            console.log("Dead stop - Already in XY space");
+            //console.log("Dead stop - Already in XY space");
             this.player[offsetTarget] = 0;
             return false;    
         }
@@ -209,7 +209,7 @@ function PlayerController(world) {
             );
             const newThreshold = polarizedEvaluation(this.player[offsetTarget],0,positiveDifference);
             if((newLookAhead || newSideCollision) && newThreshold) {
-                console.log("Dead stop - Post movement update");
+                //console.log("Dead stop - Post movement update");
                 this.player[offsetTarget] = 0;
                 return false;
             }
