@@ -1075,6 +1075,7 @@ function WorldRenderer() {
             const xOffset = horizontalOffset - Math.round(this.camera.xOffset * horizontalTileSize);
             const yOffset = verticalOffset - Math.round(this.camera.yOffset * verticalTileSize);
 
+            const decalBuffer = [];
             const objectBuffer = [];
 
             let y = yStart, x;
@@ -1117,7 +1118,7 @@ function WorldRenderer() {
 
                         const decalRegister = this.decals[xPos][yPos];
                         if(decalRegister) {
-                            objectBuffer.push(decalRegister,xDestination,yDestination);
+                            decalBuffer.push(decalRegister,xDestination,yDestination);
                         }
                         const objectRegister = this.objectsLookup[xPos][yPos];
                         if(objectRegister) {
@@ -1128,6 +1129,17 @@ function WorldRenderer() {
                     x++;
                 }
                 y++;
+            }
+            let decalBufferIndex = 0;
+            while(decalBufferIndex < decalBuffer.length) {
+                decalBuffer[decalBufferIndex].render(
+                    timestamp,
+                    objectBuffer[decalBufferIndex+1],
+                    objectBuffer[decalBufferIndex+2],
+                    horizontalTileSize,
+                    verticalTileSize
+                );
+                decalBufferIndex += 3;
             }
             let objectBufferIndex = 0;
             while(objectBufferIndex < objectBuffer.length) {

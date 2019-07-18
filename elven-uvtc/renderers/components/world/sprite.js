@@ -5,16 +5,29 @@ const ELF_WIDTH = 9;
 const ELF_HEIGHT = 20;
 const FOOTSTEPS_SPRITE_NAME = "footsteps";
 
+const MAX_CONVOY_PATH_SIZE = 100;
+const CONVOY_ALIGNMENT = 8;
+
+function lerp(v0,v1,t) {
+    //https://github.com/mattdesl/lerp/blob/master/LICENSE.md
+    return v0*(1-t)+v1*t
+}
+
 function ElfRenderer(startDirection,spriteName) {
     SpriteRenderer.call(this,startDirection,spriteName,ELF_WIDTH,ELF_HEIGHT);
 }
-function PlayerRenderer(startDirection) {
+function PlayerRenderer(startDirection,isFakePlayer=false) {
     if(ENV_FLAGS.ELF_PLAYER_HACK) {
         ElfRenderer.call(this,startDirection,"wimpy-red-elf");
     } else {
         SpriteRenderer.call(this,startDirection,"player");
     }
-    this.isPlayer = true;
+    if(!isFakePlayer) {
+        this.convoyAdd(new PlayerRenderer("down",true));
+        this.convoyAdd(new SpriteRenderer("down","jim"));
+        this.convoyAdd(new SpriteRenderer("down","tree-lee"));
+    }
+    this.isPlayer = isFakePlayer ? false : true;
 }
 function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumnHeight) {
     const sprite = imageDictionary[`sprites/${spriteName}`];
@@ -70,6 +83,148 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
 
     const maxFootStepCount = 2;
     const footStepBuffer = [];
+
+    const convoyPath = [];
+    let convoyPathCount = 0;
+    const convoy = [];
+    let convoyCount = 0;
+    this.convoyAdd = object => {
+        convoy.push(object);
+        object.x = 0;
+        object.y = 0;
+        object.xOffset = 0;
+        object.yOffset = 0;
+        object.lastRenderX = -100;
+        object.lastRenderY = -100;
+        convoyCount++;
+    }
+
+    const modifyConvoy = method => {
+        const removed = convoy[method]();
+        convoyCount = convoy.length;
+        if(!convoyCount) {
+            convoyPath.splice(0,convoyPathCount);
+            convoyPathCount = 0;
+        }
+        return removed;
+    }
+
+    this.convoyRemoveFirst = () => modifyConvoy("shift");
+    this.convoyRemoveLast = () => modifyConvoy("pop");
+    Object.defineProperty(this,"convoyLength",{
+        get: function() {
+            return convoy.length;
+        }
+    });
+
+    const setConvoyWalking = isWalking => {
+        let i = 0;
+        while(i < convoyCount) {
+            convoy[i].setWalking(isWalking);
+            i++;
+        }
+    }
+    
+    let lastX = null;
+    let lastY = null;
+    const renderConvoy = (timestamp,x,y,width,height) => {
+
+        const calculatedX = this.x + this.xOffset;
+        const calculatedY = this.y + this.yOffset;
+        if(lastX !== calculatedX || lastY !== calculatedY) {
+            convoyPath.unshift({x:calculatedX,y:calculatedY,direction:this.direction});
+            if(convoyPath.length > MAX_CONVOY_PATH_SIZE) {
+                convoyPath.pop();
+            }
+            convoyPathCount = convoyPath.length;
+            if(convoyCount) {
+                setConvoyWalking(true);
+            }
+        } else if(convoyCount) {
+            setConvoyWalking(false);
+        }
+        lastX = calculatedX;
+        lastY = calculatedY;
+        
+        if(convoyPathCount) {
+            const renderStack = [];
+            const antiJitter = width / 16;
+            let pathIndex = 0;
+            let convoyIndex = 0;
+            let pathDistance = 0;
+            let lastX, lastY;
+            while(convoyIndex < convoyCount && pathIndex < convoyPathCount) {
+                const path = convoyPath[pathIndex];
+                if(!lastX || !lastY) {
+                    lastX = path.x;
+                    lastY = path.y;
+                }
+                const xDistance = Math.abs(lastX - path.x);
+                const yDistance = Math.abs(lastY - path.y);
+                pathDistance += xDistance + yDistance;
+                if(pathDistance >= CONVOY_ALIGNMENT) {
+
+                    const interpolationPoint = (pathDistance-CONVOY_ALIGNMENT)/CONVOY_ALIGNMENT;
+
+                    const nextPath = convoyPath[pathIndex+1] || path;
+
+                    const follower = convoy[convoyIndex];
+
+                    const lerpedPathX = lerp(path.x,nextPath.x,interpolationPoint);
+                    const lerpedPathY = lerp(path.y,nextPath.y,interpolationPoint);
+
+                    let renderX = x + ((lerpedPathX - this.x) * width);
+                    let renderY = y + ((lerpedPathY - this.y) * height);
+                    if(Math.abs(follower.lastRenderX-renderX) < antiJitter) {
+                        renderX = follower.lastRenderX;
+                    }
+                    if(Math.abs(follower.lastRenderY-renderY) < antiJitter) {
+                        renderY = follower.lastRenderY;
+                    }
+                    follower.lastRenderX = renderX;
+                    follower.lastRenderY = renderY;
+
+                    lastX = path.x;
+                    lastY = path.y;
+
+                    follower.updateDirection(path.direction);
+                    renderStack.unshift({follower:follower,x:renderX,y:renderY});
+                    convoyIndex++;
+                    pathDistance -= CONVOY_ALIGNMENT;
+                }
+                pathIndex++;
+                
+            }
+            while(convoyIndex < convoyCount) {
+                const path = convoyPath[convoyPathCount-1];
+                const follower = convoy[convoyIndex];
+                let renderX = x + ((path.x - this.x) * width);
+                let renderY = y + ((path.y - this.y) * height);
+                if(Math.abs(follower.lastRenderX-renderX) < antiJitter) {
+                    renderX = follower.lastRenderX;
+                }
+                if(Math.abs(follower.lastRenderY-renderY) < antiJitter) {
+                    renderY = follower.lastRenderY;
+                }
+                follower.lastRenderX = renderX;
+                follower.lastRenderY = renderY;
+                follower.updateDirection(path.direction);
+                renderStack.unshift({follower:follower,x:renderX,y:renderY});
+                convoyIndex++;
+            }
+            const renderStackSize = renderStack.length;
+            let i = 0;
+            while(i<renderStackSize) {
+                const renderOperation = renderStack[i];
+                renderOperation.follower.render(
+                    timestamp,
+                    renderOperation.x,renderOperation.y,
+                    width,height
+                );
+                i++;
+            }
+        }
+    }
 
     this.firstPosition = true;
     this.worldPositionUpdated = function(oldX,oldY,newX,newY,world,initial) {
@@ -226,7 +381,6 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
             this.renderLogic(timestamp);
         }
     }
-
     if(customSize) {
         this.render = function(timestamp,x,y,width,height) {
             const startX = this.x, startY = this.y;
@@ -234,7 +388,9 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
             if(this.hidden) {
                 return;
             }
-
+            if(convoyCount) {
+                renderConvoy(timestamp,x,y,width,height);
+            }
             const renderWidth = width * worldScaleTranslation;
             const renderHeight = customWidthRatio * renderWidth;
 
@@ -267,6 +423,9 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
             processRenderLogicForFrame(timestamp);
             if(this.hidden) {
                 return;
+            }
+            if(convoyCount) {
+                renderConvoy(timestamp,x,y,width,height);
             }
             const destinationX = this.xOffset * width + x + (this.x - startX) * width;
             const destinationY = this.yOffset * height + y + (this.y - startY) * height;

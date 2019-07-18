@@ -1,14 +1,3 @@
-(function(){
-    const roundingTypes = [
-        Math.round,
-        Math.floor,
-        Math.ceil
-    ];
-    Math.fuckyouRound = function(value) {
-        return roundingTypes[Math.floor(Math.random()*3)](value);
-    }
-})();
-
 function ScrollingBackground(backgroundName,padding=0) {
     const doublePadding = padding + padding;
     const image = imageDictionary[`backgrounds/${backgroundName}`];
