@@ -361,16 +361,16 @@ function MainMenuRenderer(toChapterPane=false) {
         context.fillStyle = "white";
         context.fillText(VERSION_STRING,fullWidth+VERSION_X_OFFSET,fullHeight+VERSION_Y_OFFSET);
 
-        if(this.overlayPane) {
-            this.overlayPane.render(timestamp,BACKGROUND_MARGIN,BACKGROUND_MARGIN,fullWidth-DOUBLE_BACKGROUND_MARGIN,fullHeight-BACKGROUND_BOTTOM_MARGIN);
-        }
-
         context.drawImage(
             elfmartImage,0,0,elfmartImage.width,elfmartImage.height,
             ELFMART_MARGIN,
             fullHeight-LOGO_SIZE-ELFMART_MARGIN,
             LOGO_SIZE,LOGO_SIZE
         );
+
+        if(this.overlayPane) {
+            this.overlayPane.render(timestamp,BACKGROUND_MARGIN,BACKGROUND_MARGIN,fullWidth-DOUBLE_BACKGROUND_MARGIN,fullHeight-BACKGROUND_BOTTOM_MARGIN);
+        }
 
     }
 }

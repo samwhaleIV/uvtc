@@ -164,8 +164,8 @@ function ChapterPane(callback,parent,instant=false) {
                         prompt.show();
                     } else {
                         if(GlobalState.data.activeChapter) {
-                            prompt = new UIPrompt("You are already in progress on a chapter. Do you want to lose your progress and start this chapter?",{
-                                text: "Yes, that's fine",
+                            prompt = new UIPrompt("A different chapter is active. Do you want end it?",{
+                                text: "Yes, start this chapter",
                                 callback: () => {
                                     clearPrompt();
                                     loadWorld();
