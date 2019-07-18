@@ -22,11 +22,6 @@ function PlayerRenderer(startDirection,isFakePlayer=false) {
     } else {
         SpriteRenderer.call(this,startDirection,"player");
     }
-    if(!isFakePlayer) {
-        this.convoyAdd(new PlayerRenderer("down",true));
-        this.convoyAdd(new SpriteRenderer("down","jim"));
-        this.convoyAdd(new SpriteRenderer("down","tree-lee"));
-    }
     this.isPlayer = isFakePlayer ? false : true;
 }
 function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumnHeight) {
