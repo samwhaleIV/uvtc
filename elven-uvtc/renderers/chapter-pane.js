@@ -174,6 +174,7 @@ function ChapterPane(callback,parent,instant=false) {
                                 text: "No, keep my current chapter",
                                 callback: clearPrompt
                             });
+                            prompt.show();
                         } else {
                             loadWorld();
                         }
