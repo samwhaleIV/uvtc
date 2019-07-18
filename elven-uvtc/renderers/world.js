@@ -16,6 +16,7 @@ import BattleFaderEffect from "./components/battle-fader-effect.js";
 import ChapterManager from "../runtime/chapter-manager.js";
 import MainMenuRenderer from "./main-menu.js";
 import ElvesFillIn from "./components/elves-fill-in.js";
+import FadeToBlack from "./components/world/fade-to-black.js";
 
 const songIntroLookup = {};
 SongsWithIntros.forEach(song => {
@@ -44,6 +45,7 @@ function WorldRenderer() {
     });
     this.chapterComplete = async () => {
         const chapterNumber = GlobalState.data.activeChapter;
+        this.pushCustomRenderer(new FadeToBlack(2000));
         this.pushCustomRenderer(new ChapterPreview(chapterNumber,this.getItemPreviewBounds));
         ChapterManager.setActiveChapterCompleted();
         if(chapterNumber === 17) {
@@ -290,33 +292,27 @@ function WorldRenderer() {
     this.playerObject = null;
     this.popup = null;
     this.prompt = null;
-    this.customRenderer = null;
 
     const customRendererStack = [];
+    let customRendererStackSize = 0;
     this.pushCustomRenderer = customRenderer => {
         if(!customRenderer.render) {
             console.warn(`Custom renderer '${String(customRenderer)}' does not have a render method!`);
             return;
         }
         customRendererStack.push(customRenderer);
-        this.customRenderer = customRenderer;
+        customRendererStackSize = customRendererStack.length;
     }
     this.popCustomRenderer = () => {
-        if(customRendererStack.length >= 1) {
-            customRendererStack.pop();
-            const stackSize = customRendererStack.length;
-            if(stackSize >= 1) {
-                this.customRenderer = customRendererStack[stackSize-1];
-            } else {
-                this.customRenderer = null;
-            }
-        }
+        customRendererStack.pop();
+        customRendererStackSize = customRendererStack.length;
     }
-    this.popCustomRendererStack = () => {
+    this.clearCustomRendererStack = () => {
         this.customRenderer = null;
         while(customRendererStack.length) {
             customRendererStack.pop();
         }
+        customRendererStackSize = 0;
     }
 
     this.playerController = new PlayerController(this);
@@ -1145,16 +1141,21 @@ function WorldRenderer() {
                 objectBufferIndex += 3;
             }
         }
-        if(this.prompt) {
-            this.prompt.render(timestamp);
-        } else if(this.popup) {
-            this.popup.render(timestamp);
+        let i = 0;
+        while(i < customRendererStackSize) {
+            customRendererStack[i].render(timestamp);
+            i++;
         }
         if(this.customRenderer) {
             this.customRenderer.render(timestamp);
         }
         if(this.escapeMenuShown) {
             this.escapeMenu.render(timestamp);
+        }
+        if(this.prompt) {
+            this.prompt.render(timestamp);
+        } else if(this.popup) {
+            this.popup.render(timestamp);
         }
         if(alert) {
             if(!alert.render(timestamp)) {

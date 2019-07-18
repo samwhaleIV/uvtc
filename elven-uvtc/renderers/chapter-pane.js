@@ -5,7 +5,7 @@ import UIPrompt from "./components/ui-prompt.js";
 import ChapterManager from "../runtime/chapter-manager.js";
 import MovesManager from "../runtime/moves-manager.js";
 
-function ChapterPane(callback,parent) {
+function ChapterPane(callback,parent,instant=false) {
 
     const movesIcon = imageDictionary["ui/moves"];
 
@@ -319,6 +319,9 @@ function ChapterPane(callback,parent) {
     this.centerButtonText = "P  L  A  Y";
 
     let startTime;
+    if(instant) {
+        startTime = 1;
+    }
     this.render = (timestamp,x,y,width,height) => {
         if(!startTime) {
             startTime = timestamp;

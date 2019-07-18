@@ -126,7 +126,7 @@ function MainMenuRenderer(toChapterPane=false) {
                 this.overlayPane = new ControlsPaneRenderer(this.clearOverlay,this);
                 break;
             case hoverTypes.elf3:
-                this.overlayPane = new ChapterPane(this.clearOverlay,this);
+                this.overlayPane = new ChapterPane(this.clearOverlay,this,false);
                 break;
             case hoverTypes.elf4:
                 this.leaveWithFillInLayer(CreditsRenderer);
@@ -276,7 +276,7 @@ function MainMenuRenderer(toChapterPane=false) {
     }
 
     if(toChapterPane) {
-        this.overlayPane = new ChapterPane(this.clearOverlay,this);
+        this.overlayPane = new ChapterPane(this.clearOverlay,this,true);
     }
 
     this.render = function(timestamp) {
