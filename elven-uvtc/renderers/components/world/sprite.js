@@ -22,6 +22,9 @@ function PlayerRenderer(startDirection,isFakePlayer=false) {
     } else {
         SpriteRenderer.call(this,startDirection,"player");
     }
+    if(!isFakePlayer) {
+        this.convoyAdd(new PlayerRenderer("down",true),new PlayerRenderer("down",true),new PlayerRenderer("down",true))
+    }
     this.isPlayer = isFakePlayer ? false : true;
 }
 function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumnHeight) {
@@ -83,7 +86,7 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
     let convoyPathCount = 0;
     const convoy = [];
     let convoyCount = 0;
-    this.convoyAdd = object => {
+    const convoyAdd = object => {
         convoy.push(object);
         object.x = 0;
         object.y = 0;
@@ -93,6 +96,7 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         object.lastRenderY = -100;
         convoyCount++;
     }
+    this.convoyAdd = (...objects) => objects.forEach(convoyAdd);
 
     const modifyConvoy = method => {
         const removed = convoy[method]();
@@ -122,13 +126,24 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
     
     let lastX = null;
     let lastY = null;
+    let lastTime = null;
+    const baseRate = 1000 / 60;
+    const minRate = baseRate * 4;
     const renderConvoy = (timestamp,x,y,width,height) => {
+        if(!lastTime) {
+            lastTime = timestamp;
+        }
+        let delta = timestamp - lastTime;
+        if(delta > minRate) {
+            delta = baseRate;
+        }
+        delta = baseRate / delta;
 
         const calculatedX = this.x + this.xOffset;
         const calculatedY = this.y + this.yOffset;
         if(lastX !== calculatedX || lastY !== calculatedY) {
             convoyPath.unshift({x:calculatedX,y:calculatedY,direction:this.direction});
-            if(convoyPath.length > MAX_CONVOY_PATH_SIZE) {
+            if(convoyPath.length > Math.floor(MAX_CONVOY_PATH_SIZE * delta)) {
                 convoyPath.pop();
             }
             convoyPathCount = convoyPath.length;
@@ -154,9 +169,10 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
                     lastX = path.x;
                     lastY = path.y;
                 }
-                const xDistance = Math.abs(lastX - path.x);
-                const yDistance = Math.abs(lastY - path.y);
-                pathDistance += xDistance + yDistance;
+                const xDistance = Math.pow(lastX - path.x,2);
+                const yDistance = Math.pow(lastY - path.y,2);
+                const distance = Math.sqrt(xDistance + yDistance);
+                pathDistance += distance;
                 if(pathDistance >= CONVOY_ALIGNMENT) {
 
                     const interpolationPoint = (pathDistance-CONVOY_ALIGNMENT)/CONVOY_ALIGNMENT;
@@ -170,10 +186,10 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
 
                     let renderX = x + ((lerpedPathX - this.x) * width);
                     let renderY = y + ((lerpedPathY - this.y) * height);
-                    if(Math.abs(follower.lastRenderX-renderX) < antiJitter) {
+                    if(Math.sqrt(Math.pow(follower.lastRenderX-renderX,2)) < antiJitter) {
                         renderX = follower.lastRenderX;
                     }
-                    if(Math.abs(follower.lastRenderY-renderY) < antiJitter) {
+                    if(Math.sqrt(Math.pow(follower.lastRenderY-renderY,2)) < antiJitter) {
                         renderY = follower.lastRenderY;
                     }
                     follower.lastRenderX = renderX;
