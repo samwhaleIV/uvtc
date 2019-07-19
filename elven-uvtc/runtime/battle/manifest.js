@@ -66,16 +66,14 @@ const BattleManifest = {
     },
     "wimpy-red-elf": {
         name: "Wimpy Red Elf",
-        leftBoxBorder: "#BF0000",
-        leftBoxHealth: "#F74646",
-        leftBoxColor: "#CE2D2D",
-
-        rightBoxBorder: "#717171",
-        rightBoxColor: "#C3C3C3",
-        rightBoxHealth: "#222222",
-
-        noOuterRing: true,
-
+        "leftBoxBorder":"rgb(255, 0, 0)",
+        "leftBoxHealth":"rgb(255, 0, 0)",
+        "leftBoxColor":"rgb(247, 5, 5)",
+        "rightBoxBorder":"rgb(190, 190, 190)",
+        "rightBoxHealth":"rgb(150, 102, 102)",
+        "rightBoxColor":"rgb(255, 255, 255)",
+        "noOuterRing":false,
+        "backgroundColor":"rgb(212, 2, 2)",
         holeRingColor: "rgba(255,128,128,0.3)",
         getBackground: function() {
             return new (function(){

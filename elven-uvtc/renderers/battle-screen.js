@@ -4,11 +4,12 @@ import RenderMove from "./components/battle/move.js";
 
 const HEALTH_FLASH_TIME = 100;
 const FULL_TEXT_TRANSITION_TIME = 300;
-const circleTraceTime = 1300;
+const CIRCLE_RADIUS_COEFFICIENT = 0.2;
+const circleTraceTime = 1000;
 const circleFillTime = 500;
-const backgroundSaturateTime = 1500;
+const backgroundSaturateTime = 1200;
 const saturatePopExponent = 4; //Higher numbers are more abrupt
-const centerCircleOffset = 20;
+const centerCircleOffset = 10;
 const outerRingRadius = 4;
 const forcedSpeechDelay = FULL_TEXT_TRANSITION_TIME + 200;
 
@@ -249,22 +250,24 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
         context.fillRect(x,y,width,height);
         context.fillStyle = "white";
 
-        const textAreaX = x+20;
-        const textAreaY = y-30;
-        const textAreaWidth = width - 40;
-        const textAreaHeight = 60;
-        context.fillRect(textAreaX,textAreaY,textAreaWidth,textAreaHeight);
+        const fontSize = Math.ceil(Math.ceil(widthNormal * 21)/7)*7;
+        const textAreaHeight = fontSize * 3;
+        const halfTextAreaHeight = textAreaHeight / 2;
 
+        const textAreaX = x + 20;
+        const textAreaY = y-halfTextAreaHeight;
+        const textAreaWidth = width - 40;
+        context.fillRect(textAreaX,textAreaY,textAreaWidth,textAreaHeight);
+        const margin = Math.ceil(widthNormal * 6/2)*2;
         if(this.marqueeText) {
             context.textAlign = "center";
             context.textBaseline = "middle";
-            context.font = "100 22px Roboto";
-
+            context.font = `100 ${fontSize}px Roboto`;
             const textX = textAreaX + textAreaWidth/2;
-            const textY = textAreaY + textAreaHeight/2;
+            const textY = textAreaY + halfTextAreaHeight;
             const textWidth = context.measureText(this.marqueeText).width;
             const halfTextWidth = textWidth/2;
-            const textPadding = 5;
+            const textPadding = margin;
             context.fillStyle = "black";
             context.fillRect(
                 Math.round(textX-halfTextWidth-textPadding-textPadding),
@@ -280,10 +283,10 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
                 textY
             );
         }
-        const moveMargin = 15;
+        const moveMargin = Math.ceil(widthNormal*16/2)*2;
         let i = 0;
-        const moveHeight = height - 50-10;
-        const moveY = y + 45;
+        const moveHeight = height - moveMargin - moveMargin - halfTextAreaHeight;
+        const moveY = y + halfTextAreaHeight + moveMargin;
         let xOffset = Math.round(x + width / 2 - (playerMoves.length * (moveHeight + moveMargin)-moveMargin) / 2);
         while(i<playerMoves.length) {
             const moveLocation = moveRenderAreas[i];
@@ -455,9 +458,9 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
 
         const movesAreaHeight = Math.floor(verticalStatusArea.size * 2);
         let movesAreaWidth = width;
-        const maxWidth = Math.floor(fullWidth * 0.75);
-        if(movesAreaWidth > maxWidth) {
-            movesAreaWidth = maxWidth;
+        const maxWidth = 1500;
+        if(movesAreaWidth > maxWidth - 20) {
+            movesAreaWidth = maxWidth - 20;
         }
         if(this.fullText || leavingText) {
             let delta, text, transitionPolarity;
@@ -487,13 +490,15 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
                     delta = 1;
                 }
             }
-            const textAreaHeight = height - movesAreaHeight - verticalStatusArea.size - 80;
-            let textAreaWidth = width;
-            if(textAreaWidth > 1000) {
-                textAreaWidth = 1000;
+            const margin = 10;
+            const heightOffset = Math.round(Math.ceil(Math.ceil(widthNormal * 21)/7)*21/2);
+            const textAreaHeight = height - movesAreaHeight - verticalStatusArea.size - heightOffset - margin - margin;
+            let textAreaWidth = 1000;
+            if(textAreaWidth > movesAreaWidth - 20) {
+                textAreaWidth = movesAreaWidth - 20;
             }
             const textAreaX = Math.round(x+width/2-textAreaWidth/2);
-            let textAreaY = verticalStatusArea.pos + verticalStatusArea.size + 25;
+            let textAreaY = verticalStatusArea.pos + verticalStatusArea.size + margin;
             if(transitionPolarity) {
                 textAreaY -= fullHeight * (1-delta);
             } else {
@@ -522,26 +527,13 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
     }
 
     const renderInterface = timestamp => {
-        const boxMargin = 40;
-        const boxSize = smallestDimension - boxMargin - boxMargin;
-        if(greaterWidth) {
-            const width = fullWidth * 0.7;
-            renderInterfaceElements(
-                timestamp,
-                Math.round(halfWidth - width/2),
-                boxMargin,
-                width,
-                boxSize
-            );
-        } else {
-            renderInterfaceElements(
-                timestamp,
-                boxMargin,
-                Math.round(halfHeight-boxSize/2),
-                boxSize,
-                boxSize
-            );
-        }
+        renderInterfaceElements(
+            timestamp,
+            10,
+            10,
+            fullWidth-20,
+            fullHeight-20
+        );
     }
 
     this.render = timestamp => {
@@ -561,7 +553,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
         } else {
             startDelta = timestamp - startTime;
         }
-        const radius = smallestDimension * 0.22;
+        const radius = smallestDimension * CIRCLE_RADIUS_COEFFICIENT;
         const traceNormal = startDelta / circleTraceTime;
         if(this.background) {
             const saturateNormal = startDelta / backgroundSaturateTime;
@@ -606,7 +598,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
             context.stroke();
         }
         if(this.foreground) {
-            this.foreground.render(timestamp);
+            this.foreground.render(timestamp,radius);
         }
         renderInterface(timestamp);
     }

@@ -422,7 +422,7 @@ function ChapterPane(callback,parent,instant=false) {
         const subtitleLayerHeight = widthNormal * 45;
         const subtitleBoxCenterY = subtitleLayerHeight + halfHeight + imageSize / 2;
         context.fillStyle = "black";
-        context.fillRect(halfWidth-20-subtitleWidth/2,subtitleBoxCenterY-subtitleLayerHeight/2,subtitleWidth+40,subtitleLayerHeight);
+        context.fillRect(Math.round(halfWidth-fontSize-subtitleWidth/2),subtitleBoxCenterY-subtitleLayerHeight/2,Math.round(subtitleWidth+fontSize+fontSize),subtitleLayerHeight);
         context.fillStyle = "white";
         context.font = `300 ${fontSize}px Roboto`;
         context.fillText(this.chapterSubTitle,halfWidth,robotoOffset+subtitleBoxCenterY);

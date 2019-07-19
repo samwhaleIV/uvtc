@@ -16,8 +16,8 @@ function SpriteForeground(whomstve,isElf,customWidth,customHeight,yOffset) {
     sprite.x = 0;
     sprite.y = 0;
 
-    this.render = timestamp => {
-        const size = Math.ceil(largestDimension / 5 / 16) * 16;
+    this.render = (timestamp,size) => {
+        size = Math.ceil(size * 2 / 16) * 16;
         const halfSize = size/2;
         sprite.render(timestamp,halfWidth-halfSize,halfHeight-halfSize+yOffset*size,size,size);
     }
