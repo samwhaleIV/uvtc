@@ -122,13 +122,15 @@ const BattleManifest = {
         rightBoxHealth: "#262626",
         holeRingColor: "#262626",
 
+        backgroundColor: "#E57834",
+
         getBackground: function() {
             const scrollingBackground = new ScrollingBackground("checkered",0);
             return {
                 render: timestamp => {
                     scrollingBackground.render(timestamp);
                     context.save();
-                    context.fillStyle = "#E57834";
+                    context.fillStyle = this.backgroundColor;
                     context.globalCompositeOperation = "multiply";
                     context.fillRect(0,0,fullWidth,fullHeight);
                     context.restore();

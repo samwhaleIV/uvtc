@@ -253,7 +253,7 @@ function WorldRenderer() {
                 this.movesManager.unlockMove(moveName);
             }
             this.pushCustomRenderer(new MovePreview(moveName,this.getItemPreviewBounds));
-            await this.showInstantTextPopupSound(`You received the move ${moveName}!`);
+            let messages = [`You received the move ${moveName}!`];
             if(!alreadyHasMove) {
                 const move = Moves[moveName];
                 let description = move.description;
@@ -263,10 +263,11 @@ function WorldRenderer() {
                         type = type.substring(0,1).toUpperCase() + type.substring(1);
                         description = `${type}: ${description}`;
                     }
-                    playSound("click");
-                    await this.showInstantTextPopup(description);
+                    messages.push(description);
                 }
             }
+            playSound("energy");
+            await this.showInstantTextPopups(messages);
             playSound("click");
             this.popCustomRenderer();
             resolve();
@@ -494,6 +495,7 @@ function WorldRenderer() {
     this.showTextPopup =        page =>         showTextPopup([page]);
     this.showTextPopups =       pages =>        showTextPopup(pages);
     this.showInstantTextPopup = page =>         showTextPopup([page],null,true);
+    this.showInstantTextPopups = pages =>       showTextPopup(pages,null,true);
     this.showNamedTextPopup =   (page,name) =>  showTextPopup([page],name);
     this.showNamedTextPopups =  (pages,name) => showTextPopup(pages,name);
     this.showInstantTextPopupSound = page => {

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Battle Style Maker</title>
+    <style>
+        div#area {
+            width: 800px;
+            height: 600px;
+            background-image: url("elven-uvtc/images/backgrounds/checkered.png");
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: rgb(0, 0, 255);
+            background-size: contain;
+            background-blend-mode: multiply;
+        }
+        div.statusArea {
+            max-width: 75%;
+            width: 500px;
+            height: 100px;
+            position: relative;
+            top: 10px;
+            left: 10px;
+            margin-bottom: 10px;
+            border-width: 5px;
+            border-style: solid;
+            background-blend-mode: multiply;
+            background-image: url("elven-uvtc/images/ui/status-fill.png");
+            background-size: cover;
+        }
+        div#leftStatusArea {
+            border-color: red;
+            border-bottom-color: aqua;
+            background-color: yellow;
+        }
+        div#rightStatusArea {
+            border-color: red;
+            border-bottom-color: aqua;
+            background-color: yellow;
+        }
+        button {
+            width: 100%;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            height: 40px;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 800px;
+            display: block;
+        }
+        div#toggle {
+            text-align: center;
+            margin-top: 10px;
+        }
+        div#circle {
+            width: 200px;
+            height: 200px;
+            left: calc(50% - 100px);
+            background-color: rgb(0, 0, 0);
+            border-radius: 50%;
+            position: absolute;
+            top: 305px;
+        }
+        div#bigcircle {
+            width: 210px;
+            height: 210px;
+            left: calc(50% - 105px);
+            background-color: rgb(255, 0, 0);
+            border-radius: 50%;
+            position: absolute;
+            top: 300px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="area">
+        <div class="statusArea" id="leftStatusArea"></div>
+        <div class="statusArea" id="rightStatusArea"></div>
+        <div id="bigcircle">
+        </div>
+        <div id="circle">
+        </div>
+    </div>
+    <div id="toggle">
+        <input type="checkbox" id="outerring" name="scales" onchange="updateToggle(event)" checked>
+        <label for="outerring">Outer ring</label>
+    </div>
+    <button onclick="exportStyle()">Export Style</button>
+    <script>
+    const leftStatusArea = document.getElementById("leftStatusArea");
+    const rightStatusArea = document.getElementById("rightStatusArea");
+    const area = document.getElementById("area");
+    const bigCircle = document.getElementById("bigcircle");
+    let outerRing = true;
+    function updateToggle(event) {
+        const checked = event.target.checked;
+        outerRing = checked;
+        bigCircle.classList.toggle("hidden");
+    }
+    function exportStyle() {
+        const leftStyle = getComputedStyle(leftStatusArea);
+        const rightStyle = getComputedStyle(rightStatusArea);
+        const areaStyle = getComputedStyle(area);
+        const bigCircleStyle = getComputedStyle(bigCircle);
+        const data = {
+            leftBoxBorder: leftStyle.getPropertyValue("border-top-color"),
+            leftBoxHealth: leftStyle.getPropertyValue("border-bottom-color"),
+            leftBoxColor:  leftStyle.getPropertyValue("background-color"),
+
+            rightBoxBorder: rightStyle.getPropertyValue("border-top-color"),
+            rightBoxHealth: rightStyle.getPropertyValue("border-bottom-color"),
+            rightBoxColor:  rightStyle.getPropertyValue("background-color"),
+
+            noOuterRing: outerRing,
+            holeRingColor: bigCircleStyle.getPropertyValue("backgrond-color"),
+            backgroundColor: areaStyle.getPropertyValue("background-color")
+        };
+        prompt("Here's your fucking data you filthy degenerate:",JSON.stringify(data));
+    }
+    </script>
+</body>
+</html>
