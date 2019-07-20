@@ -74,10 +74,10 @@ function BattleFaderEffect() {
         const maxBoxCount = Math.ceil((verticalCount * horizontalCount + extraAmount) * intensity);
 
         let x = 0, y = 0, direction = 0, row = 0, render = false, boxCount = 0;
-        let fullRotationCount
+        let fullRotationCount = 0;
         startBlockAreaRender();
         renderBlock(x,y,verticalOffset,horizontalOffset);
-        do {
+        while(boxCount < maxBoxCount && fullRotationCount < 2) {
             render = false;
             if(direction === 0) {
                 x++;
@@ -121,7 +121,7 @@ function BattleFaderEffect() {
             } else {
                 fullRotationCount++;
             }
-        } while(boxCount < maxBoxCount && fullRotationCount < 4);
+        }
         endBlockAreaRender(intensity);
     }
 }
