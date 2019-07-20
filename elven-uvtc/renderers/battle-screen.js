@@ -11,7 +11,9 @@ const backgroundSaturateTime = 1200;
 const saturatePopExponent = 4; //Higher numbers are more abrupt
 const centerCircleOffset = 10;
 const outerRingRadius = 4;
-const forcedSpeechDelay = FULL_TEXT_TRANSITION_TIME + 200;
+const DESCRIPTION_TIMEOUT = 140;
+
+const NO_ACTION_RESOLVER = "There is no current player action resolver";
 
 function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
 
@@ -48,7 +50,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
     this.rightHealthNormal = null;
 
     let playerMoves = [];
-    this.marqueeText = "Prepare to battle!";
+    this.marqueeText = "A challenger awaits!";
     this.fullText = null;
 
     let leavingText = null;
@@ -108,8 +110,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
             startDelay = 0;
         }
         setTimeout(playSound,startDelay,"text-sound");
-        setTimeout(playSound,startDelay + 100,"text-sound");
-        setTimeout(playSound,startDelay + 200,"text-sound");
+        setTimeout(playSound,startDelay + 90,"text-sound");
     };
     this.clearFullText = () => {
         leavingText = this.fullText;
@@ -126,16 +127,79 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
         return playerActionPromise();
     };
     let moveUpdateFlagged = false;
+    let firstIsBack = false;
     this.updatePlayerMoves = newMoves => {
         playerMoves = newMoves;
+        firstIsBack = newMoves.length && newMoves[0].name === "Back" ? 1 : 0;
         moveUpdateFlagged = true;
     }
 
     this.sequencer = new BattleSequencer(winCallback,loseCallback,...sequencerParameters);
     this.sequencer.bindToBattleScreen(this);
 
+    let descriptionPreview = null;
+    let descriptionResetTimeout = null;
+
+    const setDescriptionPreview = value => {
+        if(value !== null) {
+            clearTimeout(descriptionResetTimeout);
+        }
+        descriptionPreview = value;
+    };
+
+    const clearMoveDescription = immediate => {
+        if(immediate) {
+            descriptionPreview = null;
+            clearTimeout(descriptionResetTimeout);
+            return;
+        }
+        clearTimeout(descriptionResetTimeout);
+        descriptionResetTimeout = setTimeout(
+            setDescriptionPreview,
+            DESCRIPTION_TIMEOUT,
+            null
+        );
+    };
+
+    const updateMoveDescriptionPreview = active => {
+        if(!active) {
+            clearMoveDescription();
+        } else {
+            let move = null;
+            switch(hoverType) {
+                case m1.hoverType:
+                    move = playerMoves[0];
+                    break;
+                case m2.hoverType:
+                    move = playerMoves[1];
+                    break;
+                case m3.hoverType:
+                    move = playerMoves[2];
+                    break;
+                case m4.hoverType:
+                    move = playerMoves[3];
+                    break;
+            }
+            if(!move) {
+                clearMoveDescription();
+                return;
+            }
+            if(move.type === "ui") {
+                clearMoveDescription();
+                return;
+            }
+            if(!move.description) {
+                clearMoveDescription();
+                return;
+            }
+            setDescriptionPreview(
+                processTextForWrapping(move.description)
+            );
+        }
+    }
 
     this.processMove = (x,y) => {
+        let active = true;
         if(contains(x,y,m1)) {
             hoverType = m1.hoverType;
         } else if(contains(x,y,m2)) {
@@ -146,34 +210,24 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
             hoverType = m4.hoverType;
         } else {
             hoverType = hoverTypes.none;
+            active = false;
         }
+        updateMoveDescriptionPreview(active);
     }
 
     let enterDown = false;
     this.processKey = key => {
         switch(key) {
             case kc.accept:
-                if(!enterDown) {
-                    if(playerMoves.length === 1 && playerMoves[0].name === "Skip") {
+                if(!enterDown && playerMoves.length === 1) {
+                    const firstMoveName = playerMoves[0].name;
+                    if(firstMoveName === "Skip" || firstMoveName === "Start") {
                         if(playerActionResolver) {
-                            if(this.fullText) {
-                                if(performance.now() < fullTextStart + forcedSpeechDelay) {
-                                    return;
-                                } else {
-                                    playSound("click");
-                                    playerActionResolver(0);
-                                    playerActionResolver = null;
-                                }
-                            } else {
-                                playSound("click");
-                                playerActionResolver(0);
-                                playerActionResolver = null;
-                            }
-                        } else if(!this.sequencer.started) {
-                            playSound("click");
-                            this.sequencer.startBattle();
+                            playerActionResolver(0);
+                            playerActionResolver = null;
+                            clearMoveDescription(true);
                         } else {
-                            playSound("click");
+                            console.warn(NO_ACTION_RESOLVER);
                         }
                     }
                 }
@@ -201,23 +255,13 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
                 if(hoverType > playerMoves.length) {
                     break;
                 }
-                if(!this.sequencer.started) {
-                    playSound("click");
-                    this.sequencer.startBattle();
-                    break;
-                }
-                if(this.fullText) {
-                    if(playerMoves.length === 1 && playerMoves[0].name === "Skip") {
-                        if(performance.now() < fullTextStart + forcedSpeechDelay) {
-                            break;
-                        }
-                    }
-                }
                 if(playerActionResolver) {
                     playerActionResolver(hoverType-1);
                     playerActionResolver = null;
+                    clearMoveDescription(true);
+                } else {
+                    console.warn(NO_ACTION_RESOLVER);
                 }
-                playSound("click");
                 break;
         }
     }
@@ -259,13 +303,14 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
         const textAreaWidth = width - 40;
         context.fillRect(textAreaX,textAreaY,textAreaWidth,textAreaHeight);
         const margin = Math.ceil(widthNormal * 6/2)*2;
-        if(this.marqueeText) {
+        const marqueeText = this.marqueeText;
+        if(marqueeText) {
             context.textAlign = "center";
             context.textBaseline = "middle";
             context.font = `100 ${fontSize}px Roboto`;
             const textX = textAreaX + textAreaWidth/2;
             const textY = textAreaY + halfTextAreaHeight;
-            const textWidth = context.measureText(this.marqueeText).width;
+            const textWidth = context.measureText(marqueeText).width;
             const halfTextWidth = textWidth/2;
             const textPadding = margin;
             context.fillStyle = "black";
@@ -278,17 +323,23 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
 
             context.fillStyle = "white";
             context.fillText(
-                this.marqueeText,
+                marqueeText,
                 textX,
                 textY
             );
         }
         const moveMargin = Math.ceil(widthNormal*16/2)*2;
         let i = 0;
-        const moveHeight = height - moveMargin - moveMargin - halfTextAreaHeight;
-        const moveY = y + halfTextAreaHeight + moveMargin;
-        let xOffset = Math.round(x + width / 2 - (playerMoves.length * (moveHeight + moveMargin)-moveMargin) / 2);
+        const moveHeight = Math.round(height - moveMargin - moveMargin - halfTextAreaHeight);
+        const moveY = y + Math.round(halfTextAreaHeight + moveMargin);
+        
+        let xOffset = Math.round(x + width / 2 - ((playerMoves.length-firstIsBack) * (moveHeight + moveMargin)-moveMargin) / 2);
         while(i<playerMoves.length) {
+            let tmpXOffset = null;
+            if(i === 0 && firstIsBack) {
+                tmpXOffset = xOffset;
+                xOffset = x + moveMargin;
+            }
             const moveLocation = moveRenderAreas[i];
             moveLocation.x = xOffset;
             moveLocation.y = moveY;
@@ -302,7 +353,11 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
                 hoverType === moveLocation.hoverType,
                 false
             );
-            xOffset += moveHeight + moveMargin;
+            if(tmpXOffset !== null) {
+                xOffset = tmpXOffset;
+            } else {
+                xOffset += moveHeight + moveMargin;
+            }
             i++;
         }
         if(moveUpdateFlagged) {
@@ -462,7 +517,8 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
         if(movesAreaWidth > maxWidth - 20) {
             movesAreaWidth = maxWidth - 20;
         }
-        if(this.fullText || leavingText) {
+        const hasDescriptionPreview = descriptionPreview !== null;
+        if(this.fullText || leavingText || hasDescriptionPreview) {
             let delta, text, transitionPolarity;
             if(leavingText) {
                 transitionPolarity = false;
@@ -477,7 +533,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
                     delta = 1;
                     leavingText = null;
                 }
-            } else {
+            } else if(this.fullText) {
                 transitionPolarity = true;
                 text = this.fullText;
                 if(!fullTextStart) {
@@ -489,25 +545,41 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
                 } else if(delta > 1) {
                     delta = 1;
                 }
+            } else {
+                text = descriptionPreview;
+                delta = 1;
+                transitionPolarity = true;
             }
             const margin = 10;
             const heightOffset = Math.round(Math.ceil(Math.ceil(widthNormal * 21)/7)*21/2);
-            const textAreaHeight = height - movesAreaHeight - verticalStatusArea.size - heightOffset - margin - margin;
+            const fullTextAreaHeight = height - movesAreaHeight - verticalStatusArea.size - heightOffset - margin - margin;
+            let textAreaHeight = height - movesAreaHeight - verticalStatusArea.size - heightOffset - margin - margin;
+            if(hasDescriptionPreview) {
+                textAreaHeight = Math.round(textAreaHeight / 4) + 20;
+            }
             let textAreaWidth = 1000;
             if(textAreaWidth > movesAreaWidth - 20) {
                 textAreaWidth = movesAreaWidth - 20;
             }
             const textAreaX = Math.round(x+width/2-textAreaWidth/2);
-            let textAreaY = verticalStatusArea.pos + verticalStatusArea.size + margin;
-            if(transitionPolarity) {
-                textAreaY -= fullHeight * (1-delta);
+            let textAreaY;
+            if(hasDescriptionPreview) {
+                textAreaY = verticalStatusArea.pos + verticalStatusArea.size + fullTextAreaHeight - textAreaHeight + margin;
             } else {
-                textAreaY += fullHeight * delta;
+                textAreaY = verticalStatusArea.pos + verticalStatusArea.size + margin;
+                if(transitionPolarity) {
+                    textAreaY -= fullHeight * (1-delta);
+                } else {
+                    textAreaY += fullHeight * delta;
+                }
             }
             textAreaY = Math.round(textAreaY);
-            context.fillStyle = "rgba(0,0,0,0.9)";
+            context.fillStyle = hasDescriptionPreview ? "rgb(255,255,255)" : "rgba(0,0,0,0.9)";
             context.fillRect(textAreaX,textAreaY,textAreaWidth,textAreaHeight);
-            BitmapText.drawTextWrappingWhite(text,textAreaX+20,textAreaY+20,textAreaWidth-40,Math.ceil(5/maxHorizontalResolution*fullWidth));
+            BitmapText.drawTextWrapping(
+                text,textAreaX+20,textAreaY+20,textAreaWidth-40,Math.ceil(5/maxHorizontalResolution*fullWidth),
+                hasDescriptionPreview ? "black" : "white"
+            );
         }
         renderStatusArea(
             horizontalLeftArea.pos,
@@ -539,13 +611,6 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
     this.render = timestamp => {
         if(!startTime) {
             startTime = this.fader.start + faderTime / 2;
-            if(!this.sequencer.started) {
-                setTimeout(()=>{
-                    if(!this.sequencer.started) {
-                        this.sequencer.startBattle();
-                    }
-                },faderTime+backgroundSaturateTime);
-            }
         }
         let startDelta;
         if(timestamp < startTime) {
@@ -602,5 +667,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
         }
         renderInterface(timestamp);
     }
+
+    this.sequencer.startBattle();
 }
 export default BattleScreenRenderer;

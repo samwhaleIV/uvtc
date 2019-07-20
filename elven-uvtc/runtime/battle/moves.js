@@ -9,7 +9,7 @@ const MovesList = [
     {
         name: "Nothing",
         description: "What is it good for? Absolutely nothing.",
-        type:"ui",
+        type: "ui",
         noTextBlur: true,
         process: (user,target) => {
             return {
@@ -19,15 +19,17 @@ const MovesList = [
         }
     },
     {
+        name: "Start",
+        type: "ui",
+    },
+    {
         name: "Back",
         type: "ui",
-        noTextBlur: false
     },
     {
         name: "Skip",
         description: "Skip what's happening right now so you can continue kicking ass.",
         type: "ui",
-        noTextBlur: false
     },
     {
         name:"Logic",
@@ -71,7 +73,7 @@ const MovesList = [
         type: "logic",
         description: "Eat an apple and heal 1 health to yourself.",
         process: (user,target) => {
-            user.health++;
+            user.health += 1;
             return {
                 type: "text",
                 text: "An apple a day keeps the doctor away."

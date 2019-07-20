@@ -4,7 +4,10 @@ import RenderMove from "../battle/move.js";
 const MAX_RENDER_SIZE = 450;
 
 function MovePreview(moveName,getArea) {
-    const move = Moves[moveName];
+    let move = Moves[moveName];
+    if(!move) {
+        move = Moves["Nothing"];
+    }
     this.render = () => {
         let moveSize;
         const area = getArea();

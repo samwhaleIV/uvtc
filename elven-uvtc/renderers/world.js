@@ -255,7 +255,11 @@ function WorldRenderer() {
             this.pushCustomRenderer(new MovePreview(moveName,this.getItemPreviewBounds));
             let messages = [`You received the move ${moveName}!`];
             if(!alreadyHasMove) {
-                const move = Moves[moveName];
+                let move = Moves[moveName];
+                if(!move) {
+                    move = Moves["Nothing"];
+                    console.error(`Move '${moveName}' does not exist!`);
+                }
                 let description = move.description;
                 let type = move.type;
                 if(description) {

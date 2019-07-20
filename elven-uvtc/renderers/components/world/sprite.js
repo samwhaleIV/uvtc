@@ -8,9 +8,11 @@ const FOOTSTEPS_SPRITE_NAME = "footsteps";
 const MAX_CONVOY_PATH_SIZE = 100;
 const CONVOY_ALIGNMENT = 8;
 
+const SPRITE_ALERT_TIMEOUT = 400;
+
 function lerp(v0,v1,t) {
     //https://github.com/mattdesl/lerp/blob/master/LICENSE.md
-    return v0*(1-t)+v1*t
+    return v0*(1-t)+v1*t;
 }
 
 function ElfRenderer(startDirection,spriteName) {
@@ -367,7 +369,7 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
             setTimeout(() => {
                 showingAlert = false;
                 resolve();
-            },SpriteAlertTimeout);
+            },SPRITE_ALERT_TIMEOUT);
         });
     }
     const alertSprite = imageDictionary["sprites/alert"];

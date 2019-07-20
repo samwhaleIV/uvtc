@@ -85,7 +85,7 @@ const getBattleEntity = (name,health,isPlayer) => {
     let entityName = name;
 
     let entityHealth = health;
-    let entityMaxHealth = health;
+    let entityMaxHealth = MAX_DISPLAY_HEALTH;
 
     const battleState = {};
     const entity = {};
@@ -457,6 +457,9 @@ async function logicalBattleSequencer(sequencer) {
     const player = sequencer.player;
     let battleAlive = true;
     const endParameters = {};
+    await sequencer.getAction();
+    sequencer.updatePlayerMoves([SKIP_MOVE]);
+    sequencer.setMarqueeText("The battle begins!");
     if(opponentSequencer.getStartEvents) {
         await runBattleEvents(sequencer,opponentSequencer.getStartEvents());
     }
@@ -581,7 +584,7 @@ function BattleSequencer(winCallback,loseCallback,opponentSequencer) {
     this.playerFearMoves = getSlotMoves("fear");
 
     this.opponentSequencer = opponentSequencer;
-    this.playerMoves = [Moves["Skip"]];
+    this.playerMoves = [Moves["Start"]];
 
     addEvent(this,"PlayerMovesChanged");
 
