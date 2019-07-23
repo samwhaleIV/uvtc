@@ -11,12 +11,12 @@ addMap({
             wizard = world.getCharacter("wizard-elf","down");
 
             wimpyRed.convoyAdd(wimpyGreen,wizard);
-            world.addObject(wimpyRed,9,1);
-            wimpyRed.yOffset = -2;
+            world.addObject(wimpyRed,9,-2);
+            wimpyRed.yOffset = 0;
 
             world.followObject = wimpyRed;    
             this.start = async () => {
-                await wimpyRed.move({y:22});
+                await wimpyRed.move({y:25});
             }
         }
     },

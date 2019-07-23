@@ -20,11 +20,14 @@ function addMap(map) {
     map.rows = tilemaps.rows;
     map.columns = tilemaps.columns;
 
+    map.finalRow = tilemaps.rows - 1;
+    map.finalColumn = tilemaps.columns - 1;
+
     map.lowerHorizontalBound = !isNaN(map.minCameraX) ? map.minCameraX : 0;
     map.lowerVerticalBound = !isNaN(map.minCameraY) ? map.minCameraY : 0;
 
-    map.horizontalUpperBound = !isNaN(map.maxCameraX) ? map.maxCameraX : map.columns - 1;
-    map.verticalUpperBound = !isNaN(map.maxCameraY) ? map.maxCameraY : map.rows - 1;
+    map.horizontalUpperBound = !isNaN(map.maxCameraX) ? map.maxCameraX : map.finalColumn;
+    map.verticalUpperBound = !isNaN(map.maxCameraY) ? map.maxCameraY : map.finalRow;
 
     delete rawMapData[map.name];
 

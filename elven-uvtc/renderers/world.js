@@ -577,6 +577,7 @@ function WorldRenderer() {
     this.objects = {};
     this.objectsLookup = [];
     let offscreenObjects = [];
+    let offscreenObjectCount = 0;
 
     let lastID = 0;
     const getNextObjectID = function() {
@@ -596,14 +597,73 @@ function WorldRenderer() {
         return this.addObject(newPlayer,x,y);
     }
 
-    let offscreenObjectCount = 0;
-    this.addObject = function(object,x,y) {
-        const objectID = getNextObjectID();
-        object.ID = objectID;
-        if(object.offscreenRendering) {
+    const removeOffScreenObject = objectID => {
+        for(let i = 0;i<offscreenObjects.length;i++) {
+            if(offscreenObjects[i].ID === objectID) {
+                offscreenObjects.splice(i,1);
+                offscreenObjectCount--;
+                break;
+            }
+        }
+    }
+
+    const registerOffscreenToggler = (object,startActive) => {
+        const startWithOffscreen = object.offscreenRendering ? true : false;
+        let offscreenRendering = startWithOffscreen;
+        let world = this;
+        if(startWithOffscreen) {
+            delete object.offscreenRendering;
+        }
+        Object.defineProperty(object,"offscreenRendering",{
+            get: function() {
+                return offscreenRendering;
+            },
+            set: function(value) {
+                if(typeof value !== "boolean") {
+                    throw TypeError("Value 'offscreenRendering' must be of type 'boolean'!");
+                }
+                if(offscreenRendering) {
+                    if(!value) {
+                        //turn off off screen rendering for this object
+                        offscreenRendering = false;
+                        removeOffScreenObject(object.ID);
+                        let x = object.x, y = object.y;
+                        if(x < 0) {
+                            x = 0;
+                        } else if(x > world.renderMap.finalColumn) {
+                            x = world.renderMap.finalColumn;
+                        }
+                        if(y < 0) {
+                            y = 0;
+                        } else if(y > world.renderMap.finalRow) {
+                            y = world.renderMap.finalRow;
+                        }
+                        object.x = null;
+                        object.y = null;
+                        world.moveObject(object.ID,x,y,false);
+                    }
+                } else if(value) {
+                    //turn on off screen rendering for this object
+                    offscreenRendering = true;
+                    world.objectsLookup[object.x][object.y] = null;
+                    offscreenObjects.push(object);
+                    offscreenObjectCount++;
+
+                }
+            }
+        });
+        if(startWithOffscreen) {
             offscreenObjects.push(object);
             offscreenObjectCount++;
         }
+    }
+
+    this.addObject = function(object,x,y) {
+        const objectID = getNextObjectID();
+        object.ID = objectID;
+
+        registerOffscreenToggler(object);
+
         if(!isNaN(x) && !isNaN(y)) {
             object.x = x;
             object.y = y;
@@ -615,6 +675,9 @@ function WorldRenderer() {
         }
         object.world = this;
         this.objects[objectID] = object;
+        if(object.offscreenRendering) {
+            return objectID;
+        }
         if(this.objectsLookup[object.x][object.y]) {
             console.error("Error: An object collision has occured through the add object method");
             console.log("Existing item",this.objectsLookup[object.x][object.y],"New item",object);
@@ -635,13 +698,7 @@ function WorldRenderer() {
     this.removeObject = function(objectID) {
         const object = objectIDFilter(objectID);
         if(object.offscreenRendering) {
-            for(let i = 0;i<offscreenObjects.length;i++) {
-                if(item.ID === object.ID) {
-                    offscreenObjects.splice(i,1);
-                    offscreenObjectCount--;
-                    break;
-                }
-            }
+            removeOffScreenObject(object.ID);
         }
         if(object.isPlayer) {
             this.playerObject = null;
@@ -651,9 +708,29 @@ function WorldRenderer() {
     }
     this.moveObject = function(objectID,newX,newY,isInitialPosition=false) {
         const object = objectIDFilter(objectID);
-        this.objectsLookup[object.x][object.y] = null;
-        const oldX = object.x;
-        const oldY = object.y;
+        let oldX = object.x;
+        let oldY = object.y;
+        const hadNoPosition = oldX === null || oldY === null;
+        if(hadNoPosition) {
+            oldX = newX;
+            oldY = newY;
+            const oldObject = this.objectsLookup[oldX][oldY];
+            if(oldObject) {
+                console.error("Error: Shifting into this position loses an object on the lookup plane");
+                console.log(`Position: ${newX},${newY}`,"Existing item",oldObject,"New item",object);
+            }
+        }
+        if(object.offscreenRendering) {
+            object.x = newX;
+            object.y = newY;
+            if(object.worldPositionUpdated) {
+                object.worldPositionUpdated(oldX,oldY,newX,newY,this,isInitialPosition);
+            }
+            return;
+        }
+        if(!hadNoPosition) {
+            this.objectsLookup[object.x][object.y] = null;
+        }
         object.x = newX;
         object.y = newY;
         if(object.worldPositionUpdated) {
@@ -1166,7 +1243,7 @@ function WorldRenderer() {
                             decalBuffer.push(decalRegister,xDestination,yDestination);
                         }
                         const objectRegister = this.objectsLookup[xPos][yPos];
-                        if(objectRegister && !objectRegister.offscreenRendering) {
+                        if(objectRegister) {
                             objectBuffer.push(objectRegister,xDestination,yDestination);
                         }
 
@@ -1179,8 +1256,8 @@ function WorldRenderer() {
             let i = 0;
             while(i < offscreenObjectCount) {
                 const object = offscreenObjects[i];
-                const xDestination = xOffset + (object.x - adjustedXPos) * horizontalTileSize;
-                const yDestination = yOffset + (object.y - adjustedYPos) * verticalTileSize;
+                const xDestination = (object.x - adjustedXPos) * horizontalTileSize + xOffset;
+                const yDestination = (object.y - adjustedYPos) * verticalTileSize + yOffset;
                 objectBuffer.push(
                     object,xDestination,yDestination,
                 );
