@@ -6,7 +6,10 @@ const CharacterMakers = {
     "chili-wife":       defaultCharacterMaker,
     "chili":            defaultCharacterMaker,
     "tree-lee":         defaultCharacterMaker,
-    "jam":              defaultCharacterMaker
+    "jam":              defaultCharacterMaker,
+    "wizard-elf":       elfCharacterMaker,
+    "tiny-arm-elf":     elfCharacterMaker,
+    "wimpy-green-elf":  elfCharacterMaker
 };
 const CharacterColors = {
     "jim":              "blue",
@@ -26,7 +29,10 @@ const CharacterColors = {
     "chili-wife":       "deeppink",
     "jam":              "blue",
     "boxy":             "blueviolet",
-    "louis":            "green"
+    "louis":            "green",
+    "wizard-elf":       "blueviolet",
+    "tiny-arm-elf":     "cyan",
+    "wimpy-green-elf":  "green"
 };
 const CharacterDisplayNames = {
     "jim":              "Jim",
@@ -46,7 +52,10 @@ const CharacterDisplayNames = {
     "chili-wife":       "Chillene",
     "jam":              "Jam",
     "boxy":             "Boxy",
-    "louis":            "Louis"
+    "louis":            "Louis",
+    "wizard-elf":       "Wizard Elf",
+    "tiny-arm-elf":     "Tiny Arm Elf",
+    "wimpy-green-elf":  "Wimpy Green Elf"
 };
 const ColorLookup = {};
 Object.entries(textColorLookup).forEach(entry => {

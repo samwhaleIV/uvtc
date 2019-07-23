@@ -15,7 +15,8 @@ const Chapters = [
             "Poison Apple",
             "Submission",
             "Jingle Bells"
-        ]
+        ],
+        startMap: "north_pole_preview"
     },
     {
         title: "Tumble town fallen",

@@ -60,14 +60,14 @@ function WorldRenderer() {
         this.fader.fadeOut(MainMenuRenderer,true);
     }
     this.saveState = (withPositionData=true,skipGlobal=false) => {
-        if(withPositionData && this.playerObject) {
+        if(withPositionData && playerObject) {
             GlobalState.data["last_map"] = this.renderMap.name;
             GlobalState.data["last_player_pos"] = {
-                d: this.playerObject.direction,
-                x: this.playerObject.x,
-                y: this.playerObject.y,
-                xo: this.playerObject.xOffset,
-                yo: this.playerObject.yOffset,
+                d: playerObject.direction,
+                x: playerObject.x,
+                y: playerObject.y,
+                xo: playerObject.xOffset,
+                yo: playerObject.yOffset,
             }
         }
         if(!skipGlobal) {
@@ -81,11 +81,11 @@ function WorldRenderer() {
             let lp = GlobalState.data["last_player_pos"];
             if(lp) {
                 return () => {
-                    if(this.playerObject) {
-                        this.moveObject(this.playerObject.ID,lp.x,lp.y,true);
-                        this.playerObject.xOffset = lp.xo;
-                        this.playerObject.yOffset = lp.yo;
-                        this.playerObject.updateDirection(lp.d);
+                    if(playerObject) {
+                        this.moveObject(playerObject.ID,lp.x,lp.y,true);
+                        playerObject.xOffset = lp.xo;
+                        playerObject.yOffset = lp.yo;
+                        playerObject.updateDirection(lp.d);
                     }
                 }
             }
@@ -294,7 +294,17 @@ function WorldRenderer() {
     }
     const collisionTriggerOffset = -2;
 
-    this.playerObject = null;
+    this.playerController = new PlayerController(this);
+    let playerObject = null;
+    Object.defineProperty(this,"playerObject",{
+        get: function() {
+            return playerObject;
+        },
+        set: function(value) {
+            playerObject = value;
+            this.playerController.player = value;
+        }
+    });
     this.popup = null;
     this.prompt = null;
 
@@ -319,8 +329,6 @@ function WorldRenderer() {
         }
         customRendererStackSize = 0;
     }
-
-    this.playerController = new PlayerController(this);
 
     let playerMovementLocked = false;
 
@@ -389,7 +397,7 @@ function WorldRenderer() {
                     this.popup.progress();
                 }
             }
-        } else if(this.playerObject) {
+        } else if(playerObject) {
             if(key === kc.accept) { 
                 if(!enterReleased) {
                     return;
@@ -568,6 +576,7 @@ function WorldRenderer() {
     this.map = null;
     this.objects = {};
     this.objectsLookup = [];
+    let offscreenObjects = [];
 
     let lastID = 0;
     const getNextObjectID = function() {
@@ -587,9 +596,14 @@ function WorldRenderer() {
         return this.addObject(newPlayer,x,y);
     }
 
+    let offscreenObjectCount = 0;
     this.addObject = function(object,x,y) {
         const objectID = getNextObjectID();
         object.ID = objectID;
+        if(object.offscreenRendering) {
+            offscreenObjects.push(object);
+            offscreenObjectCount++;
+        }
         if(!isNaN(x) && !isNaN(y)) {
             object.x = x;
             object.y = y;
@@ -608,13 +622,35 @@ function WorldRenderer() {
         this.objectsLookup[object.x][object.y] = object;
         return objectID;
     }
+    const objectIDFilter = objectID => {
+        if(typeof objectID === "object" && typeof objectID.ID === "string") {
+            if(object.world !== this) {
+                console.warn(`Object '${object.ID}' belongs to a different world!`);
+            }
+            return objectID;
+        } else {
+            return this.objects[objectID];
+        }
+    }
     this.removeObject = function(objectID) {
-        const object = this.objects[objectID];
-        delete this.objects[objectID];
+        const object = objectIDFilter(objectID);
+        if(object.offscreenRendering) {
+            for(let i = 0;i<offscreenObjects.length;i++) {
+                if(item.ID === object.ID) {
+                    offscreenObjects.splice(i,1);
+                    offscreenObjectCount--;
+                    break;
+                }
+            }
+        }
+        if(object.isPlayer) {
+            this.playerObject = null;
+        }
+        delete this.objects[object.ID];
         this.objectsLookup[object.x][object.y] = null;
     }
     this.moveObject = function(objectID,newX,newY,isInitialPosition=false) {
-        const object = this.objects[objectID];
+        const object = objectIDFilter(objectID);
         this.objectsLookup[object.x][object.y] = null;
         const oldX = object.x;
         const oldY = object.y;
@@ -631,10 +667,9 @@ function WorldRenderer() {
     }
 
     this.moveSprite = function(objectID,steps) {
+        const object = objectIDFilter(objectID);
         let promiseResolver = null;
         const promise = new Promise(resolve=>promiseResolver=resolve);
-        const object = typeof objectID === "string" ? this.objects[objectID] : objectID;
-        objectID = object.ID;
         const world = this;
         let lastCallback = () => {
             object.setWalking(false);
@@ -687,7 +722,7 @@ function WorldRenderer() {
                             }
                             if(rolloverRequired) {
                                 object[offsetProperty] -= offsetRollover;
-                                world.moveObject(objectID,object.x+xChangeRollover,object.y+yChangeRollover,false);
+                                world.moveObject(object.ID,object.x+xChangeRollover,object.y+yChangeRollover,false);
                             }
                             if(endValue === object[targetProperty]) {
                                 object[offsetProperty] = 0;
@@ -744,7 +779,7 @@ function WorldRenderer() {
         if(this.map.getCameraStart) {
             this.camera = this.map.getCameraStart(this);
         }
-        this.playerController.player = this.playerObject;
+        this.playerController.player = playerObject;
         this.restoreRoomSong();
     }
     this.stopMusic = callback => {
@@ -826,7 +861,9 @@ function WorldRenderer() {
         }
         this.decals = [];
         this.objects = {};
-        this.playerObject = null;
+        offscreenObjects = [];
+        offscreenObjectCount = 0;
+        playerObject = null;
         this.map = newMap.WorldState ? new newMap.WorldState(this,data):{};
         if(newMap.cameraStart) {
             this.camera.x = newMap.cameraStart.x;
@@ -996,9 +1033,11 @@ function WorldRenderer() {
         if(this.cameraController) {
             this.cameraController(timestamp);
         } else if((!this.renderMap.fixedCamera || this.fixedCameraOverride) && !this.cameraFrozen) {
-            let followObject = this.playerObject;
+            let followObject;
             if(this.followObject) {
                 followObject = this.followObject;
+            } else {
+                followObject = playerObject;
             }
             if(followObject) {
                 if(followObject.renderLogic) {
@@ -1018,16 +1057,16 @@ function WorldRenderer() {
             const abolsuteCameraX = this.camera.x + this.camera.xOffset;
             const absoluteCameraY = this.camera.y + this.camera.yOffset;
 
-            if(abolsuteCameraX - halfHorizontalTiles < 0) {
-                this.camera.x = halfHorizontalTiles;
+            if(abolsuteCameraX - halfHorizontalTiles < this.renderMap.lowerHorizontalBound) {
+                this.camera.x = halfHorizontalTiles + this.renderMap.lowerHorizontalBound;
                 this.camera.xOffset = 0;   
             } else if(abolsuteCameraX + halfHorizontalTiles > this.renderMap.horizontalUpperBound) {
                 this.camera.x = this.renderMap.horizontalUpperBound - halfHorizontalTiles;
                 this.camera.xOffset = 0;
             }
 
-            if(absoluteCameraY - halfVerticalTiles < 0) {
-                this.camera.y = halfVerticalTiles;
+            if(absoluteCameraY - halfVerticalTiles < this.renderMap.lowerVerticalBound) {
+                this.camera.y = halfVerticalTiles + this.renderMap.lowerVerticalBound;
                 this.camera.yOffset = 0;
             } else if(absoluteCameraY + halfVerticalTiles > this.renderMap.verticalUpperBound) {
                 this.camera.y = this.renderMap.verticalUpperBound - halfVerticalTiles;
@@ -1127,7 +1166,7 @@ function WorldRenderer() {
                             decalBuffer.push(decalRegister,xDestination,yDestination);
                         }
                         const objectRegister = this.objectsLookup[xPos][yPos];
-                        if(objectRegister) {
+                        if(objectRegister && !objectRegister.offscreenRendering) {
                             objectBuffer.push(objectRegister,xDestination,yDestination);
                         }
 
@@ -1135,6 +1174,17 @@ function WorldRenderer() {
                     x++;
                 }
                 y++;
+            }
+
+            let i = 0;
+            while(i < offscreenObjectCount) {
+                const object = offscreenObjects[i];
+                const xDestination = xOffset + (object.x - adjustedXPos) * horizontalTileSize;
+                const yDestination = yOffset + (object.y - adjustedYPos) * verticalTileSize;
+                objectBuffer.push(
+                    object,xDestination,yDestination,
+                );
+                i++;
             }
             let decalBufferIndex = 0;
             while(decalBufferIndex < decalBuffer.length) {

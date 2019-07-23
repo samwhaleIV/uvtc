@@ -47,6 +47,9 @@ addMap({
         }
         this.otherClicked = async type => {
             switch(type) {
+                case 17:
+                    world.updateMap("tumble_woods",{fromDoorWay:true});
+                    break;
                 case 8:
                 case 9:
                 case 10:

@@ -302,24 +302,40 @@ function PlayerController(world) {
         }
     }
     this.processKey = function(key) {
+        const worldHasPlayer = this.player ? true : false;
         switch(key) {
             case kc.up:
-                this.player.updateDirection("up");
                 wDown = true;
+                if(!worldHasPlayer) {
+                    return;
+                }
+                this.player.updateDirection("up");
                 break;
             case kc.down:
-                this.player.updateDirection("down");
                 sDown = true;
+                if(!this.player) {
+                    return;
+                }
+                this.player.updateDirection("down");
                 break;
             case kc.left:
-                this.player.updateDirection("left");
                 aDown = true;
+                if(!this.player) {
+                    return;
+                }
+                this.player.updateDirection("left");
                 break;
             case kc.right:
-                this.player.updateDirection("right");
                 dDown = true;
+                if(!this.player) {
+                    return;
+                }
+                this.player.updateDirection("right");
                 break;
             case kc.accept:
+                if(!this.player) {
+                    return;
+                }
                 processEnter();
                 return;
         }
@@ -331,6 +347,7 @@ function PlayerController(world) {
         }
     }
     this.processKeyUp = function(key) {
+        const worldHasPlayer = this.player ? true : false;
         switch(key) {
             case kc.up:
                 wDown = false;
@@ -346,6 +363,9 @@ function PlayerController(world) {
                 break;
             default:
                 return;
+        }
+        if(!worldHasPlayer) {
+            return;
         }
         const soloMovementRegister = checkForSoloMovement();
         if(soloMovementRegister >= 0) {

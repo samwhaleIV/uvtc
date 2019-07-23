@@ -14,6 +14,9 @@ function lerp(v0,v1,t) {
     //https://github.com/mattdesl/lerp/blob/master/LICENSE.md
     return v0*(1-t)+v1*t;
 }
+function convoyRenderSort(a,b) {
+    return a.y - b.y;
+}
 
 function ElfRenderer(startDirection,spriteName) {
     SpriteRenderer.call(this,startDirection,spriteName,ELF_WIDTH,ELF_HEIGHT);
@@ -127,16 +130,44 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
     let lastY = null;
     let lastTime = null;
     const baseRate = 1000 / 60;
-    const minRate = baseRate * 4;
+    const minRate = baseRate * 5;
+    let lastStemX = null;
+    let lastStemY = null;
     const renderConvoy = (timestamp,x,y,width,height) => {
         if(!lastTime) {
             lastTime = timestamp;
         }
         let delta = timestamp - lastTime;
         if(delta > minRate) {
-            delta = baseRate;
+            lastStemX = null;
+            lastStemY = null;
+            lastX = null;
+            lastY = null;
+            lastTime = null;
+            convoyPath.splice(0,convoyPathCount);
+            return;
         }
         delta = baseRate / delta;
+        lastTime = timestamp;
+
+        let xStemDifference, yStemDifference;
+        if(lastStemX === null) {
+            lastStemX = Math.round(x+this.xOffset*height);
+            xStemDifference = 0;
+        } else {
+            const stemValue = Math.round(x+this.xOffset*height);
+            xStemDifference = Math.abs(stemValue-lastStemX);
+            lastStemX = stemValue;
+        }
+
+        if(lastStemY === null) {
+            lastStemY = Math.round(y+this.yOffset*height);
+            yStemDifference = 0;
+        } else {
+            const stemValue = Math.round(y+this.yOffset*height);
+            yStemDifference = Math.abs(stemValue-lastStemY);
+            lastStemY = stemValue;
+        }
 
         const calculatedX = this.x + this.xOffset;
         const calculatedY = this.y + this.yOffset;
@@ -158,6 +189,9 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         if(convoyPathCount) {
             const renderStack = [];
             const antiJitter = width / 16;
+            const horizontalAntiJitter = xStemDifference ? 0 : antiJitter;
+            const verticalAntiJitter = yStemDifference ? 0 : antiJitter;
+
             let pathIndex = 0;
             let convoyIndex = 0;
             let pathDistance = 0;
@@ -185,10 +219,10 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
 
                     let renderX = x + ((lerpedPathX - this.x) * width);
                     let renderY = y + ((lerpedPathY - this.y) * height);
-                    if(Math.sqrt(Math.pow(follower.lastRenderX-renderX,2)) < antiJitter) {
+                    if(Math.abs(follower.lastRenderX-renderX) < horizontalAntiJitter && follower.direction === this.direction) {
                         renderX = follower.lastRenderX;
                     }
-                    if(Math.sqrt(Math.pow(follower.lastRenderY-renderY,2)) < antiJitter) {
+                    if(Math.abs(follower.lastRenderY-renderY) < verticalAntiJitter && follower.direction === this.direction) {
                         renderY = follower.lastRenderY;
                     }
                     follower.lastRenderX = renderX;
@@ -198,7 +232,7 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
                     lastY = path.y;
 
                     follower.updateDirection(path.direction);
-                    renderStack.unshift({follower:follower,x:renderX,y:renderY});
+                    renderStack.push({follower:follower,x:renderX,y:renderY,index:convoyIndex});
                     convoyIndex++;
                     pathDistance -= CONVOY_ALIGNMENT;
                 }
@@ -223,7 +257,13 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
                 convoyIndex++;
             }
             const renderStackSize = renderStack.length;
+            renderStack.sort(convoyRenderSort);
             let i = 0;
+            let renderedSelf = false;
+            if(lastStemY < renderStack[0].y) {
+                this.renderSelf(x,y,width,height);
+                renderedSelf = true;
+            }
             while(i<renderStackSize) {
                 const renderOperation = renderStack[i];
                 renderOperation.follower.render(
@@ -232,6 +272,9 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
                     width,height
                 );
                 i++;
+            }
+            if(!renderedSelf) {
+                this.renderSelf(x,y,width,height);
             }
         }
     }
@@ -392,15 +435,8 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         }
     }
     if(customSize) {
-        this.render = function(timestamp,x,y,width,height) {
-            const startX = this.x, startY = this.y;
-            processRenderLogicForFrame(timestamp);
-            if(this.hidden) {
-                return;
-            }
-            if(convoyCount) {
-                renderConvoy(timestamp,x,y,width,height);
-            }
+        let startX, startY, recentTimestamp;
+        this.renderSelf = function(x,y,width,height) {
             const renderWidth = width * worldScaleTranslation;
             const renderHeight = customWidthRatio * renderWidth;
 
@@ -411,7 +447,7 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
             const destinationY = (this.yOffset * height + y + (this.y - startY) * height) + renderYOffset;
 
             const animationRow = specialRow !== null ? specialRow : !this.walkingOverride && walking ? 
-                Math.floor(timestamp / animationFrameTime) % rowCount * rowHeight
+                Math.floor(recentTimestamp / animationFrameTime) % rowCount * rowHeight
             : 0;
 
             context.drawImage(
@@ -427,31 +463,51 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
                 );
             }
         }
-    } else {
         this.render = function(timestamp,x,y,width,height) {
-            const startX = this.x, startY = this.y;
+            recentTimestamp = timestamp;
+            startX = this.x;
+            startY = this.y;
             processRenderLogicForFrame(timestamp);
             if(this.hidden) {
                 return;
             }
             if(convoyCount) {
                 renderConvoy(timestamp,x,y,width,height);
+            } else {
+                this.renderSelf(x,y,width,height);
             }
+        }
+    } else {
+        let startX, startY;
+        this.renderSelf = function(x,y,width,height) {
             const destinationX = this.xOffset * width + x + (this.x - startX) * width;
             const destinationY = this.yOffset * height + y + (this.y - startY) * height;
-
             if(showingAlert) {
                 context.drawImage(
                     alertSprite,destinationX,destinationY-height,width,height
                 );
             }
-    
             const animationRow = specialRow !== null ? specialRow : !this.walkingOverride && walking ? 
-                Math.floor(timestamp / animationFrameTime) % rowCount * rowHeight
+                Math.floor(recentTimestamp / animationFrameTime) % rowCount * rowHeight
             : 0;
             context.drawImage(
                 sprite,currentColumn,animationRow,columnWidth,rowHeight,destinationX,destinationY,width,height
             );
+        }
+        this.render = function(timestamp,x,y,width,height) {
+            recentTimestamp = timestamp;
+            startX = this.x;
+            startY = this.y;
+            processRenderLogicForFrame(timestamp);
+            if(this.hidden) {
+                return;
+            }
+            if(convoyCount) {
+                renderConvoy(timestamp,x,y,width,height);
+            } else {
+                this.renderSelf(x,y,width,height);
+            }
+
         }
     }
 

@@ -16,6 +16,9 @@ addMap({
         }
         this.otherClicked = async type => {
             switch(type) {
+                case 17:
+                    world.updateMap("tumble_woods",{fromDoorWay:true});
+                    break;
                 case 8:
                     world.showTextPopup("Overpriced office supplies, everyone's favorite!");
                     break;
