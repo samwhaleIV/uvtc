@@ -8,7 +8,7 @@ const PLAYER_SPRITE_NAME = "player";
 const ELF_HACK_SPRITE = "wimpy-red-elf";
 
 const MAX_CONVOY_PATH_SIZE = 200;
-const CONVOY_ALIGNMENT = 8;
+const CONVOY_ALIGNMENT = 1;
 
 const SPRITE_ALERT_TIMEOUT = 400;
 
@@ -86,8 +86,8 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
     const maxFootStepCount = 2;
     const footStepBuffer = [];
 
-    const convoyPath = [];
-    let convoyPathCount = 0;
+    let convoyPath = [];
+
     const convoy = [];
     let convoyCount = 0;
     const convoyAdd = object => {
@@ -128,200 +128,133 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         }
     }
 
-    let min = Infinity;
-    let max = -Infinity;
-    const evalIntpPoint = intp => {
-        if(intp > max) {
-            max = intp;
-            console.log("min",min,"max",max);
+    const getConvoyPosition = convoyIndex => {
+        const endLength = (convoyIndex + 1) * CONVOY_ALIGNMENT;
+        let pathIndex = 1;
+        let lastPath = convoyPath[0];
+        let lengthBuffer = endLength;
+        while(pathIndex < convoyPath.length) {
+            const nextPath = convoyPath[pathIndex];
+
+            const xDistance = Math.abs(lastPath.x-nextPath.x,2);
+            const yDistance = Math.abs(lastPath.y-nextPath.y,2);
+
+            const distance = xDistance || yDistance;
+
+            if(lengthBuffer > distance) {
+                lengthBuffer -= distance;
+                pathIndex++;
+                lastPath = nextPath;
+            } else {
+                if(xDistance) {
+                    return {
+                        direction: lastPath.direction,
+                        x: lastPath.direction === "left" ? lastPath.x + lengthBuffer : lastPath.x - lengthBuffer,
+                        y: lastPath.y
+                    };
+                } else {
+                    return {
+                        direction: lastPath.direction,
+                        x: lastPath.x,
+                        y: lastPath.direction === "up" ? lastPath.y + lengthBuffer : lastPath.y - lengthBuffer
+                    };
+                }
+            }
         }
-        if(intp < min) {
-            min = intp;
-            console.log("min",min,"max",max);
-        }
+        const finalPath = convoyPath[convoyPath.length-1];
+        return finalPath;
     }
     
     let lastX = null;
     let lastY = null;
-    let lastTime = null;
-    const baseRate = 1000 / 60;
-    const minRate = baseRate * 5;
-    let lastStemX = null;
-    let lastStemY = null;
     const renderConvoy = (timestamp,x,y,width,height) => {
-        if(!lastTime) {
-            lastTime = timestamp;
-        }
-        let delta = timestamp - lastTime;
-        context.beginPath();
-        context.fillStyle = "red";
-        for(let i = 0;i<convoyPathCount;i++) {
-            const path = convoyPath[i];
-            context.rect(
-                x + (path.x - this.x) * width,
-                y + (path.y - this.y) * height,
-                width,2
-            );
-        }
-        context.fill();
-        context.beginPath();
-        context.fillStyle = "blue";
-        for(let i = 0;i<convoyPathCount;i++) {
-            const path = convoyPath[i];
-            const nextPath = convoyPath[i+1] || path;
-            context.rect(
-                x + (path.x - this.x) * width,
-                y + (lerp(path.y,nextPath.y,0.5) - this.y) * height,
-                width,2
-            );
-        }
-        context.fill();
-        if(delta > minRate) {
-            lastTime = timestamp;
-            return;
-            lastStemX = null;
-            lastStemY = null;
-            lastX = null;
-            lastY = null;
-            lastTime = null;
-            convoyPath.splice(0,convoyPathCount);
-            convoyPathCount = 0;
-            return;
-        }
-        delta = baseRate / delta;
-        lastTime = timestamp;
-
-        let xStemDifference, yStemDifference;
-        if(lastStemX === null) {
-            lastStemX = Math.round(x+this.xOffset*height);
-            xStemDifference = 0;
-        } else {
-            const stemValue = Math.round(x+this.xOffset*height);
-            xStemDifference = Math.abs(stemValue-lastStemX);
-            lastStemX = stemValue;
-        }
-
-        if(lastStemY === null) {
-            lastStemY = Math.round(y+this.yOffset*height);
-            yStemDifference = 0;
-        } else {
-            const stemValue = Math.round(y+this.yOffset*height);
-            yStemDifference = Math.abs(stemValue-lastStemY);
-            lastStemY = stemValue;
-        }
-
         const calculatedX = this.x + this.xOffset;
         const calculatedY = this.y + this.yOffset;
         if(lastX !== calculatedX || lastY !== calculatedY) {
-            convoyPath.unshift({x:calculatedX,y:calculatedY,direction:this.direction});
-            if(convoyPath.length > Math.floor(MAX_CONVOY_PATH_SIZE * delta / this.tilesPerSecond)) {
-                convoyPath.pop();
+            const frontPath = convoyPath[0];
+            if(!frontPath) {
+                convoyPath[0] = {
+                    direction: this.direction,
+                    x: calculatedX,
+                    y: calculatedY
+                };
+                convoyPath[1] = {
+                    direction: this.direction,
+                    x: calculatedX,
+                    y: calculatedY
+                };
+            } else {
+                if(this.direction !== frontPath.direction) {
+                    convoyPath.unshift({
+                        direction: this.direction,
+                        x: calculatedX,
+                        y: calculatedY
+                    });
+                } else {
+                    frontPath.x = calculatedX;
+                    frontPath.y = calculatedY;
+                }
             }
-            convoyPathCount = convoyPath.length;
-            if(convoyCount) {
-                setConvoyWalking(true);
-            }
-        } else if(convoyCount) {
+            setConvoyWalking(true);
+        } else {
             setConvoyWalking(false);
         }
         lastX = calculatedX;
         lastY = calculatedY;
-        
-        if(convoyPathCount) {
-            const renderStack = [];
-            const antiJitter = width / 16;
-            const horizontalAntiJitter = xStemDifference ? 0 : antiJitter;
-            const verticalAntiJitter = yStemDifference ? 0 : antiJitter;
 
-            let pathIndex = 0;
-            let convoyIndex = 0;
-            let pathDistance = 0;
-            let lastX, lastY;
-            while(convoyIndex < convoyCount && pathIndex < convoyPathCount) {
-                const path = convoyPath[pathIndex];
-                if(!lastX || !lastY) {
-                    lastX = path.x;
-                    lastY = path.y;
-                }
-                const xDistance = Math.pow(lastX - path.x,2);
-                const yDistance = Math.pow(lastY - path.y,2);
-                const distance = Math.sqrt(xDistance + yDistance);
-                pathDistance += distance;
-
-                if(pathDistance >= CONVOY_ALIGNMENT) {
-
-                    const nextPath = convoyPath[pathIndex-1] || path;
-
-                    const interpolationPoint = Math.abs(nextPath.y - path.y);
-                    evalIntpPoint(interpolationPoint);
-
-
-
-                    const follower = convoy[convoyIndex];
-
-
-                    const lerpedPathX = lerp(path.x,nextPath.x,interpolationPoint);
-                    const lerpedPathY = lerp(path.y,nextPath.y,interpolationPoint);
-
-                    let renderX = x + (lerpedPathX - this.x) * width;
-                    let renderY = y + (lerpedPathY - this.y) * height;
-                    if(Math.abs(follower.lastRenderX-renderX) < horizontalAntiJitter && follower.direction === this.direction) {
-                        renderX = follower.lastRenderX;
-                    }
-                    if(Math.abs(follower.lastRenderY-renderY) < verticalAntiJitter && follower.direction === this.direction) {
-                        renderY = follower.lastRenderY;
-                    }
-                    follower.lastRenderX = renderX;
-                    follower.lastRenderY = renderY;
-
-                    lastX = path.x;
-                    lastY = path.y;
-
-                    follower.updateDirection(path.direction);
-                    renderStack.push({follower:follower,x:renderX,y:renderY,index:convoyIndex});
-                    convoyIndex++;
-                    pathDistance -= CONVOY_ALIGNMENT;
-                }
-                pathIndex++;
-                
-            }
-            while(convoyIndex < convoyCount) {
-                const path = convoyPath[convoyPathCount-1];
-                const follower = convoy[convoyIndex];
-                let renderX = x + (path.x - this.x) * width;
-                let renderY = y + (path.y - this.y) * height;
-                if(Math.abs(follower.lastRenderX-renderX) < antiJitter) {
-                    renderX = follower.lastRenderX;
-                }
-                if(Math.abs(follower.lastRenderY-renderY) < antiJitter) {
-                    renderY = follower.lastRenderY;
-                }
-                follower.lastRenderX = renderX;
-                follower.lastRenderY = renderY;
-                follower.updateDirection(path.direction);
-                renderStack.unshift({follower:follower,x:renderX,y:renderY});
-                convoyIndex++;
-            }
-            const renderStackSize = renderStack.length;
-            renderStack.sort(convoyRenderSort);
-            let i = 0;
-            let renderedSelf = false;
-            if(lastStemY < renderStack[0].y) {
-                this.renderSelf(x,y,width,height);
-                renderedSelf = true;
-            }
-            while(i<renderStackSize) {
-                const renderOperation = renderStack[i];
-                renderOperation.follower.render(
-                    timestamp,
-                    renderOperation.x,renderOperation.y,
-                    width,height
+        if(ENV_FLAGS.CONVOY_TRACE) {
+            const xOffset = width / 2;
+            const yOffset = height / 2;
+            context.beginPath();
+            context.lineWidth = 2;
+            context.strokeStyle = "red";
+            context.moveTo(
+                xOffset + x + (convoyPath[0].x - this.x) * width,
+                yOffset + y + (convoyPath[0].y - this.y) * height
+            );
+            for(let i = 1;i<convoyPath.length;i++) {
+                const path = convoyPath[i];
+                context.lineTo(
+                    xOffset + x + (path.x - this.x) * width,
+                    yOffset + y + (path.y - this.y) * height
                 );
-                i++;
-            }
-            if(!renderedSelf) {
-                this.renderSelf(x,y,width,height);
-            }
+            } 
+            context.stroke();
+        }
+
+        const renderStack = [];
+        let convoyIndex = 0;
+        while(convoyIndex < convoyCount) {
+            const follower = convoy[convoyIndex];
+            const convoyPosition = getConvoyPosition(convoyIndex);
+            follower.updateDirection(convoyPosition.direction);
+            renderStack.unshift({
+                follower: follower,
+                x: x + (convoyPosition.x - this.x) * width,
+                y: y + (convoyPosition.y - this.y) * height
+            });
+            convoyIndex++;
+        }
+        const renderStackSize = renderStack.length;
+        renderStack.sort(convoyRenderSort);
+        let i = 0;
+        let renderedSelf = false;
+        const renderY = Math.round(y+this.yOffset*height);
+        if(renderY < renderStack[0].y) {
+            this.renderSelf(x,y,width,height);
+            renderedSelf = true;
+        }
+        while(i<renderStackSize) {
+            const renderOperation = renderStack[i];
+            renderOperation.follower.render(
+                timestamp,
+                renderOperation.x,renderOperation.y,
+                width,height
+            );
+            i++;
+        }
+        if(!renderedSelf) {
+            this.renderSelf(x,y,width,height);
         }
     }
 

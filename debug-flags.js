@@ -6,5 +6,6 @@ const ENV_FLAGS = {
     BATTLE_RENDERER: false,
     NO_SONOGRAPH_WARNING: false,
     ELF_PLAYER_HACK: false,
-    MOVEMENT_FRAME_WARNING: true
+    MOVEMENT_FRAME_WARNING: true,
+    CONVOY_TRACE: true
 }

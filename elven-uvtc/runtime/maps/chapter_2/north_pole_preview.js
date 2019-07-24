@@ -15,12 +15,18 @@ addMap({
             wimpyRed.yOffset = 0;
 
             world.followObject = wimpyRed;   
-            let polarity = 1; 
             this.start = async () => {
+                await wimpyRed.move({y:5});
+                await delay(1000);
                 while(true) {
-                    await wimpyRed.move({y:15*polarity});
+                    await wimpyRed.move({y:4});
                     await delay(1000);
-                    polarity = -polarity;
+                    await wimpyRed.move({x:2});
+                    await delay(1000);
+                    await wimpyRed.move({y:-4});
+                    await delay(1000);
+                    await wimpyRed.move({x:-2});
+                    await delay(1000);
                 }
             }
         }
