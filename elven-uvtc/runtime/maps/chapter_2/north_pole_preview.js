@@ -14,9 +14,14 @@ addMap({
             world.addObject(wimpyRed,9,-2);
             wimpyRed.yOffset = 0;
 
-            world.followObject = wimpyRed;    
+            world.followObject = wimpyRed;   
+            let polarity = 1; 
             this.start = async () => {
-                await wimpyRed.move({y:25});
+                while(true) {
+                    await wimpyRed.move({y:15*polarity});
+                    await delay(1000);
+                    polarity = -polarity;
+                }
             }
         }
     },

@@ -4,8 +4,10 @@ const SPRITE_HEIGHT = 16;
 const ELF_WIDTH = 9;
 const ELF_HEIGHT = 20;
 const FOOTSTEPS_SPRITE_NAME = "footsteps";
+const PLAYER_SPRITE_NAME = "player";
+const ELF_HACK_SPRITE = "wimpy-red-elf";
 
-const MAX_CONVOY_PATH_SIZE = 100;
+const MAX_CONVOY_PATH_SIZE = 200;
 const CONVOY_ALIGNMENT = 8;
 
 const SPRITE_ALERT_TIMEOUT = 400;
@@ -23,9 +25,9 @@ function ElfRenderer(startDirection,spriteName) {
 }
 function PlayerRenderer(startDirection,isFakePlayer=false) {
     if(ENV_FLAGS.ELF_PLAYER_HACK) {
-        ElfRenderer.call(this,startDirection,"wimpy-red-elf");
+        ElfRenderer.call(this,startDirection,ELF_HACK_SPRITE);
     } else {
-        SpriteRenderer.call(this,startDirection,"player");
+        SpriteRenderer.call(this,startDirection,PLAYER_SPRITE_NAME);
     }
     this.isPlayer = isFakePlayer ? false : true;
 }
@@ -125,6 +127,19 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
             i++;
         }
     }
+
+    let min = Infinity;
+    let max = -Infinity;
+    const evalIntpPoint = intp => {
+        if(intp > max) {
+            max = intp;
+            console.log("min",min,"max",max);
+        }
+        if(intp < min) {
+            min = intp;
+            console.log("min",min,"max",max);
+        }
+    }
     
     let lastX = null;
     let lastY = null;
@@ -138,13 +153,39 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
             lastTime = timestamp;
         }
         let delta = timestamp - lastTime;
+        context.beginPath();
+        context.fillStyle = "red";
+        for(let i = 0;i<convoyPathCount;i++) {
+            const path = convoyPath[i];
+            context.rect(
+                x + (path.x - this.x) * width,
+                y + (path.y - this.y) * height,
+                width,2
+            );
+        }
+        context.fill();
+        context.beginPath();
+        context.fillStyle = "blue";
+        for(let i = 0;i<convoyPathCount;i++) {
+            const path = convoyPath[i];
+            const nextPath = convoyPath[i+1] || path;
+            context.rect(
+                x + (path.x - this.x) * width,
+                y + (lerp(path.y,nextPath.y,0.5) - this.y) * height,
+                width,2
+            );
+        }
+        context.fill();
         if(delta > minRate) {
+            lastTime = timestamp;
+            return;
             lastStemX = null;
             lastStemY = null;
             lastX = null;
             lastY = null;
             lastTime = null;
             convoyPath.splice(0,convoyPathCount);
+            convoyPathCount = 0;
             return;
         }
         delta = baseRate / delta;
@@ -173,7 +214,7 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         const calculatedY = this.y + this.yOffset;
         if(lastX !== calculatedX || lastY !== calculatedY) {
             convoyPath.unshift({x:calculatedX,y:calculatedY,direction:this.direction});
-            if(convoyPath.length > Math.floor(MAX_CONVOY_PATH_SIZE * delta)) {
+            if(convoyPath.length > Math.floor(MAX_CONVOY_PATH_SIZE * delta / this.tilesPerSecond)) {
                 convoyPath.pop();
             }
             convoyPathCount = convoyPath.length;
@@ -206,19 +247,24 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
                 const yDistance = Math.pow(lastY - path.y,2);
                 const distance = Math.sqrt(xDistance + yDistance);
                 pathDistance += distance;
+
                 if(pathDistance >= CONVOY_ALIGNMENT) {
 
-                    const interpolationPoint = (pathDistance-CONVOY_ALIGNMENT)/CONVOY_ALIGNMENT;
+                    const nextPath = convoyPath[pathIndex-1] || path;
 
-                    const nextPath = convoyPath[pathIndex+1] || path;
+                    const interpolationPoint = Math.abs(nextPath.y - path.y);
+                    evalIntpPoint(interpolationPoint);
+
+
 
                     const follower = convoy[convoyIndex];
+
 
                     const lerpedPathX = lerp(path.x,nextPath.x,interpolationPoint);
                     const lerpedPathY = lerp(path.y,nextPath.y,interpolationPoint);
 
-                    let renderX = x + ((lerpedPathX - this.x) * width);
-                    let renderY = y + ((lerpedPathY - this.y) * height);
+                    let renderX = x + (lerpedPathX - this.x) * width;
+                    let renderY = y + (lerpedPathY - this.y) * height;
                     if(Math.abs(follower.lastRenderX-renderX) < horizontalAntiJitter && follower.direction === this.direction) {
                         renderX = follower.lastRenderX;
                     }
@@ -242,8 +288,8 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
             while(convoyIndex < convoyCount) {
                 const path = convoyPath[convoyPathCount-1];
                 const follower = convoy[convoyIndex];
-                let renderX = x + ((path.x - this.x) * width);
-                let renderY = y + ((path.y - this.y) * height);
+                let renderX = x + (path.x - this.x) * width;
+                let renderY = y + (path.y - this.y) * height;
                 if(Math.abs(follower.lastRenderX-renderX) < antiJitter) {
                     renderX = follower.lastRenderX;
                 }
