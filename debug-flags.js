@@ -7,5 +7,6 @@ const ENV_FLAGS = {
     NO_SONOGRAPH_WARNING: false,
     ELF_PLAYER_HACK: false,
     MOVEMENT_FRAME_WARNING: true,
-    CONVOY_TRACE: true
+    CONVOY_TRACE: true,
+    DEBUG_PLAYER_CONVOY: false
 }

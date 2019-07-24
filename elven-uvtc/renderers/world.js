@@ -941,6 +941,8 @@ function WorldRenderer() {
         offscreenObjects = [];
         offscreenObjectCount = 0;
         playerObject = null;
+        this.followObject = null;
+        this.cameraFrozen = false;
         this.map = newMap.WorldState ? new newMap.WorldState(this,data):{};
         if(newMap.cameraStart) {
             this.camera.x = newMap.cameraStart.x;
@@ -1105,6 +1107,7 @@ function WorldRenderer() {
     }
 
     this.fixedCameraOverride = false;
+    this.followObject = null;
 
     this.updateCamera = function(timestamp,movementLocked) {
         if(this.cameraController) {

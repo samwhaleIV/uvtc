@@ -29,6 +29,13 @@ function PlayerRenderer(startDirection,isFakePlayer=false) {
     } else {
         SpriteRenderer.call(this,startDirection,PLAYER_SPRITE_NAME);
     }
+    if(!isFakePlayer && ENV_FLAGS.DEBUG_PLAYER_CONVOY) {
+        this.convoyAdd(
+            new PlayerRenderer(null,true),
+            new PlayerRenderer(null,true),
+            new PlayerRenderer(null,true)
+        );
+    }
     this.isPlayer = isFakePlayer ? false : true;
 }
 function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumnHeight) {
@@ -413,8 +420,8 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
             this.renderLogic(timestamp);
         }
     }
+    let startX, startY, recentTimestamp;
     if(customSize) {
-        let startX, startY, recentTimestamp;
         this.renderSelf = function(x,y,width,height) {
             const renderWidth = width * worldScaleTranslation;
             const renderHeight = customWidthRatio * renderWidth;
@@ -457,7 +464,6 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
             }
         }
     } else {
-        let startX, startY;
         this.renderSelf = function(x,y,width,height) {
             const destinationX = this.xOffset * width + x + (this.x - startX) * width;
             const destinationY = this.yOffset * height + y + (this.y - startY) * height;

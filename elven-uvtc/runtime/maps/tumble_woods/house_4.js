@@ -12,10 +12,11 @@ addMap({
                 clearP3();
             }
             world.addPlayer(4,3,"down");
-            const jam = world.getCharacter("jam","left");
+            const jam = world.getCharacter("jam","down");
             world.addObject(jam,8,5,"down");
             jam.interacted = async (x,y,direction) => {
                 world.lockPlayerMovement();
+                await jam.alert();
                 jam.updateDirection(direction);
                 if(world.globalState.metJam) {
                     await jam.say("Hey, next time you see Jim be sure to give him a piece of my mind for me.");
@@ -38,6 +39,8 @@ addMap({
                     await delay(500);
                     await jam.say("Alright. I'm better now. Welcome to Tumble Town.");
                     world.globalState.metJam = true;
+                    await delay(100);
+                    jam.updateDirection("down");
                 }
                 world.unlockPlayerMovement();
             }
