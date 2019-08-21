@@ -65,8 +65,6 @@ function WorldRenderer() {
         } else {
             await this.showInstantTextPopupSound(`Good job, hero. You completed chapter ${chapterNameLookup[chapterNumber]}! Onwards and upwards...`);
         }
-
-        playSound("click");
         this.popCustomRenderer();
         faderEffectsRenderer.fillInLayer = new ElvesFillIn();
         this.fader.fadeOut(MainMenuRenderer,true);
@@ -284,7 +282,6 @@ function WorldRenderer() {
             }
             playSound("energy");
             await this.showInstantTextPopups(messages);
-            playSound("click");
             this.popCustomRenderer();
             resolve();
         });
