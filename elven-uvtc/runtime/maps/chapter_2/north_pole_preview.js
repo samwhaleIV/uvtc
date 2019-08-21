@@ -41,7 +41,7 @@ addMap({
                 });
                 fadeOutSongs(2500);
                 await world.fadeToBlack(3000);
-                world.updateMap("chili_house");
+                world.updateMap("chili_house",{fromNorthPolePreview:true});
             }
         }
     },
