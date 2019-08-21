@@ -16,7 +16,7 @@ import BattleFaderEffect from "./components/battle-fader-effect.js";
 import ChapterManager from "../runtime/chapter-manager.js";
 import MainMenuRenderer from "./main-menu.js";
 import ElvesFillIn from "./components/elves-fill-in.js";
-import FadeToBlack from "./components/world/fade-to-black.js";
+import {FadeIn,FadeOut} from "./components/world/fade.js";
 
 const songIntroLookup = {};
 SongsWithIntros.forEach(song => {
@@ -43,9 +43,21 @@ function WorldRenderer() {
             return GlobalState.data;
         }
     });
+    const safeFade = (duration,fadeIn) => {
+        return new Promise(resolve => {
+            const fader = fadeIn ? FadeIn : FadeOut;
+            this.pushCustomRenderer(new fader(duration,null,resolve));
+        });
+    }
+    this.fadeFromBlack = async duration => {
+        return safeFade(duration,true);
+    }
+    this.fadeToBlack = async duration => {
+        return safeFade(duration,false);
+    }
     this.chapterComplete = async () => {
         const chapterNumber = GlobalState.data.activeChapter;
-        this.pushCustomRenderer(new FadeToBlack(2000));
+        this.pushCustomRenderer(new FadOut(2000));
         this.pushCustomRenderer(new ChapterPreview(chapterNumber,this.getItemPreviewBounds));
         ChapterManager.setActiveChapterCompleted();
         if(chapterNumber === 17) {
@@ -943,6 +955,7 @@ function WorldRenderer() {
         playerObject = null;
         this.followObject = null;
         this.cameraFrozen = false;
+        this.clearCustomRendererStack();
         this.map = newMap.WorldState ? new newMap.WorldState(this,data):{};
         if(newMap.cameraStart) {
             this.camera.x = newMap.cameraStart.x;
@@ -1213,7 +1226,7 @@ function WorldRenderer() {
                     const xPos = adjustedXPos + x;
                     const yPos = adjustedYPos + y;
 
-                    if(xPos < this.renderMap.columns && xPos >= 0) {
+                    if(xPos < this.renderMap.columns && xPos >= 0 && yPos < this.renderMap.rows && yPos >= 0) {
                         const mapIndex = xPos + yPos * this.renderMap.columns;
                         
                         const backgroundValue = this.renderMap.background[mapIndex];

@@ -29,7 +29,8 @@ const SongsWithIntros = [
     //"burrs_battle_song" //burrs_battle_song_intro is implied - you don't have to call it burrs_battle_song, just link it to "burr" in BattleMusicLinkingManifest
 	"cabin",
 	"tavern",
-	"store"
+    "store",
+    "elf_march"
 ];
 const BattleMusicLinkingManifest = {
     "burr": "test-song"
@@ -37,6 +38,9 @@ const BattleMusicLinkingManifest = {
     //And for the intro, 'wimpy_wimpy' is added to SongsWithIntros and 'wimpy_wimpy_intro' is assumed to exist.
 };
 const MusicLinkingManifest = {
+    "north_pole_preview": {
+        song: "elf_march"
+    },
     "tutorial_place": {
         song: null
     },

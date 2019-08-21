@@ -13,10 +13,47 @@ function ControlsPaneRenderer(callback,parent) {
     this.fadeOutEnd = null;
 
     const forcedKeyTranslations = {
-        "ESCAPE": "ESC",
-        "DELETE": "DEL"
+        "ESCAPE":       "ESC",
+        "DELETE":       "DEL",
+        "ARROWUP":      "↑",
+        "ARROWDOWN":    "↓",
+        "ARROWLEFT":    "←",
+        "ARROWRIGHT":   "→",
+        "SLASH":        "/",
+        "BACKSLASH":    "\\",
+        "SEMICOLON":    ";",
+        "COLON":        ":",
+        "COMMA":        ",",
+        "PERIOD":       ".",
+        "BRACKETLEFT":  "[",
+        "BRACKETRIGHT": "]",
+        "DIGIT0":       "0",
+        "DIGIT1":       "1",
+        "DIGIT2":       "2",
+        "DIGIT3":       "3",
+        "DIGIT4":       "4",
+        "DIGIT5":       "5",
+        "DIGIT6":       "6",
+        "DIGIT7":       "7",
+        "DIGIT8":       "8",
+        "DIGIT9":       "9"
     };
+    const blacklistKeys = {
+        "Meta": true,
+        "Control": true,
+        "Alt": true,
+        "Shift": true,
+        "ContextMenu": true,
+        "PrintScreen": true,
+        "ScrollLock": true,
+        "Tab": true,
+        "PageDown": true,
+        "PageUp": true,
+        "NumberLock": true
+    };
+
     const getFriendlyKeyName = keyCode => {
+        console.log(keyCode);
         let friendlyName = keyCode.toLowerCase();
         if(friendlyName.startsWith("key")) {
             friendlyName = friendlyName.substring(3);
@@ -256,6 +293,9 @@ function ControlsPaneRenderer(callback,parent) {
     const getNewKey = () => {
         return new Promise(resolve => {
             this.trueKeyUp = key => {
+                if(blacklistKeys[key.key]) {
+                    return;
+                }
                 unsubscribeTrueKeyEvents();
                 this.trueKeyUp = () => {
                     return;

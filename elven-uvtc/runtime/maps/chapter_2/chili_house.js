@@ -1,7 +1,19 @@
 addMap({
+    requiredSongs: ["hero","cabin"],
     WorldState: function(world,data) {
         this.load = () => {
-        
+            world.addPlayer(5,3,"down");
+            this.start = async () => {
+                world.playSong("hero");
+                await world.fadeFromBlack(2000);
+                world.popCustomRenderer();
+                await delay(1500);
+                world.stopMusic();
+                await world.showTextPopup("Uhhhh! WRONG SONG!");
+                await world.playSong("cabin");
+                await world.showTextPopup("Ah, yes. That's better.");
+                world.unlockPlayerMovement();
+            }
         }
         this.doorClicked = () => {
 
