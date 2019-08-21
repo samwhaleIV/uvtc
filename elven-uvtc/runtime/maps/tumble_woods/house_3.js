@@ -63,7 +63,9 @@ addMap({
                 switch(reason) {
                     case 0:
                         await iceman.speech([
-                            "Ah. Fighting. That I can help you with.",
+                            "Ah. Fighting. I know a thing or two about fighting.",
+                            "Some would say I am an expert.",
+                            "Some would say I am the best.",
                             "Surely you must know that I am the greatest fighter in all of Tumble Town.",
                             "But of course you knew that.",
                             "Everyone knows that.",

@@ -35,7 +35,7 @@ addMap({
                     await delay(800);
                     await treelee.say("It's a beautiful Tree, isn't it?");
                     await delay(800);
-                    await treelee.say("... Don't answer that. I already know it's a beautiful tree");
+                    await treelee.say("... Don't answer that. I already know it's a beautiful tree.");
                     await delay(400);
                     treelee.updateDirection("left");
                     world.globalState.metTreeLee = true;
