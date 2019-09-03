@@ -44,7 +44,17 @@ const ChapterKeysManifest = {
         "metLouis"
     ],
     2: [
-
+        "talkedToShiver",
+        "jimToldYouToMingle",
+        "mingle1",
+        "mingle2",
+        "mingle3",
+        "mingle4",
+        "mingle5",
+        "mingle6",
+        "mingle7",
+        "mingle8",
+        "metAll"
     ],
     3: [
 

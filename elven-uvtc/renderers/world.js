@@ -17,6 +17,7 @@ import ChapterManager from "../runtime/chapter-manager.js";
 import MainMenuRenderer from "./main-menu.js";
 import ElvesFillIn from "./components/elves-fill-in.js";
 import {FadeIn,FadeOut} from "./components/world/fade.js";
+import ObjectiveHUD from "./components/world/objective-hud.js";
 
 const songIntroLookup = {};
 SongsWithIntros.forEach(song => {
@@ -29,9 +30,11 @@ const chapterNameLookup = [
     "sixteen","seventeen"
 ];
 
+const alertTime = 1000;
+
 function WorldRenderer() {
-    const alertTime = 1000;
     let alert = null;
+    let objectiveHUD = null;
     this.showAlert = (message,duration=alertTime,noSound=false) => {
         alert = new UIAlert(message.toLowerCase(),duration,noSound);
     }
@@ -49,6 +52,15 @@ function WorldRenderer() {
             this.pushCustomRenderer(new fader(duration,null,resolve));
         });
     }
+
+    this.setObjectiveHUD = (...parameters) => {
+        objectiveHUD = new ObjectiveHUD(this,...parameters);
+        return objectiveHUD;
+    }
+    this.clearObjectiveHUD = () => {
+        objectiveHUD = null;
+    }
+
     this.fadeFromBlack = async duration => {
         return safeFade(duration,true);
     }
@@ -88,10 +100,10 @@ function WorldRenderer() {
         let lastMap = GlobalState.data["last_map"]; 
         if(lastMap) {
             this.updateMap(lastMap);
-            let lp = GlobalState.data["last_player_pos"];
+            const lp = GlobalState.data["last_player_pos"];
             if(lp) {
                 return () => {
-                    if(playerObject) {
+                    if(playerObject && !playerObject.forcedStartPosition) {
                         this.moveObject(playerObject.ID,lp.x,lp.y,true);
                         playerObject.xOffset = lp.xo;
                         playerObject.yOffset = lp.yo;
@@ -1298,6 +1310,9 @@ function WorldRenderer() {
                 );
                 objectBufferIndex += 3;
             }
+        }
+        if(objectiveHUD) {
+            objectiveHUD.render(timestamp);
         }
         let i = 0;
         while(i < customRendererStackSize) {

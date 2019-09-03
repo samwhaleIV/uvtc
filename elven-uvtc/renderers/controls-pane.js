@@ -53,7 +53,6 @@ function ControlsPaneRenderer(callback,parent) {
     };
 
     const getFriendlyKeyName = keyCode => {
-        console.log(keyCode);
         let friendlyName = keyCode.toLowerCase();
         if(friendlyName.startsWith("key")) {
             friendlyName = friendlyName.substring(3);
