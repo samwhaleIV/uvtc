@@ -1,5 +1,5 @@
 addMap({
-    requiredSongs: ["hero","cabin"],
+    requiredSongs: ["oops_wrong_song","cabin","elf_intro_theme"],
     WorldState: function(world,data) {
 
         let objectiveHUD = null;
@@ -241,7 +241,7 @@ addMap({
                 world.removeObject(jam.ID);
 
                 await iceMan.say("Quick! Somebody get the lights back on!");
-                world.playSong("hero");
+                world.playSong("elf_intro_theme");
                 await world.showNamedTextPopup("Oh. As you wish.","???: ");
 
                 world.moveObject(world.playerObject.ID,5,4,false);

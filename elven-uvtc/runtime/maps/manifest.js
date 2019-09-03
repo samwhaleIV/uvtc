@@ -1,5 +1,6 @@
 import "./chapter_2/chili_house.js";
 import "./chapter_2/north_pole_preview.js";
+import "./chapter_2/tumble_showdown.js";
 import "./tumble_woods/house_1.js";
 import "./tumble_woods/house_10.js";
 import "./tumble_woods/house_1_end.js";

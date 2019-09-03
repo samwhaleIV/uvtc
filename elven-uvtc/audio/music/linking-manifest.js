@@ -30,7 +30,8 @@ const SongsWithIntros = [
 	"cabin",
 	"tavern",
     "store",
-    "elf_march"
+    "elf_march",
+    "elf_intro_theme"
 ];
 const BattleMusicLinkingManifest = {
     "burr": "test-song"

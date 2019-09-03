@@ -54,7 +54,8 @@ const ChapterKeysManifest = {
         "mingle6",
         "mingle7",
         "mingle8",
-        "metAll"
+        "metAll",
+        "borderCreated"
     ],
     3: [
 

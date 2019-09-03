@@ -708,8 +708,8 @@ function WorldRenderer() {
     }
     const objectIDFilter = objectID => {
         if(typeof objectID === "object" && typeof objectID.ID === "string") {
-            if(object.world !== this) {
-                console.warn(`Object '${object.ID}' belongs to a different world!`);
+            if(objectID.world !== this) {
+                console.warn(`Object '${objectID.ID}' belongs to a different world!`);
             }
             return objectID;
         } else {
@@ -860,15 +860,32 @@ function WorldRenderer() {
 
     const getIdx = (x,y) => x + y * this.renderMap.columns;
 
-    this.changeCollisionTile = (value,x,y) => {
-        this.renderMap.collision[getIdx(x,y)] = value;
+    const getLayer = (layer,x,y) => {
+        return layer[getIdx[x,y]];
     }
-    this.changeForegroundTile = (value,x,y) => {
-        this.renderMap.foreground[getIdx(x,y)] = value;
+    const changeLayer = (layer,value,x,y) => {
+        layer[getIdx(x,y)] = value;
     }
-    this.changeBackgroundTile = (value,x,y) => {
-        this.renderMap.background[getIdx(x,y)] = value;
+    const isZeroFilter = value => value === 0;
+
+    const changeLayerFilter = (layer,value,x,y,filter=isZeroFilter) => {
+        const index = getIdx(x,y);
+        if(filter(layer[index])) {
+            layer[index] = value;
+        }
     }
+
+    this.getCollisionTile = (x,y) => getLayer(this.renderMap.collision,x,y);
+    this.getForegroundTile = (x,y) => getLayer(this.renderMap.foreground,x,y);
+    this.getBackgroundTile = (x,y) => getLayer(this.renderMap.background,x,y);
+
+    this.changeCollisionTile =  (value,x,y) => changeLayer(this.renderMap.collision,value,x,y);
+    this.changeForegroundTile = (value,x,y) => changeLayer(this.renderMap.foreground,value,x,y);
+    this.changeBackgroundTile = (value,x,y) => changeLayer(this.renderMap.background,value,x,y);
+
+    this.changeCollisionTileFilter = (value,x,y,filter) => changeLayerFilter(this.renderMap.collision,value,x,y,filter);
+    this.changeForegroundTileFilter = (value,x,y,filter) => changeLayerFilter(this.renderMap.foreground,value,x,y,filter);
+    this.changeBackgroundTileFilter = (value,x,y,filter) => changeLayerFilter(this.renderMap.background,value,x,y,filter);
 
     this.updateMapEnd = function() {
         if(this.map.load) {
@@ -1292,8 +1309,8 @@ function WorldRenderer() {
             while(decalBufferIndex < decalBuffer.length) {
                 decalBuffer[decalBufferIndex].render(
                     timestamp,
-                    objectBuffer[decalBufferIndex+1],
-                    objectBuffer[decalBufferIndex+2],
+                    decalBuffer[decalBufferIndex+1],
+                    decalBuffer[decalBufferIndex+2],
                     horizontalTileSize,
                     verticalTileSize
                 );
