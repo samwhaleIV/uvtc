@@ -12,9 +12,8 @@ const Chapters = [
     {
         title: "Christmas is cancelled",
         unlockableMoves: [
-            "Poison Apple",
-            "Submission",
-            "Jingle Bells"
+            "Jingle Bells",
+            "Submission"
         ],
         startMap: "north_pole_preview"
     },

@@ -1,5 +1,22 @@
 import { MOVE_SOURCE_WIDTH } from "../../renderers/components/battle/move.js";
 
+const PUNCH_MOVES = [["Wimpy Punch",1]].reduce((pv,cv)=>{
+    pv[cv[0]] = cv[1];
+    return pv;
+},{});
+
+const getPossessiveName = target => {
+    if(target.isPlayer) {
+        return "your";
+    } else {
+        if(target.name.endsWith("s")) {
+            return target.name + "'";
+        } else {
+            return target.name + "'s";
+        }
+    }
+}
+
 const MovesList = [
     {
         name: "None",
@@ -11,7 +28,7 @@ const MovesList = [
         description: "What is it good for? Absolutely nothing.",
         type: "ui",
         noTextBlur: true,
-        process: (user,target) => {
+        process: () => {
             return {
                 type: "text",
                 text: "Nothing happened."
@@ -47,7 +64,7 @@ const MovesList = [
         name: "Wimpy Punch",
         description: "Hey, a punch is a punch. Does minimal damage.",
         type:"malice",
-        process: (user,target) => {
+        process: (_,target) => {
             target.health -= 1;
             if(!target.isPlayer) {
                 return {
@@ -72,7 +89,7 @@ const MovesList = [
         name:"Red Apple",
         type: "logic",
         description: "Eat an apple and heal 1 health to yourself.",
-        process: (user,target) => {
+        process: user => {
             user.health += 1;
             return {
                 type: "text",
@@ -85,15 +102,60 @@ const MovesList = [
         description: "If your opponent last used a punch, you deal double its damage.",
         type: "malice",
         process: (user,target) => {
-            return {
-                type: "text",
-                text: "This move is not done yet. SORRY."
+            let punchDamage = PUNCH_MOVES[target.lastMove];
+            if(punchDamage) {
+                punchDamage *= 2;
+                target.health -= punchDamage;
+                return {
+                    type: "text",
+                    text: `${user.name} dealt ${punchDamage} to ${target.name}!`
+                }
+            } else {
+                return {
+                    type: "text",
+                    text: "But it failed!"
+                }
             }
         }
     },
-    {name:"Poison Apple"},
+    {
+        name: "Jingle Bells",
+        description: "Ring the bells and your opponent may miss their next move!",
+        type: "logic",
+        process: (_,target) => {
+            target.setStatus({
+                name: "Ringing Ears",
+                priority: 100,
+                imageID: 1,
+                outgoingFilter: user => {
+                    user.clearStatus("Ringing Ears");
+                    if(Math.random() > 0.5) {
+                        return {
+                            directive: "block",
+                            events: {
+                                type: "text",
+                                text: "Ringing Ears caused it to fail!"
+                            }
+                        }
+                    } else {
+                        return {
+                            directive: "continue",
+                            events: {
+                                type: "text",
+                                text: "Ringing Ears didn't get in the way."
+                            }
+                        }
+                    }
+                }
+            });
+            return {
+                type: "text",
+                text: `${getPossessiveName(target)} ears are now ringing!`
+            }
+        }
+    },
     {name:"Submission"},
-    {name:"Jingle Bells"},
+    {name:"Poison Apple"},
     {name:"Wooden Sword"},
     {name:"Wooden Shield"},
     {name:"Cry"},

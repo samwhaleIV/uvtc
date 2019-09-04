@@ -15,7 +15,7 @@ function loadCallback() {
     }
 }
 
-setPageTitle("UVTC: Pre-alpha");
+setPageTitle("UVTC: Early Alpha");
 setImageIndexMode(IndexModes.LoseRoot);
 ImageManager.loadImages(loadCallback);
 SoundManager.loadSounds(loadCallback);

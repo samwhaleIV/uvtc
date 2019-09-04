@@ -40,7 +40,7 @@ addMap({
                 case 16:
                     await world.showInstantTextPopup("Ooh. A present just for you? I wonder what's inside!");
                     clearPresent();
-                    world.unlockedReturnToSender = true;
+                    world.globalState.unlockedReturnToSender = true;
                     world.unlockMove("Return to Sender");
                     break;
                 case 14:

@@ -55,6 +55,18 @@ addMap({
                 }
             });
         }
+        const createWimpyRedBorder = () => {
+            world.changeCollisionTile(1,28,14);
+            world.changeCollisionTile(1,28,15);
+            world.changeCollisionTile(1,28,17);
+            world.changeCollisionTile(1,28,18);
+        }
+        const clearWimpyRedBorder = () => {
+            world.changeCollisionTile(0,28,14);
+            world.changeCollisionTile(0,28,15);
+            world.changeCollisionTile(0,28,17);
+            world.changeCollisionTile(0,28,18);
+        }
         
         let wimpyRed;
         let wimpyGreen;
@@ -64,8 +76,29 @@ addMap({
             wimpyGreen = world.getCharacter("wimpy-green-elf","left");
             wizard = world.getCharacter("wizard-elf","down");
 
+            wimpyRed.interacted = async direction => {
+                wimpyRed.updateDirection(direction);
+                if(world.globalState.wimpyRedDefeated) {
+                    await wimpyRed.say("It's too late to save you friends.");
+                    await wimpyRed.say("You're going down.");
+                } else {
+
+                }
+            }
+            wimpyGreen.interacted = async () => {
+
+            }
+
             world.addObject(wizard,26,11);
-            world.addObject(wimpyRed,28,16);
+            if(world.globalState.wimpyRedDefeated) {
+                world.addObject(wimpyRed,28,18);
+                wimpyRed.updateDirection("up");
+                clearWimpyRedBorder();
+            } else {
+                world.addObject(wimpyRed,28,16);
+                createWimpyRedBorder();
+            }
+
             world.addObject(wimpyGreen,29,16);
 
             world.addPlayer(22,14,"down");

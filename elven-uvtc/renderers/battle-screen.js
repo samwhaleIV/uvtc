@@ -1,5 +1,4 @@
 import BattleSequencer from "../runtime/battle/battle-sequencer.js";
-import RenderStatus from "./components/battle/status.js";
 import RenderMove from "./components/battle/move.js";
 
 const HEALTH_FLASH_TIME = 100;
@@ -284,6 +283,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
 
     const statusRollImage = imageDictionary["ui/status-roll"];
     const statusFill = imageDictionary["ui/status-fill"];
+    const statusIconSet = imageDictionary["battle/statuses"];
 
     const renderHealthIcon = (x,y,width,height,value) => {
         context.drawImage(statusRollImage,32*value,0,32,32,x,y,width,height);
@@ -479,12 +479,17 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
 
         let i = 0;
         while(i<statuses.length) {
-            RenderStatus(
-                statuses[i],
-                textBackgroundX + i * (statusHeight+statusAreaBorderWidth),
-                statusY,
-                statusHeight,
-                statusHeight
+            context.drawImage(
+                statusIconSet,//image
+                statuses[i].imageID * statusIconSet.height,//sourceX
+                0,//sourceY
+                statusIconSet.height,//sourceWidth
+                statusIconSet.height,//sourceHeight
+
+                textBackgroundX + i * (statusHeight+statusAreaBorderWidth),//desX
+                statusY,//desY
+                statusHeight,//desWidth
+                statusHeight//desHeight
             );
             i++;
         }

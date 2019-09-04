@@ -53,15 +53,21 @@ const addEvent = (object,eventName) => {
     }
 }
 
+const statusPrioritySort = (a,b) => (b.priority||0) - (a.priority||0);
+
 const getStatusName = status => {
-    let statusName = status;
-    if(status.name) {
-        statusName = status.name;
+    if(typeof status === STRING_TYPE) {
+        return status;
+    } else if(typeof status === OBJECT_TYPE) {
+        const statusName = status.name;
+        if(statusName && typeof statusName === STRING_TYPE) {
+            return statusName;
+        } else {
+            throw Error(INVALID_STATUS_TYPE);
+        }
+    } else {
+        throw Error(INVALID_STATUS_TYPE);  
     }
-    if(typeof statusName !== STRING_TYPE) {
-        throw Error(INVALID_STATUS_TYPE);
-    }
-    return statusName;
 }
 
 const getBattleEntity = (name,health,isPlayer) => {
@@ -365,6 +371,36 @@ async function runBattleEvents(sequencer,events) {
     }
 }
 
+function moveStatusFilter(move,user,target) {
+
+    const outgoingStatusFilters = Object.values(user.statuses).filter(status=>status.outgoingFilter);
+    const incomingStatusFilters = Object.values(target.statuses).filter(status=>status.incomingFilter);
+
+    const allStatuses = [...outgoingStatusFilters,...incomingStatusFilters].sort(statusPrioritySort);
+
+    for(let i = 0;i<allStatuses.length;i++) {
+        const status = allStatuses[i];
+        let result;
+        if(status.outgoingFilter) {
+            result = status.outgoingFilter(user,target,move);
+        } else {
+            /*
+              Note that 'target' and 'user' is swapped for (self,attacker)     order
+                                            instead of     (attacker,defender) order
+            */
+            result = status.incomingFilter(target,user,move);
+        }
+        if(result) {
+            return {
+                events: moveResultPreprocess(result.events),
+                directive: result.directive
+            }
+        }
+    }
+
+    return null;
+}
+
 async function processMove(move,user,target,sequencer) {
     if(user.isPlayer) {
         sequencer.setMarqueeText(WATING_FOR_EXTERNAL_TEXT);
@@ -372,11 +408,28 @@ async function processMove(move,user,target,sequencer) {
     }
     const targetMove = move.process ? move : NOTHING_MOVE;
     user.lastMove = targetMove;
-    const resultEvents = moveResultPreprocess(targetMove.process(
-        user,
-        target,
-        sequencer
-    ));
+    let resultEvents;
+
+    let shouldRunMove = false;
+
+    if(targetMove !== NOTHING_MOVE) {
+        const result = moveStatusFilter(targetMove,user,target);
+        if(result.directive === "continue") {
+            shouldRunMove = true;
+        }
+        resultEvents = result.events;
+    }
+
+    if(!resultEvents) {
+        resultEvents = [];
+        shouldRunMove = true;
+    }
+    if(shouldRunMove) {
+        resultEvents.push(...moveResultPreprocess(targetMove.process(
+            user,target,sequencer
+        )));
+    }
+
     const events = [{
         type: "text",
         text: `${user.name} used ${move.name}.`

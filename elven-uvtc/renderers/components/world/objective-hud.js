@@ -41,9 +41,12 @@ function ObjectiveHUD(world,description,isNew) {
             callback();
         }
     }
+    this.getBottom = () => {
+        return BOX_Y + BitmapText.drawTextTest("",TEXT_SCALE).height + DOUBLE_BOX_MARGIN;
+    }
     this.render = () => {
         const textSize = BitmapText.drawTextTest(text,TEXT_SCALE);
-        const boxX = Math.round(halfWidth - textSize.width/2 + BOX_MARGIN);
+        const boxX = Math.round(halfWidth - textSize.width / 2 - BOX_MARGIN);
 
         context.fillStyle = "white";
         context.strokeStyle = "black";

@@ -40,6 +40,7 @@ const ChapterKeysManifest = {
         "hasSealedLetter",
         "sentSealedLetter",
         "talkedToStoreTrees",
+        "unlockedReturnToSender",
         "beatTreeCoGame",
         "metLouis"
     ],
@@ -55,7 +56,10 @@ const ChapterKeysManifest = {
         "mingle7",
         "mingle8",
         "metAll",
-        "borderCreated"
+        "borderCreated",
+        "wimpyRedDefeated",
+        "chiliMovePresent",
+        "gotWrongPresentAnswer"
     ],
     3: [
 

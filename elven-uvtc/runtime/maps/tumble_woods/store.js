@@ -4,7 +4,7 @@ addMap({
         const question = async (ID,question,correct,...options) => {
             await world.showInstantTextPopup("Question " + ID);
             const q1 = await world.showPrompt(question,...options);
-            await delay(500);
+            await delay(400);
             if(q1 === correct || correct === "any") {
                 await world.showInstantTextPopup("Correct!");
                 return true;
@@ -16,7 +16,6 @@ addMap({
         const treeCoGame = async () => {
             let correct = 0;
             await louis.say("Alright! Here we go! If you get at least 3 out of 4 questions right, you get my prize! If not, you can try again.");
-            await delay(300);
 
             if(await question(1,"what is this place called?",2,"store","tree place","tree-co")) {
                 correct++;
@@ -74,7 +73,7 @@ addMap({
                         } else {
                             await louis.say("Hey again! Are you here to play the Tree-Co holiday special? I think you'll love it!");
                             const wantToPlay = await world.showPrompt("want to play the tree-co game?","yes","no") === 0 ? true : false;
-                            await delay(700);
+                            await delay(500);
                             if(wantToPlay) {
                                 await treeCoGame();
                             } else {
@@ -87,7 +86,7 @@ addMap({
                         await louis.say("My name is Louis. I sell trees. If you can answer some questions about trees, I'll give you a present.");
                         await louis.say("It's a new holiday special we're running called 'if you're smarter than a tree.'");
                         const wantToTry = await world.showPrompt("want to play?","yes","no") === 0 ? true : false;
-                        await delay(700);
+                        await delay(500);
                         if(wantToTry) {
                             await treeCoGame();
                         } else {

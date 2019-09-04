@@ -256,18 +256,31 @@ function WorldRenderer() {
     }
 
     this.getItemPreviewBounds = () => {
+
+        const x = 10;
+        const width = fullWidth - 10;
+
+        let y = 10;
+        let height = fullHeight - 10;
+        
         if(this.popup) {
-            const popupY = this.popup.startY - 10;
-            return {
-                y: 10,
-                x: 10,
-                width: fullWidth - 10,
-                height: popupY - 10
+            if(objectiveHUD) {
+                const objectiveHUDBottom = objectiveHUD.getBottom();
+                y += objectiveHUDBottom;
+                height -= objectiveHUDBottom;
             }
+            height -= fullHeight - this.popup.startY + 10;
+        } else if(objectiveHUD) {
+            const objectiveHUDBottom = objectiveHUD.getBottom();
+            y += objectiveHUDBottom;
+            height -= objectiveHUDBottom;
         } else {
-            return {
-                x:10,y:10,width:fullWidth-10,height:fullHeight-10
-            }
+            y = 10;
+            height = fullHeight - 10;
+        }
+
+        return {
+            x:x,y:y,width:width,height:height
         }
     }
 

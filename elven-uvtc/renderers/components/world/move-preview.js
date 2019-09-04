@@ -22,8 +22,8 @@ function MovePreview(moveName,getArea) {
         const halfMoveSize = moveSize / 2;
         RenderMove(
             move,
-            area.x+area.width/2-halfMoveSize,
-            area.y+area.height/2-halfMoveSize,
+            Math.round(area.x+area.width/2-halfMoveSize),
+            Math.round(area.y+area.height/2-halfMoveSize),
             moveSize,
             "white",true
         );
