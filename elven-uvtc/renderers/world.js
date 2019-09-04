@@ -19,23 +19,26 @@ import ElvesFillIn from "./components/elves-fill-in.js";
 import {FadeIn,FadeOut} from "./components/world/fade.js";
 import ObjectiveHUD from "./components/world/objective-hud.js";
 
-const songIntroLookup = {};
+const SONG_INTRO_LOOKUP = {};
 SongsWithIntros.forEach(song => {
-    songIntroLookup[song] = song + MUSIC_INTRO_SUFFIX;
+    SONG_INTRO_LOOKUP[song] = song + MUSIC_INTRO_SUFFIX;
 });
 
-const chapterNameLookup = [
+const CHAPTER_NAME_LOOKUP = [
     null,"one","two","three","four","five","six","seven","eight",
     "nine","ten","eleven","twelve","thirteen","fourteen","fifteen",
     "sixteen","seventeen"
 ];
 
-const alertTime = 1000;
+const ALERT_TIME = 1000;
+const ANIMATION_TILE_COUNT = 5;
+const ANIMATION_CYCLE_DURATION = 400;
+const ANIMATION_FRAME_TIME = ANIMATION_CYCLE_DURATION / ANIMATION_TILE_COUNT;
 
 function WorldRenderer() {
     let alert = null;
     let objectiveHUD = null;
-    this.showAlert = (message,duration=alertTime,noSound=false) => {
+    this.showAlert = (message,duration=ALERT_TIME,noSound=false) => {
         alert = new UIAlert(message.toLowerCase(),duration,noSound);
     }
     this.clearAlert = () => {
@@ -75,7 +78,7 @@ function WorldRenderer() {
         if(chapterNumber === 17) {
             await this.showInstantTextPopupSound(`Good job, hero. This is it. Your journey has reached its end... Or is this merely the beginning?`);
         } else {
-            await this.showInstantTextPopupSound(`Good job, hero. You completed chapter ${chapterNameLookup[chapterNumber]}! Onwards and upwards...`);
+            await this.showInstantTextPopupSound(`Good job, hero. You completed chapter ${CHAPTER_NAME_LOOKUP[chapterNumber]}! Onwards and upwards...`);
         }
         this.popCustomRenderer();
         faderEffectsRenderer.fillInLayer = new ElvesFillIn();
@@ -198,7 +201,7 @@ function WorldRenderer() {
             let loadedSongs = 0;
             const songNames = {};
             requiredSongs.forEach(song => {
-                const introSong = songIntroLookup[song];
+                const introSong = SONG_INTRO_LOOKUP[song];
                 if(introSong) {
                     requiredSongs.push(introSong);
                 }
@@ -902,7 +905,7 @@ function WorldRenderer() {
     }
     this.playSong = songName => {
         const playingSongFull = musicNodes[songName];
-        const introName = songIntroLookup[songName];
+        const introName = SONG_INTRO_LOOKUP[songName];
         let playingIntro = false;
         if(introName) {
             playingIntro = musicNodes[introName] ? true : false;
@@ -927,7 +930,7 @@ function WorldRenderer() {
                     );
                 }
                 const enter_sandman = songName => {
-                    const intro = songIntroLookup[songName];
+                    const intro = SONG_INTRO_LOOKUP[songName];
                     if(intro && audioBuffers[intro]) {
                         songIntro = intro;
                         playMusicWithIntro(songName,intro);
@@ -1208,6 +1211,10 @@ function WorldRenderer() {
                 }
             }
 
+            //const animationTileOffset = timestamp % ANIMATION_FRAME_TIME % ANIMATION_TILE_COUNT;
+
+            const animationTileOffset = Math.floor(timestamp % ANIMATION_CYCLE_DURATION / ANIMATION_FRAME_TIME);
+
             context.fillStyle = "black";
             context.fillRect(0,0,fullWidth,fullHeight);
 
@@ -1255,12 +1262,19 @@ function WorldRenderer() {
                     if(xPos < this.renderMap.columns && xPos >= 0 && yPos < this.renderMap.rows && yPos >= 0) {
                         const mapIndex = xPos + yPos * this.renderMap.columns;
                         
-                        const backgroundValue = this.renderMap.background[mapIndex];
-                        const foregroundValue = this.renderMap.foreground[mapIndex];
+                        let backgroundValue = this.renderMap.background[mapIndex];
+                        let foregroundValue = this.renderMap.foreground[mapIndex];
         
                         const xDestination = xOffset + x * horizontalTileSize;
                         const yDestination = yOffset + y * verticalTileSize;
-        
+
+                        if(backgroundValue >= WorldTextureAnimationStart) {
+                            backgroundValue += animationTileOffset;
+                        }
+                        if(foregroundValue >= WorldTextureAnimationStart) {
+                            foregroundValue += animationTileOffset;
+                        }
+
                         if(backgroundValue > 0) {
                             const textureX = backgroundValue % WorldTextureColumns * WorldTextureSize;
                             const textureY = Math.floor(backgroundValue / WorldTextureColumns) * WorldTextureSize;

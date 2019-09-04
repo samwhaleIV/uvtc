@@ -17,6 +17,10 @@ const WorldTextureSize = 16;
 const WorldTextureScale = 3;
 const WorldTileSize = WorldTextureSize * WorldTextureScale;
 const WorldTextureColumns = 64;
+
+const WorldTextureAnimationRows = 4;
+const WorldTextureAnimationStart = Math.pow(WorldTextureColumns,2) - WorldTextureColumns * WorldTextureAnimationRows;
+
 const footPrintTiles = {
     21: true
 };
