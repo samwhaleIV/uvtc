@@ -49,7 +49,7 @@ function BurrTheBrute() {
     let wimpedIndex = 0;
 
     this.getTurnEvents = () => {
-        const lastMove = this.player.lastMove.name
+        const lastMove = this.player.lastMove.name;
         if(lastMove === "None") {
             if(noticedYouUsedNone) {
                 const event = youKeepUsingNone[noneIndex];

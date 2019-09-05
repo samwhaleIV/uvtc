@@ -13,7 +13,10 @@ function OpponentSequencer(opponentID,...spriteParameters) {
     const song = BattleMusicLinkingManifest[opponentID];
     let songIntro = null;
     if(song) {
-        songIntro = SongsWithIntros[song];
+        const intro = SONG_INTRO_LOOKUP[song];
+        if(intro) {
+            songIntro = intro;
+        }
     }
     this.getSong = () => song;
     this.getSongIntro = () => songIntro;

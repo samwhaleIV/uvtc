@@ -355,7 +355,7 @@ const isBadPlayerAction = playerAction => {
     return isNaN(playerAction) ||  playerAction < 0;
 }
 async function runBattleEvents(sequencer,events) {
-    if(typeof events === OBJECT_TYPE && !events.length) {
+    if(typeof events === OBJECT_TYPE && isNaN(events.length)) {
         events = [events];
     }
     const eventCount = events.length;

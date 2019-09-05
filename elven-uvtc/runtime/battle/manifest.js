@@ -93,6 +93,35 @@ const BattleManifest = {
         }
 
     },
+    "wimpy-green-elf": {
+        name: "Wimpy Green Elf",
+        "leftBoxBorder":"rgb(0, 255, 0)",
+        "leftBoxHealth":"rgb(0, 255, 0)",
+        "leftBoxColor":"rgb(5, 247, 5)",
+        "rightBoxBorder":"rgb(190, 190, 190)",
+        "rightBoxHealth":"rgb(102, 150, 102)",
+        "rightBoxColor":"rgb(255, 255, 255)",
+        "noOuterRing":false,
+        "backgroundColor":"rgb(2, 212, 2)",
+        holeRingColor: "rgba(128,255,128,0.3)",
+        getBackground: function() {
+            return new (function(){
+                const scrollingBackground = new ScrollingBackground("checkered-dark",0);
+                const rotatingBackground = new RotatingBackground("wimpy-green");
+                rotatingBackground.rotationTime = 20000;
+                rotatingBackground.clockwise = true;
+                this.render = timestamp => {
+                    scrollingBackground.render(timestamp);
+                    context.save();
+                    context.globalCompositeOperation = "overlay";
+                    context.globalAlpha = "0.9";
+                    rotatingBackground.render(timestamp);
+                    context.restore();
+                }
+            })();
+        }
+
+    },
     "boney-elf": {
         name: "Boney Elf",
         leftBoxBorder: "#F8529A",

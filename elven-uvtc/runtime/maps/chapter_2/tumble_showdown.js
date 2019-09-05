@@ -76,17 +76,32 @@ addMap({
             wimpyGreen = world.getCharacter("wimpy-green-elf","left");
             wizard = world.getCharacter("wizard-elf","down");
 
-            wimpyRed.interacted = async direction => {
+            wimpyRed.interacted = async (x,y,direction) => {
                 wimpyRed.updateDirection(direction);
-                if(world.globalState.wimpyRedDefeated) {
-                    await wimpyRed.say("It's too late to save you friends.");
+                if(!world.globalState.wimpyRedDefeated) {
+                    await wimpyRed.say("It's too late to save your friends.");
                     await wimpyRed.say("You're going down.");
+                    world.startBattle("wimpy-red-elf",winData=>{
+                        world.globalState.justWonToWimpyRed = true;
+                    },loseData=>{
+                        world.globalState.justLostToWimpyRed = true;
+                    },"tumble_showdown");
                 } else {
-
+                    await wimpyRed.say("A non-elf abusing an elf... Typical.");
                 }
             }
-            wimpyGreen.interacted = async () => {
-
+            wimpyGreen.interacted = async (x,y,direction) => {
+                wimpyGreen.updateDirection(direction);
+                if(!world.globalState.wimpyRedDefeated) {
+                    await wimpyGreen.say("Wow. Not only are you elf hating scum, you also cheat at video games.");
+                } else {
+                    await wimpyGreen.say("I won't let you down, Wimpy Red.");
+                    world.startBattle("wimpy-green-elf",winData=>{
+                        world.globalState.justWonToWimpyGreen = true;
+                    },loseData=>{
+                        world.globalState.justLostToWimpyGreen = true;
+                    });
+                }
             }
 
             world.addObject(wizard,26,11);
@@ -102,7 +117,45 @@ addMap({
             world.addObject(wimpyGreen,29,16);
 
             world.addPlayer(22,14,"down");
-            world.playerObject.forcedStartPosition = true;
+
+            if(world.globalState.justLostToWimpyGreen) {
+                this.start = async () => {
+                    await delay(800);
+                    await wimpyGreen.say("I never let Wimpy Red down.");
+                    await wimpyGreen.say("The future is ours.");
+                    world.gameOver();
+                }
+                delete world.globalState.justLostToWimpyGreen;
+            } else if(world.globalState.justWonToWimpyGreen) {
+                this.start = async () => {
+                    await delay(800);
+                }
+                delete world.globalState.justWonToWimpyGreen;
+            } else if(world.globalState.justLostToWimpyRed) {
+                this.start = async () => {
+                    await delay(800);
+                    await wimpyRed.say("Just as I expected. A loser.");
+                    world.gameOver();
+                }
+                delete world.globalState.justLostToWimpyRed;
+            } else if(world.globalState.justWonToWimpyRed) {
+                this.start = async () => {
+                    await delay(800);
+                    await wimpyRed.say("You may have bested me... but I still my have wingman.");
+                    await delay(400);
+                    wimpyRed.updateDirection("down");
+                    await delay(400);
+                    await wimpyRed.move({y:2});
+                    await delay(400);
+                    wimpyRed.updateDirection("up");
+                    world.globalState.wimpyRedDefeated = true;
+                    clearWimpyRedBorder();
+                    world.unlockPlayerMovement();
+                }
+                delete world.globalState.justWonToWimpyRed;
+            } else {
+                world.playerObject.forcedStartPosition = true;
+            }
 
             const createBorderScript = async () => {
                 world.lockPlayerMovement();

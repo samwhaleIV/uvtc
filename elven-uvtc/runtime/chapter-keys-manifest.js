@@ -59,7 +59,11 @@ const ChapterKeysManifest = {
         "borderCreated",
         "wimpyRedDefeated",
         "chiliMovePresent",
-        "gotWrongPresentAnswer"
+        "gotWrongPresentAnswer",
+        "justWonToWimpyRed",
+        "justWonToWimpyGreen",
+        "justLostToWimpyRed",
+        "justLostToWimpyGreen"
     ],
     3: [
 

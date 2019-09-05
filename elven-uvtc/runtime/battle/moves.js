@@ -102,7 +102,7 @@ const MovesList = [
         description: "If your opponent last used a punch, you deal double its damage.",
         type: "malice",
         process: (user,target) => {
-            let punchDamage = PUNCH_MOVES[target.lastMove];
+            let punchDamage = PUNCH_MOVES[target.lastMove.name];
             if(punchDamage) {
                 punchDamage *= 2;
                 target.health -= punchDamage;

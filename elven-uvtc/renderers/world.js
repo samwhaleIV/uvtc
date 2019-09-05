@@ -18,11 +18,7 @@ import MainMenuRenderer from "./main-menu.js";
 import ElvesFillIn from "./components/elves-fill-in.js";
 import {FadeIn,FadeOut} from "./components/world/fade.js";
 import ObjectiveHUD from "./components/world/objective-hud.js";
-
-const SONG_INTRO_LOOKUP = {};
-SongsWithIntros.forEach(song => {
-    SONG_INTRO_LOOKUP[song] = song + MUSIC_INTRO_SUFFIX;
-});
+import BoxFaderEffect from "./components/box-fader-effect.js";
 
 const CHAPTER_NAME_LOOKUP = [
     null,"one","two","three","four","five","six","seven","eight",
@@ -81,6 +77,7 @@ function WorldRenderer() {
             await this.showInstantTextPopupSound(`Good job. You completed chapter ${CHAPTER_NAME_LOOKUP[chapterNumber]}! Onwards and upwards...`);
         }
         this.popCustomRenderer();
+        setFaderEffectsRenderer(new BoxFaderEffect());
         faderEffectsRenderer.fillInLayer = new ElvesFillIn();
         this.fader.fadeOut(MainMenuRenderer,true);
     }
@@ -1035,8 +1032,16 @@ function WorldRenderer() {
     this.disableAdaptiveFill = true;
     this.noPixelScale = true;
 
+    this.gameOver = async () => {
+        this.pushCustomRenderer(new FadeOut(2000));
+        await delay(2100);
+        setFaderEffectsRenderer(new BoxFaderEffect());
+        faderEffectsRenderer.fillInLayer = new ElvesFillIn();
+        rendererState.fader.fadeOut(WorldRenderer);
+    }
+
     this.startBattle = (battleID,winCallback,loseCallback,...battleParameters) => {
-        this.saveState(true,true);
+        this.saveState(true,false);
         setFaderEffectsRenderer(new BattleFaderEffect());
         setFaderInSound("battle-fade-in",true);
         setFaderOutSound("battle-fade-out",true);
@@ -1223,8 +1228,6 @@ function WorldRenderer() {
                     return;
                 }
             }
-
-            //const animationTileOffset = timestamp % ANIMATION_FRAME_TIME % ANIMATION_TILE_COUNT;
 
             const animationTileOffset = Math.floor(timestamp % ANIMATION_CYCLE_DURATION / ANIMATION_FRAME_TIME);
 

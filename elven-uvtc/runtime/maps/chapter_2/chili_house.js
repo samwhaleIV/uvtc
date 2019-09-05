@@ -287,9 +287,9 @@ addMap({
 
                 chiliWife.updateDirection("up");
 
-                await delay(400);
+                await delay(600);
                 world.popCustomRenderer();
-                await delay(400);
+                await delay(600);
 
                 await wimpyRed.say("Why... Hello there.");
                 await wimpyRed.say("Pleasure to meet you all.");

@@ -31,11 +31,13 @@ const SongsWithIntros = [
 	"tavern",
     "store",
     "elf_march",
-    "elf_intro_theme"
+    "elf_intro_theme",
+    "wimpy"
 ];
 const BattleMusicLinkingManifest = {
-    "burr": "test-song"
-
+    "burr": "test-song",
+    "wimpy-red-elf": "wimpy",
+    "wimpy-green-elf": "wimpy"
     //And for the intro, 'wimpy_wimpy' is added to SongsWithIntros and 'wimpy_wimpy_intro' is assumed to exist.
 };
 const MusicLinkingManifest = {
@@ -91,3 +93,7 @@ const MusicLinkingManifest = {
         linkTo: "house_1"
     }
 }
+const SONG_INTRO_LOOKUP = {};
+SongsWithIntros.forEach(song => {
+    SONG_INTRO_LOOKUP[song] = song + MUSIC_INTRO_SUFFIX;
+});
