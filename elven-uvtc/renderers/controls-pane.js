@@ -192,12 +192,12 @@ function ControlsPaneRenderer(callback,parent) {
 
         context.textBaseline = "bottom";
         context.fillStyle = topColor;
-        context.font = "100 22px Roboto";
+        context.font = "100 21px Roboto";
         context.fillText(button.title,buttonCenterX,buttonCenterY-2);
 
         context.textBaseline = "top";
         context.fillStyle = keyNameColor;
-        context.font = "300 22px Roboto";
+        context.font = "300 21px Roboto";
         context.fillText(bottomText,buttonCenterX,buttonCenterY+2);
     }
 
@@ -441,13 +441,11 @@ function ControlsPaneRenderer(callback,parent) {
         context.restore();
 
         const controlsLabelX = x + halfWidth;
-        let buttonAreaWidth = 500;
-        if(buttonAreaWidth > fullWidth-40) {
-            buttonAreaWidth = fullWidth - 40;
-        }
-        let buttonAreaHeight = buttonAreaWidth - 100;
 
-        let halfButtonAreaWidth = buttonAreaWidth / 2;
+        let buttonAreaWidth = halfWidth;
+        let buttonAreaHeight = halfHeight;
+
+        const halfButtonAreaWidth = buttonAreaWidth / 2;
 
         const buttonAreaX = Math.round(controlsLabelX - buttonAreaWidth / 2);
         const buttonAreaY = Math.round(halfHeight - buttonAreaHeight / 2) + 40;
@@ -524,7 +522,7 @@ function ControlsPaneRenderer(callback,parent) {
         context.fillStyle = "white";
         context.textBaseline = "bottom";
         context.textAlign = "center";
-        context.font = "100 36px Roboto";
+        context.font = "100 34px Roboto";
         context.fillText("C O N T R O L S",controlsLabelX,buttonAreaY-40);
         context.restore();
 

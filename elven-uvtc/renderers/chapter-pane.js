@@ -350,7 +350,7 @@ function ChapterPane(callback,parent,instant=false) {
 
         const robotoOffset = 2.5 * widthNormal;
 
-        const imageSize = widthNormal * 565;
+        const imageSize = halfHeight;
 
         const sideButtonWidth = imageSize * 0.5;
         const heightNormal = sideButtonWidth / 240
@@ -361,8 +361,8 @@ function ChapterPane(callback,parent,instant=false) {
         const halfButtonWidth = sideButtonWidth / 2;
         const halfButtonHeight = sideButtonHeight / 2;
 
-        const leftButtonCenterX = halfWidth - imageSize;
-        const rightButtonCenterX = halfWidth + imageSize;
+        const leftButtonCenterX = halfWidth - imageSize / 2 - halfButtonWidth - 10;
+        const rightButtonCenterX = halfWidth + imageSize / 2 + halfButtonWidth + 10;
 
         leftButton.x = Math.floor(leftButtonCenterX - halfButtonWidth);
         leftButton.y = Math.floor(halfHeight - halfButtonHeight);
@@ -406,8 +406,7 @@ function ChapterPane(callback,parent,instant=false) {
             }
             drawRectangle(rightButton,"black");
         }
-
-        const fontSize = widthNormal * 22;
+        const fontSize = halfHeight / 500 * 21;
 
         context.font = `100 ${fontSize}px Roboto`;
         context.textAlign = "center";
@@ -419,15 +418,15 @@ function ChapterPane(callback,parent,instant=false) {
         context.fillText(this.centerButtonText,halfWidth,halfHeight+robotoOffset);
 
         const subtitleWidth = context.measureText(this.chapterSubTitle).width;
-        const subtitleLayerHeight = widthNormal * 45;
+        const subtitleLayerHeight = Math.floor(halfHeight / 500 * 60);
         const subtitleBoxCenterY = subtitleLayerHeight + halfHeight + imageSize / 2;
         context.fillStyle = "black";
         context.fillRect(Math.round(halfWidth-fontSize-subtitleWidth/2),subtitleBoxCenterY-subtitleLayerHeight/2,Math.round(subtitleWidth+fontSize+fontSize),subtitleLayerHeight);
         context.fillStyle = "white";
         context.font = `300 ${fontSize}px Roboto`;
         context.fillText(this.chapterSubTitle,halfWidth,robotoOffset+subtitleBoxCenterY);
-        context.font = `300 ${subtitleLayerHeight}px Roboto`;
-        context.fillText(this.chapterTitle,halfWidth,halfHeight - imageSize / 2 - subtitleLayerHeight);
+        context.font = `300 ${fontSize + fontSize}px Roboto`;
+        context.fillText(this.chapterTitle,halfWidth,halfHeight - imageSize / 2 - subtitleLayerHeight + fontSize);
 
         exitLabel = renderExitButton(x,y,hoverType===hoverTypes.exitLabel,false,cancelDown);
         

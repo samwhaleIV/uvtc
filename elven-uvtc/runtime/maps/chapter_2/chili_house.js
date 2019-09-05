@@ -156,7 +156,7 @@ addMap({
             this.start = async () => {
                 if(data.fromNorthPolePreview) {
                     if(!musicMuted) {
-                        world.playSong("hero");
+                        world.playSong("oops_wrong_song");
                     } else {
                         world.playSong("cabin");
                     }

@@ -4,6 +4,11 @@ import WorldSettingsRenderer from "./world-settings.js";
 import MovesPaneRenderer from "./moves-pane.js";
 import BoxFaderEffect from "./components/box-fader-effect.js";
 
+const ICON_PART_1_WIDTH = 64;
+const ICON_PART_2_WIDTH = 58;
+const ICON_ROW_SCALE_FACTOR = 4;
+const HORIZONTAL_FALLBACK_MARGIN = 50;
+
 function WorldUIRenderer(world) {
 
     const iconImage = imageDictionary["ui/escape-menu"];
@@ -13,11 +18,8 @@ function WorldUIRenderer(world) {
     const blurImage = imageDictionary["ui/escape-blur"];
     const hoverFX = imageDictionary["ui/escape-menu-fx"];
 
-    const iconPart1Width = 64;
-    const iconPart2Width = 58;
-
-    const partOneRatio = iconPart1Width / iconImage.height;
-    const partTwoRatio = iconPart2Width / iconImage.height;
+    const partOneRatio = ICON_PART_1_WIDTH / iconImage.height;
+    const partTwoRatio = ICON_PART_2_WIDTH / iconImage.height;
 
     let loadStart = null;
     let loading = false;
@@ -291,18 +293,20 @@ function WorldUIRenderer(world) {
         leavingCallback = callback;
         loadStart = performance.now();
         loading = true;
-        //Do something that transitions then sets transitioning to false
     }
     this.renderParts = timeNormal => {
         if(timeNormal < 0) {
             timeNormal = 0;
         }
-        let height = 250;
-        let padding = 30;
-        if(height * iconImageRatio > fullWidth-100) {
-            height = (fullWidth-100) * iconImageRatioInverse;
-            padding = 20;
+        let height = Math.max(Math.floor(fullHeight / ICON_ROW_SCALE_FACTOR / iconImage.height) * iconImage.height,iconImage.height*4);
+
+        const testWidth = fullWidth - HORIZONTAL_FALLBACK_MARGIN;
+        if(height * iconImageRatio > testWidth) {
+            height = Math.max(Math.floor(testWidth * iconImageRatioInverse / iconImage.height)*iconImage.height,iconImage.height);
         }
+
+        let padding = Math.round(height / 25);
+
         const backgroundHeight = height + padding + padding;
         context.fillStyle = "rgba(0,0,0,0.87)";
         const yBase = Math.floor(halfHeight-height/2);
@@ -341,11 +345,15 @@ function WorldUIRenderer(world) {
             const part1Width = partOneRatio * height;
             const part2Width = partTwoRatio * height;
 
-            context.drawImage(iconImage,0,0,iconPart1Width,iconImage.height,adjustedHalfWidth-part1Width,yBase,part1Width,height);
-            context.drawImage(iconImage,iconPart1Width,0,iconPart2Width,iconImage.height,part2X,yBase,part2Width,height);
+            context.drawImage(iconImage,0,0,ICON_PART_1_WIDTH,iconImage.height,adjustedHalfWidth-part1Width,yBase,part1Width,height);
+            context.drawImage(iconImage,ICON_PART_1_WIDTH,0,ICON_PART_2_WIDTH,iconImage.height,part2X,yBase,part2Width,height);
         }
     }
     this.render = timestamp => {
+        if(panel) {
+            panel.render(timestamp,0,0,fullWidth,fullHeight);
+            return;
+        }
         if(loading) {
             const progress = (timestamp - loadStart) / transitionTime;
             if(progress >= 1) {
@@ -365,9 +373,6 @@ function WorldUIRenderer(world) {
             this.renderParts(1-progress);
         } else {
             this.renderParts(1);
-        }
-        if(panel) {
-            panel.render(timestamp,0,0,fullWidth,fullHeight);
         }
     }
 }

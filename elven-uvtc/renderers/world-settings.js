@@ -2,13 +2,14 @@ import RotatingBackground from "./components/rotating-background.js";
 import AudioPane from "./audio-pane.js";
 import ControlsPaneRenderer from "./controls-pane.js";
 
-const BACKGROUND_MARGIN = 20;
+const BACKGROUND_MARGIN = 10;
 const DOUBLE_BACKGROUND_MARGIN = BACKGROUND_MARGIN + BACKGROUND_MARGIN;
 const ELF_HEIGHT_MODIFIER = -10;
 const LABEL_WIDTH_COEFFICIENT = 1.12;
 const AUDIO_LABEL_Y = 0.59;
-const CONTROLS_LABEL_Y = 0.5;
-const LABEL_FONT = "21px Roboto";
+const CONTROLS_LABEL_Y = 0.49;
+const LABEL_FONT = "18px Roboto";
+const LABEL_HEIGHT_COEFFICIENT = 0.28;
 
 function WorldSettingsRenderer(callback) {
 
@@ -114,32 +115,29 @@ function WorldSettingsRenderer(callback) {
     }
 
     this.render = timestamp => {
-
-        const backgroundX = BACKGROUND_MARGIN;
-        const backgroundY = BACKGROUND_MARGIN;
-        const backgroundWidth = fullWidth - DOUBLE_BACKGROUND_MARGIN;
-        const backgroundHeight = fullHeight - DOUBLE_BACKGROUND_MARGIN;
-        const width = backgroundHeight - DOUBLE_BACKGROUND_MARGIN - DOUBLE_BACKGROUND_MARGIN;
-        const x = halfWidth - width / 2;
-
-        context.fillStyle = "white";
-        context.save();
-        context.globalCompositeOperation = "destination-out";
-        context.fillRect(backgroundX,backgroundY,backgroundWidth,backgroundHeight);
-        context.globalCompositeOperation = "destination-over";
         background.render(timestamp);
-        context.restore();
 
-        exitLabel = renderExitButton(backgroundX,backgroundY,hoverType===hoverTypes.exitLabel,true,cancelDown);
+        exitLabel = renderExitButton(BACKGROUND_MARGIN,BACKGROUND_MARGIN,hoverType===hoverTypes.exitLabel,true,cancelDown);
 
-        const elfHeight = backgroundHeight - exitLabel.y - exitLabel.height + ELF_HEIGHT_MODIFIER;
+        const elfHeight = fullHeight - exitLabel.y - exitLabel.height + ELF_HEIGHT_MODIFIER;
         const elfWidth = elfHeight * floatingElfRatio;
 
-        renderElf(floatingElfImage,x+DOUBLE_BACKGROUND_MARGIN,fullHeight-elfHeight,elfWidth,elfHeight,audioButton);
-        renderElf(floatingElfImageAlt,x+width-elfWidth-DOUBLE_BACKGROUND_MARGIN,0,elfWidth,elfHeight,controlsButton);
+        const elfMargin = elfWidth / 4;
 
-        const labelWidth = Math.floor(elfWidth * LABEL_WIDTH_COEFFICIENT);
-        const labelHeight = exitLabel.height;
+        renderElf(floatingElfImage,
+
+            halfWidth-elfWidth-elfMargin,
+
+        fullHeight-elfHeight,elfWidth,elfHeight,audioButton);
+        renderElf(floatingElfImageAlt,
+
+            halfWidth+elfMargin,
+
+        0,elfWidth,elfHeight,controlsButton);
+
+        let labelWidth = elfWidth * LABEL_WIDTH_COEFFICIENT;
+        const labelHeight = Math.floor(labelWidth * LABEL_HEIGHT_COEFFICIENT);
+        labelWidth = Math.floor(labelWidth);
 
         const halfLabelWidth = labelWidth / 2;
         const halfLabelHeight = labelHeight / 2;
@@ -168,9 +166,14 @@ function WorldSettingsRenderer(callback) {
         context.fillText("Audio",label1X+halfLabelWidth,label1Y+halfLabelHeight);
         context.fillText("Settings",label2X+halfLabelWidth,label2Y+halfLabelHeight);
 
-
         if(childPage) {
-            childPage.render(timestamp,backgroundX,backgroundY,backgroundWidth,backgroundHeight);
+            childPage.render(
+                timestamp,
+                BACKGROUND_MARGIN,
+                BACKGROUND_MARGIN,
+                fullWidth - DOUBLE_BACKGROUND_MARGIN,
+                fullHeight - DOUBLE_BACKGROUND_MARGIN
+            );
         }
     }
 }

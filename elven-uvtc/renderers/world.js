@@ -72,13 +72,13 @@ function WorldRenderer() {
     }
     this.chapterComplete = async () => {
         const chapterNumber = GlobalState.data.activeChapter;
-        this.pushCustomRenderer(new FadOut(2000));
+        this.pushCustomRenderer(new FadeOut(2000));
         this.pushCustomRenderer(new ChapterPreview(chapterNumber,this.getItemPreviewBounds));
         ChapterManager.setActiveChapterCompleted();
         if(chapterNumber === 17) {
-            await this.showInstantTextPopupSound(`Good job, hero. This is it. Your journey has reached its end... Or is this merely the beginning?`);
+            await this.showInstantTextPopupSound(`Good job. This is it. Your journey has reached its end... Or is this merely the beginning?`);
         } else {
-            await this.showInstantTextPopupSound(`Good job, hero. You completed chapter ${CHAPTER_NAME_LOOKUP[chapterNumber]}! Onwards and upwards...`);
+            await this.showInstantTextPopupSound(`Good job. You completed chapter ${CHAPTER_NAME_LOOKUP[chapterNumber]}! Onwards and upwards...`);
         }
         this.popCustomRenderer();
         faderEffectsRenderer.fillInLayer = new ElvesFillIn();
