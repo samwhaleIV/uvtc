@@ -68,7 +68,7 @@ function applySonographToPopupFeed(popupFeed) {
     }
     return popupFeed;
 }
-function WorldPopup(pages,callback,prefix,isInstant=false,world) {
+function WorldPopup(pages,callback,prefix,isInstant=false) {
 
     prefix = prefix ? prefix : "";
 
@@ -168,12 +168,12 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world) {
                 }
             }
             if(pageValue.delay) {
-                timeout = world.setTimeout(timeoutMethod,pageValue.delay);
+                timeout = setTimeout(timeoutMethod,pageValue.delay);
             } else {
                 if(!pageValue.noSound) {
                     playSound("text-sound");
                 }
-                timeout = world.setTimeout(timeoutMethod,pageValue.noSound ? pageValue.speed / 2 : pageValue.speed);
+                timeout = setTimeout(timeoutMethod,pageValue.noSound ? pageValue.speed / 2 : pageValue.speed);
             }
         } else {
             if(pageIndex + 1 >= pageCount) {
@@ -185,7 +185,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world) {
 
     timeoutMethod();
     this.progress = function() {
-        world.clearTimeout(timeout);
+        clearTimeout(timeout);
         if(readyToTerminate) {
             if(terminated) {
                 return;

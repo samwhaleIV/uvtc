@@ -38,34 +38,6 @@ const ANIMATION_FRAME_TIME = ANIMATION_CYCLE_DURATION / ANIMATION_TILE_COUNT;
 function WorldRenderer() {
     let alert = null;
     let objectiveHUD = null;
-
-    const timeoutThreads = [];
-    let timeoutHandle = 0;
-
-    this.setTimeout = (action,delay,...parameters) => {
-        const thisHandle = timeoutHandle;
-        timeoutHandle++;
-        timeoutThreads.push({
-            action: () => {
-                action(...parameters);
-            },
-            endTime: performance.now() + delay,
-            handle: thisHandle
-        });
-        return thisHandle;
-    }
-    this.clearTimeout = handle => {
-        let i = 0;
-        while(i<timeoutThreads.length) {
-            const thread = timeoutThreads[i];
-            if(thread.handle === handle) {
-                timeoutThreads.splice(i,1);
-                break;
-            }
-            i++;
-        }
-    }
-
     this.showAlert = (message,duration=ALERT_TIME,noSound=false) => {
         alert = new UIAlert(message.toLowerCase(),duration,noSound);
     }
@@ -565,7 +537,7 @@ function WorldRenderer() {
                 () => {
                     this.clearTextPopup();
                     resolve();
-                },name,instant,this
+                },name,instant
             );
         });
     }
@@ -1239,17 +1211,6 @@ function WorldRenderer() {
     }
 
     this.render = function(timestamp) {
-
-        for(let i = 0;i<timeoutThreads.length;i++) {
-            const timeoutThread = timeoutThreads[i];
-            if(timestamp >= timeoutThread.endTime) {
-                timeoutThreads.splice(i,1);
-                timeoutThread.action();
-                i--;
-            } else {
-                break;
-            }
-        }
 
         if(tileRenderingEnabled) {
         
