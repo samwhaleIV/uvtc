@@ -203,7 +203,7 @@ function ControlsPaneRenderer(callback,parent) {
 
     const exit = () => {
         if(!backButton.keyName) {
-            prompt = new UIPrompt("You must have an active back/escape button!",{
+            prompt = new UIPrompt("You must have a configured back button!",{
                 text: "Okay",
                 callback: () => prompt = null
             });

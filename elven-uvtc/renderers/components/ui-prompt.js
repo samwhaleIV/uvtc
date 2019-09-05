@@ -2,6 +2,7 @@ const acceptButton = getPlaceholderLocation();
 const cancelButton = getPlaceholderLocation();
 
 function UIPrompt(message,accept,cancel) {
+    message = message.split("\n");
     const hoverTypes = {
         none: 0,
         accept: 1,
@@ -54,11 +55,14 @@ function UIPrompt(message,accept,cancel) {
         context.fillStyle = "rgba(0,0,0,0.75)";
         context.fillRect(0,0,fullWidth,fullHeight);
 
-        let width = Math.floor(950);
-        if(width > fullWidth - 50) {
-            width = fullWidth - 50;
+        let width = 800;
+        if(width > fullWidth - 200) {
+            width = fullWidth - 200;
         }
-        const height = 400;
+        let height = 400;
+        if(height > fullHeight - 300) {
+            height = fullHeight - 300;
+        }
         const x = Math.floor(halfWidth-width/2);
         const y = Math.floor(halfHeight-height/2);
 
@@ -69,8 +73,15 @@ function UIPrompt(message,accept,cancel) {
         context.textAlign = "center";
         context.textBaseline = "middle";
         context.font = UI_ALERT_FONT;
-        const buttonHeight = 80;
-        context.fillText(message,halfWidth,halfHeight-buttonMargin);
+        const buttonHeight = 60;
+
+        let i = 0;
+        const messageOffset = (message.length % 2 === 0 ? message.length : message.length-1) * 28 / 2;
+        while(i<message.length) {
+            context.fillText(message[i],halfWidth,halfHeight - messageOffset + 28 * i);
+            i++;
+        }
+
 
         const buttonY = y + height - buttonHeight - buttonMargin;
         context.font = MENU_BUTTON_FONT;

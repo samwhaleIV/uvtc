@@ -126,14 +126,14 @@ function ChapterPane(callback,parent,instant=false) {
 
                 const highestChapter = GlobalState.data.highestChapterFinished || 0;
                 if(this.chapterNumber > highestChapter + 1) {
-                    prompt = new UIPrompt("You must finish the previous chapter before you can play this chapter!",{
+                    prompt = new UIPrompt("You must finish the previous chapter\nbefore you can play this chapter!",{
                         text: "Okay",
                         callback: clearPrompt
                     });
                     prompt.show();
                 } else {
                     if(GlobalState.data.activeChapter === this.chapterNumber) {
-                        prompt = new UIPrompt("You are already in progress on this chapter. Do you want to start over?",{
+                        prompt = new UIPrompt("Chapter already in progress.\nDo you want to start over?",{
                             text: "Yes",
                             callback: () => {
                                 clearPrompt();
@@ -145,7 +145,7 @@ function ChapterPane(callback,parent,instant=false) {
                                 if(GlobalState.data.tippedAboutMenu) {
                                     clearPrompt();
                                 } else {
-                                    const newPrompt = new UIPrompt("Tip: Use the play button on the main menu to continue your current chapter.",{
+                                    const newPrompt = new UIPrompt("Tip: Use the play button on the main\nmenu to continue your current chapter.",{
                                         text: "Got it",
                                         callback: clearPrompt
                                     },{
@@ -164,14 +164,14 @@ function ChapterPane(callback,parent,instant=false) {
                         prompt.show();
                     } else {
                         if(GlobalState.data.activeChapter) {
-                            prompt = new UIPrompt("A different chapter is active. Do you want end it?",{
+                            prompt = new UIPrompt("A different chapter is active.\nDo you want end it?",{
                                 text: "Yes, start this chapter",
                                 callback: () => {
                                     clearPrompt();
                                     loadWorld();
                                 }
                             },{
-                                text: "No, keep my current chapter",
+                                text: "Keep current chapter",
                                 callback: clearPrompt
                             });
                             prompt.show();
@@ -239,16 +239,6 @@ function ChapterPane(callback,parent,instant=false) {
             );
 
         }
-    }
-
-    const renderHoverEffect = (x,y,width,height) => {
-        const halfRadius = width / 2;
-        const gradient = context.createRadialGradient(x,y,0,x,y,halfRadius);
-        gradient.addColorStop(0,"white");
-        gradient.addColorStop(0.98,"white");
-        gradient.addColorStop(1,"rgba(255,255,255,0)");
-        context.fillStyle = gradient;
-        context.fillRect(x-halfRadius,y-halfRadius,width,height);
     }
 
     this.chapterForward = () => {
@@ -348,21 +338,22 @@ function ChapterPane(callback,parent,instant=false) {
             context.globalAlpha = alpha;
         }
 
+        const fontSize = 21;
+
         const robotoOffset = 2.5 * widthNormal;
 
         const imageSize = halfHeight;
 
-        const sideButtonWidth = imageSize * 0.5;
-        const heightNormal = sideButtonWidth / 240
-        const sideButtonHeight = heightNormal * 80;
-        const centerButtonHeight = heightNormal * 65;
-        const centerButtonWidth = imageSize * 0.5;
+        const sideButtonWidth = 180;
+        const sideButtonHeight = 70;
+        const centerButtonHeight = 70;
+        const centerButtonWidth = 150;
 
         const halfButtonWidth = sideButtonWidth / 2;
         const halfButtonHeight = sideButtonHeight / 2;
 
-        const leftButtonCenterX = halfWidth - imageSize / 2 - halfButtonWidth - 10;
-        const rightButtonCenterX = halfWidth + imageSize / 2 + halfButtonWidth + 10;
+        const leftButtonCenterX = halfWidth - imageSize / 2 - halfButtonWidth - fontSize;
+        const rightButtonCenterX = halfWidth + imageSize / 2 + halfButtonWidth + fontSize;
 
         leftButton.x = Math.floor(leftButtonCenterX - halfButtonWidth);
         leftButton.y = Math.floor(halfHeight - halfButtonHeight);
@@ -406,9 +397,8 @@ function ChapterPane(callback,parent,instant=false) {
             }
             drawRectangle(rightButton,"black");
         }
-        const fontSize = halfHeight / 500 * 21;
 
-        context.font = `100 ${fontSize}px Roboto`;
+        context.font = "100 21px Roboto";
         context.textAlign = "center";
         context.textBaseline = "middle";
         context.fillStyle = "white";
@@ -417,16 +407,17 @@ function ChapterPane(callback,parent,instant=false) {
         context.fillText(this.rightButtonText,rightButtonCenterX,halfHeight+robotoOffset);
         context.fillText(this.centerButtonText,halfWidth,halfHeight+robotoOffset);
 
+        context.font = "300 21px Roboto";
         const subtitleWidth = context.measureText(this.chapterSubTitle).width;
-        const subtitleLayerHeight = Math.floor(halfHeight / 500 * 60);
-        const subtitleBoxCenterY = subtitleLayerHeight + halfHeight + imageSize / 2;
+
+        const subtitleBoxCenterY = halfHeight + imageSize / 2 + fontSize;
         context.fillStyle = "black";
-        context.fillRect(Math.round(halfWidth-fontSize-subtitleWidth/2),subtitleBoxCenterY-subtitleLayerHeight/2,Math.round(subtitleWidth+fontSize+fontSize),subtitleLayerHeight);
+        context.fillRect(Math.round(halfWidth-fontSize-subtitleWidth/2),subtitleBoxCenterY,Math.round(subtitleWidth+fontSize+fontSize)+4,50);
         context.fillStyle = "white";
-        context.font = `300 ${fontSize}px Roboto`;
-        context.fillText(this.chapterSubTitle,halfWidth,robotoOffset+subtitleBoxCenterY);
-        context.font = `300 ${fontSize + fontSize}px Roboto`;
-        context.fillText(this.chapterTitle,halfWidth,halfHeight - imageSize / 2 - subtitleLayerHeight + fontSize);
+
+        context.fillText(this.chapterSubTitle,halfWidth,subtitleBoxCenterY+25+robotoOffset);
+        context.font = "300 38px Roboto";
+        context.fillText(this.chapterTitle,halfWidth,halfHeight - imageSize / 2 - 42);
 
         exitLabel = renderExitButton(x,y,hoverType===hoverTypes.exitLabel,false,cancelDown);
         
