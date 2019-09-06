@@ -508,16 +508,20 @@ async function logicalBattleSequencer(sequencer) {
     const opponentSequencer = sequencer.opponentSequencer;
     const opponent = sequencer.opponent;
     const player = sequencer.player;
+    opponentSequencer.player = player;
+    opponentSequencer.self = opponent;
+    if(opponentSequencer.load) {
+        opponentSequencer.load();
+    }
     let battleAlive = true;
     const endParameters = {};
     await sequencer.getAction();
     sequencer.updatePlayerMoves([SKIP_MOVE]);
     sequencer.setMarqueeText("The battle begins!");
+    await sequencer.getAction();
     if(opponentSequencer.getStartEvents) {
         await runBattleEvents(sequencer,opponentSequencer.getStartEvents());
     }
-    opponentSequencer.player = player;
-    opponentSequencer.self = opponent;
     let lastDirective = null;
     const postLoopProcess = () => {
         if(battleAlive && lastDirective !== RETURN_DIRECTIVE) {

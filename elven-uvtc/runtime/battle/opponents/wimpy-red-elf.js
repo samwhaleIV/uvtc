@@ -6,6 +6,31 @@ function WimpyRedElfShowdown() {
     this.getStalemateEvents = battleOutput => [];
     this.getDefaultHealth = () => 10;
     this.getTurnEvents = () => [];
+    this.load = () => {
+        this.self.state.isElf = true;
+        this.self.state.submissionHandle = () => {
+            return {
+                name: "Honorable Suicide",
+                description: "It's what the cool kids do.",
+                process: user => {
+                    user.kill();
+                    return [{
+                        type: "text",
+                        text: `${user.name} commited suicide`
+                    },{
+                        type: "speech",
+                        text: `Remember kids, suicide is a permanent solution to a temporary problem.`
+                    },{
+                        type: "speech",
+                        text: "You're not alone. Confidential help is available for free."
+                    },{
+                        type: "speech",
+                        text: "For National Suicide Prevention Lifeline, call 1-800-273-8255."
+                    }];
+                }
+            }
+        }
+    }
 }
 function WimpyRedElf(battleID) {
     OpponentSequencer.call(this,"wimpy-red-elf",true,null,null,0);

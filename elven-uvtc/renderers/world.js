@@ -1032,7 +1032,10 @@ function WorldRenderer() {
     this.disableAdaptiveFill = true;
     this.noPixelScale = true;
 
-    this.gameOver = async () => {
+    this.gameOver = async (noDelay=false) => {
+        if(!noDelay) {
+            await delay(500);
+        }
         this.pushCustomRenderer(new FadeOut(2000));
         await delay(2100);
         setFaderEffectsRenderer(new BoxFaderEffect());

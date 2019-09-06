@@ -129,13 +129,13 @@ addMap({
             } else if(world.globalState.justWonToWimpyGreen) {
                 this.start = async () => {
                     await delay(800);
+                    //todo the 
                 }
                 delete world.globalState.justWonToWimpyGreen;
             } else if(world.globalState.justLostToWimpyRed) {
                 this.start = async () => {
                     await delay(800);
                     await wimpyRed.say("Just as I expected. A loser.");
-                    await delay(500);
                     world.gameOver();
                 }
                 delete world.globalState.justLostToWimpyRed;

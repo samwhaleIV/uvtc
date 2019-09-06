@@ -17,6 +17,7 @@ const getPossessiveName = target => {
     }
 }
 
+const Moves = {};
 const MovesList = [
     {
         name: "None",
@@ -154,7 +155,45 @@ const MovesList = [
             }
         }
     },
-    {name:"Submission"},
+    {
+        name: "Submission",
+        description: "Your opponent decides what move you'll perform.",
+        possibleMoves: [{
+            name: "Self Punch",
+            type: "malice",
+            damage: 1,
+            process: user => {
+                user.health -= this.damage;
+                return {
+                    type: "text",
+                    text: "Punching yourself seems unhealthy..."
+                }
+            }
+        },"Nothing"],
+        process: (user,target) => {
+            let move;
+            if(user.state.submissionHandle) {
+                move = user.state.submissionHandle();
+            } else {
+                move = this.possibleMoves[Math.floor(Math.random()*this.possibleMoves.length)];
+            }
+            if(typeof move === "string") {
+                move = Moves[move];
+            }
+            return [
+                {
+                    type: "text",
+                    text: user.isPlayer ?
+                        `You decided ${target.name} will use ${move.name}.`:
+                        `${target.name} decided you will use ${move.name}.`
+                },
+                {
+                    type: user.isPlayer ? "player-move" : "opponent-move",
+                    move: move
+                }
+            ]
+        }
+    },
     {name:"Poison Apple"},
     {name:"Wooden Sword"},
     {name:"Wooden Shield"},
@@ -168,7 +207,6 @@ const MovesList = [
     {name:"Friendship"},
     {name:"Vitamins"}
 ];
-const Moves = {};
 MovesList.forEach((move,index) => {
     Moves[move.name] = move;
     move.wrappedName = processTextForWrapping(move.name);

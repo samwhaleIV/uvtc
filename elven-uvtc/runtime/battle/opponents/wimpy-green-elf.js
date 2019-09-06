@@ -6,6 +6,9 @@ function WimpyGreenElfShowdown() {
     this.getStalemateEvents = battleOutput => [];
     this.getDefaultHealth = () => 10;
     this.getTurnEvents = () => [];
+    this.load = () => {
+        this.self.state.isElf = true;
+    }
 }
 function WimpyGreenElf(battleID) {
     OpponentSequencer.call(this,"wimpy-green-elf",true,null,null,0);

@@ -301,7 +301,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
         const textAreaX = x + 20;
         const textAreaY = y-halfTextAreaHeight;
         const textAreaWidth = width - 40;
-        context.fillRect(textAreaX,textAreaY,textAreaWidth,textAreaHeight);
+        context.fillRect(textAreaX,Math.ceil(textAreaY),textAreaWidth,textAreaHeight);
         const margin = Math.ceil(widthNormal * 6/2)*2;
         const marqueeText = this.marqueeText;
         if(marqueeText) {

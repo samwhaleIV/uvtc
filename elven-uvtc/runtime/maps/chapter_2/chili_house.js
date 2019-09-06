@@ -334,6 +334,7 @@ addMap({
                 await wizard.say("A new world.");
                 await world.moveCamera(...world.playerObject.location,300);
 
+                await delay(400);
                 await wimpyRed.say("Let those we have taken from you burn in your mind!");
                 await wimpyGreen.say("Let it burn every day!");
                 await wizard.say("Burn. Every. Second.");
