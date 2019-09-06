@@ -1,6 +1,6 @@
 const BOX_MARGIN = 15;
 const DOUBLE_BOX_MARGIN = BOX_MARGIN * 2;
-const TEXT_SCALE = 5;
+const TEXT_SCALE = 4;
 const BORDER_WIDTH = 3;
 const VERTICAL_EDGE_MARGIN = 7;
 const LINE_WIDTH = BORDER_WIDTH * 2;

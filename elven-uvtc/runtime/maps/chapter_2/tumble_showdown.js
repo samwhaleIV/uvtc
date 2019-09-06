@@ -81,7 +81,7 @@ addMap({
                 if(!world.globalState.wimpyRedDefeated) {
                     await wimpyRed.say("It's too late to save your friends.");
                     await wimpyRed.say("You're going down.");
-                    world.startBattle("wimpy-red-elf",winData=>{
+                    world.startBattle("wimpy-red-elf",()=>{
                         world.globalState.justWonToWimpyRed = true;
                     },loseData=>{
                         world.globalState.justLostToWimpyRed = true;
@@ -96,9 +96,9 @@ addMap({
                     await wimpyGreen.say("Wow. Not only are you elf hating scum, you also cheat at video games.");
                 } else {
                     await wimpyGreen.say("I won't let you down, Wimpy Red.");
-                    world.startBattle("wimpy-green-elf",winData=>{
+                    world.startBattle("wimpy-green-elf",()=>{
                         world.globalState.justWonToWimpyGreen = true;
-                    },loseData=>{
+                    },()=>{
                         world.globalState.justLostToWimpyGreen = true;
                     });
                 }
@@ -135,6 +135,7 @@ addMap({
                 this.start = async () => {
                     await delay(800);
                     await wimpyRed.say("Just as I expected. A loser.");
+                    await delay(500);
                     world.gameOver();
                 }
                 delete world.globalState.justLostToWimpyRed;

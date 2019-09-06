@@ -26,7 +26,6 @@ const MUSIC_INTRO_SUFFIX = "_intro";
 //This is NOT used for songs that will play anywhere other than the over. Battles, menus, etc. will use something else.
 //Be sure not to include the intro suffix string or your files are gonna have to be named like 'song_intro_intro'
 const SongsWithIntros = [
-    //"burrs_battle_song" //burrs_battle_song_intro is implied - you don't have to call it burrs_battle_song, just link it to "burr" in BattleMusicLinkingManifest
 	"cabin",
 	"tavern",
     "store",
@@ -35,13 +34,21 @@ const SongsWithIntros = [
     "wimpy"
 ];
 const BattleMusicLinkingManifest = {
-    "burr": "test-song",
-    "wimpy-red-elf": "wimpy",
-    "wimpy-green-elf": "wimpy"
-    //And for the intro, 'wimpy_wimpy' is added to SongsWithIntros and 'wimpy_wimpy_intro' is assumed to exist.
+    "burr": null,
+    "wimpy-red-elf": null,
+    "wimpy-green-elf": null
 };
+const ScriptedSongLinkingManifest = {
+    "oops-wrong-song": "hero",
+    "party-song": "cabin",
+    "lights-off-meet-elves": null
+}
 const MusicLinkingManifest = {
+    "tumble_showdown": {
+        song: ScriptedSongLinkingManifest["lights-off-meet-elves"]
+    },
     "north_pole_preview": {
+        //Chapter 2 start scene
         song: "elf_march"
     },
     "tutorial_place": {

@@ -1,5 +1,9 @@
 addMap({
-    requiredSongs: ["oops_wrong_song","cabin","elf_intro_theme"],
+    requiredSongs: [
+        ScriptedSongLinkingManifest["oops-wrong-song"],
+        ScriptedSongLinkingManifest["party-song"],
+        ScriptedSongLinkingManifest["lights-off-meet-elves"]
+    ],
     WorldState: function(world,data) {
 
         let objectiveHUD = null;
@@ -156,9 +160,13 @@ addMap({
             this.start = async () => {
                 if(data.fromNorthPolePreview) {
                     if(!musicMuted) {
-                        world.playSong("oops_wrong_song");
+                        world.playSong(
+                            ScriptedSongLinkingManifest["oops-wrong-song"]
+                        );
                     } else {
-                        world.playSong("cabin");
+                        world.playSong(
+                            ScriptedSongLinkingManifest["party-song"]
+                        );
                     }
                     await world.fadeFromBlack(2000);
                     world.popCustomRenderer();
@@ -166,11 +174,15 @@ addMap({
                         await delay(1500);
                         world.stopMusic();
                         await world.showTextPopup("Uhhhh! WRONG SONG!");
-                        await world.playSong("cabin");
+                        await world.playSong(
+                            ScriptedSongLinkingManifest["party-song"]
+                        );
                         await world.showTextPopup("Ah, yes. That's better. Less impending doom.");
                     }
                 } else {
-                    world.playSong("cabin");
+                    world.playSong(
+                        ScriptedSongLinkingManifest["party-song"]
+                    );
                 }
                 if(!world.globalState.jimToldYouToMingle) {
                     await delay(700);
@@ -259,7 +271,6 @@ addMap({
                 world.removeObject(jam.ID);
 
                 await iceMan.say("Quick! Somebody get the lights back on!");
-                world.playSong("elf_intro_theme");
                 await world.showNamedTextPopup("Oh. As you wish.","???: ");
 
                 world.moveObject(world.playerObject.ID,5,4,false);
@@ -288,9 +299,11 @@ addMap({
                 chiliWife.updateDirection("up");
 
                 await delay(600);
+                world.playSong(
+                    ScriptedSongLinkingManifest["lights-off-meet-elves"]
+                );
                 world.popCustomRenderer();
-                await delay(600);
-
+                await delay(800);
                 await wimpyRed.say("Why... Hello there.");
                 await wimpyRed.say("Pleasure to meet you all.");
                 await wimpyRed.say("Allow us to introduce ourselves.");
@@ -305,12 +318,12 @@ addMap({
                 await world.autoCameraOn();
                 await delay(400);
                 wimpyRed.updateDirection("up");
-                await delay(400);
+                await delay(500);
                 await wimpyRed.say("The pain and suffering of elves has gone on long enough...");
                 await wimpyRed.say("Us elves can't live this way anymore. Never once did you even think about us... Did you?");
-                await delay(400);
+                await delay(500);
                 wimpyRed.updateDirection("down");
-                await delay(400);
+                await delay(600);
 
                 await wimpyRed.say("Well. It's time for a change.");
                 world.autoCameraOff();
@@ -324,6 +337,7 @@ addMap({
                 await wimpyRed.say("Let those we have taken from you burn in your mind!");
                 await wimpyGreen.say("Let it burn every day!");
                 await wizard.say("Burn. Every. Second.");
+                await delay(400);
                 await wimpyRed.say("Let us share our pain with you.");
                 
                 await delay(200);
