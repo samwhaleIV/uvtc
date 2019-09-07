@@ -18,6 +18,13 @@ const SELECTION_PANEL = [Moves["Logic"],Moves["Malice"],Moves["Fear"]];
 const SKIP_MOVE = Moves["Skip"];
 const BACK_MOVE = Moves["Back"];
 const NOTHING_MOVE = Moves["Nothing"];
+const NONE_MOVE = Moves["None"];
+
+const PLAYER_MOVE_ACTION_TYPE = "player-move";
+const OPPONENT_MOVE_ACTION_TYPE = "opponent-move";
+const DEFAULT_ACTION_TYPE = "action";
+const TEXT_ACTION_TYPE = "text";
+const SPEECH_ACTION_TYPE = "speech";
 
 const SELECT_A_MOVE_TEXT = "Select a move...";
 const WATING_FOR_EXTERNAL_TEXT = "Please wait...";
@@ -91,7 +98,7 @@ const getBattleEntity = (name,health,isPlayer) => {
     let entityName = name;
 
     let entityHealth = health;
-    let entityMaxHealth = MAX_DISPLAY_HEALTH;
+    let entityMaxHealth = health;
 
     const battleState = {};
     const entity = {};
@@ -254,7 +261,7 @@ const getBattleEntity = (name,health,isPlayer) => {
         }
     });
 
-    let lastMove = null;
+    let lastMove = NONE_MOVE;
     Object.defineProperty(entity,"lastMove",{
         get: function() {
             return lastMove;
@@ -362,11 +369,19 @@ async function runBattleEvents(sequencer,events) {
     for(let i = 0;i<eventCount;i++) {
         const event = events[i];
         await fireBattleEvent(sequencer,event);
-        const playerAction = await sequencer.getAction();
-        if(isBadPlayerAction(playerAction)) {
-            invalidPlayerAction(playerAction);
-        } else if(typeof playerAction !== NUMBER_TYPE) {
-            invalidPlayerAction(playerAction);
+        switch(event.type) {
+            case OPPONENT_MOVE_ACTION_TYPE:
+            case PLAYER_MOVE_ACTION_TYPE:
+            case DEFAULT_ACTION_TYPE:
+                break;
+            default:
+                const playerAction = await sequencer.getAction();
+                if(isBadPlayerAction(playerAction)) {
+                    invalidPlayerAction(playerAction);
+                } else if(typeof playerAction !== NUMBER_TYPE) {
+                    invalidPlayerAction(playerAction);
+                }
+                break;
         }
     }
 }
@@ -406,18 +421,17 @@ async function processMove(move,user,target,sequencer) {
         sequencer.setMarqueeText(WATING_FOR_EXTERNAL_TEXT);
         sequencer.updatePlayerMoves([SKIP_MOVE]);
     }
-    const targetMove = move.process ? move : NOTHING_MOVE;
-    user.lastMove = targetMove;
+    let targetMove = move;
     let resultEvents;
 
     let shouldRunMove = false;
 
-    if(targetMove !== NOTHING_MOVE) {
-        const result = moveStatusFilter(targetMove,user,target);
-        if(result.directive === "continue") {
+    const statusFilterResult = moveStatusFilter(targetMove,user,target);
+    if(statusFilterResult) {
+        if(statusFilterResult.directive === "continue") {
             shouldRunMove = true;
         }
-        resultEvents = result.events;
+        resultEvents = statusFilterResult.events;
     }
 
     if(!resultEvents) {
@@ -425,9 +439,13 @@ async function processMove(move,user,target,sequencer) {
         shouldRunMove = true;
     }
     if(shouldRunMove) {
+        if(!targetMove.process) {
+            targetMove = NOTHING_MOVE;
+        }
         resultEvents.push(...moveResultPreprocess(targetMove.process(
             user,target,sequencer
         )));
+        user.lastMove = targetMove;
     }
 
     const events = [{
@@ -474,11 +492,11 @@ async function fireBattleEvent(sequencer,event) {
             clearHangingSpeech(sequencer);
         }
         switch(event.type) {
-            case "player-move":
-            case "opponent-move":
+            case PLAYER_MOVE_ACTION_TYPE:
+            case OPPONENT_MOVE_ACTION_TYPE:
                 const move = event.move;
                 let user, target;
-                if(event.type === "player-move") {
+                if(event.type === PLAYER_MOVE_ACTION_TYPE) {
                     user = sequencer.player;
                     target = sequencer.opponent;
                 } else {
@@ -487,14 +505,14 @@ async function fireBattleEvent(sequencer,event) {
                 }
                 await processMove(move,user,target,sequencer);
                 break;
-            case "text":
+            case TEXT_ACTION_TYPE:
                 sequencer.setMarqueeText(event.text);
                 break;
-            case "speech":
+            case SPEECH_ACTION_TYPE:
                 sequencer.hangingSpeech = true;
                 sequencer.showFullText(event.text);
                 break;
-            case "action":
+            case DEFAULT_ACTION_TYPE:
                 event.process(sequencer);
                 break;
 
@@ -515,9 +533,6 @@ async function logicalBattleSequencer(sequencer) {
     }
     let battleAlive = true;
     const endParameters = {};
-    await sequencer.getAction();
-    sequencer.updatePlayerMoves([SKIP_MOVE]);
-    sequencer.setMarqueeText("The battle begins!");
     await sequencer.getAction();
     if(opponentSequencer.getStartEvents) {
         await runBattleEvents(sequencer,opponentSequencer.getStartEvents());

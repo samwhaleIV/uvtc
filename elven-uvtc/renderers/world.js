@@ -66,15 +66,16 @@ function WorldRenderer() {
     this.fadeToBlack = async duration => {
         return safeFade(duration,false);
     }
-    this.chapterComplete = async () => {
+    this.chapterComplete = async (noSound=false) => {
+        const method = noSound ? this.showInstantTextPopup : this.showInstantTextPopupSound;
         const chapterNumber = GlobalState.data.activeChapter;
         this.pushCustomRenderer(new FadeOut(2000));
         this.pushCustomRenderer(new ChapterPreview(chapterNumber,this.getItemPreviewBounds));
         ChapterManager.setActiveChapterCompleted();
         if(chapterNumber === 17) {
-            await this.showInstantTextPopupSound(`Good job. This is it. Your journey has reached its end... Or is this merely the beginning?`);
+            await method(`Good job. This is it. Your journey has reached its end... Or is this merely the beginning?`);
         } else {
-            await this.showInstantTextPopupSound(`Good job. You completed chapter ${CHAPTER_NAME_LOOKUP[chapterNumber]}! Onwards and upwards...`);
+            await method(`Good job. You completed chapter ${CHAPTER_NAME_LOOKUP[chapterNumber]}! Onwards and upwards...`);
         }
         this.popCustomRenderer();
         setFaderEffectsRenderer(new BoxFaderEffect());
@@ -932,12 +933,16 @@ function WorldRenderer() {
                     } else {
                         fadeInTarget = songName;
                     }
-                    musicNodes[fadeInTarget].volumeControl.gain.setValueAtTime(0.001,audioContext.currentTime);
-                    musicNodes[fadeInTarget].volumeControl.gain.linearRampToValueAtTime(
-                        1.0,
-                        audioContext.currentTime+
-                        OVERWORLD_MUSIC_FADE_TIME/1000
-                    );
+                    const activeNode = musicNodes[fadeInTarget];
+                    if(activeNode) {
+                        const gainProperty = activeNode.volumeControl.gain;
+                        gainProperty.setValueAtTime(0.001,audioContext.currentTime);
+                        gainProperty.linearRampToValueAtTime(
+                            1.0,
+                            audioContext.currentTime+
+                            OVERWORLD_MUSIC_FADE_TIME/1000
+                        );
+                    }
                 }
                 const enter_sandman = songName => {
                     const intro = SONG_INTRO_LOOKUP[songName];
@@ -1037,7 +1042,7 @@ function WorldRenderer() {
             await delay(500);
         }
         this.pushCustomRenderer(new FadeOut(2000));
-        await delay(2100);
+        await delay(5000);
         setFaderEffectsRenderer(new BoxFaderEffect());
         faderEffectsRenderer.fillInLayer = new ElvesFillIn();
         rendererState.fader.fadeOut(WorldRenderer);

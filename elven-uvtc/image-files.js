@@ -12,6 +12,7 @@ ImagePaths.push(
     getFile("spiral-move-select.png",FileTypes.BackgroundImage),
     getFile("stars-menu.png",FileTypes.BackgroundImage),
     getFile("tiny-arm.png",FileTypes.BackgroundImage),
+    getFile("wimpy-green.png",FileTypes.BackgroundImage),
     getFile("wimpy-red.png",FileTypes.BackgroundImage),
     getFile("battle/moves.png",FileTypes.Image),
     getFile("battle/statuses.png",FileTypes.Image),

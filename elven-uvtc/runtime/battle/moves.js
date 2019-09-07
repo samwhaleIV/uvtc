@@ -65,9 +65,9 @@ const MovesList = [
         name: "Wimpy Punch",
         description: "Hey, a punch is a punch. Does minimal damage.",
         type:"malice",
-        process: (_,target) => {
+        process: (user,target) => {
             target.health -= 1;
-            if(!target.isPlayer) {
+            if(user.isPlayer) {
                 return {
                     type: "text",
                     text: "It was mildly effective..."
@@ -80,9 +80,12 @@ const MovesList = [
         type: "logic",
         description: "Pass your opponent some nice cold whiskey.",
         process: (user,target) => {
+            if(target.state.liquorHandle) {
+                return target.state.liquorHandle();
+            }
             return {
                 type: "text",
-                text: `${user.name} gave ${target.name} some whiskey`
+                text: `${user.name} gave ${target.name} some whiskey.`
             }
         }
     },
@@ -103,13 +106,14 @@ const MovesList = [
         description: "If your opponent last used a punch, you deal double its damage.",
         type: "malice",
         process: (user,target) => {
+
             let punchDamage = PUNCH_MOVES[target.lastMove.name];
             if(punchDamage) {
                 punchDamage *= 2;
                 target.health -= punchDamage;
                 return {
                     type: "text",
-                    text: `${user.name} dealt ${punchDamage} to ${target.name}!`
+                    text: `${user.name} dealt ${punchDamage} damage to ${target.name}!`
                 }
             } else {
                 return {
@@ -157,12 +161,13 @@ const MovesList = [
     },
     {
         name: "Submission",
+        type: "fear",
         description: "Your opponent decides what move you'll perform.",
         possibleMoves: [{
             name: "Self Punch",
             type: "malice",
             damage: 1,
-            process: user => {
+            process: function(user) {
                 user.health -= this.damage;
                 return {
                     type: "text",
@@ -170,10 +175,10 @@ const MovesList = [
                 }
             }
         },"Nothing"],
-        process: (user,target) => {
+        process: function(user,target) {
             let move;
-            if(user.state.submissionHandle) {
-                move = user.state.submissionHandle();
+            if(target.state.submissionHandle && !target.isPlayer) {
+                move = target.state.submissionHandle();
             } else {
                 move = this.possibleMoves[Math.floor(Math.random()*this.possibleMoves.length)];
             }
@@ -184,8 +189,8 @@ const MovesList = [
                 {
                     type: "text",
                     text: user.isPlayer ?
-                        `You decided ${target.name} will use ${move.name}.`:
-                        `${target.name} decided you will use ${move.name}.`
+                        `${target.name} decided you will use ${move.name}.`:
+                        `You decided ${target.name} will use ${move.name}.`
                 },
                 {
                     type: user.isPlayer ? "player-move" : "opponent-move",

@@ -83,9 +83,9 @@ addMap({
                     await wimpyRed.say("You're going down.");
                     world.startBattle("wimpy-red-elf",()=>{
                         world.globalState.justWonToWimpyRed = true;
-                    },loseData=>{
+                    },()=>{
                         world.globalState.justLostToWimpyRed = true;
-                    },"tumble_showdown");
+                    },world.renderMap.name);
                 } else {
                     await wimpyRed.say("A non-elf abusing an elf... Typical.");
                 }
@@ -100,7 +100,7 @@ addMap({
                         world.globalState.justWonToWimpyGreen = true;
                     },()=>{
                         world.globalState.justLostToWimpyGreen = true;
-                    });
+                    },world.renderMap.name);
                 }
             }
 
@@ -129,7 +129,42 @@ addMap({
             } else if(world.globalState.justWonToWimpyGreen) {
                 this.start = async () => {
                     await delay(800);
-                    //todo the 
+                    await wimpyGreen.say("Uh. Wimpy Red? I seem to have lost.");
+                    await delay(800);
+                    world.autoCameraOff();
+                    await world.moveCamera(...wimpyRed.location,400);
+                    await delay(800);
+                    await wimpyRed.say("Crap.");
+                    await delay(600);
+                    wimpyRed.updateDirection("down")
+                    await delay(800);
+                    await wimpyRed.say("Well.. no one ever established an entire tyrannical dictatorship over the entire world in just twenty minutes.");
+                    await delay(200);
+                    await world.moveCamera(...wimpyGreen.location,400);
+                    await delay(200);
+                    await wimpyGreen.say("Uh, yeah. I guess not.");
+                    await delay(800);
+                    await wimpyGreen.say("Anyways.. You haven't seen the last of us, and, we are still taking your friends.");
+                    await delay(800);
+                    await wimpyGreen.say("What? Don't look at me like that. You really thought some light sparring would make wizard elf take down this barrier?");
+                    await wimpyGreen.say("You haven't seen the last of us. Changes are coming.. Spread the word.");
+                    await delay(600);
+                    await wimpyGreen.say("And in case you forget about your friends, here's another reminder.");
+                    await world.unlockMove("Submission");
+                    await delay(300);
+                    await world.moveCamera(...wimpyRed.location,400);
+                    await delay(1000);
+                    wimpyRed.updateDirection("up");
+                    await delay(1000);
+                    await wimpyRed.say("The new world is coming.");
+                    await delay(1000);
+                    wimpyRed.updateDirection("down");
+                    await delay(2000);
+                    await wimpyRed.say("This is only the beginning.");
+                    await delay(2000);
+                    await world.fadeToBlack(4000);
+                    await delay(1000);
+                    await world.chapterComplete();
                 }
                 delete world.globalState.justWonToWimpyGreen;
             } else if(world.globalState.justLostToWimpyRed) {

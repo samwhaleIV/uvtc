@@ -105,11 +105,14 @@ function PlayerController(world) {
                     );
                     break;
                 default:
-                    this.world.map.otherClicked(
-                        collisionState.map,
-                        pulseLocation.x,
-                        pulseLocation.y
-                    );
+                    const otherClickMethod = this.world.map.otherClicked;
+                    if(otherClickMethod) {
+                        otherClickMethod(
+                            collisionState.map,
+                            pulseLocation.x,
+                            pulseLocation.y
+                        );
+                    }
                     break;
             }
         }
