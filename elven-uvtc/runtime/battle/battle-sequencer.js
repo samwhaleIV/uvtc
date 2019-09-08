@@ -13,6 +13,7 @@ const STATUS_IS_STRING_ERROR = "New status must be a object, not the name";
 const NAME_IS_NOT_STRING = "Entity names must be strings";
 const FALLBACK_NAME = "Thing";
 const RETURN_DIRECTIVE = "return";
+const CONTINUE_DIRECTIVE = "continue";
 
 const SELECTION_PANEL = [Moves["Logic"],Moves["Malice"],Moves["Fear"]];
 const SKIP_MOVE = Moves["Skip"];
@@ -59,8 +60,6 @@ const addEvent = (object,eventName) => {
         informSubscribers(watchers,...parameters);
     }
 }
-
-const statusPrioritySort = (a,b) => (b.priority||0) - (a.priority||0);
 
 const getStatusName = status => {
     if(typeof status === STRING_TYPE) {
@@ -386,24 +385,32 @@ async function runBattleEvents(sequencer,events) {
     }
 }
 
+const statusPrioritySort = (a,b) => (b.root.priority||0) - (a.root.priority||0);
+
 function moveStatusFilter(move,user,target) {
 
-    const outgoingStatusFilters = Object.values(user.statuses).filter(status=>status.outgoingFilter);
-    const incomingStatusFilters = Object.values(target.statuses).filter(status=>status.incomingFilter);
+    const outgoingStatusFilters = Object.values(user.statuses).filter(status=>status.outgoingFilter).map(status=>{return{
+        type: "outgoing",
+        root: status
+    }});
+    const incomingStatusFilters = Object.values(target.statuses).filter(status=>status.incomingFilter).map(status=>{return{
+        type: "incoming",
+        root: status
+    }});
 
     const allStatuses = [...outgoingStatusFilters,...incomingStatusFilters].sort(statusPrioritySort);
 
     for(let i = 0;i<allStatuses.length;i++) {
         const status = allStatuses[i];
         let result;
-        if(status.outgoingFilter) {
-            result = status.outgoingFilter(user,target,move);
+        if(status.type === "outgoing") {
+            result = status.root.outgoingFilter(user,target,move);
         } else {
             /*
               Note that 'target' and 'user' is swapped for (self,attacker)     order
                                             instead of     (attacker,defender) order
             */
-            result = status.incomingFilter(target,user,move);
+            result = status.root.incomingFilter(target,user,move);
         }
         if(result) {
             return {
@@ -428,7 +435,7 @@ async function processMove(move,user,target,sequencer) {
 
     const statusFilterResult = moveStatusFilter(targetMove,user,target);
     if(statusFilterResult) {
-        if(statusFilterResult.directive === "continue") {
+        if(statusFilterResult.directive === CONTINUE_DIRECTIVE) {
             shouldRunMove = true;
         }
         resultEvents = statusFilterResult.events;
@@ -442,7 +449,7 @@ async function processMove(move,user,target,sequencer) {
         if(!targetMove.process) {
             targetMove = NOTHING_MOVE;
         }
-        resultEvents.push(...moveResultPreprocess(targetMove.process(
+        resultEvents.unshift(...moveResultPreprocess(targetMove.process(
             user,target,sequencer
         )));
         user.lastMove = targetMove;
@@ -644,12 +651,28 @@ function BattleSequencer(winCallback,loseCallback,opponentSequencer) {
     this.winCallback = validateCallbackEvent(winCallback);
     this.loseCallback = validateCallbackEvent(loseCallback);
 
-    this.player = getBattleEntity("You",DEFAULT_HEALTH,true);
-    this.opponent = getBattleEntity(
-        opponentSequencer.getName() || "Opponent",
-        opponentSequencer.getDefaultHealth() || DEFAULT_HEALTH,
-        false
-    );
+    let playerHealth, opponentHealth, opponentName;
+    if(opponentSequencer.getPlayerHealth) {
+        playerHealth = opponentSequencer.getPlayerHealth();
+    }
+    if(!playerHealth) {
+        playerHealth = DEFAULT_HEALTH;
+    }
+    if(opponentSequencer.getDefaultHealth) {
+        opponentHealth = opponentSequencer.getDefaultHealth();
+    }
+    if(!opponentHealth) {
+        opponentHealth = DEFAULT_HEALTH;
+    }
+    if(opponentSequencer.getName) {
+        opponentName = opponentSequencer.getName();
+    }
+    if(!opponentName) {
+        opponentName = "Opponent";
+    }
+
+    this.player = getBattleEntity("You",playerHealth,true);
+    this.opponent = getBattleEntity(opponentName,opponentHealth,false);
 
     this.playerLogicMoves = getSlotMoves("logic");
     this.playerMaliceMoves = getSlotMoves("malice");

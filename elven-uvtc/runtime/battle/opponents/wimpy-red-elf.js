@@ -2,6 +2,30 @@ import OpponentSequencer from "../opponent-sequencer.js";
 import Moves from "../moves.js";
 
 function WimpyRedElfShowdown() {
+    const cryMessages = [
+        "This fighting thing is a lot harder than I thought it would be!",
+        "I want to go home!",
+        "I should have never come here, I'm so scared!",
+        "*lots of crying*",
+        "I don't like you but I don't know how to channel my feelings into that, so I am just going to continue to cry."
+    ];
+    let cryMessageIndex = 0;
+    const CryMove = {
+        name: "Cry",
+        process: user => {
+            const cryMessage = cryMessages[cryMessageIndex];
+            cryMessageIndex = (cryMessageIndex+1) % cryMessages.length;
+            const wasCrying = user.state.isCrying;
+            user.state.isCrying = true;
+            return [{
+                type: "text",
+                text: wasCrying ? `${user.name} continues to cry.` : `${user.name} started crying.`
+            },{
+                type: "speech",
+                text: cryMessage
+            }];
+        }
+    };
     this.getStartEvents = () => [
         {
             type: "speech",
@@ -29,35 +53,12 @@ function WimpyRedElfShowdown() {
         type: "speech",
         text: "This... didn't go as I expected."
     }];
-    this.getDefaultHealth = () => 8;
-    const cryMessages = [
-        "This fighting thing is a lot harder than I thought it would be!",
-        "I want to go home!",
-        "I should have never come here, I'm so scared!",
-        "*lots of crying*",
-        "I don't like you but I don't know how to channel my feelings into that, so I am just going to continue to cry."
-    ];
-    let cryMessageIndex = 0;
+    this.getDefaultHealth = () => 6;
+    this.getPlayerHealth = () => 6;
     let moveIndex = 0;
     const movePool = [
         Moves["Wimpy Punch"],
-        {
-            name: "Cry",
-            description: "Battling brings out the best and worst of all of us.",
-            process: user => {
-                const cryMessage = cryMessages[cryMessageIndex];
-                cryMessageIndex = (cryMessageIndex+1) % cryMessages.length;
-                const wasCrying = user.state.isCrying;
-                user.state.isCrying = true;
-                return [{
-                    type: "text",
-                    text: wasCrying ? `${user.name} continues to cry.` : `${user.name} started crying.`
-                },{
-                    type: "speech",
-                    text: cryMessage
-                }]
-            }
-        }
+        CryMove
     ];
     let speechIndex = 0;
     const speeches = [
@@ -85,7 +86,7 @@ function WimpyRedElfShowdown() {
         this.self.state.liquorHandle = () => [{
             type: "speech",
             text: "Oh. Sorry. I don't drink."
-        }]
+        }];
         this.self.state.submissionHandle = () => {
             return {
                 name: "Honorable Suicide",

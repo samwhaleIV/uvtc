@@ -1,10 +1,5 @@
 import { MOVE_SOURCE_WIDTH } from "../../renderers/components/battle/move.js";
 
-const PUNCH_MOVES = [["Wimpy Punch",1]].reduce((pv,cv)=>{
-    pv[cv[0]] = cv[1];
-    return pv;
-},{});
-
 const getPossessiveName = target => {
     if(target.isPlayer) {
         return "your";
@@ -64,9 +59,11 @@ const MovesList = [
     {
         name: "Wimpy Punch",
         description: "Hey, a punch is a punch. Does minimal damage.",
-        type:"malice",
-        process: (user,target) => {
-            target.health -= 1;
+        type: "malice",
+        isPunch: true,
+        damage: 1,
+        process: function(user,target) {
+            target.health -= this.damage;
             if(user.isPlayer) {
                 return {
                     type: "text",
@@ -93,8 +90,9 @@ const MovesList = [
         name:"Red Apple",
         type: "logic",
         description: "Eat an apple and heal 1 health to yourself.",
-        process: user => {
-            user.health += 1;
+        healingAmount: 1,
+        process: function(user) {
+            user.health += this.healingAmount;
             return {
                 type: "text",
                 text: "An apple a day keeps the doctor away."
@@ -105,11 +103,10 @@ const MovesList = [
         name: "Return to Sender",
         description: "If your opponent last used a punch, you deal double its damage.",
         type: "malice",
-        process: (user,target) => {
-
-            let punchDamage = PUNCH_MOVES[target.lastMove.name];
-            if(punchDamage) {
-                punchDamage *= 2;
+        multiplier: 2,
+        process: function(user,target) {
+            if(target.lastMove.isPunch) {
+                const punchDamage = target.lastMove.damage * this.multiplier;
                 target.health -= punchDamage;
                 return {
                     type: "text",
@@ -132,9 +129,10 @@ const MovesList = [
                 name: "Ringing Ears",
                 priority: 100,
                 imageID: 1,
-                outgoingFilter: user => {
+                odds: 0.5,
+                outgoingFilter: function(user) {
                     user.clearStatus("Ringing Ears");
-                    if(Math.random() > 0.5) {
+                    if(Math.random() > this.odds) {
                         return {
                             directive: "block",
                             events: {
@@ -199,10 +197,21 @@ const MovesList = [
             ]
         }
     },
+    {
+        name: "Cry",
+        description: "Battling brings out the best and worst of all of us.",
+        process: user => {
+            const wasCrying = user.state.isCrying;
+            user.state.isCrying = true;
+            return {
+                type: "text",
+                text: wasCrying ? `${user.name} continue${user.isPlayer?"":"s"} to cry.` : `${user.name} started crying.`
+            }
+        }
+    },
     {name:"Poison Apple"},
     {name:"Wooden Sword"},
     {name:"Wooden Shield"},
-    {name:"Cry"},
     {name:"Midus Touch"},
     {name:"Hot Porridge"},
     {name:"Stress Eating"},

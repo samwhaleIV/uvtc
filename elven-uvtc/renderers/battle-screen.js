@@ -222,7 +222,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
                     const firstMoveName = playerMoves[0].name;
                     if(firstMoveName === "Skip" || firstMoveName === "Start") {
                         if(playerActionResolver) {
-                            playSound("click");
+                            //playSound("click");
                             playerActionResolver(0);
                             playerActionResolver = null;
                             clearMoveDescription(true);
@@ -256,7 +256,7 @@ function BattleScreenRenderer(winCallback,loseCallback,...sequencerParameters) {
                     break;
                 }
                 if(playerActionResolver) {
-                    playSound("click");
+                    //playSound("click");
                     playerActionResolver(hoverType-1);
                     playerActionResolver = null;
                     clearMoveDescription(true);

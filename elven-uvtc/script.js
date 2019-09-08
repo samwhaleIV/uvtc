@@ -15,7 +15,7 @@ function loadCallback() {
     }
 }
 
-setPageTitle("UVTC: Early Alpha");
+setPageTitle("You Versus Earth");
 setImageIndexMode(IndexModes.LoseRoot);
 ImageManager.loadImages(loadCallback);
 SoundManager.loadSounds(loadCallback);

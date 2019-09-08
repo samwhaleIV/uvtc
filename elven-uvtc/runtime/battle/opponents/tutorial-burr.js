@@ -23,6 +23,7 @@ function BurrTheBrute() {
         text: "Congratulations, you managed to tie at the easiest battle in the game!"
     }];
     this.getDefaultHealth = () => 3;
+    this.getPlayerHealth = () => 3;
 
     let noticedYouUsedNone = false;
     let noneIndex = 0;
