@@ -196,8 +196,8 @@ addMap({
                 case 12:
                     world.showTextPopups([
                         "This bookcase has a few intersting books on it.",
-                        "One book is called 'the cat lady manifesto'",
-                        "ȸIf I loved my children as much as I love my cats, I'd have children.ȸ"
+                        "One book is called The Cat Lady Manifesto.",
+                        '"If I loved my children as much as I love my cats, I\'d have children"'
                     ]);
                     break;
                 case 13:

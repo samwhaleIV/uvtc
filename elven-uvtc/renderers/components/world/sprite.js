@@ -1,3 +1,5 @@
+import { AlertSound } from "../../../runtime/tones.js";
+
 const SPRITE_WIDTH = 16;
 const SPRITE_HEIGHT = 16;
 
@@ -393,9 +395,9 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
     let showingAlert = false;
     this.alert = () => {
         return new Promise(resolve=>{
-            playSound("alert");
+            AlertSound();
             showingAlert = true;
-            setTimeout(() => {
+            inlineSetTimeout(() => {
                 showingAlert = false;
                 resolve();
             },SPRITE_ALERT_TIMEOUT);

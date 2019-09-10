@@ -1,7 +1,5 @@
-function getSyllableMap(word) {
-    word = word.toLowerCase();
-    return wordSyllableMaps[word];
-}
+import { TextSound } from "../../../runtime/tones.js";
+
 function applySonographToPopupFeed(popupFeed) {
     const wordSets = [];
     let wordStart = 0, word = "";
@@ -53,32 +51,29 @@ function applySonographToPopupFeed(popupFeed) {
         });
     }
 
+    let even = false;
+
     for(let i = 0;i<wordSets.length;i++) {
         const wordSet = wordSets[i];
-        let soundMap = getSyllableMap(wordSet.word);
-        if(!soundMap) {
-            if(!ENV_FLAGS.NO_SONOGRAPH_WARNING) {
-                console.warn(`Warning: '${wordSet.word}' is missing a sonograph`);
-            }
-            soundMap = [true];
-        }
-        for(let x = 0;x<soundMap.length;x++) {
-            popupFeed[x+wordSet.start].noSound = !soundMap[x];
+        for(let x = 0;x<wordSet.word.length;x++) {
+            popupFeed[x+wordSet.start].noSound = even;
+            even = !even;
         }
     }
     return popupFeed;
 }
-function WorldPopup(pages,callback,prefix,isInstant=false) {
+
+function WorldPopup(pages,callback,prefix,isInstant=false,world) {
 
     prefix = prefix ? prefix : "";
 
     const characterSpeed = 30;
     const spaceSpeed = 30;
 
-    const hyphenDelay = 300;
+    const hyphenDelay = 250;
     const commaDelay = 300;
     const periodDelay = 500;
-    const ellipsisDelay = 400;
+    const ellipsisDelay = 700;
 
     let pageIndex = 0;
     let characterIndex = 0;
@@ -133,6 +128,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
                 case "!":
                 case "?":
                 case ".":
+                case ":":
                     delay = periodDelay;
                     instant = true;
                     break;
@@ -161,19 +157,19 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
             if(lookAhead) {
                 if(lookAhead.instant) {
                     if(!pageValue.delay && !pageValue.noSound) {
-                        playSound("text-sound");
+                        TextSound();
                     }
                     timeoutMethod();
                     return;
                 }
             }
             if(pageValue.delay) {
-                timeout = setTimeout(timeoutMethod,pageValue.delay);
+                timeout = world.setTimeout(timeoutMethod,pageValue.delay);
             } else {
                 if(!pageValue.noSound) {
-                    playSound("text-sound");
+                    TextSound();
                 }
-                timeout = setTimeout(timeoutMethod,pageValue.noSound ? pageValue.speed / 2 : pageValue.speed);
+                timeout = world.setTimeout(timeoutMethod,pageValue.noSound ? pageValue.speed / 2 : pageValue.speed);
             }
         } else {
             if(pageIndex + 1 >= pageCount) {
@@ -185,7 +181,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
 
     timeoutMethod();
     this.progress = function() {
-        clearTimeout(timeout);
+        world.clearTimeout(timeout);
         if(readyToTerminate) {
             if(terminated) {
                 return;
@@ -209,13 +205,14 @@ function WorldPopup(pages,callback,prefix,isInstant=false) {
             const page = pages[pageIndex];
             textFeed = page[page.length-1].textFeed;
             pageComplete = true;
+            TextSound();
             if(pageIndex + 1 >= pageCount) {
                 readyToTerminate = true;
             }
         }
     }
     this.startY = 0;
-    this.render = function(timestamp) {
+    this.render = function() {
         if(terminated) {
             return;
         }

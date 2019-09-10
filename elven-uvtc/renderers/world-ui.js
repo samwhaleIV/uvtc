@@ -3,6 +3,7 @@ import ElvesFillIn from "./components/elves-fill-in.js";
 import WorldSettingsRenderer from "./world-settings.js";
 import MovesPaneRenderer from "./moves-pane.js";
 import BoxFaderEffect from "./components/box-fader-effect.js";
+import { OpenSound, CloseSound } from "../runtime/tones.js";
 
 const ICON_PART_1_WIDTH = 64;
 const ICON_PART_2_WIDTH = 58;
@@ -37,7 +38,7 @@ function WorldUIRenderer(world) {
         loadStart = null;
         leaveStart = performance.now();
         leaving = true;
-        playSound("reverse-click");
+        CloseSound();
     }
     const clearPanel = noSound => {
         panel = null;
@@ -161,19 +162,14 @@ function WorldUIRenderer(world) {
 
             if(contains(x,y,internalIconMap.elfmart)) {
                 hoverType = internalIconMap.elfmart.hoverID;
-
             } else if(contains(x,y,internalIconMap.settings)) {
                 hoverType = internalIconMap.settings.hoverID;
-
             } else if(contains(x,y,internalIconMap.mainMenu)) {
                 hoverType = internalIconMap.mainMenu.hoverID;
-
             } else if(contains(x,y,internalIconMap.moves)) {
                 hoverType = internalIconMap.moves.hoverID;
-
             } else if(contains(x,y,internalIconMap.help)) {
                 hoverType = internalIconMap.help.hoverID;
-
             } else {
                 hoverType = 0;
             }
@@ -246,7 +242,6 @@ function WorldUIRenderer(world) {
                         break;
                     case kc.down:
                     case kc.right:
-                        hoverType = hoverTypes.help;
                         hoverType = hoverTypes.help;
                         break;
                 }
@@ -357,7 +352,7 @@ function WorldUIRenderer(world) {
         if(loading) {
             const progress = (timestamp - loadStart) / transitionTime;
             if(progress >= 1) {
-                playSound("click");
+                OpenSound();
                 loading = false;
                 transitioning = false;
             }

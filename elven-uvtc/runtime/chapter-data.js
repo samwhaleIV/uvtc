@@ -1,6 +1,6 @@
 const Chapters = [
     {
-        title: "Making my way 'round town",
+        title: "Culture Shock",
         unlockableMoves: [
             "Iced Whiskey",
             "Wimpy Punch",
@@ -10,7 +10,7 @@ const Chapters = [
         startMap: "bedroom_1"
     },
     {
-        title: "Christmas is cancelled",
+        title: "Christmas Is Cancelled",
         unlockableMoves: [
             "Jingle Bells",
             "Submission"
@@ -18,68 +18,44 @@ const Chapters = [
         startMap: "north_pole_preview"
     },
     {
-        title: "Tumble town fallen",
+        title: "New World",
         unlockableMoves: [
-            "Wooden Sword",
-            "Wooden Shield",
-            "Cry"
         ]
     },
     {
         title: "Goldilocks",
         unlockableMoves: [
             "Midus Touch",
-            "Hot Porridge",
-            "Stress Eating"
+            "Porridge"
         ]
     },
     {
-        title: "Spies like us",
-        unlockableMoves: [
-            "Banish",
-            "Trust",
-            "Treason"
-        ]
-    },
-    {
-        title: "With a little help from my friends",
+        title: "With A Little Help From My Friends",
         unlockableMoves: [
             "Friendship",
             "Vitamins"
         ]
     },
     {
-        title: "A long way from home"
+        title: "Them Bones"
     },
     {
-        title: "Them bones"
+        title: "Poe's Law"
     },
     {
-        title: "Come one come all"
+        title: "Polar Express"
     },
     {
-        title: "Trolls and sacrifice"
+        title: "One Night In Elfmart"
     },
     {
-        title: "Polar express"
+        title: "Cloud City"
     },
     {
-        title: "One night in Elfmart"
+        title: "Murder, Kill, Maim"
     },
     {
-        title: "Cloud city"
-    },
-    {
-        title: "The experiment"
-    },
-    {
-        title: "Murder, kill, maim"
-    },
-    {
-        title: "Merry Christmas"
-    },
-    {
-        title: "Home"
+        title: "The Most Wonderful Time Of The Year"
     }
 ];
 export default Chapters;

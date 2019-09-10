@@ -6,7 +6,6 @@ EssentialSounds.push(
     getFile("damage.mp3",FileTypes.Sound),
     getFile("heal.mp3",FileTypes.Sound),
     getFile("text-sound.mp3",FileTypes.Sound),
-    getFile("alert.mp3",FileTypes.Sound),
     getFile("battle-fade-in.mp3",FileTypes.Sound),
     getFile("battle-fade-out.mp3",FileTypes.Sound),
     getFile("magic.mp3",FileTypes.Sound),

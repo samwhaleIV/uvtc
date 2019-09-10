@@ -1,4 +1,19 @@
-const delay = time => new Promise(resolve => setTimeout(resolve,time));
+function delay(time) {
+    return new Promise(resolve => {
+        if(rendererState.setTimeout) {
+            rendererState.setTimeout(resolve,time);
+        } else {
+            setTimeout(resolve,time);
+        }
+    });
+}
+function inlineSetTimeout(callback,time) {
+    if(rendererState.setTimeout) {
+        rendererState.setTimeout(callback,time);
+    } else {
+        setTimeout(callback,time);
+    }
+}
 
 const scripts = {
     jim_gets_the_hell_out_of_the_way: async (world,jim) => {

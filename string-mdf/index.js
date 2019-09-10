@@ -33,7 +33,7 @@ String.prototype.replaceAll = function(search,replacement) {
 };
 
 
-createShadowStringsFile();
+//createShadowStringsFile();
 createManifest(MAPS_FOLDER,MAP_MANIFEST_PATH);
 createManifest(OPPONENTS_FOLDER,OPPONENTS_MANIFEST_PATH);
 
