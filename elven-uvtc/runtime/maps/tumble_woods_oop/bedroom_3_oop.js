@@ -12,7 +12,7 @@ addMap({
             }
         }
     },
-    name: "bedroom_2_oop",
+    name: "bedroom_3_oop",
     doors: [
         "to_house_1_oop"
     ]

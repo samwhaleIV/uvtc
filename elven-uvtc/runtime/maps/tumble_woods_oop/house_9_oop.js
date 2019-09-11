@@ -1,12 +1,8 @@
 addMap({
     //Bathtub house
     WorldState: function(world,data) {
-        
-        const startX = 18;
-        const startY = 25;
-
         this.load = world => {
-            world.addPlayer(startX,startY,"down");
+            world.addPlayer(8,8,"down");
         }
         this.doorClicked = ID => {
             world.updateMap("tumble_woods_oop",{fromDoorWay:true});

@@ -1,12 +1,8 @@
 addMap({
     //Book house
     WorldState: function(world,data) {
-        
-        const startX = 36;//Todo
-        const startY = 29;//Todo
-
         this.load = world => {
-            world.addPlayer(startX,startY,"down");
+            world.addPlayer(4,2,"down");
         }
         this.doorClicked = ID => {
             world.updateMap("tumble_woods_oop",{fromDoorWay:true});

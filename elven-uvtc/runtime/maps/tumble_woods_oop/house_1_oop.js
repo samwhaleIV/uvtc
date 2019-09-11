@@ -30,10 +30,10 @@ addMap({
                     world.updateMap("bedroom_3_oop");
                     break;
                 case "to_tumble_woods_oop":
+                    console.log(ID);
                     world.updateMap("tumble_woods_oop",{fromDoorWay:true});
                     break;
             }
-            world.updateMap("tumble_woods_oop",{fromDoorWay:true});
         }
         this.otherClicked = async type => {
             switch(type) {

@@ -2,7 +2,7 @@ addMap({
     //Burr and Shiver's house
     WorldState: function(world,data) {
         this.load = world => {
-            world.addPlayer(5,2,"down");
+            world.addPlayer(4,2,"down");
         }
         this.doorClicked = ID => {
             world.updateMap("tumble_woods_oop",{fromDoorWay:true});

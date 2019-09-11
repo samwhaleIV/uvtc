@@ -23,7 +23,7 @@ addMap({
                         world.addPlayer(14,32,"down");
                         break;
                     case "house_8_oop":
-                        world.addPlayer(36,30,"down");
+                        world.addPlayer(36,29,"down");
                         break;
                     case "house_9_oop":
                         world.addPlayer(18,25,"down");
