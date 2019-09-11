@@ -1259,8 +1259,6 @@ function WorldRenderer() {
                 timeoutThreads.splice(i,1);
                 timeoutThread.action();
                 i--;
-            } else {
-                break;
             }
         }
 

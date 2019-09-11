@@ -22,7 +22,7 @@ addMap({
         this.otherClicked = async type => {
             switch(type) {
                 case 8:
-                    world.showTextPopups(["Wow. this person sure likes books.","You can't grab any books or else the whole house might fall apart."]);
+                    world.showTextPopups(["Wow. This person sure likes books.","You can't grab any books or else the whole house might fall apart."]);
                     break;
                 case 16:
                     clearP6();

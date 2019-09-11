@@ -209,6 +209,19 @@ addMap({
                     world.showNamedTextPopup("Hey... What're you wearing?",bookcase2Prefix);
                     break;
                 case 15:
+                    if(world.globalState.etchedNameIntoTable) {
+                        await world.showTextPopup("Your name is still etched into the table. You know that was a permanent decision, right?");
+                    } else {
+                        await world.showTextPopup("Someone etched their name into the table. Do you want to add yours?");
+                        const wantsToEtch = await world.showPrompt("etch your name in the glass?","yes","no") === 0;
+                        await delay(500);
+                        if(wantsToEtch) {
+                            world.globalState.etchedNameIntoTable = true;
+                            await world.showInstantTextPopup("Your name is now etched into the table.");
+                        } else {
+                            await world.showTextPopup("Ah, perhaps another time.");
+                        }
+                    }
                     break;
                 case 16:
                     world.showTextPopup("This couch looks too clean to sit on. Who gets a white couch anyways?");

@@ -49,6 +49,7 @@ addMap({
             iceman.interacted = async () => {
                 const shouldRepeat = await world.showPrompt("hear the battle speech?","yes","no") === 0;
                 if(shouldRepeat) {
+                    await delay(500);
                     await tutorialSpeech();
                 }
             }

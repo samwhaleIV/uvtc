@@ -6,10 +6,10 @@ addMap({
             const q1 = await world.showPrompt(question,...options);
             await delay(400);
             if(q1 === correct || correct === "any") {
-                await world.showInstantTextPopup("Correct!");
+                await louis.say("Correct!");
                 return true;
             } else {
-                await world.showInstantTextPopup("Sorry, that's incorrect!");
+                await louis.say("Sorry, that's incorrect!");
                 return false;
             }
         }

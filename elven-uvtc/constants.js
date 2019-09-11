@@ -22,7 +22,8 @@ const WorldTextureAnimationRows = 4;
 const WorldTextureAnimationStart = Math.pow(WorldTextureColumns,2) - WorldTextureColumns * WorldTextureAnimationRows;
 
 const footPrintTiles = {
-    21: true
+    21: true,
+    37: true
 };
 const FALLBACK_MAP_ID = "bedroom_1";
 

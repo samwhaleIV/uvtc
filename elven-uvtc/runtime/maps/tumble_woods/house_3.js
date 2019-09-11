@@ -136,7 +136,7 @@ addMap({
                     world.showTextPopup("Someone didn't bring the chair back to the table. How rude!");
                     break;
                 case 9:
-                    world.showTextPopup("Whoever lives here also has a sleeping bag. Do they only come in one color?");
+                    world.showTextPopup("Whoever lives here also has a blue sleeping bag... It must be a popular color.");
                     break;
             }
         }

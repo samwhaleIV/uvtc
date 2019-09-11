@@ -43,7 +43,7 @@ addMap({
                     ]);
                     break;
                 case 11:
-                    world.showTextPopup("This could be a unaligned holiday tree... But it's more likely a Christmas tree.");
+                    world.showTextPopup("This could be an unaligned holiday tree... But it's more likely a Christmas tree.");
                     break;
                 case 12:
                     world.showTextPopup("This must be Shiver's bed.");

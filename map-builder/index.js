@@ -1,8 +1,29 @@
 const fs = require("fs");
+const path = require("path");
 
+const {execSync} = require('child_process');
 const INPUT_FOLDER = "./input/";
 const OUTPUT_PATH = "../map-data.js";
 const OUTPUT_VARIABLE_PREFIX = "const rawMapData=";
+const MAP_DEV_FOLDER = "../map-dev/maps/";
+const MAP_DEV_INPUT_FORMAT = ".tmx";
+const JSON_FILE_EXTENSION = ".json";
+const MAP_DEV_OUTPUT_FORMAT = "JSON";
+
+const devMapFiles = [];
+fs.readdirSync(MAP_DEV_FOLDER).forEach(fileName => {
+    if(fileName.endsWith(MAP_DEV_INPUT_FORMAT)) {
+        const targetName = fileName.split(MAP_DEV_INPUT_FORMAT)[0]
+        devMapFiles.push({
+            source: path.resolve(MAP_DEV_FOLDER + fileName),
+            target: path.resolve(INPUT_FOLDER + targetName + JSON_FILE_EXTENSION)
+        });
+    }
+});
+console.log(devMapFiles);
+devMapFiles.forEach(mapFile=>{
+    console.log(execSync(`"C:\Program Files\Tiled\tiled.exe" --export-map ${MAP_DEV_OUTPUT_FORMAT} ${mapFile.source} ${mapFile.target}`));
+});
 
 const MAP_VALUE_OFFSET = -1;
 const MAP_COLLISION_OFFSET = -4097;

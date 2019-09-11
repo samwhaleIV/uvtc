@@ -9,15 +9,10 @@ const FOOTSTEPS_SPRITE_NAME = "footsteps";
 const PLAYER_SPRITE_NAME = "player";
 const ELF_HACK_SPRITE = "wimpy-red-elf";
 
-const MAX_CONVOY_PATH_SIZE = 200;
 const CONVOY_ALIGNMENT = 1;
 
-const SPRITE_ALERT_TIMEOUT = 400;
+const SPRITE_ALERT_TIMEOUT = 500;
 
-function lerp(v0,v1,t) {
-    //https://github.com/mattdesl/lerp/blob/master/LICENSE.md
-    return v0*(1-t)+v1*t;
-}
 function convoyRenderSort(a,b) {
     return a.y - b.y;
 }

@@ -31,7 +31,7 @@ addMap({
                     await delay(800);
                     treelee.updateDirection("left");
                     await delay(1600);
-                    treelee.updateDirection("right");
+                    treelee.updateDirection(direction);
                     await delay(800);
                     await treelee.say("It's a beautiful Tree, isn't it?");
                     await delay(800);

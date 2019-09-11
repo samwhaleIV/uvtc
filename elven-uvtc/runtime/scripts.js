@@ -1,11 +1,13 @@
 function delay(time) {
-    return new Promise(resolve => {
-        if(rendererState.setTimeout) {
+    if(rendererState.setTimeout) {
+        return new Promise(resolve=>{
             rendererState.setTimeout(resolve,time);
-        } else {
+        });
+    } else {
+        return new Promise(resolve=>{
             setTimeout(resolve,time);
-        }
-    });
+        });
+    }
 }
 function inlineSetTimeout(callback,time) {
     if(rendererState.setTimeout) {
