@@ -3,7 +3,6 @@ import { TextSound } from "../../../runtime/tones.js";
 let lastTextSoundTime = 0;
 
 function applySonographToPopupFeed(popupFeed) {
-    console.log(popupFeed);
     let even = false;
     for(let i = 0;i<popupFeed.length;i++) {
         popupFeed[i].noSound = even;
