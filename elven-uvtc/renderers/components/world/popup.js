@@ -59,6 +59,7 @@ function applySonographToPopupFeed(popupFeed) {
             popupFeed[x+wordSet.start].noSound = even;
             even = !even;
         }
+        even = !even;
     }
     return popupFeed;
 }
@@ -70,10 +71,10 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world) {
     const characterSpeed = 30;
     const spaceSpeed = 30;
 
-    const hyphenDelay = 250;
+    const hyphenDelay = 200;
     const commaDelay = 300;
     const periodDelay = 500;
-    const ellipsisDelay = 700;
+    const ellipsisDelay = 600;
 
     let pageIndex = 0;
     let characterIndex = 0;

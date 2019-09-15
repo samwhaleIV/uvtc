@@ -28,4 +28,7 @@ import "./tumble_woods_oop/house_6_oop.js";
 import "./tumble_woods_oop/house_7_oop.js";
 import "./tumble_woods_oop/house_8_oop.js";
 import "./tumble_woods_oop/house_9_oop.js";
+import "./tumble_woods_oop/rebel_base.js";
+import "./tumble_woods_oop/rebel_base_hall.js";
+import "./tumble_woods_oop/rebel_base_storage.js";
 import "./tumble_woods_oop/tumble_woods_oop.js";

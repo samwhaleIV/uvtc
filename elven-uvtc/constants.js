@@ -21,7 +21,7 @@ const WorldTextureColumns = 64;
 const WorldTextureAnimationRows = 4;
 const WorldTextureAnimationStart = Math.pow(WorldTextureColumns,2) - WorldTextureColumns * WorldTextureAnimationRows;
 
-const footPrintTiles = {
+const FootPrintTiles = {
     21: true,
     37: true,
     1552: true,

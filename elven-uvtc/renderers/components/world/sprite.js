@@ -283,7 +283,7 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
                     );
                 }
             }
-            const shouldPushNew = footPrintTiles[
+            const shouldPushNew = FootPrintTiles[
                 world.renderMap.background[
                     (newX + Math.round(xOffset)) + (newY + Math.round(yOffset)) * world.renderMap.columns
                 ]

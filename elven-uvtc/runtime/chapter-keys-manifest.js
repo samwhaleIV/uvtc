@@ -66,7 +66,8 @@ const ChapterKeysManifest = {
         "justLostToWimpyGreen"
     ],
     3: [
-
+        "openedSecretDoor",
+        "secretDoorOpen"
     ],
     4: [
 

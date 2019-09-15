@@ -110,15 +110,18 @@ function WorldRenderer() {
         faderEffectsRenderer.fillInLayer = new ElvesFillIn();
         this.fader.fadeOut(MainMenuRenderer,true);
     }
+
+    let internalPlayerObject = null;
+    let pendingPlayerObject = null;
     this.saveState = (withPositionData=true,skipGlobal=false) => {
-        if(withPositionData && playerObject) {
+        if(withPositionData && internalPlayerObject) {
             GlobalState.data["last_map"] = this.renderMap.name;
             GlobalState.data["last_player_pos"] = {
-                d: playerObject.direction,
-                x: playerObject.x,
-                y: playerObject.y,
-                xo: playerObject.xOffset,
-                yo: playerObject.yOffset,
+                d: internalPlayerObject.direction,
+                x: internalPlayerObject.x,
+                y: internalPlayerObject.y,
+                xo: internalPlayerObject.xOffset,
+                yo: internalPlayerObject.yOffset,
             }
         }
         if(!skipGlobal) {
@@ -132,11 +135,11 @@ function WorldRenderer() {
             const lp = GlobalState.data["last_player_pos"];
             if(lp) {
                 return () => {
-                    if(playerObject && !playerObject.forcedStartPosition) {
-                        this.moveObject(playerObject.ID,lp.x,lp.y,true);
-                        playerObject.xOffset = lp.xo;
-                        playerObject.yOffset = lp.yo;
-                        playerObject.updateDirection(lp.d);
+                    if(internalPlayerObject && !internalPlayerObject.forcedStartPosition) {
+                        this.moveObject(internalPlayerObject.ID,lp.x,lp.y,true);
+                        internalPlayerObject.xOffset = lp.xo;
+                        internalPlayerObject.yOffset = lp.yo;
+                        internalPlayerObject.updateDirection(lp.d);
                     }
                 }
             }
@@ -358,13 +361,17 @@ function WorldRenderer() {
     const collisionTriggerOffset = -2;
 
     this.playerController = new PlayerController(this);
-    let playerObject = null;
+
     Object.defineProperty(this,"playerObject",{
         get: function() {
-            return playerObject;
+            if(pendingPlayerObject) {
+                return pendingPlayerObject;
+            } else {
+                return internalPlayerObject;
+            }
         },
         set: function(value) {
-            playerObject = value;
+            internalPlayerObject = value;
             this.playerController.player = value;
         }
     });
@@ -402,9 +409,11 @@ function WorldRenderer() {
     this.playerInteractionLocked = playerInteractionLocked;
 
     this.lockPlayerMovement = function() {
+        console.log("Locked player movement");
         playerMovementLocked = true;
     }
     this.unlockPlayerMovement = function() {
+        console.log("Unlocked player movement");
         playerMovementLocked = false;
     }
 
@@ -412,7 +421,13 @@ function WorldRenderer() {
     let sDown = false;
     let aDown = false;
     let dDown = false;
+    let lastDown = null;
     let enterReleased = true;
+    
+    let wDownEscape = false;
+    let aDownEscape = false;
+    let sDownEscape = false;
+    let dDownEscape = false;
 
     this.popupProgressEnabled = true;
 
@@ -460,7 +475,7 @@ function WorldRenderer() {
                     this.popup.progress();
                 }
             }
-        } else if(playerObject) {
+        } else if(internalPlayerObject) {
             if(key === kc.accept) { 
                 if(!enterReleased) {
                     return;
@@ -476,19 +491,41 @@ function WorldRenderer() {
         switch(key) {
             case kc.up:
                 wDown = true;
+                lastDown = "down";
                 return;
             case kc.down:
                 sDown = true;
+                lastDown = "up";
                 return;
             case kc.left:
                 aDown = true;
+                lastDown = "left";
                 return;
             case kc.right:
                 dDown = true;
+                lastDown = "right";
                 return;
         }
     }
     this.processKeyUp = function(key) {
+        switch(key) {
+            case kc.up:
+                wDown = false;
+                wDownEscape = false;
+                break;
+            case kc.down:
+                sDown = false;
+                sDownEscape = false;
+                break;
+            case kc.left:
+                aDown = false;
+                aDownEscape = false;
+                break;
+            case kc.right:
+                dDown = false;
+                dDownEscape = false;
+                break;
+        }
         if(this.escapeMenuShown) {
             this.escapeMenu.processKeyUp(key);
             return;
@@ -498,37 +535,81 @@ function WorldRenderer() {
                 if(escapeMenuDisabled()) {
                     return;
                 }
+                wDownEscape = false;
+                aDownEscape = false;
+                sDownEscape = false;
+                dDownEscape = false;
                 if(wDown) {
                     this.processKeyUp(kc.up);
+                    wDownEscape = true;
                 }
                 if(aDown) {
                     this.processKeyUp(kc.left);
+                    aDownEscape = true;
                 }
                 if(sDown) {
                     this.processKeyUp(kc.down);
+                    sDownEscape = true;
                 }
                 if(dDown) {
                     this.processKeyUp(kc.right);
+                    dDownEscape = true;
                 }
                 this.escapeMenuShown = true;
                 this.escapeMenu.show(()=>{
                     this.escapeMenuShown = false;
+                    if(wDownEscape || sDownEscape || aDownEscape || dDownEscape) {
+                        let keyCode = null;
+                        let escaped = false;
+                        switch(lastDown) {
+                            case "up":
+                                if(!wDownEscape) {
+                                    escaped = true;
+                                    break;
+                                }
+                                keyCode = kc.up;
+                                break;
+                            case "down":
+                                if(!sDownEscape) {
+                                    escaped = true;
+                                    break;
+                                }
+                                keyCode = kc.down;
+                                break;
+                            case "left":
+                                if(!aDownEscape) {
+                                    escaped = true;
+                                    break;
+                                }
+                                keyCode = kc.left
+                                break;
+                            case "right":
+                                if(!dDownEscape) {
+                                    escaped = true;
+                                    break;
+                                }
+                                keyCode = kc.right;
+                                break;
+                        }
+                        if(escaped) {
+                            if(wDownEscape) {
+                                keyCode = kc.up;
+                            } else if(sDownEscape) {
+                                keyCode = kc.down;
+                            } else if(aDownEscape) {
+                                keyCode = kc.left;
+                            } else if(dDownEscape) {
+                                keyCode = kc.right;
+                            }
+                        }
+                        if(keyCode) {
+                            this.processKey(keyCode);
+                        }
+                    }
                 });
                 break;
             case kc.accept:
                 enterReleased = true;
-                break;
-            case kc.up:
-                wDown = false;
-                break;
-            case kc.down:
-                sDown = false;
-                break;
-            case kc.left:
-                aDown = false;
-                break;
-            case kc.right:
-                dDown = false;
                 break;
         }
         this.playerController.processKeyUp(key);
@@ -656,7 +737,7 @@ function WorldRenderer() {
 
     this.addPlayer = function(x,y,...parameters) {
         const newPlayer = new PlayerRenderer(...parameters);
-        this.playerObject = newPlayer;
+        pendingPlayerObject = newPlayer;
         return this.addObject(newPlayer,x,y);
     }
 
@@ -670,7 +751,7 @@ function WorldRenderer() {
         }
     }
 
-    const registerOffscreenToggler = (object,startActive) => {
+    const registerOffscreenToggler = object => {
         const startWithOffscreen = object.offscreenRendering ? true : false;
         let offscreenRendering = startWithOffscreen;
         let world = this;
@@ -796,14 +877,14 @@ function WorldRenderer() {
         }
         object.x = newX;
         object.y = newY;
-        if(object.worldPositionUpdated) {
-            object.worldPositionUpdated(oldX,oldY,newX,newY,this,isInitialPosition);
-        }
         if(this.objectsLookup[object.x][object.y]) {
             console.error("Error: An object collision has occured through the move object method");
             console.log("Existing item",this.objectsLookup[object.x][object.y],"New item",object);
         }
         this.objectsLookup[object.x][object.y] = object;
+        if(object.worldPositionUpdated) {
+            object.worldPositionUpdated(oldX,oldY,newX,newY,this,isInitialPosition);
+        }
     }
 
     this.moveSprite = function(objectID,steps) {
@@ -930,13 +1011,17 @@ function WorldRenderer() {
     this.changeBackgroundTileFilter = (value,x,y,filter) => changeLayerFilter(this.renderMap.background,value,x,y,filter);
 
     this.updateMapEnd = function() {
+        pendingPlayerObject = null;
         if(this.map.load) {
             this.map.load(this);
         }
         if(this.map.getCameraStart) {
             this.camera = this.map.getCameraStart(this);
         }
-        this.playerController.player = playerObject;
+        if(pendingPlayerObject) {
+            this.playerObject = pendingPlayerObject;
+        }
+        pendingPlayerObject = null;
         this.restoreRoomSong();
     }
     this.stopMusic = callback => {
@@ -1002,6 +1087,7 @@ function WorldRenderer() {
     }
 
     this.updateMap = function(newMapName,data={}) {
+        console.log(`World: Loading '${newMapName}'`);
         enterReleased = true;
         const runLoadCode = ranCustomLoader;
         if(runLoadCode) {
@@ -1024,7 +1110,7 @@ function WorldRenderer() {
         this.objects = {};
         offscreenObjects = [];
         offscreenObjectCount = 0;
-        playerObject = null;
+        this.playerObject = null;
         this.followObject = null;
         this.cameraFrozen = false;
         this.clearCustomRendererStack();
@@ -1213,7 +1299,7 @@ function WorldRenderer() {
             if(this.followObject) {
                 followObject = this.followObject;
             } else {
-                followObject = playerObject;
+                followObject = internalPlayerObject;
             }
             if(followObject) {
                 if(followObject.renderLogic) {

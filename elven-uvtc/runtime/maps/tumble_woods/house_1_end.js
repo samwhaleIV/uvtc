@@ -21,15 +21,6 @@ addMap({
                 world.chapterComplete();
             }
         }
-        this.triggerActivated = (triggerID,direction) => {
-
-        }
-        this.doorClicked = async doorID => {
-
-        }
-        this.otherClicked = async type => {
-
-        }
     },
     doors: [],
     name: "house_1_end"
