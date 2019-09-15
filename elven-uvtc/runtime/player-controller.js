@@ -397,7 +397,6 @@ function PlayerController(world) {
         }
         if(!tryApplySoloMovementRegister()) {
             stopMovementLoop();
-            lastDown = null;
         }
     }
 }
