@@ -34,12 +34,8 @@ function DoorCloseSound() {
     playTones(200,1,0,150,1,100);
 }
 
-const tones = [208,210];
-let toneIndex = 0;
-const toneDuration = 1 / 3;
 function TextSound() {
-    playTone(tones[toneIndex],toneDuration);
-    toneIndex = (toneIndex+1) % tones.length;
+    playTone(587.3295,0.3);
 }
 
 export { CloseSound,OpenSound,AlertSound, SelectionConfirmSound, SelectionChangeSound, TextSound, DoorOpenSound, DoorCloseSound, SecretDoorSound }

@@ -1306,9 +1306,9 @@ function WorldRenderer() {
             if(timestamp >= timeoutThread.endTime) {
                 timeoutThreads.splice(timeoutThreadIndex,1);
                 timeoutThread.action();
-                i--;
+                timeoutThreadIndex--;
             }
-            i++;
+            timeoutThreadIndex++;
         }
 
         if(tileRenderingEnabled) {

@@ -3,64 +3,10 @@ import { TextSound } from "../../../runtime/tones.js";
 let lastTextSoundTime = 0;
 
 function applySonographToPopupFeed(popupFeed) {
-    const wordSets = [];
-    let wordStart = 0, word = "";
-    let lastCharacter = null;
-    for(let i = 0;i<popupFeed.length;i++) {
-        const character = popupFeed[i].newCharacter;
-
-        let nextCharacter = popupFeed[i+1];
-        nextCharacter = nextCharacter ? nextCharacter.newCharacter : null;
-
-        switch(character) {
-            default:
-                if(character === "'") {
-                    if(!popupControlCharacters[lastCharacter] && lastCharacter
-                    && !popupControlCharacters[nextCharacter] && nextCharacter
-                    ) {
-                        word += character;
-                    }
-                } else if(!textControlCodes[character]) {
-                    word += character;
-                }
-                break;
-            case ellipsis:
-            case "*":
-            case "-":
-            case " ":
-            case ",":
-            case ".":
-            case "?":
-            case "!":
-            case " ":
-                if(word) {
-                    wordSets.push({
-                        start:wordStart,
-                        word:word
-                    });
-                    word = "";
-                    wordStart = i+1;
-                }
-                break;
-        }
-        lastCharacter = character;
-
-    }
-    if(word) {
-        wordSets.push({
-            start:wordStart,
-            word:word
-        });
-    }
-
+    console.log(popupFeed);
     let even = false;
-
-    for(let i = 0;i<wordSets.length;i++) {
-        const wordSet = wordSets[i];
-        for(let x = 0;x<wordSet.word.length;x++) {
-            popupFeed[x+wordSet.start].noSound = even;
-            even = !even;
-        }
+    for(let i = 0;i<popupFeed.length;i++) {
+        popupFeed[i].noSound = even;
         even = !even;
     }
     return popupFeed;
@@ -71,7 +17,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world) {
     prefix = prefix ? prefix : "";
 
     const characterSpeed = 30;
-    const spaceSpeed = 30;
+    const spaceSpeed = characterSpeed;
 
     const hyphenDelay = 200;
     const commaDelay = 300;
@@ -123,7 +69,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world) {
                     break;
                 case "*":
                 case "'":
-                    instant = true;
+                    instant = false;
                     break;
                 case ",":
                     delay = commaDelay;
