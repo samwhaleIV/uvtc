@@ -99,11 +99,6 @@ function MainMenuRenderer(toChapterPane=false) {
     }
 
     this.leaveWithFillInLayer = (rendererType,...parameters) => {
-        const musicNode = musicNodes[MAIN_MENU_SONG];
-        if(musicNode) {
-            const detune = musicNode.detune;
-            detune.linearRampToValueAtTime(50,audioContext.currentTime+2);
-        }
         this.fader.fadeOut(rendererType,...parameters);
         faderEffectsRenderer.fillInLayer = stencilBackground;
         let startTime = 0;

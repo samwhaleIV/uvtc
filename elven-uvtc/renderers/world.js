@@ -450,7 +450,7 @@ function WorldRenderer() {
 
     let i = 0;
     this.processKey = function(key) {
-        if(internalPlayerObject && key !== kc.accept) {
+        if(key !== kc.accept) {
             this.playerController.processKey(key);
         }
         if(escapeMenuShown) {
@@ -532,9 +532,7 @@ function WorldRenderer() {
         }
     }
     this.processKeyUp = function(key) {
-        if(internalPlayerObject) {
-            this.playerController.processKeyUp(key);
-        }
+        this.playerController.processKeyUp(key);
         switch(key) {
             case kc.up:
                 wDown = false;
@@ -1302,13 +1300,15 @@ function WorldRenderer() {
 
     this.render = function(timestamp) {
 
-        for(let i = 0;i<timeoutThreads.length;i++) {
-            const timeoutThread = timeoutThreads[i];
+        let timeoutThreadIndex = 0;
+        while(timeoutThreadIndex < timeoutThreads.length) {
+            const timeoutThread = timeoutThreads[timeoutThreadIndex];
             if(timestamp >= timeoutThread.endTime) {
-                timeoutThreads.splice(i,1);
+                timeoutThreads.splice(timeoutThreadIndex,1);
                 timeoutThread.action();
                 i--;
             }
+            i++;
         }
 
         if(tileRenderingEnabled) {

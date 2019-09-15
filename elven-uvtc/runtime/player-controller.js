@@ -237,11 +237,7 @@ function PlayerController(world) {
     const movementMethod = timestamp => {
         if(pendingDirection) {
             this.player.updateDirection(pendingDirection);
-            if(movementDown()) {
-                if(!tryApplySoloMovementRegister()) {
-                    applyPlayerVelocities();
-                }
-            }
+            applyPlayerVelocities();
             pendingDirection = null;
         }
         if(ENV_FLAGS.DEBUG_MICRO_SHIFT) {
@@ -396,6 +392,7 @@ function PlayerController(world) {
             return;
         }
         if(!tryApplySoloMovementRegister()) {
+            pendingDirection = null;
             stopMovementLoop();
         }
     }
