@@ -1,7 +1,12 @@
 addMap({
     WorldState: function(world,data) {
         this.load = world => {
-            world.addPlayer(5,2,"down");
+            if(data.fromDoorWay) {
+                world.addPlayer(5,2,"down");
+            } else {
+                world.addPlayer(3,4,"up");
+            }
+
         }
         this.doorClicked = () => {
             world.updateMap("house_1_oop");

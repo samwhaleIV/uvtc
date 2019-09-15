@@ -38,6 +38,7 @@ ImagePaths.push(
     getFile("ui/card-icons.png",FileTypes.Image),
     getFile("ui/chapters/1.png",FileTypes.Image),
     getFile("ui/chapters/2.png",FileTypes.Image),
+    getFile("ui/chapters/3.png",FileTypes.Image),
     getFile("ui/discard.png",FileTypes.Image),
     getFile("ui/draw.png",FileTypes.Image),
     getFile("ui/elfmart.png",FileTypes.Image),

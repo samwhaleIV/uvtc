@@ -21,7 +21,7 @@ addMap({
         this.doorClicked = ID => {
             switch(ID) {
                 case "to_bedroom_1_oop":
-                    world.updateMap("bedroom_1_oop");
+                    world.updateMap("bedroom_1_oop",{fromDoorWay:true});
                     break;
                 case "to_bedroom_2_oop":
                     world.updateMap("bedroom_2_oop");
