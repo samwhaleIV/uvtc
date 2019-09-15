@@ -433,7 +433,7 @@ addMap({
                     break;
                 case 12:
                     if(!world.globalState.chiliMovePresent) {
-                        if(world.globalState.gotWrongPresentAnswer) {
+                        if(this.gotWrongPresentAnswer) {
                             await world.showTextPopup("Look buddy, you had your chance! Come back another time.");
                             break;
                         }
@@ -454,7 +454,7 @@ addMap({
                                 clearPresentMove();
                                 world.unlockMove("Jingle Bells");
                             } else {
-                                world.globalState.gotWrongPresentAnswer = true;
+                                this.gotWrongPresentAnswer = true;
                                 await world.showTextPopup("Hmm. Nope. A present can only be opened in the present.");
                             }
                         } else {
