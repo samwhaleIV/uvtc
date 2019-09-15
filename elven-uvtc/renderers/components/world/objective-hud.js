@@ -30,15 +30,17 @@ function ObjectiveHUD(world,description,isNew) {
     if(isNew) {
         world.showInstantTextPopup("New objective: " + description);
     }
-    this.markComplete = async callback => {
+    this.markComplete = async(callback,noShow=false) => {
         if(completed) {
             return;
         }
         completed = true;
-        await world.showInstantTextPopup("Objective completed!");
+        if(!noShow) {
+            await world.showInstantTextPopup("Objective completed!");
+        }
         world.clearObjectiveHUD();
         if(callback) {
-            callback();
+            await callback();
         }
     }
     this.getBottom = () => {

@@ -164,7 +164,7 @@ function WorldSettingsRenderer(callback) {
 
         context.fillStyle = "black";
         context.fillText("Audio",label1X+halfLabelWidth,label1Y+halfLabelHeight);
-        context.fillText("Settings",label2X+halfLabelWidth,label2Y+halfLabelHeight);
+        context.fillText("Controls",label2X+halfLabelWidth,label2Y+halfLabelHeight);
 
         if(childPage) {
             childPage.render(

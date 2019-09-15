@@ -23,17 +23,22 @@ function WorldUIRenderer(world) {
     const partTwoRatio = ICON_PART_2_WIDTH / iconImage.height;
 
     let loadStart = null;
+    let firstLegalLeave = 0;
     let loading = false;
 
     let leaveStart = null;
     let leaving = false;
 
     const transitionTime = 200;
+    const transitionTimeout = transitionTime * 2;
 
     let leavingCallback = null;
     let panel = null;
     let transitioning = true;
     const exit = () => {
+        if(performance.now() < firstLegalLeave) {
+            return;
+        }
         transitioning = true;
         loadStart = null;
         leaveStart = performance.now();
@@ -130,7 +135,10 @@ function WorldUIRenderer(world) {
                     faderEffectsRenderer.fillInLayer = new ElvesFillIn();
                     transitioning = true;
                     world.saveState(true);
-                    world.fader.fadeOut(MainMenuRenderer);
+                    if(world.map.unload) {
+                        world.map.unload(world);
+                    }
+                    world.managedFaderTransition(MainMenuRenderer);
                     break;
                 case internalIconMap.moves.hoverID:
                     playSound("click");
@@ -287,6 +295,7 @@ function WorldUIRenderer(world) {
         transitioning = true;
         leavingCallback = callback;
         loadStart = performance.now();
+        firstLegalLeave = loadStart + transitionTimeout;
         loading = true;
     }
     this.renderParts = timeNormal => {

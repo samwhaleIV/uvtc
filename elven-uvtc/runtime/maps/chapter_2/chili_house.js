@@ -40,7 +40,7 @@ addMap({
             const mingleCount = getMingleCount();
             objectiveHUD.text = `Mingle With Partygoers: ${mingleCount}/8`;
             if(mingleCount === 8) {
-                objectiveHUD.markComplete(async()=> {
+                objectiveHUD.markComplete(async()=>{
                     await world.showInstantTextPopup("You are now socially exhausted.");
                     await world.showInstantTextPopup("Maybe you should take a step outside?");
                     world.globalState.metAll = true;
@@ -57,7 +57,7 @@ addMap({
         }
 
         const partyInteraction = async (target,direction) => {
-            if(this.elfChaseRequired) {
+            if(world.globalState.elfChaseRequired) {
                 await world.showInstantTextPopup("There's no time to talk! Go get those elves!");
                 return;
             }
@@ -133,7 +133,7 @@ addMap({
             chiliWife.mingleID = 6;
 
             jim.interacted = () => {
-                if(this.elfChaseRequired) {
+                if(world.globalState.elfChaseRequired) {
                     jim.say("Jam is missing! Please! Stop those elves!");
                     return;
                 }
@@ -150,11 +150,27 @@ addMap({
             bindPartyInteraction(chili);
             bindPartyInteraction(chiliWife);
 
-            world.addPlayer(3,4,"up");
-            world.playerObject.forcedStartPosition = true;
+            if(data.sourceRoom === "tumble_showdown") {
+                world.addPlayer(5,2,"down");
+            } else {
+                world.addPlayer(3,4,"up");
+            }
 
             if(world.globalState.jimToldYouToMingle) {
                 createObjectiveHUD(false);
+            }
+
+            if(world.globalState.elfChaseRequired) {
+                world.removeObject(chili.ID);
+                world.removeObject(jam.ID);
+                world.moveObject(jim.ID,8,4,false);
+                jim.updateDirection("left");
+                removeIcePeople();
+                world.moveObject(frogert.ID,4,7);
+                frogert.updateDirection("up");
+                world.moveObject(iceMan.ID,7,6);
+                iceMan.updateDirection("up");
+                chiliWife.updateDirection("up");
             }
 
             this.start = async () => {
@@ -196,7 +212,7 @@ addMap({
             }
         }
         this.doorClicked = async () => {
-            if(this.elfChaseRequired) {
+            if(world.globalState.elfChaseRequired) {
                 world.updateMap("tumble_showdown");
                 return;
             }
@@ -388,7 +404,7 @@ addMap({
                 await world.moveCamera(...world.playerObject.location,200);
                 world.autoCameraOn();
                 world.unlockPlayerMovement();
-                this.elfChaseRequired = true;
+                world.globalState.elfChaseRequired = true;
             }
         }
         this.otherClicked = async type => {

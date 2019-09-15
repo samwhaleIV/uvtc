@@ -18,7 +18,7 @@ addMap({
                 await jim.say("They're so glad you're going to the party.");
                 await jim.move({y:1});
                 await jim.say("I'm glad, too. Welcome to Tumble Town. You're gonna like it a whole lot here.");
-                world.chapterComplete();
+                await world.chapterComplete();
             }
         }
     },

@@ -1,5 +1,7 @@
 import { TextSound } from "../../../runtime/tones.js";
 
+let lastTextSoundTime = 0;
+
 function applySonographToPopupFeed(popupFeed) {
     const wordSets = [];
     let wordStart = 0, word = "";
@@ -150,6 +152,21 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world) {
     let textFeed = [];
     let timeout = -1;
 
+    const playTextSound = () => {
+        TextSound();
+        lastTextSoundTime = performance.now();
+    }
+    const playAutoCompleteTextSound = () => {
+        const now = performance.now();
+        const timeDifference = now - lastTextSoundTime;
+        const delay = Math.max(characterSpeed*2-timeDifference,0);
+        if(delay) {
+            setTimeout(playTextSound,delay);
+        } else {
+            playTextSound();
+        }
+    }
+
     let timeoutMethod = function() {
         const pageValue = pages[pageIndex][characterIndex];
         textFeed = pageValue.textFeed;
@@ -158,7 +175,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world) {
             if(lookAhead) {
                 if(lookAhead.instant) {
                     if(!pageValue.delay && !pageValue.noSound) {
-                        TextSound();
+                        playTextSound();
                     }
                     timeoutMethod();
                     return;
@@ -168,7 +185,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world) {
                 timeout = world.setTimeout(timeoutMethod,pageValue.delay);
             } else {
                 if(!pageValue.noSound) {
-                    TextSound();
+                    playTextSound();
                 }
                 timeout = world.setTimeout(timeoutMethod,pageValue.noSound ? pageValue.speed / 2 : pageValue.speed);
             }
@@ -206,7 +223,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world) {
             const page = pages[pageIndex];
             textFeed = page[page.length-1].textFeed;
             pageComplete = true;
-            TextSound();
+            playAutoCompleteTextSound();
             if(pageIndex + 1 >= pageCount) {
                 readyToTerminate = true;
             }

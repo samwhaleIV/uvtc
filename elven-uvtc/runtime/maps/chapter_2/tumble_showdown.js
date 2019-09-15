@@ -236,12 +236,8 @@ addMap({
                 }
             }
 
-            this.doorClicked = async () => {
-                if(world.globalState.borderCreated) {
-                    await world.showTextPopup("The door is being locked by Wizard Elf's magic!");
-                } else {
-                    await world.showTextPopup("The people inside are relying on you!");
-                }
+            this.doorClicked = () => {
+                world.updateMap("chili_house");
             }
            
         }

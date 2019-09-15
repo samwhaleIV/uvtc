@@ -51,24 +51,7 @@ function PlayerController(world) {
                 break;
             case "right":
                 x++;
-                break;   
-            case "upLeft":
-                y--;
-                x--;
                 break;
-            case "upRight":
-                y--;
-                x++;
-                break;
-            case "downLeft":
-                y++;
-                x--;
-                break;
-            case "downRight":
-                y++;
-                x++;
-                break;
-            
         }
         return {x:x,y:y};
     }
@@ -225,7 +208,42 @@ function PlayerController(world) {
     let lastXOffset = 0;
     let lastXPolarity = false;
 
+    let pendingDirection = null;
+
+    const tryApplySoloMovementRegister = () => {
+        const soloMovementRegister = checkForSoloMovement();
+        if(soloMovementRegister >= 0) {
+            switch(soloMovementRegister) {
+                case 0:
+                    tryUpdateDirection("up");
+                    break;
+                case 1:
+                    tryUpdateDirection("down");
+                    break;
+                case 2:
+                    tryUpdateDirection("left");
+                    break;
+                case 3:
+                    tryUpdateDirection("right");
+                    break;
+            }
+            applyPlayerVelocities();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     const movementMethod = timestamp => {
+        if(pendingDirection) {
+            this.player.updateDirection(pendingDirection);
+            if(movementDown()) {
+                if(!tryApplySoloMovementRegister()) {
+                    applyPlayerVelocities();
+                }
+            }
+            pendingDirection = null;
+        }
         if(ENV_FLAGS.DEBUG_MICRO_SHIFT) {
             if(lastXOffset > this.player.xOffset) {
                 if(!lastXPolarity) {
@@ -304,6 +322,15 @@ function PlayerController(world) {
                 break;
         }
     }
+
+    const tryUpdateDirection = direction => {
+        if(this.world.playerInteractionLocked()) {
+            pendingDirection = direction;
+            return;
+        }
+        this.player.updateDirection(direction);
+    }
+
     this.processKey = function(key) {
         const worldHasPlayer = this.player ? true : false;
         switch(key) {
@@ -312,41 +339,39 @@ function PlayerController(world) {
                 if(!worldHasPlayer) {
                     return;
                 }
-                this.player.updateDirection("up");
+                tryUpdateDirection("up");
                 break;
             case kc.down:
                 sDown = true;
-                if(!this.player) {
+                if(!worldHasPlayer) {
                     return;
                 }
-                this.player.updateDirection("down");
+                tryUpdateDirection("down");
                 break;
             case kc.left:
                 aDown = true;
-                if(!this.player) {
+                if(!worldHasPlayer) {
                     return;
                 }
-                this.player.updateDirection("left");
+                tryUpdateDirection("left");
                 break;
             case kc.right:
                 dDown = true;
-                if(!this.player) {
+                if(!worldHasPlayer) {
                     return;
                 }
-                this.player.updateDirection("right");
+                tryUpdateDirection("right");
                 break;
             case kc.accept:
-                if(!this.player) {
+                if(!worldHasPlayer) {
                     return;
                 }
                 processEnter();
                 return;
         }
         applyPlayerVelocities();
-        if(movementDown()) {
-            if(!loopRunning) {
-                startMovementLoop();
-            }
+        if(movementDown() && !loopRunning) {
+            startMovementLoop();
         }
     }
     this.processKeyUp = function(key) {
@@ -370,25 +395,9 @@ function PlayerController(world) {
         if(!worldHasPlayer) {
             return;
         }
-        const soloMovementRegister = checkForSoloMovement();
-        if(soloMovementRegister >= 0) {
-            switch(soloMovementRegister) {
-                case 0:
-                    this.player.updateDirection("up");
-                    break;
-                case 1:
-                    this.player.updateDirection("down");
-                    break;
-                case 2:
-                    this.player.updateDirection("left");
-                    break;
-                case 3:
-                    this.player.updateDirection("right");
-                    break;
-            }
-            applyPlayerVelocities();
-        } else {
+        if(!tryApplySoloMovementRegister()) {
             stopMovementLoop();
+            lastDown = null;
         }
     }
 }

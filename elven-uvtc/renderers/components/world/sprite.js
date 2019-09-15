@@ -356,13 +356,13 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         specialRow = null;
         switch(direction) {
             case "down":
-                currentColumn = columnWidth * 0;
+                currentColumn = 0;
                 break;
             case "up":
-                currentColumn = columnWidth * 1;
+                currentColumn = columnWidth;
                 break;
             case "right":
-                currentColumn = columnWidth * 2;
+                currentColumn = columnWidth + columnWidth;
                 break;
             case "left":
                 currentColumn = columnWidth * 3;
@@ -388,13 +388,21 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
     this.renderLogic = null;
 
     let showingAlert = false;
+    
+    const alertResolvers = [];
+    let alertTimeout = null;
     this.alert = () => {
         return new Promise(resolve=>{
+            if(alertTimeout !== null) {
+                clearTimeout(alertTimeout);
+            }
+            alertResolvers.push(resolve);
             AlertSound();
             showingAlert = true;
-            inlineSetTimeout(() => {
+            alertTimeout = setTimeout(() => {
+                alertResolvers.forEach(resolver=>resolver());
+                alertResolvers.splice(0);
                 showingAlert = false;
-                resolve();
             },SPRITE_ALERT_TIMEOUT);
         });
     }

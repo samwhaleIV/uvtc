@@ -1,19 +1,42 @@
 addMap({
     WorldState: function(world,data) {
+        let objectiveHUD = null;
+        const completeObjective = () => {
+            if(objectiveHUD) {
+                objectiveHUD.markComplete(async()=>{
+                    world.globalState.pressedEnterObjective = true;
+                    objectiveHUD = null;
+                },true);
+            }
+        }
+        const setHUDText = () => {
+            const keyName = (Object.entries(keyBindings).filter(entry=>entry[1]===kc.accept)[0]||[])[0]||"None";
+            objectiveHUD.text = `Press [${keyName}] on an object to interact with it`;
+        }
+        const keyBindWatchID = addKeyBindWatch(setHUDText);
         this.load = world => {
+            if(!world.globalState.pressedEnterObjective) {
+                objectiveHUD = world.setObjectiveHUD("Interact with the world",false);
+                setHUDText();
+            }
             if(data.fromDoorWay) {
                 world.addPlayer(5,2,"down");
             } else {
                 world.addPlayer(2,4,"up");
             }
         }
+        this.unload = () => {
+            removeKeyBindWatch(keyBindWatchID);
+        }
         this.doorClicked = () => {
+            completeObjective();
             const newMapData = {
                 fromDoorWay: true,
             };
             world.updateMap("house_1",newMapData);
         }
         this.otherClicked = (type,x,y) => {
+            completeObjective();
             switch(type) {
                 case 8:
                     world.showTextPopup("There are a lot of books on this shelf.");

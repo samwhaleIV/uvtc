@@ -21,15 +21,20 @@ import ObjectiveHUD from "./components/world/objective-hud.js";
 import BoxFaderEffect from "./components/box-fader-effect.js";
 
 const CHAPTER_NAME_LOOKUP = [
-    null,"one","two","three","four","five","six","seven","eight",
-    "nine","ten","eleven","twelve","thirteen","fourteen","fifteen",
-    "sixteen","seventeen"
+    "an impossible chapter that cannot exist",
+    "one","two","three","four","five","six",
+    "seven","eight","nine","ten","eleven",
+    "twelve","thirteen","fourteen",
+    "fifteen","sixteen","seventeen"
 ];
 
 const ALERT_TIME = 1000;
 const ANIMATION_TILE_COUNT = 5;
 const ANIMATION_CYCLE_DURATION = 400;
 const ANIMATION_FRAME_TIME = ANIMATION_CYCLE_DURATION / ANIMATION_TILE_COUNT;
+
+const FINAL_CHAPTER_NUMBER = 12;
+const CHAPTER_COMPLETE_SOUND_SOUND_BY_DEFAULT = false;
 
 function WorldRenderer() {
     let alert = null;
@@ -94,21 +99,31 @@ function WorldRenderer() {
     this.fadeToBlack = async duration => {
         return safeFade(duration,false);
     }
-    this.chapterComplete = async (noSound=false) => {
+
+    this.managedFaderTransition = (...parameters) => {
+        if(this.map.unload) {
+            this.map.unload(this);
+        }
+        this.fader.fadeOut(...parameters);
+    }
+
+    this.chapterComplete = async (noSound=!CHAPTER_COMPLETE_SOUND_SOUND_BY_DEFAULT) => {
         const method = noSound ? this.showInstantTextPopup : this.showInstantTextPopupSound;
         const chapterNumber = GlobalState.data.activeChapter;
         this.pushCustomRenderer(new FadeOut(2000));
         this.pushCustomRenderer(new ChapterPreview(chapterNumber,this.getItemPreviewBounds));
         ChapterManager.setActiveChapterCompleted();
-        if(chapterNumber === 17) {
-            await method(`Good job. This is it. Your journey has reached its end... Or is this merely the beginning?`);
+        let message = null;
+        if(chapterNumber === FINAL_CHAPTER_NUMBER) {
+            message = `Good job. This is it. Your journey has reached its end... Or is this merely the beginning?`;
         } else {
-            await method(`Good job. You completed chapter ${CHAPTER_NAME_LOOKUP[chapterNumber]}! Onwards and upwards...`);
+            message = `Good job. You completed chapter ${CHAPTER_NAME_LOOKUP[chapterNumber]}! Onwards and upwards...`;
         }
-        this.popCustomRenderer();
         setFaderEffectsRenderer(new BoxFaderEffect());
         faderEffectsRenderer.fillInLayer = new ElvesFillIn();
-        this.fader.fadeOut(MainMenuRenderer,true);
+
+        await method(message);
+        this.managedFaderTransition(MainMenuRenderer,true);
     }
 
     let internalPlayerObject = null;
@@ -402,8 +417,12 @@ function WorldRenderer() {
 
     let playerMovementLocked = false;
 
+    const escapeMenu = new WorldUIRenderer(this);
+    let escapeMenuShown = false;
+    this.escapeMenuDisabled = false;
+
     const playerInteractionLocked = () => {
-        return playerMovementLocked || this.popup || this.prompt ? true : false;
+        return playerMovementLocked || escapeMenuShown || this.popup || this.prompt ? true : false;
     }
 
     this.playerInteractionLocked = playerInteractionLocked;
@@ -421,69 +440,78 @@ function WorldRenderer() {
     let sDown = false;
     let aDown = false;
     let dDown = false;
-    let lastDown = null;
-    let enterReleased = true;
-    
-    let wDownEscape = false;
-    let aDownEscape = false;
-    let sDownEscape = false;
-    let dDownEscape = false;
+    let enterReleased = true; 
 
     this.popupProgressEnabled = true;
 
-    this.escapeMenu = new WorldUIRenderer(this);
-    this.escapeMenuShown = false;
-    this.escapeMenuDisabled = false;
     const escapeMenuDisabled = () => {
         return this.escapeMenuDisabled || playerInteractionLocked();
     }
 
+    let i = 0;
     this.processKey = function(key) {
-        if(this.escapeMenuShown) {
-            this.escapeMenu.processKey(key);
+        if(internalPlayerObject && key !== kc.accept) {
+            this.playerController.processKey(key);
+        }
+        if(escapeMenuShown) {
+            escapeMenu.processKey(key);
             return;
         }
         if(this.prompt) {
             switch(key) {
                 case kc.accept:
-                    if(!enterReleased) return;
-                    enterReleased = false;
-                    this.prompt.confirmSelection();
-                    break;
+                    if(enterReleased) {
+                        this.prompt.confirmSelection();
+                        enterReleased = false;
+                        return;
+                    } else {
+                        return;
+                    }
                 case kc.up:
-                    if(wDown) return;
+                    if(wDown) {
+                        return;
+                    }
                     this.prompt.moveSelection("up");
                     break;
                 case kc.down:
-                    if(sDown) return;
+                    if(sDown) {
+                        return;
+                    }
                     this.prompt.moveSelection("down");
                     break;
                 case kc.left:
-                    if(aDown) return;
+                    if(aDown) {
+                        return;
+                    }
                     this.prompt.moveSelection("left");
                     break;
                 case kc.right:
-                    if(dDown) return;
+                    if(dDown) {
+                        return;
+                    }
                     this.prompt.moveSelection("right");
                     break;
             }
         } else if(this.popup) {
             if(key === kc.accept) {
-                if(!enterReleased) return;
-                enterReleased = false;
-                if(this.popupProgressEnabled) {
-                    this.popup.progress();
+                if(enterReleased) {
+                    if(this.popupProgressEnabled) {
+                        this.popup.progress();
+                    }
+                    enterReleased = false;
+                } else {
+                    return;
                 }
             }
         } else if(internalPlayerObject) {
-            if(key === kc.accept) { 
-                if(!enterReleased) {
-                    return;
-                } else {
+            if(key === kc.accept && enterReleased) {
+                if(enterReleased) {
                     enterReleased = false;
+                    this.playerController.processKey(key);
+                } else {
+                    return;
                 }
             }
-            this.playerController.processKey(key);
         } else if(key === kc.accept) {
             enterReleased = false;
             return;
@@ -491,43 +519,38 @@ function WorldRenderer() {
         switch(key) {
             case kc.up:
                 wDown = true;
-                lastDown = "down";
                 return;
             case kc.down:
                 sDown = true;
-                lastDown = "up";
                 return;
             case kc.left:
                 aDown = true;
-                lastDown = "left";
                 return;
             case kc.right:
                 dDown = true;
-                lastDown = "right";
                 return;
         }
     }
     this.processKeyUp = function(key) {
+        if(internalPlayerObject) {
+            this.playerController.processKeyUp(key);
+        }
         switch(key) {
             case kc.up:
                 wDown = false;
-                wDownEscape = false;
-                break;
+                return;
             case kc.down:
                 sDown = false;
-                sDownEscape = false;
-                break;
+                return;
             case kc.left:
                 aDown = false;
-                aDownEscape = false;
-                break;
+                return;
             case kc.right:
                 dDown = false;
-                dDownEscape = false;
-                break;
+                return;
         }
-        if(this.escapeMenuShown) {
-            this.escapeMenu.processKeyUp(key);
+        if(escapeMenuShown) {
+            escapeMenu.processKeyUp(key);
             return;
         }
         switch(key) {
@@ -535,100 +558,31 @@ function WorldRenderer() {
                 if(escapeMenuDisabled()) {
                     return;
                 }
-                wDownEscape = false;
-                aDownEscape = false;
-                sDownEscape = false;
-                dDownEscape = false;
-                if(wDown) {
-                    this.processKeyUp(kc.up);
-                    wDownEscape = true;
-                }
-                if(aDown) {
-                    this.processKeyUp(kc.left);
-                    aDownEscape = true;
-                }
-                if(sDown) {
-                    this.processKeyUp(kc.down);
-                    sDownEscape = true;
-                }
-                if(dDown) {
-                    this.processKeyUp(kc.right);
-                    dDownEscape = true;
-                }
-                this.escapeMenuShown = true;
-                this.escapeMenu.show(()=>{
-                    this.escapeMenuShown = false;
-                    if(wDownEscape || sDownEscape || aDownEscape || dDownEscape) {
-                        let keyCode = null;
-                        let escaped = false;
-                        switch(lastDown) {
-                            case "up":
-                                if(!wDownEscape) {
-                                    escaped = true;
-                                    break;
-                                }
-                                keyCode = kc.up;
-                                break;
-                            case "down":
-                                if(!sDownEscape) {
-                                    escaped = true;
-                                    break;
-                                }
-                                keyCode = kc.down;
-                                break;
-                            case "left":
-                                if(!aDownEscape) {
-                                    escaped = true;
-                                    break;
-                                }
-                                keyCode = kc.left
-                                break;
-                            case "right":
-                                if(!dDownEscape) {
-                                    escaped = true;
-                                    break;
-                                }
-                                keyCode = kc.right;
-                                break;
-                        }
-                        if(escaped) {
-                            if(wDownEscape) {
-                                keyCode = kc.up;
-                            } else if(sDownEscape) {
-                                keyCode = kc.down;
-                            } else if(aDownEscape) {
-                                keyCode = kc.left;
-                            } else if(dDownEscape) {
-                                keyCode = kc.right;
-                            }
-                        }
-                        if(keyCode) {
-                            this.processKey(keyCode);
-                        }
-                    }
+                escapeMenuShown = true;
+                escapeMenu.show(()=>{
+                    escapeMenuShown = false;
                 });
-                break;
+                return;
             case kc.accept:
                 enterReleased = true;
-                break;
+                return;
         }
-        this.playerController.processKeyUp(key);
     }
     this.processMove = function(x,y) {
-        if(this.escapeMenuShown) {
-            this.escapeMenu.processMove(x,y);
+        if(escapeMenuShown) {
+            escapeMenu.processMove(x,y);
             return;
         }
     }
     this.processClick = function(x,y) {
-        if(this.escapeMenuShown) {
-            this.escapeMenu.processClick(x,y);
+        if(escapeMenuShown) {
+            escapeMenu.processClick(x,y);
             return;
         }
     }
     this.processClickEnd = function(x,y) {
-        if(this.escapeMenuShown) {
-            this.escapeMenu.processClickEnd(x,y);
+        if(escapeMenuShown) {
+            escapeMenu.processClickEnd(x,y);
             return;
         }
     }
@@ -1159,7 +1113,10 @@ function WorldRenderer() {
         await delay(5000);
         setFaderEffectsRenderer(new BoxFaderEffect());
         faderEffectsRenderer.fillInLayer = new ElvesFillIn();
-        rendererState.fader.fadeOut(WorldRenderer);
+        if(this.map.unload) {
+            this.map.unload(this);
+        }
+        this.managedFaderTransition(WorldRenderer);
     }
 
     this.startBattle = (battleID,winCallback,loseCallback,...battleParameters) => {
@@ -1170,7 +1127,10 @@ function WorldRenderer() {
         function returnToWorld() {
             setFaderInSound("battle-fade-in",true);
             setFaderOutSound("battle-fade-out",true);
-            rendererState.fader.fadeOut(WorldRenderer);
+            if(this.map.unload) {
+                this.map.unload(this);
+            }
+            this.managedFaderTransition(WorldRenderer);
         }
         function win(battleOutput) {
             if(winCallback) {
@@ -1185,7 +1145,10 @@ function WorldRenderer() {
             returnToWorld();
         }
         const opponent = getOpponent(battleID,...battleParameters);
-        rendererState.fader.fadeOut(BattleScreenRenderer,win,lose,opponent);
+        if(this.map.unload) {
+            this.map.unload(this);
+        }
+        this.managedFaderTransition(BattleScreenRenderer,win,lose,opponent);
     }
 
     this.updateSize = function() {
@@ -1500,8 +1463,8 @@ function WorldRenderer() {
         if(this.customRenderer) {
             this.customRenderer.render(timestamp);
         }
-        if(this.escapeMenuShown) {
-            this.escapeMenu.render(timestamp);
+        if(escapeMenuShown) {
+            escapeMenu.render(timestamp);
         }
         if(this.prompt) {
             this.prompt.render(timestamp);

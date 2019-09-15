@@ -1,4 +1,4 @@
-function Fade(duration,start,end,polarity) {
+function Fade(duration,start,end,polarity,grayScale=0) {
     let fadeStart = start ? start : null;
     let finished = false;
     this.render = timestamp => {
@@ -16,15 +16,15 @@ function Fade(duration,start,end,polarity) {
             }
         }
         const gradientValue = polarity ? progress : 1 - progress;
-        context.fillStyle = `rgba(0,0,0,${gradientValue})`;
+        context.fillStyle = `rgba(${grayScale},${grayScale},${grayScale},${gradientValue})`;
         context.fillRect(0,0,fullWidth,fullHeight);
     }
 }
 
-function FadeOut(duration,start,end) {
-    Fade.call(this,duration,start,end,true);
+function FadeOut(duration,start,end,grayScale) {
+    Fade.call(this,duration,start,end,true,grayScale);
 }
-function FadeIn(duration,start,end) {
-    Fade.call(this,duration,start,end,false);
+function FadeIn(duration,start,end,grayScale) {
+    Fade.call(this,duration,start,end,false,grayScale);
 }
 export {FadeIn,FadeOut}
