@@ -23,7 +23,19 @@ const ChapterManager = new (function(){
         GlobalState.save();
     }
     this.setActiveChapterCompleted = () => {
-        GlobalState.data.highestChapterFinished = GlobalState.data.activeChapter;
+        let maxCompleteChapter = GlobalState.data.highestChapterFinished;
+        let currentChapter = GlobalState.data.activeChapter;
+        if(!maxCompleteChapter) {
+            if(!currentChapter) {
+                maxCompleteChapter = 0;
+                currentChapter = 0;
+            } else {
+                maxCompleteChapter = currentChapter;
+            }
+        } else if(!currentChapter) {
+            currentChapter = 0;
+        }
+        GlobalState.data.highestChapterFinished = Math.max(maxCompleteChapter,currentChapter);
         ClearChapter();
         GlobalState.save();
     }
