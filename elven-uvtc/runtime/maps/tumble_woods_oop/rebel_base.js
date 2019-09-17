@@ -5,7 +5,7 @@ addMap({
         this.load = world => {
             world.addPlayer(5,8,"up");
         }
-        this.otherClicked = async type => {
+        this.worldClicked = async type => {
             switch(type) {
                 //Todo object interactions
             }

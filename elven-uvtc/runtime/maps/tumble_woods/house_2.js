@@ -43,7 +43,7 @@ addMap({
             };
             world.updateMap("tumble_woods",newMapData);
         }
-        this.otherClicked = type => {
+        this.worldClicked = type => {
             switch(type) {
                 case 8:
                     world.showTextPopups([

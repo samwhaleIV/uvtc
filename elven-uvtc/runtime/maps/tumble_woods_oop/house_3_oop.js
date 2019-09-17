@@ -8,7 +8,7 @@ addMap({
         this.doorClicked = ID => {
             world.updateMap("tumble_woods_oop",{fromDoorWay:true});
         }
-        this.otherClicked = async type => {
+        this.worldClicked = async type => {
             switch(type) {
                 //Todo object interactions
             }

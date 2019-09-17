@@ -66,7 +66,7 @@ addMap({
             }
 
         }
-        this.otherClicked = async type => {
+        this.worldClicked = async type => {
             switch(type) {
                 case 8:
                     world.lockPlayerMovement();

@@ -130,7 +130,7 @@ addMap({
             };
             world.updateMap("tumble_woods",newMapData);
         }
-        this.otherClicked = type => {
+        this.worldClicked = type => {
             switch(type) {
                 case 8:
                     world.showTextPopup("Someone didn't bring the chair back to the table. How rude!");

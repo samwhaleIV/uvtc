@@ -6,7 +6,7 @@ addMap({
         this.doorClicked = () => {
             world.updateMap("house_1_oop");
         }
-        this.otherClicked = async type => {
+        this.worldClicked = async type => {
             switch(type) {
                 //Todo object interactions
             }

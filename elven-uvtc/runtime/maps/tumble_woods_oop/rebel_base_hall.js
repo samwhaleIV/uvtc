@@ -16,7 +16,7 @@ addMap({
                     break;
             }
         }
-        this.otherClicked = async type => {
+        this.worldClicked = async type => {
             switch(type) {
                 case 16:
                     world.updateMap("rebel_base");

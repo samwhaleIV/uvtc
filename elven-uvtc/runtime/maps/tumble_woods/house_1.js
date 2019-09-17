@@ -35,7 +35,7 @@ addMap({
             };
             world.updateMap("house_1",newMapData);
         }
-        this.otherClicked = (type,x,y) => {
+        this.worldClicked = (type,x,y) => {
             completeObjective();
             switch(type) {
                 case 8:
@@ -64,7 +64,7 @@ addMap({
             };
             world.updateMap("house_1",newMapData);
         }
-        this.otherClicked = type => {
+        this.worldClicked = type => {
             switch(type) {
                 case 8:
                     world.showTextPopup("Lots of books here... A lot of them seem to mention some kind of card game?");
@@ -95,7 +95,7 @@ addMap({
             };
             world.updateMap("house_1",newMapData);
         }
-        this.otherClicked = type => {
+        this.worldClicked = type => {
             switch(type) {
                 case 8:
                     world.showTextPopup("These tables are pretty much everywhere.");
@@ -202,7 +202,7 @@ addMap({
                     break;
             }
         }
-        this.otherClicked = async type => {
+        this.worldClicked = async type => {
             switch(type) {
                 case 8:
                     world.showTextPopup("It's important to wash your hands!");

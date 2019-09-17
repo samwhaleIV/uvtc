@@ -44,7 +44,7 @@ addMap({
             world.addPlayer(5,7,"up");
             louis = world.getStaticCharacter("louis");
         }
-        this.otherClicked = async type => {
+        this.worldClicked = async type => {
             switch(type) {
                 case 17:
                     world.updateMap("tumble_woods",{fromDoorWay:true});

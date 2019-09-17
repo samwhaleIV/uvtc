@@ -623,10 +623,15 @@ function WorldRenderer() {
         });
     }
 
+    const outOfBounds = (x,y) => {
+        return x < 0 || y < 0 || x >= this.renderMap.finalColumn || y > this.renderMap.finalRow;
+    }
+
     this.getTriggerState = function(x,y) {
-        const collisionType = this.renderMap.collision[
-            x + y * this.renderMap.columns
-        ];
+        if(outOfBounds(x,y)) {
+            return null;
+        }
+        const collisionType = this.renderMap.collision[getIdx(x,y)];
         if(collisionTriggers[collisionType]) {
             return collisionType + collisionTriggerOffset;
         }
@@ -634,9 +639,10 @@ function WorldRenderer() {
     }
 
     this.getCollisionState = function(x,y,ignoreNoCollide) {
-        let mapCollision = this.renderMap.collision[
-            x + y * this.renderMap.columns
-        ];
+        if(outOfBounds(x,y)) {
+            return {map: 1, object: null};
+        }
+        let mapCollision = this.renderMap.collision[getIdx(x,y)];
         let objectCollision = this.objectsLookup[x][y];
         if(!ignoreNoCollide) {
             if((this.map.noCollide && this.map.noCollide[

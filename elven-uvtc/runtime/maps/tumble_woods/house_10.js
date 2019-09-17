@@ -126,7 +126,7 @@ addMap({
                 world.updateMap("tumble_woods",newMapData);
             }
         }
-        this.otherClicked = type => {
+        this.worldClicked = type => {
             switch(type) {
                 case 8:
                     world.showTextPopup("The small glass table. A staple in any modern interior design.");

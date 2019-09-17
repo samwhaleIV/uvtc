@@ -35,7 +35,7 @@ addMap({
                     break;
             }
         }
-        this.otherClicked = async type => {
+        this.worldClicked = async type => {
             switch(type) {
                 //Todo object interactions
             }

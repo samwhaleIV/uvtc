@@ -19,7 +19,7 @@ addMap({
             };
             world.updateMap("tumble_woods",newMapData);
         }
-        this.otherClicked = async type => {
+        this.worldClicked = async type => {
             switch(type) {
                 case 8:
                     world.showTextPopup("This is clearly a room of luxury.");
