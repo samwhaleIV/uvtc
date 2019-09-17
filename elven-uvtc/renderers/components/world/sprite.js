@@ -309,40 +309,22 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
             return;
         }
         this.triggerState = world.getTriggerState(newX,newY);
+        if(!this.triggerState) {
+            this.lastActive = null;
+        }
         this.impulseTrigger(world,initial);
     }
 
     this.impulseTrigger = (world,initial=false) => {
-        const trigger = this.triggerState;
-        const isOnTrigger = trigger ? true : false;
-        const triggerAlreadyPressed = world.map.triggerActive;
-
-        console.log("Trigger impulsed");
-
-        if(triggerAlreadyPressed && !world.map.triggerActivationMask) {
-            if(!isOnTrigger) {
-                world.map.triggerActive = false;
-                world.map.triggerActivationMask = false;
-                if(world.map.triggerDeactivated) {
-                    world.map.triggerDeactivated(world.map.lastTrigger,invertDirection(this.direction));
-                }
+        if(this.triggerState && !initial) {
+            if(this.lastActive === this.triggerState) {
+                return;
             }
-        } else {
-            if(isOnTrigger) {
-                world.map.lastTrigger = trigger;
-                world.map.triggerActive = true;
-                if(initial) {
-                    world.map.triggerActivationMask = true;
-                    return;
-                }
-                if(world.map.triggerActivated) {
-                    const result = world.map.triggerActivated(trigger,invertDirection(this.direction));
-                    if(result === PENDING_CODE) {
-                        world.map.triggerActivationMask = true;
-                    } else {
-                        world.map.triggerActivationMask = false;
-                    }
-                }
+            const result = world.map.triggerImpulse(this.triggerState,this.direction);
+            if(result === TRIGGER_ACTIVATED) {
+                this.lastActive = this.triggerState;
+            } else {
+                this.lastActive = null;
             }
         }
     }

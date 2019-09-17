@@ -7,11 +7,10 @@ addMap({
             world.playerObject.yOffset = 0.5;
         }
 
-        this.triggerActivated = (ID,direction) => {
-            if(direction === "right") {
+        this.triggerImpulse = (ID,direction) => {
+            if(direction === "left") {
                 world.updateMap("east_tumble_woods_oop");
-            } else {
-                return PENDING_CODE;
+                return TRIGGER_ACTIVATED;
             }
         }
     },

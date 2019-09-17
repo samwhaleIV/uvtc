@@ -290,8 +290,8 @@ function PlayerController(world) {
         } else if(this.verticalVelocity < 0) {
             this.player.setWalking(tryMove(-movementDistance,0,-1));
         }
-        if(this.world.map.triggerActive || this.world.map.triggerActivationMask) {
-            this.player.impulseTrigger(this.world);
+        if(this.player.triggerState) {
+            this.player.impulseTrigger(this.world,false);
         }
     }
 

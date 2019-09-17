@@ -99,12 +99,23 @@ addMap({
             world.updateMap(doorID.substring(3),{fromDoorWay:true});
         }
 
-        this.triggerActivated = ID => {
+        const importantThingsToDo = () => {
+            world.showTextPopup("You can't leave ȹTumble Townȹ yet! You have important things to do!");
+        }
+        this.triggerImpulse = (ID,direction) => {
             switch(ID) {
-                case 2:
                 case 1:
-                    world.showTextPopup("You can't leave ȹTumble Townȹ yet! You have important things to do!");
-                    break;
+                    if(direction !== "down") {
+                        return;
+                    }
+                    importantThingsToDo()
+                    return TRIGGER_ACTIVATED;
+                case 2:
+                    if(direction !== "right") {
+                        return;
+                    }
+                    importantThingsToDo();
+                    return TRIGGER_ACTIVATED;
 
             }
         }

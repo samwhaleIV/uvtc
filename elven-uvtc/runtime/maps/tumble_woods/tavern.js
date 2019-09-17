@@ -250,23 +250,27 @@ addMap({
             }
         }
 
-        this.triggerActivated = async triggerID => {
+        const convenienceFunction = async () => {
+            if(world.globalState.tavernEnterTrigger) {
+                return;
+            }
+            await shiver.say(
+                "Man, it would be real convenient if someone came in here right now that could go get us more beers."
+            );
+            await burr.say(
+                "You're so right dude. I would kill for another beer right now."
+            );
+            await shiver.say(
+                "Yeah, but it's just a pipe dream. The odds of someone walking in here right now and hearing this exact conversation are so low."
+            );
+            world.globalState.tavernEnterTrigger = true;
+        }
+
+        this.triggerImpulse = triggerID => {
             switch(triggerID) {
                 case 1:
-                    if(world.globalState.tavernEnterTrigger) {
-                        return;
-                    }
-                    await shiver.say(
-                        "Man, it would be real convenient if someone came in here right now that could go get us more beers."
-                    );
-                    await burr.say(
-                        "You're so right dude. I would kill for another beer right now."
-                    );
-                    await shiver.say(
-                        "Yeah, but it's just a pipe dream. The odds of someone walking in here right now and hearing this exact conversation are so low."
-                    );
-                    world.globalState.tavernEnterTrigger = true;
-                    break;
+                    convenienceFunction();
+                    return TRIGGER_ACTIVATED;
             }
         }
     },

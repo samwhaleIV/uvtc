@@ -66,23 +66,22 @@ addMap({
             }
         }
 
-        this.triggerActivated = (ID,direction) => {
+        this.triggerImpulse = (ID,direction) => {
             switch(ID) {
                 case 2:
-                    if(direction === "left") {
+                    if(direction === "right") {
                         world.updateMap("east_tumble_woods_oop");
-                        return;
+                        return TRIGGER_ACTIVATED;
                     }
                     break;
                 case 1:
-                    if(direction === "up") {
+                    if(direction === "down") {
                         world.showTextPopup("You can't leave ȹTumble Townȹ yet! You have important things to do!");
-                        return;
+                        return TRIGGER_ACTIVATED;
                     }
                     break;
 
             }
-            return PENDING_CODE;
         }
     },
     useCameraPadding: true,

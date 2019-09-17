@@ -161,10 +161,10 @@ addMap({
             }
         }
         let didTriggerEnterTrigger = false;
-        this.triggerActivated = (triggerID,direction) => {
+        this.triggerImpulse = (triggerID,direction) => {
             switch(triggerID) {
                 case 1:
-                    if(direction !== "left") {
+                    if(direction !== "right") {
                         return;
                     }
                     if(!world.globalState.playedEnterTrigger) {
@@ -173,7 +173,7 @@ addMap({
                             scripts.how_to_press_enter(world,jim);
                         }
                     }
-                    break;
+                    return TRIGGER_ACTIVATED;
             }
         }
         this.doorClicked = async doorID => {

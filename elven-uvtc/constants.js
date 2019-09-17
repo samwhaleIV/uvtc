@@ -37,4 +37,4 @@ const OVERWORLD_MUSIC_FADE_TIME = 100;
 const FAKE_OVERWORLD_LOAD_TIME = 500;
 const VERSION_STRING = "you versus earth, v0.2.3";
 
-const PENDING_CODE = Symbol("Pending");
+const TRIGGER_ACTIVATED = Symbol("TRIGGER_ACTIVATED");

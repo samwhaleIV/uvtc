@@ -26,11 +26,10 @@ addMap({
                     break;
             }
         }
-        this.triggerActivated = (triggerID,direction) => {
-            if(triggerID === 1 && direction === "up") {
+        this.triggerImpulse = (triggerID,direction) => {
+            if(triggerID === 1 && direction === "down") {
                 world.updateMap("house_7_oop",{fromDoorWay:true});
-            } else {
-                return PENDING_CODE;
+                return TRIGGER_ACTIVATED;
             }
         }
     },

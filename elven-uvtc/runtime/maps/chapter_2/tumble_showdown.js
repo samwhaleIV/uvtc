@@ -225,14 +225,13 @@ addMap({
                 createWizardBorderFast();
             }
 
-            this.triggerActivated = ID => {
+            this.triggerImpulse = ID => {
                 switch(ID) {
                     case 1:
                         if(!world.globalState.borderCreated) {
                             createBorderScript();
                         }
-                        break;
-    
+                        return TRIGGER_ACTIVATED;
                 }
             }
 
