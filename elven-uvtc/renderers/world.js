@@ -1,5 +1,6 @@
 import PlayerController from "../runtime/player-controller.js";
 import { PlayerRenderer, SpriteRenderer, ElfRenderer } from "./components/world/sprite.js";
+import TileSprite from "./components/world/tile-sprite.js";
 import WorldPopup from "./components/world/popup.js";
 import WorldPrompt from "./components/world/prompt.js";
 import GlobalState from "../runtime/global-state.js";
@@ -10,7 +11,7 @@ import MovesManager from "../runtime/moves-manager.js";
 import MovePreview from "./components/world/move-preview.js";
 import ChapterPreview from "./components/world/chapter-preview.js";
 import Moves from "../runtime/battle/moves.js";
-import Chapters from "../runtime/chapter-data.js";
+import Chapters from "../runtime/chapters.js";
 import BattleScreenRenderer from "./battle-screen.js";
 import BattleFaderEffect from "./components/battle-fader-effect.js";
 import ChapterManager from "../runtime/chapter-manager.js";
@@ -37,6 +38,43 @@ const FINAL_CHAPTER_NUMBER = 12;
 const CHAPTER_COMPLETE_SOUND_SOUND_BY_DEFAULT = false;
 
 function WorldRenderer() {
+
+    const activeChapter = GlobalState.data.activeChapter;
+    const chapter = Chapters[activeChapter-1];
+    const chapterName = `chapter ${CHAPTER_NAME_LOOKUP[activeChapter]}`;
+
+    let chapterState = null;
+    if(chapter.chapterState) {
+        chapterState = new chapter.chapterState();
+    } else {
+        chapterState = {
+            load: null,
+            mapChanged: null,
+            unload: null
+        };
+    }
+
+    Object.defineProperty(this,"activeChapter",{
+        get: function() {
+            return activeChapter;
+        }
+    });
+    Object.defineProperty(this,"chapterName",{
+        get: function() {
+            return chapterName;
+        }
+    });
+    Object.defineProperty(this,"chapter",{
+        get: function() {
+            return chapter;
+        }
+    });
+    Object.defineProperty(this,"chapterState",{
+        get: function() {
+            return chapterState;
+        }
+    });
+
     let alert = null;
     let objectiveHUD = null;
 
@@ -104,20 +142,22 @@ function WorldRenderer() {
         if(this.map.unload) {
             this.map.unload(this);
         }
+        if(chapterState.unload) {
+            chapterState.unload(this);
+        }
         this.fader.fadeOut(...parameters);
     }
 
     this.chapterComplete = async (noSound=!CHAPTER_COMPLETE_SOUND_SOUND_BY_DEFAULT) => {
         const method = noSound ? this.showInstantTextPopup : this.showInstantTextPopupSound;
-        const chapterNumber = GlobalState.data.activeChapter;
         this.pushCustomRenderer(new FadeOut(2000));
-        this.pushCustomRenderer(new ChapterPreview(chapterNumber,this.getItemPreviewBounds));
+        this.pushCustomRenderer(new ChapterPreview(activeChapter,this.getItemPreviewBounds));
         ChapterManager.setActiveChapterCompleted();
         let message = null;
-        if(chapterNumber === FINAL_CHAPTER_NUMBER) {
+        if(activeChapter === FINAL_CHAPTER_NUMBER) {
             message = `Good job. This is it. Your journey has reached its end... Or is this merely the beginning?`;
         } else {
-            message = `Good job. You completed chapter ${CHAPTER_NAME_LOOKUP[chapterNumber]}! Onwards and upwards...`;
+            message = `Good job. You completed ${chapterName}! Onwards and upwards...`;
         }
         setFaderEffectsRenderer(new BoxFaderEffect());
         faderEffectsRenderer.fillInLayer = new ElvesFillIn();
@@ -159,19 +199,17 @@ function WorldRenderer() {
                 }
             }
         } else {
-            const activeChapter = GlobalState.data.activeChapter;
-            let startMapByChapter = Chapters[activeChapter-1];
-            startMapByChapter = typeof startMapByChapter === "object" ? startMapByChapter.startMap : null;
-            const startMap = startMapByChapter ? startMapByChapter : FALLBACK_MAP_ID;
-            if(!startMapByChapter) {
-                console.warn(`World: Using a fallback map because the start map could not be found by the active chapter (${activeChapter}) of global data`);
+            let startMap = chapter.startMap ? chapter.startMap : null;
+            if(!startMap) {
+                startMap = FALLBACK_MAP_ID;
+                console.warn(`World: Using a fallback map because chapter ${activeChapter} is missing a start map start map`);
             }
             this.updateMap(startMap);
         }
         return null;
     }
     let ranCustomLoader = false;
-    this.customLoader = (callback,fromMapUpdate,sourceRoom) => {
+    this.customLoader = (callback,fromMapUpdate=false,sourceRoom) => {
         const callbackWithMapPost = (firstTime=false) => {
             this.updateCamera(performance.now(),playerInteractionLocked());
             if(this.map.start) {
@@ -194,6 +232,9 @@ function WorldRenderer() {
             const endTime = performance.now();
             const realTimeSpentLoading = endTime - startTime;
             const firstTime = !ranCustomLoader;
+            if(!fromMapUpdate && chapterState.load) {
+                chapterState.load(this);
+            }
             this.updateMapEnd();
             if(!fromMapUpdate) {
                 if(loadPlayer) {
@@ -283,8 +324,19 @@ function WorldRenderer() {
         }
         loadLastMapOrDefault();
     }
+    this.tileSprite = (function(world){
+        return function(...parameters) {
+            TileSprite.apply(this,parameters);
+            TileSprite.move = async (...steps) => await world.moveSprite(this.ID,steps);
+            TileSprite.say = world.showTextPopup;
+            TileSprite.alert = () => {
+                throw Error("Tile sprites don't support the alert function!");
+            }
+        }
+    })(this);
     this.sprite = SpriteRenderer;
     this.elfSprite = ElfRenderer;
+    this.getTileSprite = tileID => new this.tileSprite(tileID);
     this.getCharacter = (name,direction) => GetOverworldCharacter(this,name,direction,false);
     this.getStaticCharacter = name => GetOverworldCharacter(this,name,null,true);
     this.movesManager = MovesManager;
@@ -624,7 +676,7 @@ function WorldRenderer() {
     }
 
     const outOfBounds = (x,y) => {
-        return x < 0 || y < 0 || x >= this.renderMap.finalColumn || y > this.renderMap.finalRow;
+        return x < 0 || y < 0 || x > this.renderMap.finalColumn || y > this.renderMap.finalRow;
     }
 
     this.getTriggerState = function(x,y) {
@@ -980,6 +1032,9 @@ function WorldRenderer() {
             this.playerObject = pendingPlayerObject;
         }
         pendingPlayerObject = null;
+        if(chapterState.mapChanged) {
+            chapterState.mapChanged(this.map);
+        }
         this.restoreRoomSong();
     }
     this.stopMusic = callback => {

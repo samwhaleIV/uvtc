@@ -18,6 +18,8 @@ const WorldTextureScale = 3;
 const WorldTileSize = WorldTextureSize * WorldTextureScale;
 const WorldTextureColumns = 64;
 
+const LogicLayerInteractStart = 8;
+
 const WorldTextureAnimationRows = 4;
 const WorldTextureAnimationStart = Math.pow(WorldTextureColumns,2) - WorldTextureColumns * WorldTextureAnimationRows;
 
@@ -29,7 +31,7 @@ const FootPrintTiles = {
     1680: true,
     1744: true
 };
-const FALLBACK_MAP_ID = "bedroom_1";
+const FALLBACK_MAP_ID = "missing_map";
 
 const OVERWORLD_MUSIC_FADE_TIME = 100;
 const FAKE_OVERWORLD_LOAD_TIME = 500;

@@ -1,6 +1,7 @@
 import "./chapter_2/chili_house.js";
 import "./chapter_2/north_pole_preview.js";
 import "./chapter_2/tumble_showdown.js";
+import "./other/missing_map.js";
 import "./tumble_woods/house_1.js";
 import "./tumble_woods/house_10.js";
 import "./tumble_woods/house_1_end.js";
@@ -20,6 +21,8 @@ import "./tumble_woods/tutorial_place.js";
 import "./tumble_woods_oop/bedroom_1_oop.js";
 import "./tumble_woods_oop/bedroom_2_oop.js";
 import "./tumble_woods_oop/bedroom_3_oop.js";
+import "./tumble_woods_oop/east_tumble_woods_oop.js";
+import "./tumble_woods_oop/east_tumble_woods_oop_grotto.js";
 import "./tumble_woods_oop/house_1_oop.js";
 import "./tumble_woods_oop/house_2_oop.js";
 import "./tumble_woods_oop/house_3_oop.js";

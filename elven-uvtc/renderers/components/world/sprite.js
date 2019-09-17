@@ -317,6 +317,8 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         const isOnTrigger = trigger ? true : false;
         const triggerAlreadyPressed = world.map.triggerActive;
 
+        console.log("Trigger impulsed");
+
         if(triggerAlreadyPressed && !world.map.triggerActivationMask) {
             if(!isOnTrigger) {
                 world.map.triggerActive = false;
@@ -454,20 +456,6 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
                 );
             }
         }
-        this.render = function(timestamp,x,y,width,height) {
-            recentTimestamp = timestamp;
-            startX = this.x;
-            startY = this.y;
-            processRenderLogicForFrame(timestamp);
-            if(this.hidden) {
-                return;
-            }
-            if(convoyCount) {
-                renderConvoy(timestamp,x,y,width,height);
-            } else {
-                this.renderSelf(x,y,width,height);
-            }
-        }
     } else {
         this.renderSelf = function(x,y,width,height) {
             const destinationX = this.xOffset * width + x + (this.x - startX) * width;
@@ -484,24 +472,21 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
                 sprite,currentColumn,animationRow,columnWidth,rowHeight,destinationX,destinationY,width,height
             );
         }
-        this.render = function(timestamp,x,y,width,height) {
-            recentTimestamp = timestamp;
-            startX = this.x;
-            startY = this.y;
-            processRenderLogicForFrame(timestamp);
-            if(this.hidden) {
-                return;
-            }
-            if(convoyCount) {
-                renderConvoy(timestamp,x,y,width,height);
-            } else {
-                this.renderSelf(x,y,width,height);
-            }
-
+    }
+    this.render = function(timestamp,x,y,width,height) {
+        recentTimestamp = timestamp;
+        startX = this.x;
+        startY = this.y;
+        processRenderLogicForFrame(timestamp);
+        if(this.hidden) {
+            return;
+        }
+        if(convoyCount) {
+            renderConvoy(timestamp,x,y,width,height);
+        } else {
+            this.renderSelf(x,y,width,height);
         }
     }
-
-
 }
 export default SpriteRenderer;
 export { PlayerRenderer, SpriteRenderer, ElfRenderer };

@@ -88,6 +88,9 @@ function PlayerController(world) {
                     );
                     break;
                 default:
+                    if(collisionState.map < LogicLayerInteractStart) {
+                        break;
+                    }
                     const worldClickedMethod = this.world.map.worldClicked;
                     if(worldClickedMethod) {
                         worldClickedMethod(

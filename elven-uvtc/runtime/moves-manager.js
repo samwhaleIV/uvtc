@@ -1,6 +1,6 @@
 import GlobalState from "./global-state.js";
 import { Moves, MovesList } from "./battle/moves.js";
-import Chapters from "./chapter-data.js";
+import Chapters from "./chapters.js";
 import RenderMove from "../renderers/components/battle/move.js";
 
 MovesList.forEach(move => {

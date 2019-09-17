@@ -30,7 +30,11 @@ addMap({
                         break;
                 }
             } else {
-                world.addPlayer(28,24,"down");
+                if(data.sourceRoom === "east_tumble_woods_oop") {
+                    world.addPlayer(41,41,"left");
+                } else {
+                    world.addPlayer(28,24,"down");
+                }
             }
         }
         this.doorClicked = doorID => {
@@ -62,14 +66,23 @@ addMap({
             }
         }
 
-        this.triggerActivated = ID => {
+        this.triggerActivated = (ID,direction) => {
             switch(ID) {
                 case 2:
+                    if(direction === "left") {
+                        world.updateMap("east_tumble_woods_oop");
+                        return;
+                    }
+                    break;
                 case 1:
-                    world.showTextPopup("You can't leave ȹTumble Townȹ yet! You have important things to do!");
+                    if(direction === "up") {
+                        world.showTextPopup("You can't leave ȹTumble Townȹ yet! You have important things to do!");
+                        return;
+                    }
                     break;
 
             }
+            return PENDING_CODE;
         }
     },
     useCameraPadding: true,
