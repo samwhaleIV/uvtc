@@ -2,7 +2,30 @@ function PlayerController(world) {
 
     this.world = world;
     this.camera = world.camera;
-    this.player = null;
+
+    let player = null;
+    let lastDirection = null;
+    let lastWalking = null;
+
+    Object.defineProperty(this,"player",{
+        get: function() {
+            return player;
+        },
+        set: function(newPlayer) {
+            if(newPlayer) {
+                if(lastDirection && lastWalking) {
+                    newPlayer.updateDirection(lastDirection);
+                }
+                player = newPlayer;
+            } else {
+                if(player) {
+                    lastDirection = player.direction;
+                    lastWalking = player.isWalking();
+                }
+                player = newPlayer;
+            }
+        }
+    })
 
     let wDown = false;
     let sDown = false;
@@ -57,13 +80,13 @@ function PlayerController(world) {
     }
 
     const processEnter = () => {
-        if(this.player.isWalking() || this.world.playerInteractionLocked()) {
+        if(player.isWalking() || this.world.playerInteractionLocked()) {
             return;
         }
         const pulseLocation = addDirectionToCoordinate(
-            this.player.x + Math.round(this.player.xOffset),
-            this.player.y + Math.round(this.player.yOffset),
-            this.player.direction
+            player.x + Math.round(player.xOffset),
+            player.y + Math.round(player.yOffset),
+            player.direction
         );
         const collisionState = this.world.getCollisionState(
             pulseLocation.x,pulseLocation.y,true
@@ -73,7 +96,7 @@ function PlayerController(world) {
                 collisionState.object.interacted(
                     pulseLocation.x,
                     pulseLocation.y,
-                    invertDirection(this.player.direction)
+                    invertDirection(player.direction)
                 );
             }
         } else if(collisionState.map) {
@@ -107,7 +130,7 @@ function PlayerController(world) {
                 otherClickedMethod(
                     pulseLocation.x,
                     pulseLocation.y,
-                    invertDirection(this.player.direction)
+                    invertDirection(player.direction)
                 );
             }
         }
@@ -123,18 +146,18 @@ function PlayerController(world) {
     const inverseCornerCollisionThreshold = 0;
 
     const getSideCollision = (target,xDifference,yDifference) => {
-        const offset = this.player[target];
+        const offset = player[target];
         if(yDifference) {
             if(offset > cornerCollisionThreshold) {
-                return this.world.collides(this.player.x+1,this.player.y+yDifference,this.player.ID);
+                return this.world.collides(player.x+1,player.y+yDifference,player.ID);
             } else if(offset < 0) {
-                return this.world.collides(this.player.x-1,this.player.y+yDifference,this.player.ID);
+                return this.world.collides(player.x-1,player.y+yDifference,player.ID);
             }
         } else if(xDifference) {
             if(offset > inverseCornerCollisionThreshold) {
-                return this.world.collides(this.player.x+xDifference,this.player.y+1,this.player.ID);
+                return this.world.collides(player.x+xDifference,player.y+1,player.ID);
             } else if(offset < 0) {
-                return this.world.collides(this.player.x+xDifference,this.player.y-1,this.player.ID);
+                return this.world.collides(player.x+xDifference,player.y-1,player.ID);
             }
         }
         return false;
@@ -168,47 +191,47 @@ function PlayerController(world) {
             return false;
         }
         const sideCollision = getSideCollision(sideTarget,xDifference,yDifference);
-        const valueAtThreshold = polarizedEvaluation(this.player[offsetTarget],0,positiveDifference);
+        const valueAtThreshold = polarizedEvaluation(player[offsetTarget],0,positiveDifference);
         const lookAheadCollision = this.world.collides(
-            this.player.x+xDifference,
-            this.player.y+yDifference,
-            this.player.ID
+            player.x+xDifference,
+            player.y+yDifference,
+            player.ID
         );
         if((lookAheadCollision || sideCollision) && valueAtThreshold) {
             //console.log("Dead stop - Maximum position already reached");
-            this.player[offsetTarget] = 0;
+            player[offsetTarget] = 0;
             return false;
         }
 
-        this.player[offsetTarget] += movementDistance;
-        const spaceThresholdReached = polarizedEvaluation(this.player[offsetTarget],0,positiveDifference);
+        player[offsetTarget] += movementDistance;
+        const spaceThresholdReached = polarizedEvaluation(player[offsetTarget],0,positiveDifference);
         if((lookAheadCollision || sideCollision) && spaceThresholdReached) {
             //console.log("Dead stop - Already in XY space");
-            this.player[offsetTarget] = 0;
+            player[offsetTarget] = 0;
             return false;    
         }
-        const valueOverflowing = polarizedOverflowEvaluation(this.player[offsetTarget],positiveDifference);
+        const valueOverflowing = polarizedOverflowEvaluation(player[offsetTarget],positiveDifference);
         if(valueOverflowing) {
             if(positiveDifference) {
-                this.player[offsetTarget]--;
+                player[offsetTarget]--;
             } else {
-                this.player[offsetTarget]++;
+                player[offsetTarget]++;
             }
             this.world.moveObject(
-                this.player.ID,
-                this.player.x+xDifference,
-                this.player.y+yDifference
+                player.ID,
+                player.x+xDifference,
+                player.y+yDifference
             );
             const newSideCollision = getSideCollision(sideTarget,xDifference,yDifference);
             const newLookAhead = this.world.collides(
-                this.player.x+xDifference,
-                this.player.y+yDifference,
-                this.player.ID
+                player.x+xDifference,
+                player.y+yDifference,
+                player.ID
             );
-            const newThreshold = polarizedEvaluation(this.player[offsetTarget],0,positiveDifference);
+            const newThreshold = polarizedEvaluation(player[offsetTarget],0,positiveDifference);
             if((newLookAhead || newSideCollision) && newThreshold) {
                 //console.log("Dead stop - Post movement update");
-                this.player[offsetTarget] = 0;
+                player[offsetTarget] = 0;
                 return false;
             }
         }
@@ -248,12 +271,12 @@ function PlayerController(world) {
 
     const movementMethod = timestamp => {
         if(pendingDirection) {
-            this.player.updateDirection(pendingDirection);
+            player.updateDirection(pendingDirection);
             applyPlayerVelocities();
             pendingDirection = null;
         }
         if(ENV_FLAGS.DEBUG_MICRO_SHIFT) {
-            if(lastXOffset > this.player.xOffset) {
+            if(lastXOffset > player.xOffset) {
                 if(!lastXPolarity) {
                     console.log("Player controller: Micro direction shift!");
                 }
@@ -264,8 +287,8 @@ function PlayerController(world) {
                 }
                 lastXPolarity = false;
             }
-            lastXOffset = this.player.xOffset;
-            console.log(this.player.xOffset);
+            lastXOffset = player.xOffset;
+            console.log(player.xOffset);
         }
         if(!lastFrame) {
             lastFrame = timestamp;
@@ -281,17 +304,17 @@ function PlayerController(world) {
         const movementDistance = delta / 1000 * tilesPerSecond;
 
         if(this.horizontalVelocity > 0) {
-            this.player.setWalking(tryMove(movementDistance,1,0));
+            player.setWalking(tryMove(movementDistance,1,0));
         } else if(this.horizontalVelocity < 0) {
-            this.player.setWalking(tryMove(-movementDistance,-1,0));
+            player.setWalking(tryMove(-movementDistance,-1,0));
         }
         if(this.verticalVelocity > 0) {
-            this.player.setWalking(tryMove(movementDistance,0,1));
+            player.setWalking(tryMove(movementDistance,0,1));
         } else if(this.verticalVelocity < 0) {
-            this.player.setWalking(tryMove(-movementDistance,0,-1));
+            player.setWalking(tryMove(-movementDistance,0,-1));
         }
-        if(this.player.triggerState) {
-            this.player.impulseTrigger(this.world,false);
+        if(player.triggerState) {
+            player.impulseTrigger(this.world,false);
         }
     }
 
@@ -306,7 +329,7 @@ function PlayerController(world) {
         this.renderMethod = null;
         loopRunning = false;
         lastFrame = null;
-        this.player.setWalking(false);
+        player.setWalking(false);
     }
 
     const applyPlayerVelocities = none => {
@@ -315,7 +338,7 @@ function PlayerController(world) {
         if(none) {
             return;
         }
-        switch(this.player.direction) {
+        switch(player.direction) {
             case "up":
                 this.verticalVelocity = -1;
                 break;
@@ -336,11 +359,11 @@ function PlayerController(world) {
             pendingDirection = direction;
             return;
         }
-        this.player.updateDirection(direction);
+        player.updateDirection(direction);
     }
 
     this.processKey = function(key) {
-        const worldHasPlayer = this.player ? true : false;
+        const worldHasPlayer = player ? true : false;
         switch(key) {
             case kc.up:
                 wDown = true;
@@ -383,7 +406,7 @@ function PlayerController(world) {
         }
     }
     this.processKeyUp = function(key) {
-        const worldHasPlayer = this.player ? true : false;
+        const worldHasPlayer = player ? true : false;
         switch(key) {
             case kc.up:
                 wDown = false;
