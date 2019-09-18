@@ -22,6 +22,8 @@ function TileSprite(tileID) {
     this.xOffset = 0;
     this.yOffset = 0;
 
+    this.tilesPerSecond = 1;
+
     Object.defineProperty(this,"location",{get:function(){
         return [this.x,this.y,this.xOffset,this.yOffset];
     }});

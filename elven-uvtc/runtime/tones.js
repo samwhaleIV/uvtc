@@ -28,14 +28,34 @@ function SecretDoorSound() {
 }
 
 function DoorOpenSound() {
-    playTones(150,1,0,200,1,100);
+    playTones(1,1,1,[150,1,0,200,1,100]);
 }
 function DoorCloseSound() {
-    playTones(200,1,0,150,1,100);
+    playTones(1,1,1,[200,1,0,150,1,100]);
 }
 
 function TextSound() {
     playTone(587.3295,0.3);
 }
 
-export { CloseSound,OpenSound,AlertSound, SelectionConfirmSound, SelectionChangeSound, TextSound, DoorOpenSound, DoorCloseSound, SecretDoorSound }
+function RockMoveStartSound() {
+    playTone(45,0.8);
+}
+function RockMoveEndSound() {
+    playTone(90,0.75);
+}
+function IceSmashSound() {
+    playTonesScaled(1,1,1,[
+        500,0.4,0,
+        450,0.4,100,
+        410,0.4,200,
+        500,0.4,300,
+    ]);
+}
+
+export { CloseSound,OpenSound,AlertSound,
+    SelectionConfirmSound, SelectionChangeSound,
+    TextSound, DoorOpenSound, DoorCloseSound,
+    SecretDoorSound, IceSmashSound,
+    RockMoveEndSound, RockMoveStartSound
+}

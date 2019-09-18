@@ -119,7 +119,8 @@ function PlayerController(world) {
                         worldClickedMethod(
                             collisionState.map,
                             pulseLocation.x,
-                            pulseLocation.y
+                            pulseLocation.y,
+                            invertDirection(player.direction)
                         );
                     }
                     break;

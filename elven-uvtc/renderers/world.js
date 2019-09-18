@@ -327,11 +327,13 @@ function WorldRenderer() {
     this.tileSprite = (function(world){
         return function(...parameters) {
             TileSprite.apply(this,parameters);
-            TileSprite.move = async (...steps) => await world.moveSprite(this.ID,steps);
-            TileSprite.say = world.showTextPopup;
-            TileSprite.alert = () => {
+            this.move = async (...steps) => await world.moveSprite(this.ID,steps);
+            this.say = world.showTextPopup;
+            this.alert = () => {
                 throw Error("Tile sprites don't support the alert function!");
             }
+            this.setWalking = () => void undefined;
+            this.updateDirection = () => void undefined;
         }
     })(this);
     this.sprite = SpriteRenderer;
@@ -1241,6 +1243,8 @@ function WorldRenderer() {
         
         halfHorizontalTiles = Math.floor(horizontalTiles / 2);
         halfVerticalTiles = Math.floor(verticalTiles / 2);
+
+        console.log(horizontalTiles/adjustedTileSize);
 
         if(this.renderMap.fixedCamera) {
             if(verticalTiles < this.renderMap.rows || horizontalTiles < this.renderMap.columns) {
