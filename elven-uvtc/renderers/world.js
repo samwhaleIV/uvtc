@@ -173,10 +173,8 @@ function WorldRenderer() {
             GlobalState.data["last_map"] = this.renderMap.name;
             GlobalState.data["last_player_pos"] = {
                 d: internalPlayerObject.direction,
-                x: internalPlayerObject.x,
-                y: internalPlayerObject.y,
-                xo: internalPlayerObject.xOffset,
-                yo: internalPlayerObject.yOffset,
+                x: Math.round(internalPlayerObject.x + internalPlayerObject.xOffset),
+                y: Math.round(internalPlayerObject.y + internalPlayerObject.yOffset)
             }
         }
         if(!skipGlobal) {
@@ -192,8 +190,6 @@ function WorldRenderer() {
                 return () => {
                     if(internalPlayerObject && !internalPlayerObject.forcedStartPosition) {
                         this.moveObject(internalPlayerObject.ID,lp.x,lp.y,true);
-                        internalPlayerObject.xOffset = lp.xo;
-                        internalPlayerObject.yOffset = lp.yo;
                         internalPlayerObject.updateDirection(lp.d);
                     }
                 }
@@ -482,11 +478,9 @@ function WorldRenderer() {
     this.playerInteractionLocked = playerInteractionLocked;
 
     this.lockPlayerMovement = function() {
-        console.log("Locked player movement");
         playerMovementLocked = true;
     }
     this.unlockPlayerMovement = function() {
-        console.log("Unlocked player movement");
         playerMovementLocked = false;
     }
 
@@ -654,9 +648,9 @@ function WorldRenderer() {
             );
         });
     }
-    this.showTextPopup =        page =>         showTextPopup([page]);
-    this.showTextPopups =       pages =>        showTextPopup(pages);
-    this.showInstantTextPopup = page =>         showTextPopup([page],null,true);
+    this.showTextPopup =         page =>        showTextPopup([page]);
+    this.showTextPopups =        pages =>       showTextPopup(pages);
+    this.showInstantTextPopup =  page =>        showTextPopup([page],null,true);
     this.showInstantTextPopups = pages =>       showTextPopup(pages,null,true);
     this.showNamedTextPopup =   (page,name) =>  showTextPopup([page],name);
     this.showNamedTextPopups =  (pages,name) => showTextPopup(pages,name);
@@ -814,6 +808,25 @@ function WorldRenderer() {
         }
     }
 
+    const collisionResolution = (existingObject,newObject,x,y) => {
+        if(!this.collides(x,y-1)) {
+            this.objectsLookup[x][y-1] = newObject;
+            newObject.y--;
+        } else if(!this.collides(x+1,y)) {
+            this.objectsLookup[x+1][y] = newObject;
+            newObject.x++;
+        } else if(!this.collides(x,y+1)) {
+            this.objectsLookup[x][y+1] = newObject;
+            newObject.y++;
+        } else if(!this.collides(x-1,y)) {
+            this.objectsLookup[x-1][y] = newObject;
+            newObject.x--;
+        } else {
+            console.error("Error: Object collision could not find a resolution");
+            this.objectsLookup[x][y] = newObject;
+        }
+    }
+
     this.addObject = function(object,x,y) {
         const objectID = getNextObjectID();
         object.ID = objectID;
@@ -834,11 +847,15 @@ function WorldRenderer() {
         if(object.offscreenRendering) {
             return objectID;
         }
-        if(this.objectsLookup[object.x][object.y]) {
-            console.error("Error: An object collision has occured through the add object method");
-            console.log("Existing item",this.objectsLookup[object.x][object.y],"New item",object);
+
+        const existingItem = this.objectsLookup[object.x][object.y];
+        if(existingItem) {
+            console.error("Warning: An object collision has occured through the add object method");
+            console.log("Existing item",existingItem,"New item",object);
+            collisionResolution(existingItem,object,object.x,object.y);
+        } else {
+            this.objectsLookup[object.x][object.y] = object;
         }
-        this.objectsLookup[object.x][object.y] = object;
         return objectID;
     }
     const objectIDFilter = objectID => {
@@ -889,11 +906,15 @@ function WorldRenderer() {
         }
         object.x = newX;
         object.y = newY;
-        if(this.objectsLookup[object.x][object.y]) {
-            console.error("Error: An object collision has occured through the move object method");
-            console.log("Existing item",this.objectsLookup[object.x][object.y],"New item",object);
+
+        const existingObject = this.objectsLookup[object.x][object.y];
+        if(existingObject) {
+            console.warn("Warning: An object collision has occured through the move object method");
+            console.log("Existing item",existingObject,"New item",object);
+            collisionResolution(existingObject,object,newX,newY);
+        } else {
+            this.objectsLookup[object.x][object.y] = object;
         }
-        this.objectsLookup[object.x][object.y] = object;
         if(object.worldPositionUpdated) {
             object.worldPositionUpdated(oldX,oldY,newX,newY,this,isInitialPosition);
         }
@@ -1243,8 +1264,6 @@ function WorldRenderer() {
         
         halfHorizontalTiles = Math.floor(horizontalTiles / 2);
         halfVerticalTiles = Math.floor(verticalTiles / 2);
-
-        console.log(horizontalTiles/adjustedTileSize);
 
         if(this.renderMap.fixedCamera) {
             if(verticalTiles < this.renderMap.rows || horizontalTiles < this.renderMap.columns) {
