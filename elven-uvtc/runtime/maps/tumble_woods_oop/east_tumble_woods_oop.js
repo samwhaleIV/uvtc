@@ -85,12 +85,12 @@ addMap({
                     await delay(500);
                     IceSmashSound();
                     world.removeObject(rock.ID);
-                    await delay(500);
+                    await delay(1000);
                     world.changeBackgroundTile(iceElfSpyTile,hitX,hitY);
                     world.changeBackgroundTile(iceElfSpyTileTop,hitX,hitY-1);
                     world.changeCollisionTile(elfInIceCollisionType,hitX,hitY);
                     AlertSound();
-                    await delay(700);
+                    await delay(1000);
                     await iceSpy.say("Hey! You broke my rock! Just when I thought I had the perfect disguise..");
                     await iceSpy.say("I don't imagine you're gonna help me get of this hole, on account of the whole elf thing..");
                     await iceSpy.say("If you at least tell an Elf Guard that I'm stuck down here I'll try to make it worth your while.");
