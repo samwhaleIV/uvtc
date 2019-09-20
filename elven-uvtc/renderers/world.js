@@ -149,7 +149,7 @@ function WorldRenderer() {
     }
 
     this.chapterComplete = async (noSound=!CHAPTER_COMPLETE_SOUND_SOUND_BY_DEFAULT) => {
-        const method = noSound ? this.showInstantTextPopup : this.showInstantTextPopupSound;
+        const method = noSound ? this.showInstantPopup : this.showInstantPopupSound;
         this.pushCustomRenderer(new FadeOut(2000));
         this.pushCustomRenderer(new ChapterPreview(activeChapter,this.getItemPreviewBounds));
         ChapterManager.setActiveChapterCompleted();
@@ -324,7 +324,7 @@ function WorldRenderer() {
         return function(...parameters) {
             TileSprite.apply(this,parameters);
             this.move = async (...steps) => await world.moveSprite(this.ID,steps);
-            this.say = world.showTextPopup;
+            this.say = world.showPopup;
             this.alert = () => {
                 throw Error("Tile sprites don't support the alert function!");
             }
@@ -343,9 +343,9 @@ function WorldRenderer() {
     this.someoneIsNowYourFriend = (character,customString) => {
         if(customString) {
             const message = customString.replace("{NAME}",character.coloredName);
-            return this.showInstantTextPopupSound(message);
+            return this.showInstantPopupSound(message);
         } else {
-            return this.showInstantTextPopupSound(`Congratulations! ${character.coloredName} is now your friend!`);
+            return this.showInstantPopupSound(`Congratulations! ${character.coloredName} is now your friend!`);
         }
     }
 
@@ -403,7 +403,7 @@ function WorldRenderer() {
                 }
             }
             playSound("energy");
-            await this.showInstantTextPopups(messages);
+            await this.showInstantPopups(messages);
             this.popCustomRenderer();
             resolve();
         });
@@ -637,7 +637,7 @@ function WorldRenderer() {
     }
     this.allowKeysDuringPause = true;
 
-    const showTextPopup = (pages,name=null,instant=false) => {
+    const showPopup = (pages,name=null,instant=false) => {
         return new Promise(resolve=>{
             this.popup = new WorldPopup(
                 pages,
@@ -648,15 +648,15 @@ function WorldRenderer() {
             );
         });
     }
-    this.showTextPopup =         page =>        showTextPopup([page]);
-    this.showTextPopups =        pages =>       showTextPopup(pages);
-    this.showInstantTextPopup =  page =>        showTextPopup([page],null,true);
-    this.showInstantTextPopups = pages =>       showTextPopup(pages,null,true);
-    this.showNamedTextPopup =   (page,name) =>  showTextPopup([page],name);
-    this.showNamedTextPopups =  (pages,name) => showTextPopup(pages,name);
-    this.showInstantTextPopupSound = page => {
+    this.showPopup =         page =>        showPopup([page]);
+    this.showPopups =        pages =>       showPopup(pages);
+    this.showInstantPopup =  page =>        showPopup([page],null,true);
+    this.showInstantPopups = pages =>       showPopup(pages,null,true);
+    this.showNamedPopup =   (page,name) =>  showPopup([page],name);
+    this.showNamedPopups =  (pages,name) => showPopup(pages,name);
+    this.showInstantPopupSound = page => {
         playSound("energy");
-        return showTextPopup([page],null,true);
+        return showPopup([page],null,true);
     }
 
     this.clearPrompt = () => {
@@ -1035,13 +1035,13 @@ function WorldRenderer() {
     this.getForegroundTile = (x,y) => getLayer(this.renderMap.foreground,x,y);
     this.getBackgroundTile = (x,y) => getLayer(this.renderMap.background,x,y);
 
-    this.changeCollisionTile =  (value,x,y) => changeLayer(this.renderMap.collision,value,x,y);
-    this.changeForegroundTile = (value,x,y) => changeLayer(this.renderMap.foreground,value,x,y);
+    this.setCollisionTile =  (value,x,y) => changeLayer(this.renderMap.collision,value,x,y);
+    this.setForegroundTile = (value,x,y) => changeLayer(this.renderMap.foreground,value,x,y);
     this.changeBackgroundTile = (value,x,y) => changeLayer(this.renderMap.background,value,x,y);
 
-    this.changeCollisionTileFilter = (value,x,y,filter) => changeLayerFilter(this.renderMap.collision,value,x,y,filter);
-    this.changeForegroundTileFilter = (value,x,y,filter) => changeLayerFilter(this.renderMap.foreground,value,x,y,filter);
-    this.changeBackgroundTileFilter = (value,x,y,filter) => changeLayerFilter(this.renderMap.background,value,x,y,filter);
+    this.setCollisionTileFilter = (value,x,y,filter) => changeLayerFilter(this.renderMap.collision,value,x,y,filter);
+    this.setForegroundTileFilter = (value,x,y,filter) => changeLayerFilter(this.renderMap.foreground,value,x,y,filter);
+    this.setBackgroundTileFilter = (value,x,y,filter) => changeLayerFilter(this.renderMap.background,value,x,y,filter);
 
     this.updateMapEnd = function() {
         pendingPlayerObject = null;

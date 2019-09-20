@@ -21,7 +21,7 @@ addMap({
                     await chili.say("Darling! I'm sure 'the new guy' has a name.");
                     await chiliWife.say("Hey! Chill!");
                     await chili.say("Are you flirting with me or making a pun?");
-                    await world.showInstantTextPopup("...");
+                    await world.showInstantPopup("...");
                     await chili.alert();
                     await chili.say("Excuse us! Where are our manners.");
                     await delay(300);
@@ -39,8 +39,8 @@ addMap({
                     await chiliWife.say("We're kind of the socialites of Tumble Town.");
                     await chili.say("Well, the sexy socialites.");
                     await chiliWife.say("Hehehehe that's right, babe.");
-                    await world.showInstantTextPopup("...");
-                    await world.showInstantTextPopup("As the narrator, I am going to puke.");
+                    await world.showInstantPopup("...");
+                    await world.showInstantPopup("As the narrator, I am going to puke.");
                     await chili.say("We actually need a big favor from you.");
                     await chiliWife.say("Want me to explain?");
                     await chili.say("Sure babe.");
@@ -99,7 +99,7 @@ addMap({
                         world.lockPlayerMovement();
                         await target.say("Woohoo! You got all the red presents. You are an absolute life saver!");
                         await target.say("Now we just need you to do one more thing from us!");
-                        await world.showInstantTextPopup("You received a sealed letter.");
+                        await world.showInstantPopup("You received a sealed letter.");
                         world.globalState.hasSealedLetter = true;
                         await target.say("We just need you to bring this to the post office for us. It's an invitation to some very special guests.");
                         world.unlockPlayerMovement();
@@ -129,26 +129,26 @@ addMap({
         this.worldClicked = type => {
             switch(type) {
                 case 8:
-                    world.showTextPopup("The small glass table. A staple in any modern interior design.");
+                    world.showPopup("The small glass table. A staple in any modern interior design.");
                     break;
                 case 9:
-                    world.showTextPopup("Longgggg, longgg, tableee.");
+                    world.showPopup("Longgggg, longgg, tableee.");
                     break;
                 case 10:
-                    world.showTextPopup("Why don't Christmas trees have stars on their anymore?");
+                    world.showPopup("Why don't Christmas trees have stars on their anymore?");
                     break;
                 case 11:
-                    world.showTextPopup("The Chilis are probably wondering why you're jamming your face into their lamp.");
+                    world.showPopup("The Chilis are probably wondering why you're jamming your face into their lamp.");
                     break;
                 case 12:
-                    world.showTextPopup("What is your obsession with touching everyone's furniture?");
+                    world.showPopup("What is your obsession with touching everyone's furniture?");
                     break;
                 case 13:
                 case 14:
-                    world.showTextPopup("It's not only rude to put your grimey hands all over everyone's beds, but it's weird, too.");
+                    world.showPopup("It's not only rude to put your grimey hands all over everyone's beds, but it's weird, too.");
                     break;
                 case 16:
-                    world.showInstantTextPopup("You can't take this present, it belongs to the Chilis!");
+                    world.showInstantPopup("You can't take this present, it belongs to the Chilis!");
                     break;
             }
         }

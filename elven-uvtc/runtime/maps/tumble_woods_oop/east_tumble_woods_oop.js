@@ -88,14 +88,14 @@ addMap({
                     await delay(1000);
                     world.changeBackgroundTile(iceElfSpyTile,hitX,hitY);
                     world.changeBackgroundTile(iceElfSpyTileTop,hitX,hitY-1);
-                    world.changeCollisionTile(elfInIceCollisionType,hitX,hitY);
+                    world.setCollisionTile(elfInIceCollisionType,hitX,hitY);
                     AlertSound();
                     await delay(1000);
                     await iceSpy.say("Hey! You broke my rock! Just when I thought I had the perfect disguise..");
                     await iceSpy.say("I don't imagine you're gonna help me get of this hole, on account of the whole elf thing..");
                     await iceSpy.say("If you at least tell an Elf Guard that I'm stuck down here I'll try to make it worth your while.");
                 } else {
-                    world.changeCollisionTile(noodleReadyCollisionType,hitX,hitY);
+                    world.setCollisionTile(noodleReadyCollisionType,hitX,hitY);
                     await delay(500);
                     IceSmashSound();
                     world.removeObject(rock.ID);
@@ -105,7 +105,7 @@ addMap({
                 await moveRock(rock,xDelta,yDelta);
                 RockMoveEndSound();
             } else {
-                await world.showInstantTextPopup("The rock cannot move this way.");
+                await world.showInstantPopup("The rock cannot move this way.");
             }
 
             world.unlockPlayerMovement();
@@ -133,24 +133,27 @@ addMap({
 
         this.worldClicked = async (ID,x,y,direction) => {
             switch(ID) {
+                case 8:
+                    await world.showPopup("These elves.. It feels like they're always watching.");
+                    break;
                 case elfInIceCollisionType:
                     //todo globalState stuff
                     await iceSpy.say("Were you able to tell an Elf Guard about my situation yet? It's getting quite cold down here.");
                     break;
                 case iceHoleCollisionType:
-                    await world.showTextPopup("The ice appears thinner here.");
+                    await world.showPopup("The ice appears thinner here.");
                     break;
                 case noodleReadyCollisionType:
-                    const hasNoodle = true;//todo implement noodle state handling
-                    const hasWaterBottle = true;//todo implement water bottle handling
+                    const hasNoodle = world.globalState.hasPoolNoodle;
+                    const hasWaterBottle = true; //todo implement water bottle handling
                     if(hasNoodle) {
                         if(!hasWaterBottle) {
-                            await world.showTextPopup("You may be able to collect the water with your pool noodle, but you'll have nowhere to put it.");
+                            await world.showPopup("You may be able to collect the water with your pool noodle, but you'll have nowhere to put it.");
                             break;
                         }
                         world.lockPlayerMovement();
-                        await world.showTextPopup("You may be able to use your pool noodle to collect some water, do you want to try?");
-                        const wantsToTry = await world.showPrompt("try to get some water?","yes","no") === 0 ? true : false;
+                        await world.showPopup("You may be able to use your pool noodle to collect some water, do you want to try?");
+                        const wantsToTry = await world.showPrompt("try to get some water?","yes","no") === 0;
                         await delay(600);
                         if(wantsToTry) {
                             let t1 = noodleIceTile;
@@ -172,17 +175,17 @@ addMap({
                             playTone(shouldPass ? 150 : 80,0.5);
                             await delay(1200);
                             if(shouldPass) {
-                                await world.showTextPopup("Success! You filled one water bottle.");
+                                await world.showPopup("Success! You filled one water bottle.");
                                 //todo add one filled bottle from state and clear one empty bottle
                             } else {
-                                await world.showTextPopup("Darn! The water was too shy. Try again later.");
+                                await world.showPopup("Darn! The water was too shy. Try again later.");
                             }
                             world.changeBackgroundTile(brokenIceTile,x,y);
                             world.changeBackgroundTile(regularIceTile,x,y-1);
                         }
                         world.unlockPlayerMovement();
                     } else {
-                        await world.showTextPopup("The water is too far to reach.");
+                        await world.showPopup("The water is too far to reach.");
                     }
                     break;
             }

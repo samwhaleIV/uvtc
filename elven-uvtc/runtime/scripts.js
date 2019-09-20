@@ -18,6 +18,23 @@ function inlineSetTimeout(callback,time) {
 }
 
 const scripts = {
+    table_etch = async world => {
+        world.lockPlayerMovement();
+        if(world.globalState.etchedNameIntoTable) {
+            await world.showPopup("Your name is still etched into the table. You know that was a permanent decision, right?");
+        } else {
+            await world.showPopup("Someone etched their name into the table. Do you want to add yours?");
+            const wantsToEtch = await world.showPrompt("etch your name in the glass?","yes","no") === 0;
+            await delay(500);
+            if(wantsToEtch) {
+                world.globalState.etchedNameIntoTable = true;
+                await world.showInstantPopup("Your name is now etched into the table.");
+            } else {
+                await world.showPopup("Ah, perhaps another time.");
+            }
+        }
+        world.unlockPlayerMovement();
+    },
     jim_gets_the_hell_out_of_the_way: async (world,jim) => {
         world.lockPlayerMovement();
         await world.showPrompt("what do you want to whisper?","i love you","please move","uh.. nice panel?");
@@ -290,15 +307,15 @@ const scripts = {
         world.lockPlayerMovement();
         world.globalState.gotBeer = false;
         world.globalState.frogertGotHisBeer = true;
-        await world.showInstantTextPopupSound("You handed the beer to frogert!");
+        await world.showInstantPopupSound("You handed the beer to frogert!");
         await frogert.say("...");
-        await world.showInstantTextPopup("Frogert is inspecting the beer.");
+        await world.showInstantPopup("Frogert is inspecting the beer.");
         await frogert.say("This isn't poison is it?");
         await world.showPrompt("is this beer poison?","uhh no","sometimes","technically yes");
         await delay(1500);
         await frogert.say("Well, that's a risk I'm willing to take. I'm just sooo thirsty.");
-        await world.showInstantTextPopup("Frogert drank the entire beer.");
-        await world.showInstantTextPopup("Does everyone in this town have an alchohol problem or something?");
+        await world.showInstantPopup("Frogert drank the entire beer.");
+        await world.showInstantPopup("Does everyone in this town have an alchohol problem or something?");
         await frogert.speech([
             "Ahhhhhhhhh",
             "That hit the spot.",

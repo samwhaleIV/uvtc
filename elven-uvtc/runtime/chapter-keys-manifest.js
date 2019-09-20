@@ -68,7 +68,10 @@ const ChapterKeysManifest = {
     ],
     3: [
         "openedSecretDoor",
-        "secretDoorOpen"
+        "secretDoorOpen",
+        "hasCanOfPaint",
+        "hasPoolNoodle",
+        "paintedLamp"
     ],
     4: [
 

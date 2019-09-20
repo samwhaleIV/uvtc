@@ -9,7 +9,15 @@ addMap({
         }
         this.worldClicked = async type => {
             switch(type) {
-                //Todo object interactions
+                case 8:
+                    await world.showPopup("It seems that the elves have redesignated this book hoarder's home into a warehouse for their propaganda.");
+                    break;
+                case 9:
+                    await world.showPopups([
+                        "I can't take these books anymore.",
+                        "Please.. Kill me."
+                    ]);
+                    break;
             }
         }
     },

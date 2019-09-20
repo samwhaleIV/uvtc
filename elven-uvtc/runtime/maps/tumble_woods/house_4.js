@@ -3,8 +3,8 @@ addMap({
         const clearP3 = () => {
             const x = 15;
             const y = 4;
-            world.changeForegroundTile(0,x,y);
-            world.changeCollisionTile(0,x,y);
+            world.setForegroundTile(0,x,y);
+            world.setCollisionTile(0,x,y);
         };
         const statusMessage = () => worldMaps.tumble_woods.presentTracker.getRemainingMessage(world);
         this.load = world => {
@@ -25,7 +25,7 @@ addMap({
                     await jam.say("I've heard such great things about you.");
                     await jam.say("W-what? He didn't even mention me?");
                     await delay(500);
-                    await world.showInstantTextPopup("Yikes. This is awkward.");
+                    await world.showInstantPopup("Yikes. This is awkward.");
                     await delay(300);
                     await jam.say("I... Need a moment.");
                     await delay(300);
@@ -54,46 +54,46 @@ addMap({
         this.worldClicked = async type => {
             switch(type) {
                 case 8:
-                    await world.showTextPopups([
+                    await world.showPopups([
                         "There's a notecard taped to this shelf.",
                         "'Adults only'",
                         "Hmm... this might be interesting.",
                     ]);
                     const selection = await world.showPrompt("do you want to read an adult book?","yes","no");
                     if(selection === 0) {
-                        world.showTextPopup("Ew. There's more important things you should be doing than reading someone else's smut.");
+                        world.showPopup("Ew. There's more important things you should be doing than reading someone else's smut.");
                     } else {
-                        world.showTextPopup("Ah, I see. Saving yourself for marriage.");
+                        world.showPopup("Ah, I see. Saving yourself for marriage.");
                     }
                     break;
                 case 9:
-                    world.showTextPopup("The books appear to have slipped into another dimension.");
+                    world.showPopup("The books appear to have slipped into another dimension.");
                     break;
                 case 10:
-                    world.showTextPopup("This table is long, yet, you can't help but feel disappointed by it.");
+                    world.showPopup("This table is long, yet, you can't help but feel disappointed by it.");
                     break;
                 case 11:
-                    world.showTextPopup("What kind of a heathen has their dryer on the left?");
+                    world.showPopup("What kind of a heathen has their dryer on the left?");
                     break;
                 case 17:
-                    world.showTextPopup("The washer being on the right is making you very uncomfortable.");
+                    world.showPopup("The washer being on the right is making you very uncomfortable.");
                     break;
                 case 12:
-                    world.showTextPopup("A lot of people must sleep here.");
+                    world.showPopup("A lot of people must sleep here.");
                     break;
                 case 13:
-                    world.showTextPopup("This sleeping bag doesn't want to be bothered.");
+                    world.showPopup("This sleeping bag doesn't want to be bothered.");
                     break;
                 case 14:
-                    world.showTextPopup("This sleeping bag is upset with the other sleeping bags.");
+                    world.showPopup("This sleeping bag is upset with the other sleeping bags.");
                     break;
                 case 15:
-                    world.showTextPopup("Who would want to sleep this close to other people?");
+                    world.showPopup("Who would want to sleep this close to other people?");
                     break;
                 case 16:
                     clearP3();
                     world.globalState.present3 = true;
-                    await world.showInstantTextPopup(statusMessage());
+                    await world.showInstantPopup(statusMessage());
                     break;
             }
         }

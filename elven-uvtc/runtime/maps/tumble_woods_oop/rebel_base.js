@@ -7,7 +7,20 @@ addMap({
         }
         this.worldClicked = async type => {
             switch(type) {
-                //Todo object interactions
+                case 8:
+                    await world.showPopup("A whiteboard. Every official looking meeting room needs a whiteboard. Someone should probably be writing this down.");
+                    break;
+                case 9:
+                    await world.showPopup("This map looks important but it doesn't appear to be of a real place. In fact, it still has a price tag on the corner.");
+                    break;
+                case 10:
+                case 11:
+                    await world.showPopup("A green flag representing the rebellion.");
+                    break;
+                case 12:
+                case 13:
+                    await world.showPopup("A red flag representing the rebellion.");
+                    break;
             }
         }
         this.triggerImpulse = (triggerID,direction) => {

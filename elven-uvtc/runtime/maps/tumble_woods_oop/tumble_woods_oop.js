@@ -76,7 +76,7 @@ addMap({
                     break;
                 case 1:
                     if(direction === "down") {
-                        world.showTextPopup("You can't leave ȹTumble Townȹ yet! You have important things to do!");
+                        world.showPopup("You can't leave ȹTumble Townȹ yet! You have important things to do!");
                         return TRIGGER_ACTIVATED;
                     }
                     break;

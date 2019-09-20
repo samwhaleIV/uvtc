@@ -8,7 +8,7 @@ addMap({
         const closeSecretDoor = (withSound=true) => {
             secretDoorOpen = false;
             world.globalState.secretDoorOpen = false;
-            world.changeForegroundTile(67,2,1);
+            world.setForegroundTile(67,2,1);
             if(withSound) {
                 DoorCloseSound();
             }
@@ -16,7 +16,7 @@ addMap({
         const openSecretDoor = (withSound=true) => {
             secretDoorOpen = true;
             world.globalState.secretDoorOpen = true;
-            world.changeForegroundTile(259,2,1);
+            world.setForegroundTile(259,2,1);
             if(withSound) {
                 if(!world.globalState.openedSecretDoor) {
                     SecretDoorSound();
@@ -54,7 +54,7 @@ addMap({
             }
         }
         const toggleDoorScript = async () => {
-            const pressButton = await world.showPrompt("press the button?","yes","no") === 0 ? true : false;
+            const pressButton = await world.showPrompt("press the button?","yes","no") === 0;
             if(pressButton) {
                 await delay(500);
                 if(secretDoorOpen) {
@@ -75,8 +75,8 @@ addMap({
                             //todo some early condition maybe?
                             return;
                         }
-                        await world.showTextPopup("The sink seems to have been tampered with.");
-                        await world.showTextPopup("There's a small button on the bottom, do you want to press it?");
+                        await world.showPopup("The sink seems to have been tampered with.");
+                        await world.showPopup("There's a small button on the bottom, do you want to press it?");
                         await toggleDoorScript();
                     } else {
                         await toggleDoorScript();
@@ -84,7 +84,7 @@ addMap({
                     world.unlockPlayerMovement();
                     break;
                 case 9:
-                    world.showTextPopup("Someone decided to take this poster down, yet no one lives here.");
+                    world.showPopup("Someone decided to take this poster down, yet no one lives here.");
                     break;
             }
         }

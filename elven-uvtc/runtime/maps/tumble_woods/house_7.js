@@ -3,8 +3,8 @@ addMap({
         const clearP5 = () => {
             const x = 2;
             const y = 6;
-            world.changeForegroundTile(0,x,y);
-            world.changeCollisionTile(0,x,y);
+            world.setForegroundTile(0,x,y);
+            world.setCollisionTile(0,x,y);
         };
         const statusMessage = () => worldMaps.tumble_woods.presentTracker.getRemainingMessage(world);
         this.load = world => {
@@ -22,12 +22,12 @@ addMap({
         this.worldClicked = async type => {
             switch(type) {
                 case 8:
-                    world.showTextPopup("It's important to wash your hands!");
+                    world.showPopup("It's important to wash your hands!");
                     break;
                 case 16:
                     clearP5();
                     world.globalState.present5 = true;
-                    await world.showInstantTextPopup(statusMessage());
+                    await world.showInstantPopup(statusMessage());
                     break;
             }
         }

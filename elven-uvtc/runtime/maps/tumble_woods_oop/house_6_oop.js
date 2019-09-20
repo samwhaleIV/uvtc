@@ -9,7 +9,23 @@ addMap({
         }
         this.worldClicked = async type => {
             switch(type) {
-                //Todo object interactions
+                case 8:
+                    await world.showPopup("The elves replaced all the books with their own.");
+                    await world.showInstantPopup('"Rudolph the Red-Nosed Reindeer Overthrows the Means of Production"');
+                    break;
+                case 9:
+                    await world.showPopup("The elves have their own book clearing house.");
+                    await world.showInstantPopup('"Finding Your Elf-Worth: Jingling All The Way"');
+                    break;
+                case 11:
+                    await world.showPopup("This is where Shiver and Burr's Christmas tree used to be.. Is it inside this box?");
+                    break;
+                case 12:
+                    await world.showPopup("In this new world, not even an ice cream cone's bed is spared the elven hammer.");
+                    break;
+                case 13:
+                    await world.showPopup("Elves are so peculiar about their branding that they even make sure their labels always face South!");
+                    break;
             }
         }
     },

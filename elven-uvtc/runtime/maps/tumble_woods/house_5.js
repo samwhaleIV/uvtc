@@ -3,8 +3,8 @@ addMap({
         const clearP4 = () => {
             const x = 1;
             const y = 7;
-            world.changeForegroundTile(0,x,y);
-            world.changeCollisionTile(0,x,y);
+            world.setForegroundTile(0,x,y);
+            world.setCollisionTile(0,x,y);
         };
         const statusMessage = () => worldMaps.tumble_woods.presentTracker.getRemainingMessage(world);
         this.load = world => {
@@ -53,24 +53,24 @@ addMap({
         this.worldClicked = async type => {
             switch(type) {
                 case 8:
-                    world.showTextPopup("An indoor tree? Finally, something unique in one of these houses.");
+                    world.showPopup("An indoor tree? Finally, something unique in one of these houses.");
                     break;
                 case 9:
-                    world.showTextPopup("There's a nice atmosphere to do things at this table.");
+                    world.showPopup("There's a nice atmosphere to do things at this table.");
                     break;
                 case 10:
-                    world.showTextPopup("The couch has some light stains on it.");
+                    world.showPopup("The couch has some light stains on it.");
                     break;
                 case 11:
-                    world.showTextPopup("The couch is so bright it's hard to look at.");
+                    world.showPopup("The couch is so bright it's hard to look at.");
                     break;
                 case 12:
-                    world.showTextPopup("What a bright idea putting a lamp next to two windows.");
+                    world.showPopup("What a bright idea putting a lamp next to two windows.");
                     break;
                 case 16:
                     clearP4();
                     world.globalState.present4 = true;
-                    await world.showInstantTextPopup(statusMessage());
+                    await world.showInstantPopup(statusMessage());
                     break;
             }
         }

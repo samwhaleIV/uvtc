@@ -36,7 +36,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="3" name="Tile Layer 3" width="12" height="13" visible="0">
+ <layer id="3" name="Tile Layer 3" width="12" height="13">
   <data encoding="csv">
 4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,
 4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,

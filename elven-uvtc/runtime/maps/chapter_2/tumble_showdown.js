@@ -31,13 +31,13 @@ addMap({
             for(let i = 0;i<wizardBorderLocations.length;i++) {
                 playSound("magic");
                 const location = wizardBorderLocations[i];
-                world.changeForegroundTile(866,location.x,location.y);
+                world.setForegroundTile(866,location.x,location.y);
                 if(location.verticalShadow) {
-                    world.changeForegroundTileFilter(802,location.x,location.y-1);
-                    world.changeForegroundTileFilter(930,location.x,location.y+1);
+                    world.setForegroundTileFilter(802,location.x,location.y-1);
+                    world.setForegroundTileFilter(930,location.x,location.y+1);
                 } else {
-                    world.changeForegroundTileFilter(865,location.x-1,location.y);
-                    world.changeForegroundTileFilter(867,location.x+1,location.y);
+                    world.setForegroundTileFilter(865,location.x-1,location.y);
+                    world.setForegroundTileFilter(867,location.x+1,location.y);
                 }
                 await delay(90);
             }
@@ -45,27 +45,27 @@ addMap({
 
         const createWizardBorderFast = () => {
             wizardBorderLocations.forEach(location => {
-                world.changeForegroundTile(866,location.x,location.y);
+                world.setForegroundTile(866,location.x,location.y);
                 if(location.verticalShadow) {
-                    world.changeForegroundTileFilter(802,location.x,location.y-1);
-                    world.changeForegroundTileFilter(930,location.x,location.y+1);
+                    world.setForegroundTileFilter(802,location.x,location.y-1);
+                    world.setForegroundTileFilter(930,location.x,location.y+1);
                 } else {
-                    world.changeForegroundTileFilter(865,location.x-1,location.y);
-                    world.changeForegroundTileFilter(867,location.x+1,location.y);
+                    world.setForegroundTileFilter(865,location.x-1,location.y);
+                    world.setForegroundTileFilter(867,location.x+1,location.y);
                 }
             });
         }
         const createWimpyRedBorder = () => {
-            world.changeCollisionTile(1,28,14);
-            world.changeCollisionTile(1,28,15);
-            world.changeCollisionTile(1,28,17);
-            world.changeCollisionTile(1,28,18);
+            world.setCollisionTile(1,28,14);
+            world.setCollisionTile(1,28,15);
+            world.setCollisionTile(1,28,17);
+            world.setCollisionTile(1,28,18);
         }
         const clearWimpyRedBorder = () => {
-            world.changeCollisionTile(0,28,14);
-            world.changeCollisionTile(0,28,15);
-            world.changeCollisionTile(0,28,17);
-            world.changeCollisionTile(0,28,18);
+            world.setCollisionTile(0,28,14);
+            world.setCollisionTile(0,28,15);
+            world.setCollisionTile(0,28,17);
+            world.setCollisionTile(0,28,18);
         }
         
         let wimpyRed;

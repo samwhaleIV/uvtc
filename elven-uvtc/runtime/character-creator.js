@@ -120,11 +120,11 @@ function getSpeakingPrefix(character,customPrefix) {
 };
 async function speakMethod(world,character,message,customPrefix) {
     const prefix = getSpeakingPrefix(character,customPrefix);
-    await world.showNamedTextPopup(message,prefix);
+    await world.showNamedPopup(message,prefix);
 };
 async function speakMethod_multiple(world,character,messages,customPrefix) {
     const prefix = getSpeakingPrefix(character,customPrefix);
-    await world.showNamedTextPopups(messages,prefix);
+    await world.showNamedPopups(messages,prefix);
 };
 function GetOverworldCharacterSpriteless(world,name) {
     const character = {};

@@ -13,7 +13,18 @@ addMap({
         }
         this.worldClicked = async type => {
             switch(type) {
-                //Todo object interactions
+                case 8:
+                    await world.showPopups([
+                        "Some believe that one's shelves are a reflection of themself.",
+                        "It would seem that you are hallow, empty, and devoid of speech. Just like this bookcase."
+                    ]);
+                    break;
+                case 9:
+                    await world.showPopup("An elf sleeping bag. Standard issue during elven coups.");
+                    break;
+                case 10:
+                    //Todo table note interaction
+                    break;
             }
         }
     },

@@ -10,7 +10,12 @@ addMap({
         }
         this.worldClicked = async type => {
             switch(type) {
-                //Todo object interactions
+                case 8:
+                    await world.showPopup("A glass table in a frozen room. Place objects down carefully.");
+                    break;
+                case 9:
+                    await world.showPopup("Not even Ice Man, champion fighter of Tumble Town and its greater outlying areas, could manage to keep his own, personal sleeping bag.");
+                    break;
             }
         }
     },

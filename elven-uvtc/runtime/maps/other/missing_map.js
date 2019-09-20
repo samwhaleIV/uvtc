@@ -7,13 +7,13 @@ addMap({
             this.start = async () => {
                 if(world.chapter.startMap) {
                     await delay(500);
-                    await world.showTextPopups([
+                    await world.showPopups([
                         "Hello, player! I've got good news.",
                         `Remember when you wanted to play ${world.chapterName} but it wasn't ready?`,
                         "Well, it's ready now! Come over to me, the sink, when you are ready to start!"
                     ]);
                     this.worldClicked = async () => {
-                        await world.showTextPopup(`Thanks again for stopping by. I hope you enjoy ${world.chapterName}!`);
+                        await world.showPopup(`Thanks again for stopping by. I hope you enjoy ${world.chapterName}!`);
                         world.updateMap(world.chapter.startMap);
                     }
                     world.unlockPlayerMovement();
@@ -24,9 +24,9 @@ addMap({
         }
         this.worldClicked = async () => {
             if(this.talkedToSink) {
-                await world.showTextPopup(`Thanks again for stopping by ${world.chapterName}!`);
+                await world.showPopup(`Thanks again for stopping by ${world.chapterName}!`);
             } else {
-                await world.showTextPopups([
+                await world.showPopups([
                     "Hey. How's it going?",
                     "I'm here to tell you some bad news..",
                     "Here it goes...",

@@ -114,7 +114,7 @@ addMap({
                         await iceman.say("I'm glad I was able to help you.");
                         await iceman.say("You proved yourself to be a great fighter back there.");
                         await iceman.say("Maybe someday we can fight? Haha.");
-                        await rendererState.showInstantTextPopup("(Not a chance)");
+                        await rendererState.showInstantPopup("(Not a chance)");
                         await iceman.say("Well, you should probably start meeting more of the townspeople.");
                         await iceman.say("I heard the Chilis are throwing a Christmas party soon and you might put people at ease if they meet you ahead of time.");
                         await iceman.say("The Chilis live West of the tavern in the big, tall house.");
@@ -133,10 +133,10 @@ addMap({
         this.worldClicked = type => {
             switch(type) {
                 case 8:
-                    world.showTextPopup("Someone didn't bring the chair back to the table. How rude!");
+                    world.showPopup("Someone didn't bring the chair back to the table. How rude!");
                     break;
                 case 9:
-                    world.showTextPopup("Whoever lives here also has a blue sleeping bag... It must be a popular color.");
+                    world.showPopup("Whoever lives here also has a blue sleeping bag... It must be a popular color.");
                     break;
             }
         }

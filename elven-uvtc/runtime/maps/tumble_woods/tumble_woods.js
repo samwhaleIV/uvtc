@@ -74,17 +74,17 @@ addMap({
                         if(doorID === "to_tavern") {
                             world.updateMap("tavern",{fromDoorWay:true});
                         } else {
-                            world.showTextPopup("You need to get that beer back to Frogert while it's still cold. Just like a friend should.")
+                            world.showPopup("You need to get that beer back to Frogert while it's still cold. Just like a friend should.")
                         }
                     } else {
                         if(doorID === "to_tavern") {
                             world.updateMap("tavern",{fromDoorWay:true});
                         } else {
-                            world.showTextPopup("You should be a good friend and get a beer from the ȴTavernȴ for Frogert. You can go here later.");
+                            world.showPopup("You should be a good friend and get a beer from the ȴTavernȴ for Frogert. You can go here later.");
                         }
                     }
                 } else {
-                    world.showTextPopup("You should probably go check if that frog you scared is okay first.");
+                    world.showPopup("You should probably go check if that frog you scared is okay first.");
                 }
                 return;
             }
@@ -92,7 +92,7 @@ addMap({
                 if(doorID === "to_house_1" || doorID === "to_house_2" || doorID === "to_house_3") {
                     world.updateMap(doorID.substring(3),{fromDoorWay:true});
                 } else {
-                    world.showTextPopup("You should go learn some fighting skills from Ice Man. Tumble Town can be a dangerous place.");
+                    world.showPopup("You should go learn some fighting skills from Ice Man. Tumble Town can be a dangerous place.");
                 }
                 return;
             }
@@ -100,7 +100,7 @@ addMap({
         }
 
         const importantThingsToDo = () => {
-            world.showTextPopup("You can't leave ȹTumble Townȹ yet! You have important things to do!");
+            world.showPopup("You can't leave ȹTumble Townȹ yet! You have important things to do!");
         }
         this.triggerImpulse = (ID,direction) => {
             switch(ID) {

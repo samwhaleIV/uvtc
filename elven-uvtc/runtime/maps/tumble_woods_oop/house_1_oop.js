@@ -37,7 +37,24 @@ addMap({
         }
         this.worldClicked = async type => {
             switch(type) {
-                //Todo object interactions
+                case 8:
+                    await world.showPopup("You can wash your hands all your want, but it won't clean the elves from your mind.");
+                    break;
+                case 9:
+                    await world.showPopup("The elves may have gone a bit overboard, but they at least respected you and Jim enough not to paint your toilet red.")
+                    break;
+                case 10:
+                    await world.showPopup("Even during a hostile government takeover, it's still important to wash yourself.")
+                    break;
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                    await world.showPopup("The books are all cleared out. Even the famous book about the cat lady is gone.");
+                    break;
+                case 15:
+                    await scripts.table_etch(world);
+                    break;
             }
         }
     },

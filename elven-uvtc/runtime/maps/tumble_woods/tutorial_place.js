@@ -4,11 +4,11 @@ addMap({
         let burr;
         const informSlotting = async () => {
             const keyName = (Object.entries(keyBindings).filter(entry=>entry[1]===kc.cancel)[0]||[])[0]||"None";
-            await world.showInstantTextPopup(`To slot your move press [${keyName}] to access the menu, click the "moves" button, then select a malice slot.`);
+            await world.showInstantPopup(`To slot your move press [${keyName}] to access the menu, click the "moves" button, then select a malice slot.`);
         }
         const tutorialSpeech = async () => {
             await iceman.say("There's only a few things you must know before you can fight.");
-            await world.showInstantTextPopup("Number 1: Moves");
+            await world.showInstantPopup("Number 1: Moves");
             await iceman.speech([
                 "There are three types of moves in fighting: Logical ones, malicious ones, and moves of cowardice/fear.",
                 "True, in the right situation, being fearful could be logical, but moves generally belong to one category.",
@@ -16,13 +16,13 @@ addMap({
                 "In this world, you may find moves that can help you in your future battles.",
                 "Master your moves and their functions and you will begin to find certain synergies between them."
             ]);
-            await world.showInstantTextPopup("Number 2: Winning");
+            await world.showInstantPopup("Number 2: Winning");
             await iceman.speech([
                 "To win a battle, you must bring your opponent's health all the way down.",
                 "If that happens to you, you will lose. What that means depends on the situation you are in.",
                 "There may sometimes be a way to bargain or bribe your way into winning, but that all depends on you and your opponent."
             ]);
-            await world.showInstantTextPopup("Number 3: Your turn");
+            await world.showInstantPopup("Number 3: Your turn");
             await iceman.speech([
                 "Once it is your turn, you select which type of move you are going to use. (Malice, fear, or logic)",
                 "Then, you will choose one of your moves that have in your slots.",
