@@ -18,7 +18,7 @@ function inlineSetTimeout(callback,time) {
 }
 
 const scripts = {
-    table_etch = async world => {
+    table_etch: async world => {
         world.lockPlayerMovement();
         if(world.globalState.etchedNameIntoTable) {
             await world.showPopup("Your name is still etched into the table. You know that was a permanent decision, right?");
