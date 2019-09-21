@@ -2,7 +2,30 @@ function PlayerController(world) {
 
     this.world = world;
     this.camera = world.camera;
-    this.player = null;
+
+    let player = null;
+    let lastDirection = null;
+    let lastWalking = null;
+
+    Object.defineProperty(this,"player",{
+        get: function() {
+            return player;
+        },
+        set: function(newPlayer) {
+            if(newPlayer) {
+                if(lastDirection && lastWalking) {
+                    newPlayer.updateDirection(lastDirection);
+                }
+                player = newPlayer;
+            } else {
+                if(player) {
+                    lastDirection = player.direction;
+                    lastWalking = player.isWalking();
+                }
+                player = newPlayer;
+            }
+        }
+    })
 
     let wDown = false;
     let sDown = false;
@@ -51,36 +74,19 @@ function PlayerController(world) {
                 break;
             case "right":
                 x++;
-                break;   
-            case "upLeft":
-                y--;
-                x--;
                 break;
-            case "upRight":
-                y--;
-                x++;
-                break;
-            case "downLeft":
-                y++;
-                x--;
-                break;
-            case "downRight":
-                y++;
-                x++;
-                break;
-            
         }
         return {x:x,y:y};
     }
 
     const processEnter = () => {
-        if(this.player.isWalking() || this.world.playerInteractionLocked()) {
+        if(player.isWalking() || this.world.playerInteractionLocked()) {
             return;
         }
         const pulseLocation = addDirectionToCoordinate(
-            this.player.x + Math.round(this.player.xOffset),
-            this.player.y + Math.round(this.player.yOffset),
-            this.player.direction
+            player.x + Math.round(player.xOffset),
+            player.y + Math.round(player.yOffset),
+            player.direction
         );
         const collisionState = this.world.getCollisionState(
             pulseLocation.x,pulseLocation.y,true
@@ -90,7 +96,7 @@ function PlayerController(world) {
                 collisionState.object.interacted(
                     pulseLocation.x,
                     pulseLocation.y,
-                    invertDirection(this.player.direction)
+                    invertDirection(player.direction)
                 );
             }
         } else if(collisionState.map) {
@@ -105,15 +111,28 @@ function PlayerController(world) {
                     );
                     break;
                 default:
-                    const otherClickMethod = this.world.map.otherClicked;
-                    if(otherClickMethod) {
-                        otherClickMethod(
+                    if(collisionState.map < LogicLayerInteractStart) {
+                        break;
+                    }
+                    const worldClickedMethod = this.world.map.worldClicked;
+                    if(worldClickedMethod) {
+                        worldClickedMethod(
                             collisionState.map,
                             pulseLocation.x,
-                            pulseLocation.y
+                            pulseLocation.y,
+                            invertDirection(player.direction)
                         );
                     }
                     break;
+            }
+        } else {
+            const otherClickedMethod = this.world.map.otherClicked;
+            if(otherClickedMethod) {
+                otherClickedMethod(
+                    pulseLocation.x,
+                    pulseLocation.y,
+                    invertDirection(player.direction)
+                );
             }
         }
     }
@@ -128,18 +147,18 @@ function PlayerController(world) {
     const inverseCornerCollisionThreshold = 0;
 
     const getSideCollision = (target,xDifference,yDifference) => {
-        const offset = this.player[target];
+        const offset = player[target];
         if(yDifference) {
             if(offset > cornerCollisionThreshold) {
-                return this.world.collides(this.player.x+1,this.player.y+yDifference,this.player.ID);
+                return this.world.collides(player.x+1,player.y+yDifference,player.ID);
             } else if(offset < 0) {
-                return this.world.collides(this.player.x-1,this.player.y+yDifference,this.player.ID);
+                return this.world.collides(player.x-1,player.y+yDifference,player.ID);
             }
         } else if(xDifference) {
             if(offset > inverseCornerCollisionThreshold) {
-                return this.world.collides(this.player.x+xDifference,this.player.y+1,this.player.ID);
+                return this.world.collides(player.x+xDifference,player.y+1,player.ID);
             } else if(offset < 0) {
-                return this.world.collides(this.player.x+xDifference,this.player.y-1,this.player.ID);
+                return this.world.collides(player.x+xDifference,player.y-1,player.ID);
             }
         }
         return false;
@@ -173,47 +192,47 @@ function PlayerController(world) {
             return false;
         }
         const sideCollision = getSideCollision(sideTarget,xDifference,yDifference);
-        const valueAtThreshold = polarizedEvaluation(this.player[offsetTarget],0,positiveDifference);
+        const valueAtThreshold = polarizedEvaluation(player[offsetTarget],0,positiveDifference);
         const lookAheadCollision = this.world.collides(
-            this.player.x+xDifference,
-            this.player.y+yDifference,
-            this.player.ID
+            player.x+xDifference,
+            player.y+yDifference,
+            player.ID
         );
         if((lookAheadCollision || sideCollision) && valueAtThreshold) {
             //console.log("Dead stop - Maximum position already reached");
-            this.player[offsetTarget] = 0;
+            player[offsetTarget] = 0;
             return false;
         }
 
-        this.player[offsetTarget] += movementDistance;
-        const spaceThresholdReached = polarizedEvaluation(this.player[offsetTarget],0,positiveDifference);
+        player[offsetTarget] += movementDistance;
+        const spaceThresholdReached = polarizedEvaluation(player[offsetTarget],0,positiveDifference);
         if((lookAheadCollision || sideCollision) && spaceThresholdReached) {
             //console.log("Dead stop - Already in XY space");
-            this.player[offsetTarget] = 0;
+            player[offsetTarget] = 0;
             return false;    
         }
-        const valueOverflowing = polarizedOverflowEvaluation(this.player[offsetTarget],positiveDifference);
+        const valueOverflowing = polarizedOverflowEvaluation(player[offsetTarget],positiveDifference);
         if(valueOverflowing) {
             if(positiveDifference) {
-                this.player[offsetTarget]--;
+                player[offsetTarget]--;
             } else {
-                this.player[offsetTarget]++;
+                player[offsetTarget]++;
             }
             this.world.moveObject(
-                this.player.ID,
-                this.player.x+xDifference,
-                this.player.y+yDifference
+                player.ID,
+                player.x+xDifference,
+                player.y+yDifference
             );
             const newSideCollision = getSideCollision(sideTarget,xDifference,yDifference);
             const newLookAhead = this.world.collides(
-                this.player.x+xDifference,
-                this.player.y+yDifference,
-                this.player.ID
+                player.x+xDifference,
+                player.y+yDifference,
+                player.ID
             );
-            const newThreshold = polarizedEvaluation(this.player[offsetTarget],0,positiveDifference);
+            const newThreshold = polarizedEvaluation(player[offsetTarget],0,positiveDifference);
             if((newLookAhead || newSideCollision) && newThreshold) {
                 //console.log("Dead stop - Post movement update");
-                this.player[offsetTarget] = 0;
+                player[offsetTarget] = 0;
                 return false;
             }
         }
@@ -225,9 +244,40 @@ function PlayerController(world) {
     let lastXOffset = 0;
     let lastXPolarity = false;
 
+    let pendingDirection = null;
+
+    const tryApplySoloMovementRegister = () => {
+        const soloMovementRegister = checkForSoloMovement();
+        if(soloMovementRegister >= 0) {
+            switch(soloMovementRegister) {
+                case 0:
+                    tryUpdateDirection("up");
+                    break;
+                case 1:
+                    tryUpdateDirection("down");
+                    break;
+                case 2:
+                    tryUpdateDirection("left");
+                    break;
+                case 3:
+                    tryUpdateDirection("right");
+                    break;
+            }
+            applyPlayerVelocities();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     const movementMethod = timestamp => {
+        if(pendingDirection) {
+            player.updateDirection(pendingDirection);
+            applyPlayerVelocities();
+            pendingDirection = null;
+        }
         if(ENV_FLAGS.DEBUG_MICRO_SHIFT) {
-            if(lastXOffset > this.player.xOffset) {
+            if(lastXOffset > player.xOffset) {
                 if(!lastXPolarity) {
                     console.log("Player controller: Micro direction shift!");
                 }
@@ -238,8 +288,8 @@ function PlayerController(world) {
                 }
                 lastXPolarity = false;
             }
-            lastXOffset = this.player.xOffset;
-            console.log(this.player.xOffset);
+            lastXOffset = player.xOffset;
+            console.log(player.xOffset);
         }
         if(!lastFrame) {
             lastFrame = timestamp;
@@ -255,17 +305,17 @@ function PlayerController(world) {
         const movementDistance = delta / 1000 * tilesPerSecond;
 
         if(this.horizontalVelocity > 0) {
-            this.player.setWalking(tryMove(movementDistance,1,0));
+            player.setWalking(tryMove(movementDistance,1,0));
         } else if(this.horizontalVelocity < 0) {
-            this.player.setWalking(tryMove(-movementDistance,-1,0));
+            player.setWalking(tryMove(-movementDistance,-1,0));
         }
         if(this.verticalVelocity > 0) {
-            this.player.setWalking(tryMove(movementDistance,0,1));
+            player.setWalking(tryMove(movementDistance,0,1));
         } else if(this.verticalVelocity < 0) {
-            this.player.setWalking(tryMove(-movementDistance,0,-1));
+            player.setWalking(tryMove(-movementDistance,0,-1));
         }
-        if(this.world.map.triggerActive || this.world.map.triggerActivationMask) {
-            this.player.impulseTrigger(this.world);
+        if(player.triggerState) {
+            player.impulseTrigger(this.world,false);
         }
     }
 
@@ -280,7 +330,7 @@ function PlayerController(world) {
         this.renderMethod = null;
         loopRunning = false;
         lastFrame = null;
-        this.player.setWalking(false);
+        player.setWalking(false);
     }
 
     const applyPlayerVelocities = none => {
@@ -289,7 +339,7 @@ function PlayerController(world) {
         if(none) {
             return;
         }
-        switch(this.player.direction) {
+        switch(player.direction) {
             case "up":
                 this.verticalVelocity = -1;
                 break;
@@ -304,53 +354,60 @@ function PlayerController(world) {
                 break;
         }
     }
+
+    const tryUpdateDirection = direction => {
+        if(this.world.playerInteractionLocked()) {
+            pendingDirection = direction;
+            return;
+        }
+        player.updateDirection(direction);
+    }
+
     this.processKey = function(key) {
-        const worldHasPlayer = this.player ? true : false;
+        const worldHasPlayer = player ? true : false;
         switch(key) {
             case kc.up:
                 wDown = true;
                 if(!worldHasPlayer) {
                     return;
                 }
-                this.player.updateDirection("up");
+                tryUpdateDirection("up");
                 break;
             case kc.down:
                 sDown = true;
-                if(!this.player) {
+                if(!worldHasPlayer) {
                     return;
                 }
-                this.player.updateDirection("down");
+                tryUpdateDirection("down");
                 break;
             case kc.left:
                 aDown = true;
-                if(!this.player) {
+                if(!worldHasPlayer) {
                     return;
                 }
-                this.player.updateDirection("left");
+                tryUpdateDirection("left");
                 break;
             case kc.right:
                 dDown = true;
-                if(!this.player) {
+                if(!worldHasPlayer) {
                     return;
                 }
-                this.player.updateDirection("right");
+                tryUpdateDirection("right");
                 break;
             case kc.accept:
-                if(!this.player) {
+                if(!worldHasPlayer) {
                     return;
                 }
                 processEnter();
                 return;
         }
         applyPlayerVelocities();
-        if(movementDown()) {
-            if(!loopRunning) {
-                startMovementLoop();
-            }
+        if(movementDown() && !loopRunning) {
+            startMovementLoop();
         }
     }
     this.processKeyUp = function(key) {
-        const worldHasPlayer = this.player ? true : false;
+        const worldHasPlayer = player ? true : false;
         switch(key) {
             case kc.up:
                 wDown = false;
@@ -370,24 +427,8 @@ function PlayerController(world) {
         if(!worldHasPlayer) {
             return;
         }
-        const soloMovementRegister = checkForSoloMovement();
-        if(soloMovementRegister >= 0) {
-            switch(soloMovementRegister) {
-                case 0:
-                    this.player.updateDirection("up");
-                    break;
-                case 1:
-                    this.player.updateDirection("down");
-                    break;
-                case 2:
-                    this.player.updateDirection("left");
-                    break;
-                case 3:
-                    this.player.updateDirection("right");
-                    break;
-            }
-            applyPlayerVelocities();
-        } else {
+        if(!tryApplySoloMovementRegister()) {
+            pendingDirection = null;
             stopMovementLoop();
         }
     }

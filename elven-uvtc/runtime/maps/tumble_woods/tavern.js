@@ -15,7 +15,7 @@ addMap({
             };
             world.updateMap("tumble_woods",newMapData);
         }
-        this.otherClicked = async type => {
+        this.worldClicked = async type => {
             switch(type) {
                 case 16:
                     //shiver interacted
@@ -41,7 +41,7 @@ addMap({
                         }
                         world.globalState.shiverGotBeer = true;
                         world.globalState.gotBeer = false;
-                        await world.showInstantTextPopupSound("You gave your beer to Shiver.");
+                        await world.showInstantPopupSound("You gave your beer to Shiver.");
                         await shiver.say("Aweee yeah! What a boss!");
                         if(world.globalState.burrGotBeer && world.globalState.shiverGotBeer) {
                             moveUnlockSegment();
@@ -67,7 +67,7 @@ addMap({
                         }
                         world.globalState.burrGotBeer = true;
                         world.globalState.gotBeer = false;
-                        await world.showInstantTextPopupSound("You gave your beer to Burr.");
+                        await world.showInstantPopupSound("You gave your beer to Burr.");
                         await burr.say("Hey! Thanks a lot dude.");
                         if(world.globalState.burrGotBeer && world.globalState.shiverGotBeer) {
                             world.globalState.shiverWantsToGiveAGift = true;
@@ -105,7 +105,7 @@ addMap({
                                             await mascara.speech([
                                                 "Do you have a drinking problem too? This is going on your tab."
                                             ]);
-                                            await world.showInstantTextPopupSound("You received a beer!");
+                                            await world.showInstantPopupSound("You received a beer!");
                                             world.globalState.gotBeer = true;
                                         } else {
                                             world.globalState.chairDrankBeerKnown = true;
@@ -117,7 +117,7 @@ addMap({
                                                 "You gave it to the chair, didn't you?",
                                                 "Just take another one. It's going on your tab."
                                             ]);
-                                            await world.showInstantTextPopupSound("You received a beer!");
+                                            await world.showInstantPopupSound("You received a beer!");
                                             world.globalState.gotBeer = true;
                                         }
 
@@ -130,7 +130,7 @@ addMap({
                                         switch(forAChair) {
                                             case 0:
                                                 await mascara.say("Okay! Great. Uh, don't ask. There has just been some... 'events' in the past and I have to make sure the chairs stay sober.");
-                                                await world.showInstantTextPopupSound("You received a beer!");
+                                                await world.showInstantPopupSound("You received a beer!");
                                                 world.globalState.gotBeer = true;
                                                 break;
                                             case 1:
@@ -145,7 +145,7 @@ addMap({
                                                     "Fine, you're right. It's none of my business what you do with your alchohol after you leave this counter!",
                                                     "I'm totally sure you'll be responsible and not give it to any chairs."
                                                 ]);
-                                                await world.showInstantTextPopupSound("You received a beer!");
+                                                await world.showInstantPopupSound("You received a beer!");
                                                 world.globalState.gotBeer = true;
                                                 break;
                                         }
@@ -155,7 +155,7 @@ addMap({
                                         } else {
                                             await mascara.say("Alright, I'll put this on your tab.");
                                         }
-                                        await world.showInstantTextPopupSound("You received a beer!");
+                                        await world.showInstantPopupSound("You received a beer!");
                                         world.globalState.gotBeer = true;
                                     }
                                     break;
@@ -192,35 +192,35 @@ addMap({
                 case 10:
                     if(world.globalState.chairDrankBeer && world.globalState.gotBeer) {
                         world.globalState.gotBeer = false;
-                        await world.showTextPopup("You brought me MOREEEEEE????");
-                        await world.showInstantTextPopup("You really should not give this chair beer.");
-                        await world.showTextPopup("SHUT IT NARRATOR. FEEED MEEEEE.");
-                        await world.showInstantTextPopup("The chair stole the beer from you and drank it all in one sip.");
-                        await world.showTextPopup("ReEeeEEeEEEeeEeeEEeEEEee");
+                        await world.showPopup("You brought me MOREEEEEE????");
+                        await world.showInstantPopup("You really should not give this chair beer.");
+                        await world.showPopup("SHUT IT NARRATOR. FEEED MEEEEE.");
+                        await world.showInstantPopup("The chair stole the beer from you and drank it all in one sip.");
+                        await world.showPopup("ReEeeEEeEEEeeEeeEEeEEEee");
                     } else if(world.globalState.gotBeer) {
                         world.globalState.chairDrankBeer = true;
                         world.globalState.gotBeer = false;
-                        await world.showTextPopup("HAHAHAHA. YOU IDIOT.");
-                        await world.showInstantTextPopup("The chair stole the beer from you and drank it all in one sip.");
-                        await world.showTextPopups([
+                        await world.showPopup("HAHAHAHA. YOU IDIOT.");
+                        await world.showInstantPopup("The chair stole the beer from you and drank it all in one sip.");
+                        await world.showPopups([
                             "reeeeeEEEEEEEEEEEEE",
                             "REEEEEEEEEEEEEEEEEEEEEEE"
                         ]);
-                        await world.showInstantTextPopup("... Clearly you've made a terrible mistake.");
+                        await world.showInstantPopup("... Clearly you've made a terrible mistake.");
                     } else {
                         world.globalState.chairAskedForABeer = true;
                         world.globalState.gotBeer = false;
-                        await world.showTextPopup("Hey. If you bring me back a beer, I'll let you in on a secret.");
+                        await world.showPopup("Hey. If you bring me back a beer, I'll let you in on a secret.");
                     }
                     break;
                 case 11:
-                    world.showTextPopups([
+                    world.showPopups([
                         "Rule number 1 of talking to chairs- Uh, wait. How are you talking to me? I'm a chair!",
                         "GET AWAY FROM ME, WITCH!"
                     ]);
                     break;
                 case 14:
-                    world.showTextPopups([
+                    world.showPopups([
                         "When people come here they never sit at these tables. I blame the chairs. They're just so...",
                         "Frigid. Hehe.",
                         "...",
@@ -228,7 +228,7 @@ addMap({
                     ]);
                     break;
                 case 12:
-                    world.showTextPopups([
+                    world.showPopups([
                         "Hey. You should sit on me. I won't bite. I promise.",
                         "What? You don't believe me because I said that in the first place?",
                         "And I'm not making it better for myself?",
@@ -236,37 +236,41 @@ addMap({
                     ]);
                     break;
                 case 13:
-                    world.showTextPopup("Look out for my brother. He gets nervous around new people.");
+                    world.showPopup("Look out for my brother. He gets nervous around new people.");
                     break;
                 case 15:
-                    world.showTextPopup("Hands off please. I just got washed.");
+                    world.showPopup("Hands off please. I just got washed.");
                     break;
                 case 18:
-                    world.showTextPopup("That chair around the corner has a huge booze problem. It was quite the scene last time.")
+                    world.showPopup("That chair around the corner has a huge booze problem. It was quite the scene last time.")
                     break;
                 case 9:
-                    world.showTextPopup("It gets lonely over here next to the endless void.");
+                    world.showPopup("It gets lonely over here next to the endless void.");
                     break;
             }
         }
 
-        this.triggerActivated = async triggerID => {
+        const convenienceFunction = async () => {
+            if(world.globalState.tavernEnterTrigger) {
+                return;
+            }
+            await shiver.say(
+                "Man, it would be real convenient if someone came in here right now that could go get us more beers."
+            );
+            await burr.say(
+                "You're so right dude. I would kill for another beer right now."
+            );
+            await shiver.say(
+                "Yeah, but it's just a pipe dream. The odds of someone walking in here right now and hearing this exact conversation are so low."
+            );
+            world.globalState.tavernEnterTrigger = true;
+        }
+
+        this.triggerImpulse = triggerID => {
             switch(triggerID) {
                 case 1:
-                    if(world.globalState.tavernEnterTrigger) {
-                        return;
-                    }
-                    await shiver.say(
-                        "Man, it would be real convenient if someone came in here right now that could go get us more beers."
-                    );
-                    await burr.say(
-                        "You're so right dude. I would kill for another beer right now."
-                    );
-                    await shiver.say(
-                        "Yeah, but it's just a pipe dream. The odds of someone walking in here right now and hearing this exact conversation are so low."
-                    );
-                    world.globalState.tavernEnterTrigger = true;
-                    break;
+                    convenienceFunction();
+                    return TRIGGER_ACTIVATED;
             }
         }
     },

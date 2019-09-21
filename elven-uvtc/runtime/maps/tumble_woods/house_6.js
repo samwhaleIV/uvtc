@@ -3,14 +3,14 @@ addMap({
         const clearP1 = () => {
             const x = 2;
             const y = 4;
-            world.changeForegroundTile(0,x,y);
-            world.changeCollisionTile(0,x,y);
+            world.setForegroundTile(0,x,y);
+            world.setCollisionTile(0,x,y);
         };
         const clearP2 = () => {
             const x = 6;
             const y = 5;
-            world.changeForegroundTile(0,x,y);
-            world.changeCollisionTile(0,x,y);
+            world.setForegroundTile(0,x,y);
+            world.setCollisionTile(0,x,y);
         };
         const statusMessage = () => worldMaps.tumble_woods.presentTracker.getRemainingMessage(world);
         this.load = world => {
@@ -28,38 +28,38 @@ addMap({
             };
             world.updateMap("tumble_woods",newMapData);
         }
-        this.otherClicked = async type => {
+        this.worldClicked = async type => {
             switch(type) {
                 case 8:
-                    world.showTextPopups([
+                    world.showPopups([
                         "Some interesting literary choices.",
                         "'The Cold Shoulder - A Visual Novel'"
                     ]);
                     break;
                 case 9:
-                    world.showTextPopups([
+                    world.showPopups([
                         "These books look cold.",
                         "The book is titled 'Don't judge a book by its cover - The self motivation book by books for books'"
                     ]);
                     break;
                 case 11:
-                    world.showTextPopup("This could be a unaligned holiday tree... But it's more likely a Christmas tree.");
+                    world.showPopup("This could be an unaligned holiday tree... But it's more likely a Christmas tree.");
                     break;
                 case 12:
-                    world.showTextPopup("This must be Shiver's bed.");
+                    world.showPopup("This must be Shiver's bed.");
                     break;
                 case 13:
-                    world.showTextPopup("This must be Burr's bed.");
+                    world.showPopup("This must be Burr's bed.");
                     break;
                 case 16:
                     clearP1();
                     world.globalState.present1 = true;
-                    await world.showInstantTextPopup(statusMessage());
+                    await world.showInstantPopup(statusMessage());
                     break;
                 case 17:
                     clearP2();
                     world.globalState.present2 = true;
-                    await world.showInstantTextPopup(statusMessage());
+                    await world.showInstantPopup(statusMessage());
                     break;
             }
         }

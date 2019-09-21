@@ -319,7 +319,7 @@ function ControlsPaneRenderer(callback,parent) {
             button.awaiting = false;
             button.keyName = getFriendlyKeyName(keyCode);
             button.keyCode = keyCode;
-            saveKeyBinds();
+            setKeyBinds(keyBindings);
             reloadKeyBindings();
         }
         internalAsync();

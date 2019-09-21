@@ -3,8 +3,8 @@ addMap({
         const clearP7 = () => {
             const x = 1;
             const y = 4;
-            world.changeForegroundTile(0,x,y);
-            world.changeCollisionTile(0,x,y);
+            world.setForegroundTile(0,x,y);
+            world.setCollisionTile(0,x,y);
         };
         const statusMessage = () => worldMaps.tumble_woods.presentTracker.getRemainingMessage(world);
         this.load = world => {
@@ -19,24 +19,24 @@ addMap({
             };
             world.updateMap("tumble_woods",newMapData);
         }
-        this.otherClicked = async type => {
+        this.worldClicked = async type => {
             switch(type) {
                 case 8:
-                    world.showTextPopup("This is clearly a room of luxury.");
+                    world.showPopup("This is clearly a room of luxury.");
                     break;
                 case 9:
-                    world.showTextPopup("Perfectly symmetrical, as all things should be.");
+                    world.showPopup("Perfectly symmetrical, as all things should be.");
                     break;
                 case 10:
-                    world.showTextPopup("sat_lt_2");
+                    world.showPopup("sat_lt_2");
                     break;
                 case 11:
-                    world.showTextPopups(["There's a book sticking out from under the pillow.","It says something about the French revolution."]);
+                    world.showPopups(["There's a book sticking out from under the pillow.","It says something about the French revolution."]);
                     break;
                 case 16:
                     clearP7();
                     world.globalState.present7 = true;
-                    await world.showInstantTextPopup(statusMessage());
+                    await world.showInstantPopup(statusMessage());
                     break;
             }
         }

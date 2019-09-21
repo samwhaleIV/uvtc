@@ -1,5 +1,6 @@
 import PlayerController from "../runtime/player-controller.js";
 import { PlayerRenderer, SpriteRenderer, ElfRenderer } from "./components/world/sprite.js";
+import TileSprite from "./components/world/tile-sprite.js";
 import WorldPopup from "./components/world/popup.js";
 import WorldPrompt from "./components/world/prompt.js";
 import GlobalState from "../runtime/global-state.js";
@@ -10,7 +11,7 @@ import MovesManager from "../runtime/moves-manager.js";
 import MovePreview from "./components/world/move-preview.js";
 import ChapterPreview from "./components/world/chapter-preview.js";
 import Moves from "../runtime/battle/moves.js";
-import Chapters from "../runtime/chapter-data.js";
+import Chapters from "../runtime/chapters.js";
 import BattleScreenRenderer from "./battle-screen.js";
 import BattleFaderEffect from "./components/battle-fader-effect.js";
 import ChapterManager from "../runtime/chapter-manager.js";
@@ -21,9 +22,11 @@ import ObjectiveHUD from "./components/world/objective-hud.js";
 import BoxFaderEffect from "./components/box-fader-effect.js";
 
 const CHAPTER_NAME_LOOKUP = [
-    null,"one","two","three","four","five","six","seven","eight",
-    "nine","ten","eleven","twelve","thirteen","fourteen","fifteen",
-    "sixteen","seventeen"
+    "an impossible chapter that cannot exist",
+    "one","two","three","four","five","six",
+    "seven","eight","nine","ten","eleven",
+    "twelve","thirteen","fourteen",
+    "fifteen","sixteen","seventeen"
 ];
 
 const ALERT_TIME = 1000;
@@ -31,9 +34,77 @@ const ANIMATION_TILE_COUNT = 5;
 const ANIMATION_CYCLE_DURATION = 400;
 const ANIMATION_FRAME_TIME = ANIMATION_CYCLE_DURATION / ANIMATION_TILE_COUNT;
 
+const FINAL_CHAPTER_NUMBER = 12;
+const CHAPTER_COMPLETE_SOUND_SOUND_BY_DEFAULT = false;
+
 function WorldRenderer() {
+
+    const activeChapter = GlobalState.data.activeChapter;
+    const chapter = Chapters[activeChapter-1];
+    const chapterName = `chapter ${CHAPTER_NAME_LOOKUP[activeChapter]}`;
+
+    let chapterState = null;
+    if(chapter.chapterState) {
+        chapterState = new chapter.chapterState();
+    } else {
+        chapterState = {
+            load: null,
+            mapChanged: null,
+            unload: null
+        };
+    }
+
+    Object.defineProperty(this,"activeChapter",{
+        get: function() {
+            return activeChapter;
+        }
+    });
+    Object.defineProperty(this,"chapterName",{
+        get: function() {
+            return chapterName;
+        }
+    });
+    Object.defineProperty(this,"chapter",{
+        get: function() {
+            return chapter;
+        }
+    });
+    Object.defineProperty(this,"chapterState",{
+        get: function() {
+            return chapterState;
+        }
+    });
+
     let alert = null;
     let objectiveHUD = null;
+
+    const timeoutThreads = [];
+    let timeoutHandle = 0;
+
+    this.setTimeout = (action,delay,...parameters) => {
+        const thisHandle = timeoutHandle;
+        timeoutHandle++;
+        timeoutThreads.push({
+            action: () => {
+                action(...parameters);
+            },
+            endTime: performance.now() + delay,
+            handle: thisHandle
+        });
+        return thisHandle;
+    }
+    this.clearTimeout = handle => {
+        let i = 0;
+        while(i<timeoutThreads.length) {
+            const thread = timeoutThreads[i];
+            if(thread.handle === handle) {
+                timeoutThreads.splice(i,1);
+                break;
+            }
+            i++;
+        }
+    }
+
     this.showAlert = (message,duration=ALERT_TIME,noSound=false) => {
         alert = new UIAlert(message.toLowerCase(),duration,noSound);
     }
@@ -66,31 +137,44 @@ function WorldRenderer() {
     this.fadeToBlack = async duration => {
         return safeFade(duration,false);
     }
-    this.chapterComplete = async (noSound=false) => {
-        const method = noSound ? this.showInstantTextPopup : this.showInstantTextPopupSound;
-        const chapterNumber = GlobalState.data.activeChapter;
-        this.pushCustomRenderer(new FadeOut(2000));
-        this.pushCustomRenderer(new ChapterPreview(chapterNumber,this.getItemPreviewBounds));
-        ChapterManager.setActiveChapterCompleted();
-        if(chapterNumber === 17) {
-            await method(`Good job. This is it. Your journey has reached its end... Or is this merely the beginning?`);
-        } else {
-            await method(`Good job. You completed chapter ${CHAPTER_NAME_LOOKUP[chapterNumber]}! Onwards and upwards...`);
+
+    this.managedFaderTransition = (...parameters) => {
+        if(this.map.unload) {
+            this.map.unload(this);
         }
-        this.popCustomRenderer();
+        if(chapterState.unload) {
+            chapterState.unload(this);
+        }
+        this.fader.fadeOut(...parameters);
+    }
+
+    this.chapterComplete = async (noSound=!CHAPTER_COMPLETE_SOUND_SOUND_BY_DEFAULT) => {
+        const method = noSound ? this.showInstantPopup : this.showInstantPopupSound;
+        this.pushCustomRenderer(new FadeOut(2000));
+        this.pushCustomRenderer(new ChapterPreview(activeChapter,this.getItemPreviewBounds));
+        ChapterManager.setActiveChapterCompleted();
+        let message = null;
+        if(activeChapter === FINAL_CHAPTER_NUMBER) {
+            message = `Good job. This is it. Your journey has reached its end... Or is this merely the beginning?`;
+        } else {
+            message = `Good job. You completed ${chapterName}! Onwards and upwards...`;
+        }
         setFaderEffectsRenderer(new BoxFaderEffect());
         faderEffectsRenderer.fillInLayer = new ElvesFillIn();
-        this.fader.fadeOut(MainMenuRenderer,true);
+
+        await method(message);
+        this.managedFaderTransition(MainMenuRenderer,true);
     }
+
+    let internalPlayerObject = null;
+    let pendingPlayerObject = null;
     this.saveState = (withPositionData=true,skipGlobal=false) => {
-        if(withPositionData && playerObject) {
+        if(withPositionData && internalPlayerObject) {
             GlobalState.data["last_map"] = this.renderMap.name;
             GlobalState.data["last_player_pos"] = {
-                d: playerObject.direction,
-                x: playerObject.x,
-                y: playerObject.y,
-                xo: playerObject.xOffset,
-                yo: playerObject.yOffset,
+                d: internalPlayerObject.direction,
+                x: Math.round(internalPlayerObject.x + internalPlayerObject.xOffset),
+                y: Math.round(internalPlayerObject.y + internalPlayerObject.yOffset)
             }
         }
         if(!skipGlobal) {
@@ -104,28 +188,24 @@ function WorldRenderer() {
             const lp = GlobalState.data["last_player_pos"];
             if(lp) {
                 return () => {
-                    if(playerObject && !playerObject.forcedStartPosition) {
-                        this.moveObject(playerObject.ID,lp.x,lp.y,true);
-                        playerObject.xOffset = lp.xo;
-                        playerObject.yOffset = lp.yo;
-                        playerObject.updateDirection(lp.d);
+                    if(internalPlayerObject && !internalPlayerObject.forcedStartPosition) {
+                        this.moveObject(internalPlayerObject.ID,lp.x,lp.y,true);
+                        internalPlayerObject.updateDirection(lp.d);
                     }
                 }
             }
         } else {
-            const activeChapter = GlobalState.data.activeChapter;
-            let startMapByChapter = Chapters[activeChapter-1];
-            startMapByChapter = typeof startMapByChapter === "object" ? startMapByChapter.startMap : null;
-            const startMap = startMapByChapter ? startMapByChapter : FALLBACK_MAP_ID;
-            if(!startMapByChapter) {
-                console.warn(`World: Using a fallback map because the start map could not be found by the active chapter (${activeChapter}) of global data`);
+            let startMap = chapter.startMap ? chapter.startMap : null;
+            if(!startMap) {
+                startMap = FALLBACK_MAP_ID;
+                console.warn(`World: Using a fallback map because chapter ${activeChapter} is missing a start map start map`);
             }
             this.updateMap(startMap);
         }
         return null;
     }
     let ranCustomLoader = false;
-    this.customLoader = (callback,fromMapUpdate,sourceRoom) => {
+    this.customLoader = (callback,fromMapUpdate=false,sourceRoom) => {
         const callbackWithMapPost = (firstTime=false) => {
             this.updateCamera(performance.now(),playerInteractionLocked());
             if(this.map.start) {
@@ -148,6 +228,9 @@ function WorldRenderer() {
             const endTime = performance.now();
             const realTimeSpentLoading = endTime - startTime;
             const firstTime = !ranCustomLoader;
+            if(!fromMapUpdate && chapterState.load) {
+                chapterState.load(this);
+            }
             this.updateMapEnd();
             if(!fromMapUpdate) {
                 if(loadPlayer) {
@@ -237,8 +320,21 @@ function WorldRenderer() {
         }
         loadLastMapOrDefault();
     }
+    this.tileSprite = (function(world){
+        return function(...parameters) {
+            TileSprite.apply(this,parameters);
+            this.move = async (...steps) => await world.moveSprite(this.ID,steps);
+            this.say = world.showPopup;
+            this.alert = () => {
+                throw Error("Tile sprites don't support the alert function!");
+            }
+            this.setWalking = () => void undefined;
+            this.updateDirection = () => void undefined;
+        }
+    })(this);
     this.sprite = SpriteRenderer;
     this.elfSprite = ElfRenderer;
+    this.getTileSprite = tileID => new this.tileSprite(tileID);
     this.getCharacter = (name,direction) => GetOverworldCharacter(this,name,direction,false);
     this.getStaticCharacter = name => GetOverworldCharacter(this,name,null,true);
     this.movesManager = MovesManager;
@@ -247,9 +343,9 @@ function WorldRenderer() {
     this.someoneIsNowYourFriend = (character,customString) => {
         if(customString) {
             const message = customString.replace("{NAME}",character.coloredName);
-            return this.showInstantTextPopupSound(message);
+            return this.showInstantPopupSound(message);
         } else {
-            return this.showInstantTextPopupSound(`Congratulations! ${character.coloredName} is now your friend!`);
+            return this.showInstantPopupSound(`Congratulations! ${character.coloredName} is now your friend!`);
         }
     }
 
@@ -307,7 +403,7 @@ function WorldRenderer() {
                 }
             }
             playSound("energy");
-            await this.showInstantTextPopups(messages);
+            await this.showInstantPopups(messages);
             this.popCustomRenderer();
             resolve();
         });
@@ -330,13 +426,17 @@ function WorldRenderer() {
     const collisionTriggerOffset = -2;
 
     this.playerController = new PlayerController(this);
-    let playerObject = null;
+
     Object.defineProperty(this,"playerObject",{
         get: function() {
-            return playerObject;
+            if(pendingPlayerObject) {
+                return pendingPlayerObject;
+            } else {
+                return internalPlayerObject;
+            }
         },
         set: function(value) {
-            playerObject = value;
+            internalPlayerObject = value;
             this.playerController.player = value;
         }
     });
@@ -367,8 +467,12 @@ function WorldRenderer() {
 
     let playerMovementLocked = false;
 
+    const escapeMenu = new WorldUIRenderer(this);
+    let escapeMenuShown = false;
+    this.escapeMenuDisabled = false;
+
     const playerInteractionLocked = () => {
-        return playerMovementLocked || this.popup || this.prompt ? true : false;
+        return playerMovementLocked || escapeMenuShown || this.popup || this.prompt ? true : false;
     }
 
     this.playerInteractionLocked = playerInteractionLocked;
@@ -384,63 +488,78 @@ function WorldRenderer() {
     let sDown = false;
     let aDown = false;
     let dDown = false;
-    let enterReleased = true;
+    let enterReleased = true; 
 
     this.popupProgressEnabled = true;
 
-    this.escapeMenu = new WorldUIRenderer(this);
-    this.escapeMenuShown = false;
-    this.escapeMenuDisabled = false;
     const escapeMenuDisabled = () => {
         return this.escapeMenuDisabled || playerInteractionLocked();
     }
 
+    let i = 0;
     this.processKey = function(key) {
-        if(this.escapeMenuShown) {
-            this.escapeMenu.processKey(key);
+        if(key !== kc.accept) {
+            this.playerController.processKey(key);
+        }
+        if(escapeMenuShown) {
+            escapeMenu.processKey(key);
             return;
         }
         if(this.prompt) {
             switch(key) {
                 case kc.accept:
-                    if(!enterReleased) return;
-                    enterReleased = false;
-                    this.prompt.confirmSelection();
-                    break;
+                    if(enterReleased) {
+                        this.prompt.confirmSelection();
+                        enterReleased = false;
+                        return;
+                    } else {
+                        return;
+                    }
                 case kc.up:
-                    if(wDown) return;
+                    if(wDown) {
+                        return;
+                    }
                     this.prompt.moveSelection("up");
                     break;
                 case kc.down:
-                    if(sDown) return;
+                    if(sDown) {
+                        return;
+                    }
                     this.prompt.moveSelection("down");
                     break;
                 case kc.left:
-                    if(aDown) return;
+                    if(aDown) {
+                        return;
+                    }
                     this.prompt.moveSelection("left");
                     break;
                 case kc.right:
-                    if(dDown) return;
+                    if(dDown) {
+                        return;
+                    }
                     this.prompt.moveSelection("right");
                     break;
             }
         } else if(this.popup) {
             if(key === kc.accept) {
-                if(!enterReleased) return;
-                enterReleased = false;
-                if(this.popupProgressEnabled) {
-                    this.popup.progress();
-                }
-            }
-        } else if(playerObject) {
-            if(key === kc.accept) { 
-                if(!enterReleased) {
-                    return;
-                } else {
+                if(enterReleased) {
+                    if(this.popupProgressEnabled) {
+                        this.popup.progress();
+                    }
                     enterReleased = false;
+                } else {
+                    return;
                 }
             }
-            this.playerController.processKey(key);
+        } else if(internalPlayerObject) {
+            if(key === kc.accept && enterReleased) {
+                if(enterReleased) {
+                    enterReleased = false;
+                    this.playerController.processKey(key);
+                } else {
+                    return;
+                }
+            }
         } else if(key === kc.accept) {
             enterReleased = false;
             return;
@@ -461,8 +580,23 @@ function WorldRenderer() {
         }
     }
     this.processKeyUp = function(key) {
-        if(this.escapeMenuShown) {
-            this.escapeMenu.processKeyUp(key);
+        this.playerController.processKeyUp(key);
+        switch(key) {
+            case kc.up:
+                wDown = false;
+                return;
+            case kc.down:
+                sDown = false;
+                return;
+            case kc.left:
+                aDown = false;
+                return;
+            case kc.right:
+                dDown = false;
+                return;
+        }
+        if(escapeMenuShown) {
+            escapeMenu.processKeyUp(key);
             return;
         }
         switch(key) {
@@ -470,56 +604,31 @@ function WorldRenderer() {
                 if(escapeMenuDisabled()) {
                     return;
                 }
-                if(wDown) {
-                    this.processKeyUp(kc.up);
-                }
-                if(aDown) {
-                    this.processKeyUp(kc.left);
-                }
-                if(sDown) {
-                    this.processKeyUp(kc.down);
-                }
-                if(dDown) {
-                    this.processKeyUp(kc.right);
-                }
-                this.escapeMenuShown = true;
-                this.escapeMenu.show(()=>{
-                    this.escapeMenuShown = false;
+                escapeMenuShown = true;
+                escapeMenu.show(()=>{
+                    escapeMenuShown = false;
                 });
-                break;
+                return;
             case kc.accept:
                 enterReleased = true;
-                break;
-            case kc.up:
-                wDown = false;
-                break;
-            case kc.down:
-                sDown = false;
-                break;
-            case kc.left:
-                aDown = false;
-                break;
-            case kc.right:
-                dDown = false;
-                break;
+                return;
         }
-        this.playerController.processKeyUp(key);
     }
     this.processMove = function(x,y) {
-        if(this.escapeMenuShown) {
-            this.escapeMenu.processMove(x,y);
+        if(escapeMenuShown) {
+            escapeMenu.processMove(x,y);
             return;
         }
     }
     this.processClick = function(x,y) {
-        if(this.escapeMenuShown) {
-            this.escapeMenu.processClick(x,y);
+        if(escapeMenuShown) {
+            escapeMenu.processClick(x,y);
             return;
         }
     }
     this.processClickEnd = function(x,y) {
-        if(this.escapeMenuShown) {
-            this.escapeMenu.processClickEnd(x,y);
+        if(escapeMenuShown) {
+            escapeMenu.processClickEnd(x,y);
             return;
         }
     }
@@ -528,26 +637,26 @@ function WorldRenderer() {
     }
     this.allowKeysDuringPause = true;
 
-    const showTextPopup = (pages,name=null,instant=false) => {
+    const showPopup = (pages,name=null,instant=false) => {
         return new Promise(resolve=>{
             this.popup = new WorldPopup(
                 pages,
                 () => {
                     this.clearTextPopup();
                     resolve();
-                },name,instant
+                },name,instant,this
             );
         });
     }
-    this.showTextPopup =        page =>         showTextPopup([page]);
-    this.showTextPopups =       pages =>        showTextPopup(pages);
-    this.showInstantTextPopup = page =>         showTextPopup([page],null,true);
-    this.showInstantTextPopups = pages =>       showTextPopup(pages,null,true);
-    this.showNamedTextPopup =   (page,name) =>  showTextPopup([page],name);
-    this.showNamedTextPopups =  (pages,name) => showTextPopup(pages,name);
-    this.showInstantTextPopupSound = page => {
+    this.showPopup =         page =>        showPopup([page]);
+    this.showPopups =        pages =>       showPopup(pages);
+    this.showInstantPopup =  page =>        showPopup([page],null,true);
+    this.showInstantPopups = pages =>       showPopup(pages,null,true);
+    this.showNamedPopup =   (page,name) =>  showPopup([page],name);
+    this.showNamedPopups =  (pages,name) => showPopup(pages,name);
+    this.showInstantPopupSound = page => {
         playSound("energy");
-        return showTextPopup([page],null,true);
+        return showPopup([page],null,true);
     }
 
     this.clearPrompt = () => {
@@ -562,10 +671,15 @@ function WorldRenderer() {
         });
     }
 
+    const outOfBounds = (x,y) => {
+        return x < 0 || y < 0 || x > this.renderMap.finalColumn || y > this.renderMap.finalRow;
+    }
+
     this.getTriggerState = function(x,y) {
-        const collisionType = this.renderMap.collision[
-            x + y * this.renderMap.columns
-        ];
+        if(outOfBounds(x,y)) {
+            return null;
+        }
+        const collisionType = this.renderMap.collision[getIdx(x,y)];
         if(collisionTriggers[collisionType]) {
             return collisionType + collisionTriggerOffset;
         }
@@ -573,9 +687,10 @@ function WorldRenderer() {
     }
 
     this.getCollisionState = function(x,y,ignoreNoCollide) {
-        let mapCollision = this.renderMap.collision[
-            x + y * this.renderMap.columns
-        ];
+        if(outOfBounds(x,y)) {
+            return {map: 1, object: null};
+        }
+        let mapCollision = this.renderMap.collision[getIdx(x,y)];
         let objectCollision = this.objectsLookup[x][y];
         if(!ignoreNoCollide) {
             if((this.map.noCollide && this.map.noCollide[
@@ -628,7 +743,7 @@ function WorldRenderer() {
 
     this.addPlayer = function(x,y,...parameters) {
         const newPlayer = new PlayerRenderer(...parameters);
-        this.playerObject = newPlayer;
+        pendingPlayerObject = newPlayer;
         return this.addObject(newPlayer,x,y);
     }
 
@@ -642,7 +757,7 @@ function WorldRenderer() {
         }
     }
 
-    const registerOffscreenToggler = (object,startActive) => {
+    const registerOffscreenToggler = object => {
         const startWithOffscreen = object.offscreenRendering ? true : false;
         let offscreenRendering = startWithOffscreen;
         let world = this;
@@ -693,6 +808,25 @@ function WorldRenderer() {
         }
     }
 
+    const collisionResolution = (existingObject,newObject,x,y) => {
+        if(!this.collides(x,y-1)) {
+            this.objectsLookup[x][y-1] = newObject;
+            newObject.y--;
+        } else if(!this.collides(x+1,y)) {
+            this.objectsLookup[x+1][y] = newObject;
+            newObject.x++;
+        } else if(!this.collides(x,y+1)) {
+            this.objectsLookup[x][y+1] = newObject;
+            newObject.y++;
+        } else if(!this.collides(x-1,y)) {
+            this.objectsLookup[x-1][y] = newObject;
+            newObject.x--;
+        } else {
+            console.error("Error: Object collision could not find a resolution");
+            this.objectsLookup[x][y] = newObject;
+        }
+    }
+
     this.addObject = function(object,x,y) {
         const objectID = getNextObjectID();
         object.ID = objectID;
@@ -713,11 +847,15 @@ function WorldRenderer() {
         if(object.offscreenRendering) {
             return objectID;
         }
-        if(this.objectsLookup[object.x][object.y]) {
-            console.error("Error: An object collision has occured through the add object method");
-            console.log("Existing item",this.objectsLookup[object.x][object.y],"New item",object);
+
+        const existingItem = this.objectsLookup[object.x][object.y];
+        if(existingItem) {
+            console.error("Warning: An object collision has occured through the add object method");
+            console.log("Existing item",existingItem,"New item",object);
+            collisionResolution(existingItem,object,object.x,object.y);
+        } else {
+            this.objectsLookup[object.x][object.y] = object;
         }
-        this.objectsLookup[object.x][object.y] = object;
         return objectID;
     }
     const objectIDFilter = objectID => {
@@ -768,14 +906,18 @@ function WorldRenderer() {
         }
         object.x = newX;
         object.y = newY;
+
+        const existingObject = this.objectsLookup[object.x][object.y];
+        if(existingObject) {
+            console.warn("Warning: An object collision has occured through the move object method");
+            console.log("Existing item",existingObject,"New item",object);
+            collisionResolution(existingObject,object,newX,newY);
+        } else {
+            this.objectsLookup[object.x][object.y] = object;
+        }
         if(object.worldPositionUpdated) {
             object.worldPositionUpdated(oldX,oldY,newX,newY,this,isInitialPosition);
         }
-        if(this.objectsLookup[object.x][object.y]) {
-            console.error("Error: An object collision has occured through the move object method");
-            console.log("Existing item",this.objectsLookup[object.x][object.y],"New item",object);
-        }
-        this.objectsLookup[object.x][object.y] = object;
     }
 
     this.moveSprite = function(objectID,steps) {
@@ -893,22 +1035,29 @@ function WorldRenderer() {
     this.getForegroundTile = (x,y) => getLayer(this.renderMap.foreground,x,y);
     this.getBackgroundTile = (x,y) => getLayer(this.renderMap.background,x,y);
 
-    this.changeCollisionTile =  (value,x,y) => changeLayer(this.renderMap.collision,value,x,y);
-    this.changeForegroundTile = (value,x,y) => changeLayer(this.renderMap.foreground,value,x,y);
+    this.setCollisionTile =  (value,x,y) => changeLayer(this.renderMap.collision,value,x,y);
+    this.setForegroundTile = (value,x,y) => changeLayer(this.renderMap.foreground,value,x,y);
     this.changeBackgroundTile = (value,x,y) => changeLayer(this.renderMap.background,value,x,y);
 
-    this.changeCollisionTileFilter = (value,x,y,filter) => changeLayerFilter(this.renderMap.collision,value,x,y,filter);
-    this.changeForegroundTileFilter = (value,x,y,filter) => changeLayerFilter(this.renderMap.foreground,value,x,y,filter);
-    this.changeBackgroundTileFilter = (value,x,y,filter) => changeLayerFilter(this.renderMap.background,value,x,y,filter);
+    this.setCollisionTileFilter = (value,x,y,filter) => changeLayerFilter(this.renderMap.collision,value,x,y,filter);
+    this.setForegroundTileFilter = (value,x,y,filter) => changeLayerFilter(this.renderMap.foreground,value,x,y,filter);
+    this.setBackgroundTileFilter = (value,x,y,filter) => changeLayerFilter(this.renderMap.background,value,x,y,filter);
 
     this.updateMapEnd = function() {
+        pendingPlayerObject = null;
         if(this.map.load) {
             this.map.load(this);
         }
         if(this.map.getCameraStart) {
             this.camera = this.map.getCameraStart(this);
         }
-        this.playerController.player = playerObject;
+        if(pendingPlayerObject) {
+            this.playerObject = pendingPlayerObject;
+        }
+        pendingPlayerObject = null;
+        if(chapterState.mapChanged) {
+            chapterState.mapChanged(this.map);
+        }
         this.restoreRoomSong();
     }
     this.stopMusic = callback => {
@@ -974,6 +1123,7 @@ function WorldRenderer() {
     }
 
     this.updateMap = function(newMapName,data={}) {
+        console.log(`World: Loading '${newMapName}'`);
         enterReleased = true;
         const runLoadCode = ranCustomLoader;
         if(runLoadCode) {
@@ -996,7 +1146,7 @@ function WorldRenderer() {
         this.objects = {};
         offscreenObjects = [];
         offscreenObjectCount = 0;
-        playerObject = null;
+        this.playerObject = null;
         this.followObject = null;
         this.cameraFrozen = false;
         this.clearCustomRendererStack();
@@ -1045,7 +1195,10 @@ function WorldRenderer() {
         await delay(5000);
         setFaderEffectsRenderer(new BoxFaderEffect());
         faderEffectsRenderer.fillInLayer = new ElvesFillIn();
-        rendererState.fader.fadeOut(WorldRenderer);
+        if(this.map.unload) {
+            this.map.unload(this);
+        }
+        this.managedFaderTransition(WorldRenderer);
     }
 
     this.startBattle = (battleID,winCallback,loseCallback,...battleParameters) => {
@@ -1056,7 +1209,10 @@ function WorldRenderer() {
         function returnToWorld() {
             setFaderInSound("battle-fade-in",true);
             setFaderOutSound("battle-fade-out",true);
-            rendererState.fader.fadeOut(WorldRenderer);
+            if(this.map.unload) {
+                this.map.unload(this);
+            }
+            this.managedFaderTransition(WorldRenderer);
         }
         function win(battleOutput) {
             if(winCallback) {
@@ -1071,7 +1227,10 @@ function WorldRenderer() {
             returnToWorld();
         }
         const opponent = getOpponent(battleID,...battleParameters);
-        rendererState.fader.fadeOut(BattleScreenRenderer,win,lose,opponent);
+        if(this.map.unload) {
+            this.map.unload(this);
+        }
+        this.managedFaderTransition(BattleScreenRenderer,win,lose,opponent);
     }
 
     this.updateSize = function() {
@@ -1185,7 +1344,7 @@ function WorldRenderer() {
             if(this.followObject) {
                 followObject = this.followObject;
             } else {
-                followObject = playerObject;
+                followObject = internalPlayerObject;
             }
             if(followObject) {
                 if(followObject.renderLogic) {
@@ -1224,6 +1383,17 @@ function WorldRenderer() {
     }
 
     this.render = function(timestamp) {
+
+        let timeoutThreadIndex = 0;
+        while(timeoutThreadIndex < timeoutThreads.length) {
+            const timeoutThread = timeoutThreads[timeoutThreadIndex];
+            if(timestamp >= timeoutThread.endTime) {
+                timeoutThreads.splice(timeoutThreadIndex,1);
+                timeoutThread.action();
+                timeoutThreadIndex--;
+            }
+            timeoutThreadIndex++;
+        }
 
         if(tileRenderingEnabled) {
         
@@ -1377,8 +1547,8 @@ function WorldRenderer() {
         if(this.customRenderer) {
             this.customRenderer.render(timestamp);
         }
-        if(this.escapeMenuShown) {
-            this.escapeMenu.render(timestamp);
+        if(escapeMenuShown) {
+            escapeMenu.render(timestamp);
         }
         if(this.prompt) {
             this.prompt.render(timestamp);

@@ -6,7 +6,7 @@ import AudioPane from "./audio-pane.js";
 import CreditsRenderer from "./credits.js";
 import GlobalState from "../runtime/global-state.js";
 import ChapterManager from "../runtime/chapter-manager.js";
-import Chapters from "../runtime/chapter-data.js";
+import Chapters from "../runtime/chapters.js";
 import BoxFaderEffect from "./components/box-fader-effect.js";
 
 const BACKGROUND_MARGIN = 20;
@@ -35,9 +35,7 @@ const PLAY_BUTTON_TEXT = "play";
 const BACKGROUND_IMAGE = "stars-menu";
 const SPIRAL_BACKGROUND = "spiral-menu";
 
-const SONG_NAME = "main-menu";
-
-//These aren't really magic numbers, they're just fixed pseudo-random
+//These aren't magic numbers, they're just fixed pseudo-random
 const bounceVariation1 = ELF_BOUNCE_TIME_BASE - 2932;
 const bounceVariation2 = ELF_BOUNCE_TIME_BASE - 2321;
 const bounceVariation3 = ELF_BOUNCE_TIME_BASE - 1234;
@@ -146,7 +144,7 @@ function MainMenuRenderer(toChapterPane=false) {
         this.processMove(x,y);
     }
 
-    this.song = SONG_NAME;
+    this.song = MAIN_MENU_SONG;
 
     this.processMove = function(mouseX,mouseY) {
         if(this.overlayPane) {

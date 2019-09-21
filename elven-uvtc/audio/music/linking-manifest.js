@@ -22,6 +22,8 @@
 //This string should be... Well. I guess it's kinda obvious. Never mind.
 const MUSIC_INTRO_SUFFIX = "_intro";
 
+const MAIN_MENU_SONG = "main-menu";
+
 //Put the root song names here and they are assumed to have their '<name> + <intro suffix>' files in the music folder just as any other song
 //This is NOT used for songs that will play anywhere other than the over. Battles, menus, etc. will use something else.
 //Be sure not to include the intro suffix string or your files are gonna have to be named like 'song_intro_intro'

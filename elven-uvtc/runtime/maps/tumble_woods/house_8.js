@@ -3,8 +3,8 @@ addMap({
         const clearP6 = () => {
             const x = 4;
             const y = 3;
-            world.changeForegroundTile(0,x,y);
-            world.changeCollisionTile(0,x,y);
+            world.setForegroundTile(0,x,y);
+            world.setCollisionTile(0,x,y);
         };
         const statusMessage = () => worldMaps.tumble_woods.presentTracker.getRemainingMessage(world);
         this.load = world => {
@@ -19,15 +19,15 @@ addMap({
             };
             world.updateMap("tumble_woods",newMapData);
         }
-        this.otherClicked = async type => {
+        this.worldClicked = async type => {
             switch(type) {
                 case 8:
-                    world.showTextPopups(["Wow. this person sure likes books.","You can't grab any books or else the whole house might fall apart."]);
+                    world.showPopups(["Wow. This person sure likes books.","You can't grab any books or else the whole house might fall apart."]);
                     break;
                 case 16:
                     clearP6();
                     world.globalState.present6 = true;
-                    await world.showInstantTextPopup(statusMessage());
+                    await world.showInstantPopup(statusMessage());
                     break;
             }
         }

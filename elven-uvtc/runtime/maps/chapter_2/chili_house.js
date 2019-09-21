@@ -40,9 +40,9 @@ addMap({
             const mingleCount = getMingleCount();
             objectiveHUD.text = `Mingle With Partygoers: ${mingleCount}/8`;
             if(mingleCount === 8) {
-                objectiveHUD.markComplete(async()=> {
-                    await world.showInstantTextPopup("You are now socially exhausted.");
-                    await world.showInstantTextPopup("Maybe you should take a step outside?");
+                objectiveHUD.markComplete(async()=>{
+                    await world.showInstantPopup("You are now socially exhausted.");
+                    await world.showInstantPopup("Maybe you should take a step outside?");
                     world.globalState.metAll = true;
                 });
             }
@@ -57,8 +57,8 @@ addMap({
         }
 
         const partyInteraction = async (target,direction) => {
-            if(this.elfChaseRequired) {
-                await world.showInstantTextPopup("There's no time to talk! Go get those elves!");
+            if(world.globalState.elfChaseRequired) {
+                await world.showInstantPopup("There's no time to talk! Go get those elves!");
                 return;
             }
             target.updateDirection(direction);
@@ -75,14 +75,14 @@ addMap({
         const removeIcePeople = () => {
             const locations = [{x:8,y:1},{x:8,y:2},{y:1,x:10},{y:2,x:10}];
             locations.forEach(location => {
-                world.changeCollisionTile(0,location.x,location.y);
-                world.changeForegroundTile(0,location.x,location.y);
+                world.setCollisionTile(0,location.x,location.y);
+                world.setForegroundTile(0,location.x,location.y);
             });
         }
 
         const clearPresentMove = () => {
-            world.changeForegroundTile(0,10,5);
-            world.changeCollisionTile(0,10,5);
+            world.setForegroundTile(0,10,5);
+            world.setCollisionTile(0,10,5);
         }
 
         this.load = () => {
@@ -133,7 +133,7 @@ addMap({
             chiliWife.mingleID = 6;
 
             jim.interacted = () => {
-                if(this.elfChaseRequired) {
+                if(world.globalState.elfChaseRequired) {
                     jim.say("Jam is missing! Please! Stop those elves!");
                     return;
                 }
@@ -150,11 +150,27 @@ addMap({
             bindPartyInteraction(chili);
             bindPartyInteraction(chiliWife);
 
-            world.addPlayer(3,4,"up");
-            world.playerObject.forcedStartPosition = true;
+            if(data.sourceRoom === "tumble_showdown") {
+                world.addPlayer(5,2,"down");
+            } else {
+                world.addPlayer(3,4,"up");
+            }
 
             if(world.globalState.jimToldYouToMingle) {
                 createObjectiveHUD(false);
+            }
+
+            if(world.globalState.elfChaseRequired) {
+                world.removeObject(chili.ID);
+                world.removeObject(jam.ID);
+                world.moveObject(jim.ID,8,4,false);
+                jim.updateDirection("left");
+                removeIcePeople();
+                world.moveObject(frogert.ID,4,7);
+                frogert.updateDirection("up");
+                world.moveObject(iceMan.ID,7,6);
+                iceMan.updateDirection("up");
+                chiliWife.updateDirection("up");
             }
 
             this.start = async () => {
@@ -173,11 +189,11 @@ addMap({
                     if(!musicMuted) {
                         await delay(1500);
                         world.stopMusic();
-                        await world.showTextPopup("Uhhhh! WRONG SONG!");
+                        await world.showPopup("Uhhhh! WRONG SONG!");
                         await world.playSong(
                             ScriptedSongLinkingManifest["party-song"]
                         );
-                        await world.showTextPopup("Ah, yes. That's better. Less impending doom.");
+                        await world.showPopup("Ah, yes. That's better. Less impending doom.");
                     }
                 } else {
                     world.playSong(
@@ -196,19 +212,19 @@ addMap({
             }
         }
         this.doorClicked = async () => {
-            if(this.elfChaseRequired) {
+            if(world.globalState.elfChaseRequired) {
                 world.updateMap("tumble_showdown");
                 return;
             }
             if(!world.globalState.metAll) {
-                await world.showTextPopup("Are you really trying to leave? The party is just getting started!");
-                await world.showTextPopup("Say hello to more people!");
+                await world.showPopup("Are you really trying to leave? The party is just getting started!");
+                await world.showPopup("Say hello to more people!");
             } else {
                 world.stopMusic();
                 world.lockPlayerMovement();
 
-                await world.showInstantTextPopup("Someone knocked on the door right as you tried to open it!");
-                await world.showNamedTextPopup("Hey! We're here for the party!","???: ");
+                await world.showInstantPopup("Someone knocked on the door right as you tried to open it!");
+                await world.showNamedPopup("Hey! We're here for the party!","???: ");
 
                 world.autoCameraOff();
 
@@ -246,8 +262,8 @@ addMap({
                     context.fillRect(0,0,fullWidth,fullHeight);
                 }});       
 
-                await world.showInstantTextPopup("...");
-                await world.showInstantTextPopup("Light footsteps are heard entering through the door.");
+                await world.showInstantPopup("...");
+                await world.showInstantPopup("Light footsteps are heard entering through the door.");
 
 
                 await burr.say("Ahh! What are you doing!");
@@ -255,23 +271,23 @@ addMap({
 
                 await jam.say("OH GOD PLEASE DON'T TOUCH ME I AM ALLERGIC TO BEING TOUCHED!");
 
-                await world.showInstantTextPopup("Bottles are heard breaking.");
+                await world.showInstantPopup("Bottles are heard breaking.");
 
                 await chili.say("Chillene!");
 
                 await chiliWife.say("Chili! Noooo!");
 
-                await world.showInstantTextPopup("Chili's shouting fades into distant mumbling.");
+                await world.showInstantPopup("Chili's shouting fades into distant mumbling.");
 
 
                 await iceMan.say("You won't have me so easy!");
-                await world.showInstantTextPopup("Lots of punches are heard.");
+                await world.showInstantPopup("Lots of punches are heard.");
 
                 world.removeObject(chili.ID);
                 world.removeObject(jam.ID);
 
                 await iceMan.say("Quick! Somebody get the lights back on!");
-                await world.showNamedTextPopup("Oh. As you wish.","???: ");
+                await world.showNamedPopup("Oh. As you wish.","???: ");
 
                 world.moveObject(world.playerObject.ID,5,4,false);
                 world.playerObject.xOffset = 0;
@@ -388,13 +404,13 @@ addMap({
                 await world.moveCamera(...world.playerObject.location,200);
                 world.autoCameraOn();
                 world.unlockPlayerMovement();
-                this.elfChaseRequired = true;
+                world.globalState.elfChaseRequired = true;
             }
         }
-        this.otherClicked = async type => {
+        this.worldClicked = async type => {
             switch(type) {
                 case 8:
-                    world.showTextPopup("Burr and Shiver are keeping their beers under the table out of sight.");
+                    world.showPopup("Burr and Shiver are keeping their beers under the table out of sight.");
                     break;
                 case 9:
                     if(world.globalState.talkedToShiver) {
@@ -413,57 +429,57 @@ addMap({
                     updateMingleCount();
                     break;
                 case 11:
-                    world.showTextPopup("Are you trying to open someone else's present?");
+                    world.showPopup("Are you trying to open someone else's present?");
                     break;
                 case 12:
                     if(!world.globalState.chiliMovePresent) {
-                        if(world.globalState.gotWrongPresentAnswer) {
-                            await world.showTextPopup("Look buddy, you had your chance! Come back another time.");
+                        if(this.gotWrongPresentAnswer) {
+                            await world.showPopup("Look buddy, you had your chance! Come back another time.");
                             break;
                         }
                         world.lockPlayerMovement();
-                        await world.showTextPopup("Oh. Are you wondering who this present is for?");
-                        const amCurious = await world.showPrompt("are you curious?","yes","no") === 0 ? true : false;
+                        await world.showPopup("Oh. Are you wondering who this present is for?");
+                        const amCurious = await world.showPrompt("are you curious?","yes","no") === 0;
                         await delay(500);
                         if(amCurious) {
-                            await world.showTextPopup("Interesting.");
-                            await world.showTextPopup("How about this, if you can solve my riddle, you can have me.");
-                            await world.showTextPopup("Can a present be opened tomorrow? Answer carefully, I don't give second chances!");
+                            await world.showPopup("Interesting.");
+                            await world.showPopup("How about this, if you can solve my riddle, you can have me.");
+                            await world.showPopup("Can a present be opened tomorrow? Answer carefully, I don't give second chances!");
                             const correctAnswer = await world.showPrompt("can a present be opened tomorrow?","yes","no") === 0 ? false : true;
                             await delay(500);
                             if(correctAnswer) {
                                 world.globalState.chiliMovePresent = true;
-                                await world.showTextPopup("Yep! That's right. A present can only be opened in the present!");
-                                await world.showTextPopup("Open me carefully. Please be gentle.");
+                                await world.showPopup("Yep! That's right. A present can only be opened in the present!");
+                                await world.showPopup("Open me carefully. Please be gentle.");
                                 clearPresentMove();
                                 world.unlockMove("Jingle Bells");
                             } else {
-                                world.globalState.gotWrongPresentAnswer = true;
-                                await world.showTextPopup("Hmm. Nope. A present can only be opened in the present.");
+                                this.gotWrongPresentAnswer = true;
+                                await world.showPopup("Hmm. Nope. A present can only be opened in the present.");
                             }
                         } else {
-                            await world.showTextPopup("Ah, well, perhaps we can do this another time.");
+                            await world.showPopup("Ah, well, perhaps we can do this another time.");
                         }
                         world.unlockPlayerMovement();
                     }
                     break;
                 case 13:
-                    world.showTextPopup("Aren't Christmas trees supposed to have stars on them?");
+                    world.showPopup("Aren't Christmas trees supposed to have stars on them?");
                     break;
                 case 14:
-                    world.showTextPopup("I'm a bit of a wallflower at parties.");
+                    world.showPopup("I'm a bit of a wallflower at parties.");
                     break;
                 case 15:
-                    world.showTextPopup("Don't go towards the light if you're not ready for it.");
+                    world.showPopup("Don't go towards the light if you're not ready for it.");
                     break;
                 case 16:
-                    world.showTextPopup("This is Chillene's bed.");
+                    world.showPopup("This is Chillene's bed.");
                     break;
                 case 17:
-                    world.showTextPopup("This is Chili's bed.");
+                    world.showPopup("This is Chili's bed.");
                     break;
                 case 18:
-                    world.showTextPopup("There's a high probability that this table came from somewhere that sells tables.");
+                    world.showPopup("There's a high probability that this table came from somewhere that sells tables.");
                     break;
             }
         }

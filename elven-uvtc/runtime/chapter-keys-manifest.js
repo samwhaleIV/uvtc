@@ -42,7 +42,8 @@ const ChapterKeysManifest = {
         "talkedToStoreTrees",
         "unlockedReturnToSender",
         "beatTreeCoGame",
-        "metLouis"
+        "metLouis",
+        "pressedEnterObjective"
     ],
     2: [
         "talkedToShiver",
@@ -59,14 +60,18 @@ const ChapterKeysManifest = {
         "borderCreated",
         "wimpyRedDefeated",
         "chiliMovePresent",
-        "gotWrongPresentAnswer",
         "justWonToWimpyRed",
         "justWonToWimpyGreen",
         "justLostToWimpyRed",
-        "justLostToWimpyGreen"
+        "justLostToWimpyGreen",
+        "elfChaseRequired"
     ],
     3: [
-
+        "openedSecretDoor",
+        "secretDoorOpen",
+        "hasCanOfPaint",
+        "hasPoolNoodle",
+        "paintedLamp"
     ],
     4: [
 
@@ -111,4 +116,5 @@ const ChapterKeysManifest = {
 
     ]
 };
-export default ChapterKeysManifest;
+const AllChapterKeys = Object.values(ChapterKeysManifest).flat();
+export { ChapterKeysManifest, AllChapterKeys }

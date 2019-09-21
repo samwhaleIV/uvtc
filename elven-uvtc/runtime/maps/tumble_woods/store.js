@@ -2,14 +2,14 @@ addMap({
     WorldState: function(world,data) {
         let louis;
         const question = async (ID,question,correct,...options) => {
-            await world.showInstantTextPopup("Question " + ID);
+            await world.showInstantPopup("Question " + ID);
             const q1 = await world.showPrompt(question,...options);
             await delay(400);
             if(q1 === correct || correct === "any") {
-                await world.showInstantTextPopup("Correct!");
+                await louis.say("Correct!");
                 return true;
             } else {
-                await world.showInstantTextPopup("Sorry, that's incorrect!");
+                await louis.say("Sorry, that's incorrect!");
                 return false;
             }
         }
@@ -44,7 +44,7 @@ addMap({
             world.addPlayer(5,7,"up");
             louis = world.getStaticCharacter("louis");
         }
-        this.otherClicked = async type => {
+        this.worldClicked = async type => {
             switch(type) {
                 case 17:
                     world.updateMap("tumble_woods",{fromDoorWay:true});
@@ -55,14 +55,14 @@ addMap({
                 case 11:
                     const applesMessage = "Apples. APPLES. apples!";
                     if(!world.globalState.talkedToStoreTrees) {
-                        await world.showNamedTextPopup("Why are you spending your time trying to talk to trees?","ȹTree:ȹ ");
-                        await world.showNamedTextPopup("Yeah, it's kind of weird.","ȹOther Tree:ȹ ");
-                        await world.showNamedTextPopup("Hey, don't judge the dude, I like the company.","ȹOther Other Tree:ȹ ");
-                        await world.showNamedTextPopup(applesMessage,"ȹOther Other Other Tree:ȹ ");
-                        await world.showNamedTextPopup("This is why we don't invite you place, ȹOther Other Other Tree...ȹ","ȹTree:ȹ ");
+                        await world.showNamedPopup("Why are you spending your time trying to talk to trees?","ȹTree:ȹ ");
+                        await world.showNamedPopup("Yeah, it's kind of weird.","ȹOther Tree:ȹ ");
+                        await world.showNamedPopup("Hey, don't judge the dude, I like the company.","ȹOther Other Tree:ȹ ");
+                        await world.showNamedPopup(applesMessage,"ȹOther Other Other Tree:ȹ ");
+                        await world.showNamedPopup("This is why we don't invite you place, ȹOther Other Other Tree...ȹ","ȹTree:ȹ ");
                         world.globalState.talkedToStoreTrees = true;
                     } else {
-                        await world.showNamedTextPopup(applesMessage,"ȹOther Other Other Tree:ȹ ");
+                        await world.showNamedPopup(applesMessage,"ȹOther Other Other Tree:ȹ ");
                     }
                     break;
                 case 13:
@@ -72,7 +72,7 @@ addMap({
                             await louis.say("Hey again. Welcome to our town again. I'm sure we'll meet again, again.");
                         } else {
                             await louis.say("Hey again! Are you here to play the Tree-Co holiday special? I think you'll love it!");
-                            const wantToPlay = await world.showPrompt("want to play the tree-co game?","yes","no") === 0 ? true : false;
+                            const wantToPlay = await world.showPrompt("want to play the tree-co game?","yes","no") === 0;
                             await delay(500);
                             if(wantToPlay) {
                                 await treeCoGame();
@@ -85,7 +85,7 @@ addMap({
                         await louis.say("Welcome to Tree-Co. Are you here to buy my trees? They drive me MAD.");
                         await louis.say("My name is Louis. I sell trees. If you can answer some questions about trees, I'll give you a present.");
                         await louis.say("It's a new holiday special we're running called 'if you're smarter than a tree.'");
-                        const wantToTry = await world.showPrompt("want to play?","yes","no") === 0 ? true : false;
+                        const wantToTry = await world.showPrompt("want to play?","yes","no") === 0;
                         await delay(500);
                         if(wantToTry) {
                             await treeCoGame();
@@ -101,11 +101,10 @@ addMap({
             }
         }
 
-        this.triggerActivated = (triggerID,direction) => {
-            if(triggerID === 1 && direction === "up") {
+        this.triggerImpulse = (triggerID,direction) => {
+            if(triggerID === 1 && direction === "down") {
                 world.updateMap("tumble_woods",{fromDoorWay:true});
-            } else {
-                return PENDING_CODE;
+                return TRIGGER_ACTIVATED;
             }
         }
     },

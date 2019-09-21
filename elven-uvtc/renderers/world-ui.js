@@ -3,6 +3,7 @@ import ElvesFillIn from "./components/elves-fill-in.js";
 import WorldSettingsRenderer from "./world-settings.js";
 import MovesPaneRenderer from "./moves-pane.js";
 import BoxFaderEffect from "./components/box-fader-effect.js";
+import { OpenSound, CloseSound } from "../runtime/tones.js";
 
 const ICON_PART_1_WIDTH = 64;
 const ICON_PART_2_WIDTH = 58;
@@ -22,22 +23,27 @@ function WorldUIRenderer(world) {
     const partTwoRatio = ICON_PART_2_WIDTH / iconImage.height;
 
     let loadStart = null;
+    let firstLegalLeave = 0;
     let loading = false;
 
     let leaveStart = null;
     let leaving = false;
 
     const transitionTime = 200;
+    const transitionTimeout = transitionTime * 2;
 
     let leavingCallback = null;
     let panel = null;
     let transitioning = true;
     const exit = () => {
+        if(performance.now() < firstLegalLeave) {
+            return;
+        }
         transitioning = true;
         loadStart = null;
         leaveStart = performance.now();
         leaving = true;
-        playSound("reverse-click");
+        CloseSound();
     }
     const clearPanel = noSound => {
         panel = null;
@@ -129,7 +135,10 @@ function WorldUIRenderer(world) {
                     faderEffectsRenderer.fillInLayer = new ElvesFillIn();
                     transitioning = true;
                     world.saveState(true);
-                    world.fader.fadeOut(MainMenuRenderer);
+                    if(world.map.unload) {
+                        world.map.unload(world);
+                    }
+                    world.managedFaderTransition(MainMenuRenderer);
                     break;
                 case internalIconMap.moves.hoverID:
                     playSound("click");
@@ -161,19 +170,14 @@ function WorldUIRenderer(world) {
 
             if(contains(x,y,internalIconMap.elfmart)) {
                 hoverType = internalIconMap.elfmart.hoverID;
-
             } else if(contains(x,y,internalIconMap.settings)) {
                 hoverType = internalIconMap.settings.hoverID;
-
             } else if(contains(x,y,internalIconMap.mainMenu)) {
                 hoverType = internalIconMap.mainMenu.hoverID;
-
             } else if(contains(x,y,internalIconMap.moves)) {
                 hoverType = internalIconMap.moves.hoverID;
-
             } else if(contains(x,y,internalIconMap.help)) {
                 hoverType = internalIconMap.help.hoverID;
-
             } else {
                 hoverType = 0;
             }
@@ -247,7 +251,6 @@ function WorldUIRenderer(world) {
                     case kc.down:
                     case kc.right:
                         hoverType = hoverTypes.help;
-                        hoverType = hoverTypes.help;
                         break;
                 }
                 break;
@@ -292,6 +295,7 @@ function WorldUIRenderer(world) {
         transitioning = true;
         leavingCallback = callback;
         loadStart = performance.now();
+        firstLegalLeave = loadStart + transitionTimeout;
         loading = true;
     }
     this.renderParts = timeNormal => {
@@ -357,7 +361,7 @@ function WorldUIRenderer(world) {
         if(loading) {
             const progress = (timestamp - loadStart) / transitionTime;
             if(progress >= 1) {
-                playSound("click");
+                OpenSound();
                 loading = false;
                 transitioning = false;
             }

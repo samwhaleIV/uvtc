@@ -1,25 +1,48 @@
 addMap({
     WorldState: function(world,data) {
+        let objectiveHUD = null;
+        const completeObjective = () => {
+            if(objectiveHUD) {
+                objectiveHUD.markComplete(async()=>{
+                    world.globalState.pressedEnterObjective = true;
+                    objectiveHUD = null;
+                },true);
+            }
+        }
+        const setHUDText = () => {
+            const keyName = (Object.entries(keyBindings).filter(entry=>entry[1]===kc.accept)[0]||[])[0]||"None";
+            objectiveHUD.text = `Press [${keyName}] on an object to interact with it`;
+        }
+        const keyBindWatchID = addKeyBindWatch(setHUDText);
         this.load = world => {
+            if(!world.globalState.pressedEnterObjective) {
+                objectiveHUD = world.setObjectiveHUD("Interact with the world",false);
+                setHUDText();
+            }
             if(data.fromDoorWay) {
                 world.addPlayer(5,2,"down");
             } else {
                 world.addPlayer(2,4,"up");
             }
         }
+        this.unload = () => {
+            removeKeyBindWatch(keyBindWatchID);
+        }
         this.doorClicked = () => {
+            completeObjective();
             const newMapData = {
                 fromDoorWay: true,
             };
             world.updateMap("house_1",newMapData);
         }
-        this.otherClicked = (type,x,y) => {
+        this.worldClicked = (type,x,y) => {
+            completeObjective();
             switch(type) {
                 case 8:
-                    world.showTextPopup("There are a lot of books on this shelf.");
+                    world.showPopup("There are a lot of books on this shelf.");
                     break;
                 case 9:
-                    world.showTextPopup("A sleeping bag on a hardwood floor, a fine luxury.");
+                    world.showPopup("A sleeping bag on a hardwood floor, a fine luxury.");
                     break;
             }
         }
@@ -41,16 +64,16 @@ addMap({
             };
             world.updateMap("house_1",newMapData);
         }
-        this.otherClicked = type => {
+        this.worldClicked = type => {
             switch(type) {
                 case 8:
-                    world.showTextPopup("Lots of books here... A lot of them seem to mention some kind of card game?");
+                    world.showPopup("Lots of books here... A lot of them seem to mention some kind of card game?");
                     break;
                 case 9:
-                    world.showTextPopup("This bookcase demonstrates that it's okay to be small. Way to go bookcase!");
+                    world.showPopup("This bookcase demonstrates that it's okay to be small. Way to go bookcase!");
                     break;
                 case 10:
-                    world.showTextPopup("These plastic, foldable tables have seen a lot of life. Are they for parties?");
+                    world.showPopup("These plastic, foldable tables have seen a lot of life. Are they for parties?");
                     break;
             }
         }
@@ -72,17 +95,17 @@ addMap({
             };
             world.updateMap("house_1",newMapData);
         }
-        this.otherClicked = type => {
+        this.worldClicked = type => {
             switch(type) {
                 case 8:
-                    world.showTextPopup("These tables are pretty much everywhere.");
+                    world.showPopup("These tables are pretty much everywhere.");
                     break;
                 case 9:
                 case 11:
-                    world.showTextPopup("This must be a kitchen... Seems to be missing a few things, though.");
+                    world.showPopup("This must be a kitchen... Seems to be missing a few things, though.");
                     break;
                 case 10:
-                    world.showTextPopup("This is the cleanest kitchen you've seen in your entire life.");
+                    world.showPopup("This is the cleanest kitchen you've seen in your entire life.");
                     break;
             }
         }
@@ -138,10 +161,10 @@ addMap({
             }
         }
         let didTriggerEnterTrigger = false;
-        this.triggerActivated = (triggerID,direction) => {
+        this.triggerImpulse = (triggerID,direction) => {
             switch(triggerID) {
                 case 1:
-                    if(direction !== "left") {
+                    if(direction !== "right") {
                         return;
                     }
                     if(!world.globalState.playedEnterTrigger) {
@@ -150,7 +173,7 @@ addMap({
                             scripts.how_to_press_enter(world,jim);
                         }
                     }
-                    break;
+                    return TRIGGER_ACTIVATED;
             }
         }
         this.doorClicked = async doorID => {
@@ -179,39 +202,40 @@ addMap({
                     break;
             }
         }
-        this.otherClicked = async type => {
+        this.worldClicked = async type => {
             switch(type) {
                 case 8:
-                    world.showTextPopup("It's important to wash your hands!");
+                    world.showPopup("It's important to wash your hands!");
                     break;
                 case 9:
-                    world.showTextPopup("It's important to use toilets!");
+                    world.showPopup("It's important to use toilets!");
                     break;
                 case 10:
-                    world.showTextPopup("It's important to wash... yourself.");
+                    world.showPopup("It's important to wash... yourself.");
                     break;
                 case 11:
-                    world.showTextPopup("This bookcase doesn't have very many books on it.");
+                    world.showPopup("This bookcase doesn't have very many books on it.");
                     break;
                 case 12:
-                    world.showTextPopups([
+                    world.showPopups([
                         "This bookcase has a few intersting books on it.",
-                        "One book is called 'the cat lady manifesto'",
-                        "ȸIf I loved my children as much as I love my cats, I'd have children.ȸ"
+                        "One book is called The Cat Lady Manifesto.",
+                        '"If I loved my children as much as I love my cats, I\'d have children"'
                     ]);
                     break;
                 case 13:
-                    await world.showTextPopup("This bookcase is trying to be an edgy reflection of society.");
-                    world.showNamedTextPopup("Is it working?",bookcase1Prefix);
+                    await world.showPopup("This bookcase is trying to be an edgy reflection of society.");
+                    world.showNamedPopup("Is it working?",bookcase1Prefix);
                     break;
                 case 14:
-                    await world.showTextPopup("This bookcase seems to be more inappropriate than the other bookcases.");
-                    world.showNamedTextPopup("Hey... What're you wearing?",bookcase2Prefix);
+                    await world.showPopup("This bookcase seems to be more inappropriate than the other bookcases.");
+                    world.showNamedPopup("Hey... What're you wearing?",bookcase2Prefix);
                     break;
                 case 15:
+                    await scripts.table_etch(world);
                     break;
                 case 16:
-                    world.showTextPopup("This couch looks too clean to sit on. Who gets a white couch anyways?");
+                    world.showPopup("This couch looks too clean to sit on. Who gets a white couch anyways?");
                     break;
             }
         }

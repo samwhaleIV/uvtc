@@ -18,16 +18,23 @@ const WorldTextureScale = 3;
 const WorldTileSize = WorldTextureSize * WorldTextureScale;
 const WorldTextureColumns = 64;
 
+const LogicLayerInteractStart = 8;
+
 const WorldTextureAnimationRows = 4;
 const WorldTextureAnimationStart = Math.pow(WorldTextureColumns,2) - WorldTextureColumns * WorldTextureAnimationRows;
 
-const footPrintTiles = {
-    21: true
+const FootPrintTiles = {
+    21: true,
+    37: true,
+    1552: true,
+    1616: true,
+    1680: true,
+    1744: true
 };
-const FALLBACK_MAP_ID = "bedroom_1";
+const FALLBACK_MAP_ID = "missing_map";
 
 const OVERWORLD_MUSIC_FADE_TIME = 100;
 const FAKE_OVERWORLD_LOAD_TIME = 500;
-const VERSION_STRING = "you versus earth, v0.2.2";
+const VERSION_STRING = "you versus earth, v0.2.3";
 
-const PENDING_CODE = Symbol("Pending");
+const TRIGGER_ACTIVATED = Symbol("TRIGGER_ACTIVATED");

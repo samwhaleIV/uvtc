@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="2017.10.31" orientation="orthogonal" renderorder="right-down" width="16" height="8" tilewidth="16" tileheight="16" infinite="0" nextobjectid="1">
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="16" height="8" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="1">
  <tileset firstgid="1" source="../tilesets/world-tileset.tsx"/>
  <tileset firstgid="4097" source="../tilesets/collision-tileset.tsx"/>
- <layer name="Tile Layer 1" width="16" height="8">
+ <layer id="1" name="Tile Layer 1" width="16" height="8">
   <data encoding="csv">
-1,132,4,4,4,4,4,132,1,4,4,4,4,4,4,1,
-3,196,68,68,259,68,68,196,3,68,68,68,68,68,68,3,
+1,4,4,4,4,4,4,4,1,4,4,4,4,4,4,1,
+3,68,68,68,259,68,68,68,3,68,68,68,68,68,68,3,
 67,527,528,528,526,528,528,528,67,193,129,129,129,129,129,67,
-1,591,526,526,526,526,526,526,129,130,2,2,2,2,2,1,
-1,591,526,526,526,526,526,526,2,2,2,2,2,2,2,1,
+1,591,526,526,526,526,526,526,334,130,2,2,2,2,2,1,
+1,591,526,526,526,526,526,526,335,2,2,2,2,2,2,1,
 1,591,526,526,526,526,526,526,1,2,2,2,2,2,2,1,
 1,591,526,526,526,526,526,526,1,2,2,2,2,2,2,1,
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 </data>
  </layer>
- <layer name="Tile Layer 2" width="16" height="8">
+ <layer id="2" name="Tile Layer 2" width="16" height="8">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,390,0,0,0,389,0,0,0,0,0,0,0,0,0,
 0,0,454,0,0,0,453,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,334,0,0,0,332,333,0,0,
-0,0,270,0,391,0,0,0,335,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,332,333,0,0,
+0,0,270,0,391,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,455,0,270,0,0,0,268,269,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer name="Tile Layer 3" width="16" height="8">
+ <layer id="3" name="Tile Layer 3" width="16" height="8" visible="0">
   <data encoding="csv">
 4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,
 4098,4098,4105,4098,4099,4098,4106,4098,4098,4098,4098,4098,4098,4098,4098,4098,

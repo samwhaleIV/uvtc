@@ -1,3 +1,5 @@
+import { SelectionChangeSound, SelectionConfirmSound } from "../../../runtime/tones.js";
+
 function WorldPrompt(text,selections,callback) {
 
     text = processTextForWrapping(text);
@@ -12,7 +14,7 @@ function WorldPrompt(text,selections,callback) {
 
     this.confirmSelection = function() {
         if(this.selectionIndex !== null) {
-            playSound("click");
+            SelectionConfirmSound();
             callback(this.selectionIndex);
             terminated = true;
             return true;
@@ -30,7 +32,7 @@ function WorldPrompt(text,selections,callback) {
                         this.selectionIndex = 0;
                     }
                 }
-                playSound("click");
+                SelectionChangeSound();
                 break;
             case "up":
             case "left":
@@ -41,9 +43,11 @@ function WorldPrompt(text,selections,callback) {
                         this.selectionIndex = selections.length-1;
                     }
                 }
-                playSound("click");
                 break;
+            default:
+                return;
         }
+        SelectionChangeSound();
     }
 
     const largeTextScale = 4;

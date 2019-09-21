@@ -1,3 +1,5 @@
+import { AlertSound } from "../../../runtime/tones.js";
+
 const SPRITE_WIDTH = 16;
 const SPRITE_HEIGHT = 16;
 
@@ -7,15 +9,10 @@ const FOOTSTEPS_SPRITE_NAME = "footsteps";
 const PLAYER_SPRITE_NAME = "player";
 const ELF_HACK_SPRITE = "wimpy-red-elf";
 
-const MAX_CONVOY_PATH_SIZE = 200;
 const CONVOY_ALIGNMENT = 1;
 
-const SPRITE_ALERT_TIMEOUT = 400;
+const SPRITE_ALERT_TIMEOUT = 500;
 
-function lerp(v0,v1,t) {
-    //https://github.com/mattdesl/lerp/blob/master/LICENSE.md
-    return v0*(1-t)+v1*t;
-}
 function convoyRenderSort(a,b) {
     return a.y - b.y;
 }
@@ -286,7 +283,7 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
                     );
                 }
             }
-            const shouldPushNew = footPrintTiles[
+            const shouldPushNew = FootPrintTiles[
                 world.renderMap.background[
                     (newX + Math.round(xOffset)) + (newY + Math.round(yOffset)) * world.renderMap.columns
                 ]
@@ -312,38 +309,22 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
             return;
         }
         this.triggerState = world.getTriggerState(newX,newY);
+        if(!this.triggerState) {
+            this.lastActive = null;
+        }
         this.impulseTrigger(world,initial);
     }
 
     this.impulseTrigger = (world,initial=false) => {
-        const trigger = this.triggerState;
-        const isOnTrigger = trigger ? true : false;
-        const triggerAlreadyPressed = world.map.triggerActive;
-
-        if(triggerAlreadyPressed && !world.map.triggerActivationMask) {
-            if(!isOnTrigger) {
-                world.map.triggerActive = false;
-                world.map.triggerActivationMask = false;
-                if(world.map.triggerDeactivated) {
-                    world.map.triggerDeactivated(world.map.lastTrigger,invertDirection(this.direction));
-                }
+        if(this.triggerState && !initial) {
+            if(this.lastActive === this.triggerState) {
+                return;
             }
-        } else {
-            if(isOnTrigger) {
-                world.map.lastTrigger = trigger;
-                world.map.triggerActive = true;
-                if(initial) {
-                    world.map.triggerActivationMask = true;
-                    return;
-                }
-                if(world.map.triggerActivated) {
-                    const result = world.map.triggerActivated(trigger,invertDirection(this.direction));
-                    if(result === PENDING_CODE) {
-                        world.map.triggerActivationMask = true;
-                    } else {
-                        world.map.triggerActivationMask = false;
-                    }
-                }
+            const result = world.map.triggerImpulse(this.triggerState,this.direction);
+            if(result === TRIGGER_ACTIVATED) {
+                this.lastActive = this.triggerState;
+            } else {
+                this.lastActive = null;
             }
         }
     }
@@ -359,13 +340,13 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         specialRow = null;
         switch(direction) {
             case "down":
-                currentColumn = columnWidth * 0;
+                currentColumn = 0;
                 break;
             case "up":
-                currentColumn = columnWidth * 1;
+                currentColumn = columnWidth;
                 break;
             case "right":
-                currentColumn = columnWidth * 2;
+                currentColumn = columnWidth + columnWidth;
                 break;
             case "left":
                 currentColumn = columnWidth * 3;
@@ -391,13 +372,21 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
     this.renderLogic = null;
 
     let showingAlert = false;
+    
+    const alertResolvers = [];
+    let alertTimeout = null;
     this.alert = () => {
         return new Promise(resolve=>{
-            playSound("alert");
+            if(alertTimeout !== null) {
+                clearTimeout(alertTimeout);
+            }
+            alertResolvers.push(resolve);
+            AlertSound();
             showingAlert = true;
-            setTimeout(() => {
+            alertTimeout = setTimeout(() => {
+                alertResolvers.forEach(resolver=>resolver());
+                alertResolvers.splice(0);
                 showingAlert = false;
-                resolve();
             },SPRITE_ALERT_TIMEOUT);
         });
     }
@@ -449,20 +438,6 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
                 );
             }
         }
-        this.render = function(timestamp,x,y,width,height) {
-            recentTimestamp = timestamp;
-            startX = this.x;
-            startY = this.y;
-            processRenderLogicForFrame(timestamp);
-            if(this.hidden) {
-                return;
-            }
-            if(convoyCount) {
-                renderConvoy(timestamp,x,y,width,height);
-            } else {
-                this.renderSelf(x,y,width,height);
-            }
-        }
     } else {
         this.renderSelf = function(x,y,width,height) {
             const destinationX = this.xOffset * width + x + (this.x - startX) * width;
@@ -479,24 +454,21 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
                 sprite,currentColumn,animationRow,columnWidth,rowHeight,destinationX,destinationY,width,height
             );
         }
-        this.render = function(timestamp,x,y,width,height) {
-            recentTimestamp = timestamp;
-            startX = this.x;
-            startY = this.y;
-            processRenderLogicForFrame(timestamp);
-            if(this.hidden) {
-                return;
-            }
-            if(convoyCount) {
-                renderConvoy(timestamp,x,y,width,height);
-            } else {
-                this.renderSelf(x,y,width,height);
-            }
-
+    }
+    this.render = function(timestamp,x,y,width,height) {
+        recentTimestamp = timestamp;
+        startX = this.x;
+        startY = this.y;
+        processRenderLogicForFrame(timestamp);
+        if(this.hidden) {
+            return;
+        }
+        if(convoyCount) {
+            renderConvoy(timestamp,x,y,width,height);
+        } else {
+            this.renderSelf(x,y,width,height);
         }
     }
-
-
 }
 export default SpriteRenderer;
 export { PlayerRenderer, SpriteRenderer, ElfRenderer };

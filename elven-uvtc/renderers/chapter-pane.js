@@ -1,6 +1,6 @@
 import WorldRenderer from "../renderers/world.js";
 import GlobalState from "../runtime/global-state.js";
-import Chapters from "../runtime/chapter-data.js";
+import Chapters from "../runtime/chapters.js";
 import UIPrompt from "./components/ui-prompt.js";
 import ChapterManager from "../runtime/chapter-manager.js";
 import MovesManager from "../runtime/moves-manager.js";
