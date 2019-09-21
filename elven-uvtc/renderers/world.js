@@ -1195,9 +1195,6 @@ function WorldRenderer() {
         await delay(5000);
         setFaderEffectsRenderer(new BoxFaderEffect());
         faderEffectsRenderer.fillInLayer = new ElvesFillIn();
-        if(this.map.unload) {
-            this.map.unload(this);
-        }
         this.managedFaderTransition(WorldRenderer);
     }
 
@@ -1209,10 +1206,7 @@ function WorldRenderer() {
         function returnToWorld() {
             setFaderInSound("battle-fade-in",true);
             setFaderOutSound("battle-fade-out",true);
-            if(this.map.unload) {
-                this.map.unload(this);
-            }
-            this.managedFaderTransition(WorldRenderer);
+            rendererState.fader.fadeOut(WorldRenderer);
         }
         function win(battleOutput) {
             if(winCallback) {
@@ -1227,9 +1221,6 @@ function WorldRenderer() {
             returnToWorld();
         }
         const opponent = getOpponent(battleID,...battleParameters);
-        if(this.map.unload) {
-            this.map.unload(this);
-        }
         this.managedFaderTransition(BattleScreenRenderer,win,lose,opponent);
     }
 
