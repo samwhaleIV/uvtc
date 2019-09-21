@@ -581,6 +581,10 @@ function WorldRenderer() {
     }
     this.processKeyUp = function(key) {
         this.playerController.processKeyUp(key);
+        if(escapeMenuShown) {
+            escapeMenu.processKeyUp(key);
+            return;
+        }
         switch(key) {
             case kc.up:
                 wDown = false;
@@ -594,12 +598,6 @@ function WorldRenderer() {
             case kc.right:
                 dDown = false;
                 return;
-        }
-        if(escapeMenuShown) {
-            escapeMenu.processKeyUp(key);
-            return;
-        }
-        switch(key) {
             case kc.cancel:
                 if(escapeMenuDisabled()) {
                     return;
