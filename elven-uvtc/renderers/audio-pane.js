@@ -7,16 +7,31 @@ function AudioPane(callback,parent,inverted=false) {
     const fadeInTime = 300;
     this.transitioning = true;
 
+    const updateVolumeTimeout = 30;
+
     let musicVolumeNormal = getMusicVolume();
     let soundVolumeNormal = getSoundVolume();
 
-    const updateMusicVolume = normal => {
+    let updateMusicVolumeTimeout = null;
+    let updateSoundVolumeTimeout = null;
+
+    const updateMusicVolume = (normal,forced=false) => {
         musicVolumeNormal = normal;
-        setMusicVolume(normal);
+        clearTimeout(updateMusicVolumeTimeout);
+        if(forced) {
+            setMusicVolume(normal);
+        } else {
+            updateMusicVolumeTimeout = setTimeout(setMusicVolume.bind(this,normal),updateVolumeTimeout);
+        }
     }
-    const updateSoundVolume = normal => {
+    const updateSoundVolume = (normal,forced=false) => {
         soundVolumeNormal = normal;
-        setSoundVolume(normal);
+        clearTimeout(updateSoundVolumeTimeout);
+        if(forced) {
+            setSoundVolume(normal);
+        } else {
+            updateSoundVolumeTimeout = setTimeout(setSoundVolume.bind(this,normal),updateVolumeTimeout);
+        }
     }
 
     const getVolumeNormal = (x,xStart,width) => {
@@ -112,7 +127,7 @@ function AudioPane(callback,parent,inverted=false) {
             case hoverTypes.elfSlider1:
             case hoverTypes.slider1:
                 updateMusicVolume(
-                    getVolumeNormal(x,slider1.x,slider1.width)
+                    getVolumeNormal(x,slider1.x,slider1.width),true
                 );
                 saveVolumeChanges();
                 break;
@@ -120,7 +135,7 @@ function AudioPane(callback,parent,inverted=false) {
             case hoverTypes.slider2:
                 playSound("energy");
                 updateSoundVolume(
-                    getVolumeNormal(x,slider2.x,slider2.width)
+                    getVolumeNormal(x,slider2.x,slider2.width),true
                 );
                 saveVolumeChanges();
                 break;

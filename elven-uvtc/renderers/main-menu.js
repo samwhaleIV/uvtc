@@ -258,18 +258,20 @@ function MainMenuRenderer(toChapterPane=false) {
     const backgroundImage = imageDictionary["backgrounds/chapter-select"];
     const invertedBackgroundImage = imageDictionary["backgrounds/chapter-select-invert"];
     const bSize = backgroundImage.width;
+    let backgroundOffset = 0;
     this.renderBackground = (timestamp,inverted) => {
         const image = inverted ? invertedBackgroundImage : backgroundImage;
-        const tNormal = timestamp % BACKGROUND_SCROLL_RATE / BACKGROUND_SCROLL_RATE / 2;
+        const tNormal = backgroundOffset;
+        backgroundOffset = ++backgroundOffset % largestDimension;
         context.drawImage(
             image,
             0,0,bSize,bSize,
-            0,0-(largestDimension*tNormal*2),largestDimension,largestDimension
+            0,tNormal,largestDimension,largestDimension
         );
         context.drawImage(
             image,
             0,0,bSize,bSize,
-            0,largestDimension*(1-tNormal*2),largestDimension,largestDimension
+            0,tNormal-largestDimension,largestDimension,largestDimension
         );
     }
 
