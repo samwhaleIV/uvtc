@@ -159,7 +159,6 @@ function AudioPane(callback,parent,inverted=false) {
                     getVolumeNormal(x,slider2.x,slider2.width)
                 );
             }
-            return;
         }
         if(contains(x,y,elfSlider2)) {
             hoverType = hoverTypes.elfSlider2;

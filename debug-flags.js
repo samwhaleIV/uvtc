@@ -8,5 +8,6 @@ const ENV_FLAGS = {
     ELF_PLAYER_HACK: false,
     MOVEMENT_FRAME_WARNING: true,
     CONVOY_TRACE: true,
-    DEBUG_PLAYER_CONVOY: false
+    DEBUG_PLAYER_CONVOY: false,
+    DRAG_TEST: true
 }
