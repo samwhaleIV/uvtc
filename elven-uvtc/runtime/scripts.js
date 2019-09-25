@@ -18,6 +18,27 @@ function inlineSetTimeout(callback,time) {
 }
 
 const scripts = {
+    popupFormatTest: async () => {
+        let popup = rendererState.showPopup;
+        const lock = rendererState.lockPlayerMovement;
+        const unlock = rendererState.unlockPlayerMovement;
+        if(popup && lock && unlock) {
+            const messages = [
+                '"This is a test!!!!!"',
+                "Is this message choppy? 'We gonna find out!'",
+                "'Yeet.'",
+                "'Yeet'.",
+            ];
+            lock();
+            for(let i = 0;i<messages.length;i++) {
+                await popup(messages[i]);
+                await delay(500);
+            }
+            unlock();
+        } else {
+            console.log("It doesn't look like this is the world renderer state!");
+        }
+    },
     table_etch: async world => {
         world.lockPlayerMovement();
         if(world.globalState.etchedNameIntoTable) {

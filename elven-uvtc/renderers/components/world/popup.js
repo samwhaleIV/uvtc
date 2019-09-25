@@ -50,6 +50,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world) {
             continue;
         }
         let textFeed = prefix;
+        let lastCharacterInstant = false;
         for(let x = 0;x<page.length;x++) {
             let speed = characterSpeed;
             let instant = false;
@@ -68,7 +69,10 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world) {
                     break;
                 case "*":
                 case "'":
-                    instant = false;
+                case '"':
+                    if(lastCharacterInstant) {
+                        instant = true;
+                    }
                     break;
                 case ",":
                     delay = commaDelay;
@@ -81,6 +85,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world) {
                     instant = true;
                     break;
             }
+            lastCharacterInstant = instant;
             newPage.push({
                 textFeed:processTextForWrappingLookAhead(textFeed,processedFullText),
                 newCharacter:character,
