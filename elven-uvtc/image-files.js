@@ -16,6 +16,7 @@ ImagePaths.push(
     getFile("wimpy-red.png",FileTypes.BackgroundImage),
     getFile("battle/moves.png",FileTypes.Image),
     getFile("battle/statuses.png",FileTypes.Image),
+    getFile("battle/test-tileset.png",FileTypes.Image),
     getFile("collision-tileset.png",FileTypes.Image),
     getFile("sprites/alert.png",FileTypes.Image),
     getFile("sprites/boney-elf.png",FileTypes.Image),
