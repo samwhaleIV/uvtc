@@ -1,3 +1,5 @@
+import SpriteForeground from "./components/battle/sprite-foreground.js";
+import CrazyFlyingShitEffect from "./components/crazy-flying-shit.js";
 
 const groundTextureX = 0;
 const groundTextureY = 0;
@@ -13,9 +15,22 @@ const groundTextureXHalf = groundTextureX + halfTextureWidth;
 const fogColor = "rgba(255,255,255,0.6)";
 
 function SomethingDifferentRenderer() {
+
+    const opponentSprite = new SpriteForeground("wimpy-red-elf",true,null,null,0.2);
+    this.opponent = {
+        y: 0,
+        x: 0,
+        render: timestamp => {
+            opponentSprite.render(timestamp,120);
+        }
+    }
+
+    this.backgroundEffects = new CrazyFlyingShitEffect();
+
     this.forcedSizeMode = "fit";
     const tileset = imageDictionary["battle/test-tileset"];
     const worldTileset = imageDictionary["world-tileset"];
+    const headcons = imageDictionary["battle/headcon"];
     const getWorldTextureX = ID => ID % WorldTextureColumns * WorldTextureSize;
     const getWorldTextureY = ID => Math.floor(ID / WorldTextureColumns) * WorldTextureSize;
 
@@ -23,6 +38,37 @@ function SomethingDifferentRenderer() {
     const foregroundLayer1 = [];
     const foregroundLayer2 = [];
     const foregroundLayer3 = [];
+
+    const headconMap = [
+        {icon:0,lost:true},
+        {icon:0,lost:false},
+        {icon:0,lost:false},
+
+        {icon:1,lost:false},
+        {icon:1,lost:false},
+        {icon:1,lost:true}
+    ];
+
+    const renderHeadcons = () => {
+        const halfBarWidth = 180;
+        const headConDistance = halfBarWidth/3;
+        const height = 60;
+        context.translate(halfWidth-halfBarWidth,0);
+        context.fillStyle = "black";
+        context.fillRect(0,0,halfBarWidth,height);
+        context.fillStyle = "white";
+        context.fillRect(halfBarWidth,0,halfBarWidth,height);
+
+        context.translate(5,5);
+        for(let i = 0;i<6;i++) {
+            const map = headconMap[i];
+            let iconX = map.icon * 90;
+            let iconY = map.lost ? 90 : 0;
+            context.drawImage(headcons,iconX,iconY,90,90,i*headConDistance,0,50,50);
+        }
+
+        context.resetTransform();
+    }
 
     const renderForegroundObject = foregroundObject => {
         context.drawImage(
@@ -63,8 +109,8 @@ function SomethingDifferentRenderer() {
         foregroundLayer1.push(
             getTree(0.4),
             getTree(0.9),
-            getTree(-1.5),
-            getTree(2),
+            getTree(-0.5),
+            getTree(1.5),
         );
         foregroundLayer2.push(
             getTree(0.25),
@@ -85,17 +131,17 @@ function SomethingDifferentRenderer() {
 
     const renderGround = (xNormal,depthNormal) => {
 
-        depthNormal = -(depthNormal - 1) / 4;
+        depthNormal = Math.max(-(depthNormal - 1) / 4,0.01);
 
-        const renderHeight = fullHeight / 3;
-        const skewAmount = 0.25;
+        const renderHeight = fullHeight / 4;
+        const skewAmount = 0.5;
         const centerPush = 0;
 
         const groundTop = fullHeight - renderHeight;
 
-        const adjustedTextureY = depthNormal * 2 * textureHeight;
+        const adjustedTextureY = Math.max(depthNormal * 2 * textureHeight,0.0001);
 
-        const adjustedTextureX = -xNormal / depthNormal / 15 * textureWidth;
+        const adjustedTextureX = -xNormal / 10 * textureWidth + textureWidth;
 
         context.drawImage(tileset,48,0,16,16,0,groundTop,fullWidth,renderHeight);
 
@@ -126,12 +172,15 @@ function SomethingDifferentRenderer() {
         context.fillRect(0,0,fullWidth,fullHeight);
     }
 
-    const renderForeground = (xNormal,depthNormal) => {
-        depthNormal = 0.75 + (1.2 - 0.75) * depthNormal;
+    const renderForeground = (timestamp,xNormal,depthNormal) => {
+        depthNormal = 1.4 + (2.5 - 1.4) * depthNormal;
 
-        const firstDepthScale = depthNormal / 4;
-        const secondDepthScale = depthNormal / 2
-        const thirdDepthScale = depthNormal;
+        const depthFactor = 0.5;
+
+        const firstDepthScale = Math.pow(depthNormal / 2 / 2 /2,depthFactor);
+        const secondDepthScale = Math.pow(depthNormal / 2 / 2,depthFactor);
+        const thirdDepthScale = Math.pow(depthNormal / 2,depthFactor);
+        const fourthDepthScale = depthNormal + this.opponent.y;
 
         //focal length
         //const firstDepthScale = depthNormal + 0.25;
@@ -139,24 +188,27 @@ function SomethingDifferentRenderer() {
         //const thirdDepthScale = depthNormal + 1;
 
         const xOffset = halfWidth * xNormal;
-        const yOffset = 60;
+        const yContrast = 100;
+        const yOffset = -100;
 
         const firstDepthHeight = firstDepthScale * fullHeight;
         const secondDepthHeight = secondDepthScale * fullHeight;
         const thirdDepthHeight = thirdDepthScale * fullHeight;
+        const fourthDepthHeight = fourthDepthScale * fullHeight;
 
-        
-
+        const opponentXOffset = this.opponent.x * halfWidth;
         
         const thirdDepthX = (fullWidth   - thirdDepthScale  * fullWidth)  /  2 + xOffset * thirdDepthScale;
-        const thirdDepthY = (fullHeight - thirdDepthHeight) / 2;
+        const thirdDepthY = (fullHeight - thirdDepthHeight) / 2 + yContrast / thirdDepthScale + yOffset;
 
         const secondDepthX = (fullWidth  - secondDepthScale * fullWidth)  /  2 + xOffset * secondDepthScale;
-        const secondDepthY =  (fullHeight - secondDepthHeight) / 2 + yOffset / 2;
-
+        const secondDepthY =(fullHeight - secondDepthHeight) / 2 + yContrast / secondDepthScale + yOffset;
 
         const firstDepthX = (fullWidth   - firstDepthScale  * fullWidth)  /  2 + xOffset * firstDepthScale;
-        const firstDepthY = (fullHeight - firstDepthHeight) / 2 + yOffset;
+        const firstDepthY = (fullHeight - firstDepthHeight) / 2 + yContrast / firstDepthScale - 150;
+
+        const fourthDepthX = (fullWidth   - fourthDepthScale  * fullWidth)  /  2 + xOffset * fourthDepthScale - opponentXOffset;
+        const fourthDepthY = (fullHeight - fourthDepthHeight) / 2 - Math.min(depthNormal - 2.5,0) * 10;
 
         let i;
         context.setTransform(firstDepthScale,0,0,firstDepthScale,firstDepthX,firstDepthY);
@@ -174,6 +226,15 @@ function SomethingDifferentRenderer() {
         context.setTransform(thirdDepthScale,0,0,thirdDepthScale,thirdDepthX,thirdDepthY);
         for(i = 0;i<foregroundLayer3.length;i++) {
             renderForegroundObject(foregroundLayer3[i]);
+        }
+
+        context.setTransform(fourthDepthScale,0,0,fourthDepthScale,fourthDepthX,fourthDepthY);
+        if(this.backgroundEffects) {
+            this.backgroundEffects.render(timestamp)
+        }
+        this.opponent.render(timestamp);
+        if(this.foregroundEffects) {
+            this.foregroundEffects.render(timestamp);
         }
         context.resetTransform();
     }
@@ -245,7 +306,7 @@ function SomethingDifferentRenderer() {
     }
 
     let x = 0;
-    let y = 0.5;
+    let y = 0.35;
 
     let xVelocity = 0;
     let yVelocity = 0;
@@ -264,6 +325,15 @@ function SomethingDifferentRenderer() {
 
     const unlockMovement = () => {
         movementLocked = false;
+    }
+
+    let yMovementEnabled = false;
+
+    const lockYMovement = () => {
+        yMovementEnabled = false;
+    }
+    const unlockYMovement = () => {
+        yMovementEnabled = true;
     }
 
 
@@ -339,15 +409,15 @@ function SomethingDifferentRenderer() {
         if(xVelocity !== 0) {
             x -= xVelocity;
         }
-        if(yVelocity !== 0) {
+        if(yVelocity !== 0 && yMovementEnabled) {
             y -= yVelocity;
         }
 
 
-        if(x < -0.25) {
-            x = -0.25;
-        } else if(x > 0.25) {
-            x = 0.25;
+        if(x < -0.35) {
+            x = -0.35;
+        } else if(x > 0.35) {
+            x = 0.35;
         }
 
         if(y < 0) {
@@ -370,7 +440,10 @@ function SomethingDifferentRenderer() {
 
         renderSky();
         renderGround(x,y);
-        renderForeground(x,y);
+        renderForeground(timestamp,x,y);
+
+
+        renderHeadcons();
     }
 }
 export default SomethingDifferentRenderer;

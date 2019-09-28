@@ -14,6 +14,7 @@ ImagePaths.push(
     getFile("tiny-arm.png",FileTypes.BackgroundImage),
     getFile("wimpy-green.png",FileTypes.BackgroundImage),
     getFile("wimpy-red.png",FileTypes.BackgroundImage),
+    getFile("battle/headcon.png",FileTypes.Image),
     getFile("battle/moves.png",FileTypes.Image),
     getFile("battle/statuses.png",FileTypes.Image),
     getFile("battle/test-tileset.png",FileTypes.Image),
