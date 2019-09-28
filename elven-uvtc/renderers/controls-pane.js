@@ -136,25 +136,25 @@ function ControlsPaneRenderer(callback,parent) {
     const backgroundColor = "rgba(89,89,89,0.25)";
 
 
-    const reloadKeyBindings = () => {
+    const reloadKeybindings = () => {
         Object.values(keyButtons).forEach(keyButton => {
             delete keyButton.keyCode;
             delete keyButton.keyName;
         });
-        Object.entries(keyBindings).forEach(keyBind => {
-            const keyImpulse = keyBind[1];
+        Object.entries(keybindings).forEach(keybind => {
+            const keyImpulse = keybind[1];
             const association = keyAssociations[keyImpulse];
             if(association) {
                 const button = keyButtons[association];
                 if(button) {
-                    const keyCode = keyBind[0];
+                    const keyCode = keybind[0];
                     button.keyCode = keyCode;
                     button.keyName = getFriendlyKeyName(keyCode);
                 }
             }
         });
     }
-    reloadKeyBindings();
+    reloadKeybindings();
 
     const renderButton = button => {
         let topColor;
@@ -307,20 +307,20 @@ function ControlsPaneRenderer(callback,parent) {
     const setNewKey = buttonName => {
         const button = keyButtons[buttonName];
         button.awaiting = true;
-        delete keyBindings[button.keyCode];
+        delete keybindings[button.keyCode];
         const internalAsync = async () => {
             const newKey = await getNewKey();
             const keyCode = newKey.code;
-            const existingBind = keyBindings[keyCode];
+            const existingBind = keybindings[keyCode];
             if(existingBind) {
-                delete keyBindings[keyCode];
+                delete keybindings[keyCode];
             }
-            keyBindings[keyCode] = button.association;
+            keybindings[keyCode] = button.association;
             button.awaiting = false;
             button.keyName = getFriendlyKeyName(keyCode);
             button.keyCode = keyCode;
-            setKeyBinds(keyBindings);
-            reloadKeyBindings();
+            setKeybinds(keybindings);
+            reloadKeybindings();
         }
         internalAsync();
     }

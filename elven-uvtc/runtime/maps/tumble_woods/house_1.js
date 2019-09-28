@@ -10,10 +10,10 @@ addMap({
             }
         }
         const setHUDText = () => {
-            const keyName = (Object.entries(keyBindings).filter(entry=>entry[1]===kc.accept)[0]||[])[0]||"None";
+            const keyName = (Object.entries(keybindings).filter(entry=>entry[1]===kc.accept)[0]||[])[0]||"None";
             objectiveHUD.text = `Press [${keyName}] on an object to interact with it`;
         }
-        const keyBindWatchID = addKeyBindWatch(setHUDText);
+        const keybindWatchID = addKeybindWatch(setHUDText);
         this.load = world => {
             if(!world.globalState.pressedEnterObjective) {
                 objectiveHUD = world.setObjectiveHUD("Interact with the world",false);
@@ -26,7 +26,7 @@ addMap({
             }
         }
         this.unload = () => {
-            removeKeyBindWatch(keyBindWatchID);
+            removeKeybindWatch(keybindWatchID);
         }
         this.doorClicked = () => {
             completeObjective();

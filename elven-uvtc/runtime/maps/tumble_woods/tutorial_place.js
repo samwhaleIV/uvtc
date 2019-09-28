@@ -3,7 +3,7 @@ addMap({
         let iceman;
         let burr;
         const informSlotting = async () => {
-            const keyName = (Object.entries(keyBindings).filter(entry=>entry[1]===kc.cancel)[0]||[])[0]||"None";
+            const keyName = (Object.entries(keybindings).filter(entry=>entry[1]===kc.cancel)[0]||[])[0]||"None";
             await world.showInstantPopup(`To slot your move press [${keyName}] to access the menu, click the "moves" button, then select a malice slot.`);
         }
         const tutorialSpeech = async () => {
