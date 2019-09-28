@@ -1,15 +1,5 @@
-function CrazyFlyingShitEffect() {
-
+function CrazyFlyingShitEffect(particleRadius,particleVelocity,maxParticleDecay,particleUpdateTime,count,color) {
     const particles = [];
-
-    const particleRadius = 1;
-
-    const particleVelocity = 2.5;
-    const maxParticleDecay = 0.001;
-
-    const particleUpdateTime = 200;
-    let lastUpdate = 0;
-
     this.addParticle = spawnTime => {
         const horizontalVelocity = Math.random() > 0.5 ? particleVelocity : -particleVelocity;
         const verticalVelocity = Math.random() > 0.5 ? particleVelocity : -particleVelocity;
@@ -30,7 +20,6 @@ function CrazyFlyingShitEffect() {
             size: 1.0
         });
     }
-
     this.addParticles = amount => {
         const spawnTime = performance.now();
         let i = 0;
@@ -39,14 +28,14 @@ function CrazyFlyingShitEffect() {
             i++;
         }
     }
+    this.addParticles(count);
 
-    this.addParticles(80);
-
+    let lastUpdate = 0;
     this.render = timestamp => {
         const timeDifference = timestamp - lastUpdate;
         const shouldUpdate = timeDifference >= particleUpdateTime;
         let i = 0;
-        context.fillStyle = "white";
+        context.fillStyle = color;
         if(shouldUpdate) {
             lastUpdate = timestamp;
             while(i < particles.length) {

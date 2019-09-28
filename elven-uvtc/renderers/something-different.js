@@ -41,7 +41,7 @@ const spriteScale = 120;
 
 const defaultFogColor = "rgba(255,255,255,0.6)";
 
-const maxDelta = 60;
+const maxFrameDifference = 60;
 const deltaBase = 1000 / 60;
 
 const xStart = 0;
@@ -192,7 +192,7 @@ function SomethingDifferentRenderer() {
             getTree(0.20),
             getTree(0.75)
         );
-        this.backgroundEffects.addLayer(new CrazyFlyingShitEffect());
+        this.backgroundEffects.addLayer(new CrazyFlyingShitEffect(1,2.5,0.001,80,200,"white"));
         opponentSprite = new SpriteForeground("wimpy-red-elf",true,null,null,opponentSpriteOffset);
         tileset = imageDictionary["battle/test-tileset"];
         fogColor = defaultFogColor;
@@ -462,8 +462,8 @@ function SomethingDifferentRenderer() {
     }
     this.render = timestamp => {
         let delta = timestamp - lastFrame;
-        if(delta > maxDelta) {
-            delta = maxDelta;
+        if(delta > maxFrameDifference) {
+            delta = maxFrameDifference;
         }
         delta /= deltaBase;
         lastFrame = timestamp;
