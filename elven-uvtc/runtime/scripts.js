@@ -17,6 +17,10 @@ function inlineSetTimeout(callback,time) {
     }
 }
 
+function getRandomPolarity() {
+    return Math.round(Math.random()) * 2 - 1;
+}
+
 const scripts = {
     popupFormatTest: async () => {
         let popup = rendererState.showPopup;

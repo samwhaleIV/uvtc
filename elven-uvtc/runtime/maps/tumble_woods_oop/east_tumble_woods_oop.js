@@ -164,7 +164,7 @@ addMap({
                             }
                             world.changeBackgroundTile(t1,x,y);
                             world.changeBackgroundTile(t2,x,y-1);
-                            const shouldPass = Math.random() > 0.5;
+                            const shouldPass = Math.round(Math.random());
                             await delay(1000);
                             playTone(100,0.5);
                             await delay(1000);

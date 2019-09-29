@@ -1,8 +1,8 @@
 function CrazyFlyingShitEffect(particleRadius,particleVelocity,maxParticleDecay,particleUpdateTime,count,color) {
     const particles = [];
     this.addParticle = spawnTime => {
-        const horizontalVelocity = Math.random() > 0.5 ? particleVelocity : -particleVelocity;
-        const verticalVelocity = Math.random() > 0.5 ? particleVelocity : -particleVelocity;
+        const horizontalVelocity = Math.round(Math.random()) ? particleVelocity : -particleVelocity;
+        const verticalVelocity = Math.round(Math.random()) ? particleVelocity : -particleVelocity;
         const x = Math.random() * internalWidth;
         const y = Math.random() * internalHeight;
         particles.push({

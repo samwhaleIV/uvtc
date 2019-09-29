@@ -4,6 +4,7 @@ import BoxFaderEffect from "./renderers/components/box-fader-effect.js";
 import DragTestRenderer from "./renderers/drag-test.js";
 import SomethingDifferentRenderer from "./renderers/something-different.js";
 import "./runtime/battle/opponents/manifest.js";
+import SomethingDifferentTest from "./runtime/something-different-test.js";
 
 drawLoadingText();
 establishMapLinks();
@@ -13,16 +14,17 @@ function loadCallback() {
     let firstRendererState;
     switch(ENV_FLAGS.TEST) {
         case "drag-test":
-            firstRendererState = DragTestRenderer;
+            firstRendererState = new DragTestRenderer();
             break;
         case "something-different":
-            firstRendererState = SomethingDifferentRenderer;
+            firstRendererState = new SomethingDifferentRenderer();
+            firstRendererState.loadBattleSpecifics(SomethingDifferentTest);
             break;
         default:
-            firstRendererState = MainMenuRenderer;
+            firstRendererState = new MainMenuRenderer();
             break;
     }
-    setRendererState(new firstRendererState());
+    setRendererState(firstRendererState);
     startRenderer();
     if(rendererState.song) {
         playMusic(rendererState.song);
