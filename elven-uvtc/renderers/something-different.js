@@ -176,7 +176,7 @@ function SomethingDifferentRenderer() {
             let adjustedScale = spriteScale;
             let extraScale = 0;
             if(this.hands.punching && !noPunchEffect) {
-                extraScale = 1;
+                extraScale = -7;
             }
 
             this.opponentSprite.render(timestamp,adjustedScale,extraScale);
