@@ -10,8 +10,8 @@ const halftextureSize = textureSize / 2;
 const xLimit = 0.35;
 const minimumX = -xLimit;
 const maximumX = xLimit;
-const minimumY = 0;
-const maximumY = 1;
+const minimumY = 0.18;
+const maximumY = 0.7;
 
 const foregroundYRetargetStart = 1.4;
 const foregroundYRetargetEnd = 2.5;
@@ -29,12 +29,12 @@ const groundDepthFactor = 4;
 const groundXDampening = 3;
 const groundYModifier = 2;
 
-const baseXAccel =       0.001;
+const baseXAccel =       0.0015;
 const baseXDecel =       0.003;
-const baseYAccel =       0.001;
+const baseYAccel =       0.0015;
 const baseYDecel =       0.003;
 const baseMaxXVelocity = 0.01;
-const baseMaxYVelocity = 0.015;
+const baseMaxYVelocity = 0.02;
 
 const opponentSpriteOffset = 0.2;
 const spriteScale = 120;
@@ -45,7 +45,7 @@ const maxFrameDifference = 60;
 const deltaBase = 1000 / 60;
 
 const xStart = 0;
-const yStart = 0.35;
+const yStart = 0;
 
 function SomethingDifferentRenderer() {
 
@@ -63,8 +63,6 @@ function SomethingDifferentRenderer() {
 
     this.lockMovement = () => {
         movementLocked = true;
-        xVelocity = 0;
-        yVelocity = 0;
     }
     this.unlockMovement = () => {
         movementLocked = false;
@@ -77,7 +75,11 @@ function SomethingDifferentRenderer() {
         y: 0,
         x: 0,
         render: timestamp => {
-            opponentSprite.render(timestamp,spriteScale);
+            let adjustedScale = spriteScale;
+            if(this.hands.punching) {
+                adjustedScale += 1;
+            }
+            opponentSprite.render(timestamp,adjustedScale);
             //todo render this.opponentHeart
         }
     }
@@ -225,6 +227,7 @@ function SomethingDifferentRenderer() {
 
         context.drawImage(tileset,48,0,16,16,0,groundTop,fullWidth,renderHeight);
 
+        context.save();
         context.setTransform(1,0,-skewAmount,1,skewCenterPush,0);
         context.drawImage(
             tileset,
@@ -243,14 +246,13 @@ function SomethingDifferentRenderer() {
             halfWidth,groundTop,
             halfWidth,renderHeight
         );
-
-        context.resetTransform();
+        context.restore();
     }
-    const renderFog = () => {
+    const renderFog = (xPixelOffset,yPixelOffset) => {
         context.fillStyle = fogColor;
-        context.fillRect(0,0,fullWidth,fullHeight);
+        context.fillRect(-xPixelOffset,-yPixelOffset,fullWidth+xPixelOffset*2,fullHeight+yPixelOffset*2);
     }
-    const renderForeground = (timestamp,xNormal,depthNormal) => {
+    const renderForeground = (timestamp,xNormal,depthNormal,xPixelOffset,yPixelOffset) => {
         depthNormal = foregroundYRetargetStart + (foregroundYRetargetEnd - foregroundYRetargetStart) * depthNormal;
 
         const firstDepthScale = Math.pow(depthNormal / 8,depthFactor);
@@ -267,31 +269,32 @@ function SomethingDifferentRenderer() {
 
         const opponentXOffset = this.opponent.x * halfWidth;
         
-        const thirdDepthX = (fullWidth   - thirdDepthScale  * fullWidth)  /  2 + xOffset * thirdDepthScale;
-        const thirdDepthY = (fullHeight - thirdDepthHeight) / 2 + foregroundYContrast / thirdDepthScale + foregroundYOffset;
+        const thirdDepthX = (fullWidth   - thirdDepthScale  * fullWidth)  /  2 + xOffset * thirdDepthScale + xPixelOffset;
+        const thirdDepthY = (fullHeight - thirdDepthHeight) / 2 + foregroundYContrast / thirdDepthScale + foregroundYOffset + yPixelOffset;
 
-        const secondDepthX = (fullWidth  - secondDepthScale * fullWidth)  /  2 + xOffset * secondDepthScale;
-        const secondDepthY =(fullHeight - secondDepthHeight) / 2 + foregroundYContrast / secondDepthScale + foregroundYOffset;
+        const secondDepthX = (fullWidth  - secondDepthScale * fullWidth)  /  2 + xOffset * secondDepthScale + xPixelOffset;
+        const secondDepthY =(fullHeight - secondDepthHeight) / 2 + foregroundYContrast / secondDepthScale + foregroundYOffset + yPixelOffset;
 
-        const firstDepthX = (fullWidth   - firstDepthScale  * fullWidth)  /  2 + xOffset * firstDepthScale;
-        const firstDepthY = (fullHeight - firstDepthHeight) / 2 + foregroundYContrast / firstDepthScale + topLayerYOffset;
+        const firstDepthX = (fullWidth   - firstDepthScale  * fullWidth)  /  2 + xOffset * firstDepthScale + xPixelOffset;
+        const firstDepthY = (fullHeight - firstDepthHeight) / 2 + foregroundYContrast / firstDepthScale + topLayerYOffset + yPixelOffset;
 
-        const fourthDepthX = (fullWidth   - fourthDepthScale  * fullWidth)  /  2 + xOffset * fourthDepthScale - opponentXOffset;
-        const fourthDepthY = (fullHeight - fourthDepthHeight) / 2 - Math.min(depthNormal - frontLayerDepthAdjustment,0) * frontLayerSpecialModifier;
+        const fourthDepthX = (fullWidth   - fourthDepthScale  * fullWidth)  /  2 + xOffset * fourthDepthScale - opponentXOffset + xPixelOffset;
+        const fourthDepthY = (fullHeight - fourthDepthHeight) / 2 - Math.min(depthNormal - frontLayerDepthAdjustment,0) * frontLayerSpecialModifier + yPixelOffset;
 
         let i;
+        context.save();
         context.setTransform(firstDepthScale,0,0,firstDepthScale,firstDepthX,firstDepthY);
         for(i = 0;i<foregroundLayer1.length;i++) {
             renderForegroundObject(foregroundLayer1[i]);
         }
         context.resetTransform();
-        renderFog();
+        renderFog(xPixelOffset,yPixelOffset);
         context.setTransform(secondDepthScale,0,0,secondDepthScale,secondDepthX,secondDepthY);
         for(i = 0;i<foregroundLayer2.length;i++) {
             renderForegroundObject(foregroundLayer2[i]);
         }
         context.resetTransform();
-        renderFog();
+        renderFog(xPixelOffset,yPixelOffset);
         context.setTransform(thirdDepthScale,0,0,thirdDepthScale,thirdDepthX,thirdDepthY);
         for(i = 0;i<foregroundLayer3.length;i++) {
             renderForegroundObject(foregroundLayer3[i]);
@@ -305,7 +308,7 @@ function SomethingDifferentRenderer() {
         if(this.foregroundEffects) {
             this.foregroundEffects.render(timestamp);
         }
-        context.resetTransform();
+        context.restore();
     }
     let wDown, sDown, aDown, dDown;
     this.processKey = key => {
@@ -369,10 +372,16 @@ function SomethingDifferentRenderer() {
         }
     }
 
-    const processMovement = delta => {
-        if(movementLocked) {
-            return;
-        }
+    this.processClick = () => {
+        this.hands.punch(playSound.bind(this,"damage",0.15));
+    }
+
+    const processMovement = (delta,timestamp) => {
+
+        const movementLockedOrPunching = movementLocked || this.hands.punching;
+
+        const xDeltaMask = movementLockedOrPunching ? 0 : xDelta;
+        const yDeltaMask = movementLockedOrPunching ? 0 : yDelta;
 
         const xAccel = baseXAccel * delta;
         const xDecel = baseXDecel * delta;
@@ -383,12 +392,12 @@ function SomethingDifferentRenderer() {
         const maxXVelocity = baseMaxXVelocity * delta;
         const maxYVelocity = baseMaxYVelocity * delta;
 
-        if(xDelta > 0) {
+        if(xDeltaMask > 0) {
             if(xVelocity < 0) {
                 xVelocity = 0;
             }
             xVelocity += xAccel;
-        } else if(xDelta < 0) {
+        } else if(xDeltaMask < 0) {
             if(xVelocity > 0) {
                 xVelocity = 0;
             }
@@ -412,12 +421,12 @@ function SomethingDifferentRenderer() {
             xVelocity = -maxXVelocity;
         }
 
-        if(yDelta > 0) {
+        if(yDeltaMask > 0) {
             if(yVelocity < 0) {
                 yVelocity = 0;
             }
             yVelocity += yAccel;
-        } else if(yDelta < 0) {
+        } else if(yDeltaMask < 0) {
             if(yVelocity > 0) {
                 yVelocity = 0;
             }
@@ -441,24 +450,48 @@ function SomethingDifferentRenderer() {
             yVelocity = -maxYVelocity;
         }
 
-        if(xVelocity !== 0) {
-            x -= xVelocity;
-        }
-        if(yVelocity !== 0) {
-            y -= yVelocity;
+        if(!movementLockedOrPunching) {
+            if(xVelocity !== 0) {
+                x -= xVelocity;
+            }
+            if(yVelocity !== 0) {
+                y -= yVelocity;
+            }
         }
 
         if(x < minimumX) {
             x = minimumX;
+            xVelocity += xDecel;
+            if(xVelocity > 0) {
+                xVelocity = 0;
+            }
         } else if(x > maximumX) {
             x = maximumX;
+            xVelocity -= xDecel;
+            if(xVelocity < 0) {
+                xVelocity = 0;
+            }
         }
 
         if(y < minimumY) {
             y = minimumY;
+            yVelocity += yDecel;
+            if(yVelocity > 0) {
+                yVelocity = 0;
+            }
         } else if(y > maximumY) {
             y = maximumY;
+            yVelocity -= yDecel;
+            if(yVelocity < 0) {
+                yVelocity = 0;
+            }
         }
+
+        this.hands.setSway(
+            Math.abs(xVelocity)/maxXVelocity,
+            Math.abs(yVelocity)/maxYVelocity,
+            timestamp
+        );
     }
     this.render = timestamp => {
         let delta = timestamp - lastFrame;
@@ -467,10 +500,21 @@ function SomethingDifferentRenderer() {
         }
         delta /= deltaBase;
         lastFrame = timestamp;
-        processMovement(delta);
+        processMovement(delta,timestamp);
+
         renderSky();
         renderGround(x,y);
-        renderForeground(timestamp,x,y);
+
+        let foregroundXOffset = 0;
+        let foregroundYOffset = 0;
+
+        if(this.hands.punching) {//todo
+            foregroundXOffset = Math.round(Math.random());
+            foregroundYOffset = Math.round(Math.random());
+        } //else todo
+
+        renderForeground(timestamp,x,y,foregroundXOffset,foregroundYOffset);
+
         renderHeadcons();
         this.hands.render(timestamp);
         //this.playerHeart.render(timestamp); TODO
