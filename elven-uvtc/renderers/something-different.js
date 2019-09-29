@@ -76,10 +76,11 @@ function SomethingDifferentRenderer() {
         x: 0,
         render: timestamp => {
             let adjustedScale = spriteScale;
+            let extraScale = 0;
             if(this.hands.punching) {
-                adjustedScale += 1;
+                extraScale = 5;
             }
-            opponentSprite.render(timestamp,adjustedScale);
+            opponentSprite.render(timestamp,adjustedScale,extraScale);
             //todo render this.opponentHeart
         }
     }
