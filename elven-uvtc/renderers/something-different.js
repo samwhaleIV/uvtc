@@ -70,17 +70,116 @@ function SomethingDifferentRenderer() {
 
     let fogColor = defaultFogColor;
 
-    let opponentSprite = null;
+    let noPunchEffect = true;
+
+    this.opponentSprite = null;
     this.opponent = {
         y: 0,
         x: 0,
+        xTarget: null,
+        yTarget: null,
+        resolver: null,
+        setWalking: isWalking => this.opponentSprite.sprite.setWalking(isWalking),
+        updateDirection: direction => this.opponentSprite.sprite.updateDirection(direction),
+        move: async function(x,y) {
+            if(x) {
+                if(x > 0) {
+                    await this.moveBy("left",x);
+                } else if(x < 0) {
+                    await this.moveBy("right",-x);
+                }
+            } else if(y) {
+                if(y > 0) {
+                    await this.moveBy("down",y);
+                } else if(y < 0) {
+                    await this.moveBy("up",-y);
+                }
+            }
+        },
+        moveBy: function(direction,amount) {
+            return new Promise(resolve => {
+                this.xTarget = null;
+                this.yTarget = null;
+                switch(direction) {
+                    default:
+                        return;
+                    case "up":
+                        this.updateDirection("down");
+                        this.setWalking(true);
+                        this.yTarget = this.y - amount;
+                        break;
+                    case "down":
+                        this.updateDirection("down");
+                        this.setWalking(true);
+                        this.yTarget = this.y + amount;
+                        break;
+                    case "left":
+                        this.updateDirection("left");
+                        this.setWalking(true);
+                        this.xTarget = this.x + amount;
+                        break;
+                    case "right":
+                        this.updateDirection("right");
+                        this.setWalking(true);
+                        this.xTarget = this.x - amount;
+                        break;
+                }
+                this.resolver = resolve;
+            });
+        },
+        movementLogic: function(delta) {
+            if(this.xTarget !== null) {
+                const xVelocity = delta * 0.01;
+                if(this.xTarget < this.x) {
+                    this.x -= xVelocity;
+                    if(this.x < this.xTarget) {
+                        this.x = this.xTarget;
+                        this.xTarget = null;
+                        this.updateDirection("down");
+                        this.setWalking(false);
+                        this.resolver();
+                    }
+                } else if(this.xTarget > this.x) {
+                    this.x += xVelocity;
+                    if(this.x > this.xTarget) {
+                        this.x = this.xTarget;
+                        this.xTarget = null;
+                        this.updateDirection("down");
+                        this.setWalking(false);
+                        this.resolver();
+                    }
+                }
+            } else if(this.yTarget !== null) {
+                const yVelocity = delta * 0.01;
+                if(this.yTarget < this.y) {
+                    this.y -= yVelocity;
+                    if(this.y < this.yTarget) {
+                        this.y = this.yTarget;
+                        this.yTarget = null;
+                        this.updateDirection("down");
+                        this.setWalking(false);
+                        this.resolver();
+                    }
+                } else if(this.yTarget > this.y) {
+                    this.y += yVelocity;
+                    if(this.y > this.yTarget) {
+                        this.y = this.yTarget;
+                        this.yTarget = null;
+                        this.updateDirection("down");
+                        this.setWalking(false);
+                        this.resolver();
+                    }
+                }         
+            }
+        },
         render: timestamp => {
             let adjustedScale = spriteScale;
             let extraScale = 0;
-            if(this.hands.punching) {
-                extraScale = 5;
+            if(this.hands.punching && !noPunchEffect) {
+                extraScale = 1;
             }
-            opponentSprite.render(timestamp,adjustedScale,extraScale);
+
+            this.opponentSprite.render(timestamp,adjustedScale,extraScale);
             //todo render this.opponentHeart
         }
     }
@@ -196,7 +295,7 @@ function SomethingDifferentRenderer() {
             getTree(0.75)
         );
         this.backgroundEffects.addLayer(new CrazyFlyingShitEffect(1,2.5,0.001,80,200,"white"));
-        opponentSprite = new SpriteForeground("wimpy-red-elf",true,null,null,opponentSpriteOffset);
+        this.opponentSprite = new SpriteForeground("wimpy-red-elf",true,null,null,opponentSpriteOffset);
         tileset = imageDictionary["battle/test-tileset"];
         fogColor = defaultFogColor;
         headconMap = [
@@ -208,6 +307,19 @@ function SomethingDifferentRenderer() {
             {icon:1,lost:false},
             {icon:1,lost:true}
         ];
+        (async function(){
+            await delay(100);
+            while(true) {
+                await this.opponent.move(0.5);
+                await delay(500);
+                await this.opponent.move(-0.5);
+                await delay(500);
+                await this.opponent.move(-0.5);
+                await delay(500);
+                await this.opponent.move(0.5);
+                await delay(500);
+            }
+        }).call(this);
     }
     loadBattleSpecifics();
 
@@ -253,6 +365,7 @@ function SomethingDifferentRenderer() {
         context.fillStyle = fogColor;
         context.fillRect(-xPixelOffset,-yPixelOffset,fullWidth+xPixelOffset*2,fullHeight+yPixelOffset*2);
     }
+    let lastOpponentCenterX = 0;
     const renderForeground = (timestamp,xNormal,depthNormal,xPixelOffset,yPixelOffset) => {
         depthNormal = foregroundYRetargetStart + (foregroundYRetargetEnd - foregroundYRetargetStart) * depthNormal;
 
@@ -282,6 +395,8 @@ function SomethingDifferentRenderer() {
         const fourthDepthX = (fullWidth   - fourthDepthScale  * fullWidth)  /  2 + xOffset * fourthDepthScale - opponentXOffset + xPixelOffset;
         const fourthDepthY = (fullHeight - fourthDepthHeight) / 2 - Math.min(depthNormal - frontLayerDepthAdjustment,0) * frontLayerSpecialModifier + yPixelOffset;
 
+        lastOpponentCenterX = fourthDepthX + (fullWidth * fourthDepthScale / 2);
+        
         let i;
         context.save();
         context.setTransform(firstDepthScale,0,0,firstDepthScale,firstDepthX,firstDepthY);
@@ -374,7 +489,41 @@ function SomethingDifferentRenderer() {
     }
 
     this.processClick = () => {
-        this.hands.punch(playSound.bind(this,"damage",0.15));
+        const yDistance = Math.max(0,1 - y - this.opponent.y);
+        const xDistance = Math.abs(halfWidth - lastOpponentCenterX);
+        const minimumYDistance = 0.4;
+        const minimumXDistance = 80;
+        if(yDistance <= minimumYDistance && xDistance <= minimumXDistance) {
+            this.hands.punch(()=>{
+                playSound("damage",0.15);
+                this.foregroundEffects.addLayer({
+                    startTime: performance.now(),
+                    size: 20 + Math.random() * 20,
+                    angleOffset: PI2 * Math.random(),
+                    rotationPolarity: Math.random() > 0.5 ? 1 : -1,
+                    xOffset: (Math.random() * 50) - 25,
+                    yOffset: (Math.random() * 20) - 10,
+                    render: function(timestamp) {
+                        const delta = Math.min(100,timestamp-this.startTime) / 100;
+                        const size = this.size * delta;
+                        const halfSize = size / 2;
+                        context.save();
+                        context.translate(halfWidth+this.xOffset,halfHeight+this.yOffset);
+                        context.rotate(PI2*delta*this.rotationPolarity+this.angleOffset);
+                        context.fillStyle = "rgba(255,0,0,0.82)";
+                        context.fillRect(-halfSize,-halfSize,size,size);
+                        context.restore();
+                        if(delta === 1) {
+                            this.terminate();
+                        }
+                    }
+                })
+            });
+            noPunchEffect = false;
+        } else if(!this.hands.punching) {
+            this.hands.punch();
+            noPunchEffect = true;
+        }
     }
 
     const processMovement = (delta,timestamp) => {
@@ -494,6 +643,11 @@ function SomethingDifferentRenderer() {
             timestamp
         );
     }
+    let impactStart = null;
+    this.playerImpact = () => {
+        impactStart = performance.now();
+        playSound("damage");
+    }
     this.render = timestamp => {
         let delta = timestamp - lastFrame;
         if(delta > maxFrameDifference) {
@@ -503,21 +657,53 @@ function SomethingDifferentRenderer() {
         lastFrame = timestamp;
         processMovement(delta,timestamp);
 
-        renderSky();
-        renderGround(x,y);
-
         let foregroundXOffset = 0;
         let foregroundYOffset = 0;
 
-        if(this.hands.punching) {//todo
-            foregroundXOffset = Math.round(Math.random());
-            foregroundYOffset = Math.round(Math.random());
+        let renderY = y;
+        let impactDelta = 0;
+        if(impactStart !== null) {
+            const impactTime = 80;
+            impactDelta = (timestamp - impactStart) / impactTime;
+            if(impactDelta > 1) {
+                impactDelta = 1;
+                impactStart = 0;
+            }
+            impactDelta
+            if(impactDelta > 0.5) {
+                impactDelta = 1 - impactDelta;
+            } else {
+                impactDelta /= 2;
+            }
+            impactDelta = -impactDelta;
+            renderY += impactDelta * 0.4;
+
+            const offsetAmount = 15;
+            foregroundYOffset += Math.random() > 0.5 ? offsetAmount * impactDelta : offsetAmount * -impactDelta;
+        }
+
+        renderSky();
+        renderGround(x,renderY);
+
+        if(this.hands.punching && !noPunchEffect) {//todo
+            foregroundXOffset += Math.round(Math.random()*2);
+            foregroundYOffset += Math.round(Math.random()*2);
         } //else todo
 
-        renderForeground(timestamp,x,y,foregroundXOffset,foregroundYOffset);
+        this.opponent.movementLogic(delta);
+
+        renderForeground(timestamp,x,renderY,foregroundXOffset,foregroundYOffset,delta);
+
+
+        this.hands.render(timestamp);
+
+        if(impactDelta) {
+            context.fillStyle = `rgba(255,0,0,${Math.abs(impactDelta)/2})`;
+            context.fillRect(0,0,fullWidth,fullHeight);
+        }
 
         renderHeadcons();
-        this.hands.render(timestamp);
+
         //this.playerHeart.render(timestamp); TODO
         if(this.globalEffects) {
             this.globalEffects.render(timestamp);

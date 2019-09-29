@@ -59,7 +59,7 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
     let walking = false;
     let currentColumn = 0;
 
-    const animationFrameTime = 1000 / 12;
+    this.animationFrameTime = 1000 / 12;
 
     this.direction = null;
 
@@ -422,7 +422,7 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
             const destinationY = (this.yOffset * height + y + (this.y - startY) * height) + renderYOffset;
 
             const animationRow = specialRow !== null ? specialRow : !this.walkingOverride && walking ? 
-                Math.floor(recentTimestamp / animationFrameTime) % rowCount * rowHeight
+                Math.floor(recentTimestamp / this.animationFrameTime) % rowCount * rowHeight
             : 0;
 
             context.drawImage(
@@ -448,7 +448,7 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
                 );
             }
             const animationRow = specialRow !== null ? specialRow : !this.walkingOverride && walking ? 
-                Math.floor(recentTimestamp / animationFrameTime) % rowCount * rowHeight
+                Math.floor(recentTimestamp / this.animationFrameTime) % rowCount * rowHeight
             : 0;
             context.drawImage(
                 sprite,currentColumn,animationRow,columnWidth,rowHeight,destinationX,destinationY,width,height

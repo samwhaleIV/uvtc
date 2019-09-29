@@ -1,5 +1,5 @@
 function delay(time) {
-    if(rendererState.setTimeout) {
+    if(rendererState && rendererState.setTimeout) {
         return new Promise(resolve=>{
             rendererState.setTimeout(resolve,time);
         });
@@ -10,7 +10,7 @@ function delay(time) {
     }
 }
 function inlineSetTimeout(callback,time) {
-    if(rendererState.setTimeout) {
+    if(rendererState && rendererState.setTimeout) {
         rendererState.setTimeout(callback,time);
     } else {
         setTimeout(callback,time);

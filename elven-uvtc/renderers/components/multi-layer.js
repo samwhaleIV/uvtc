@@ -20,7 +20,8 @@ function MultiLayer() {
     }
     this.render = timestamp => {
         for(let i = 0;i<layerSize;i++) {
-            layers[i].render(timestamp);
+            const layer = layers[i];
+            layer.render.call(layer,timestamp);
         }
     }
 }
