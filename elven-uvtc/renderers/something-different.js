@@ -4,6 +4,7 @@ import LoveAndCrystals from "./components/battle/love-and-crystals.js";
 import GetOpponent from "./components/battle/opponent.js";
 import GetPunchImpactEffect from "./components/battle/punch-effect.js";
 import ApplyTimeoutManager from "./components/inline-timeout.js";
+import SomethingDifferentApplicator from "../runtime/battle/battle-applicator.js";
 
 const textureSize = 16;
 const halftextureSize = textureSize / 2;
@@ -60,7 +61,10 @@ const selfImpactIntensity = 0.4;
 
 const damageSoundPunchDuration = 0.15;
 
-function SomethingDifferentRenderer() {
+function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) {
+
+    this.winCallback = winCallback;
+    this.loseCallback = loseCallback;
 
     ApplyTimeoutManager(this);
 
@@ -75,8 +79,6 @@ function SomethingDifferentRenderer() {
 
     let lastFrame = 0;
     let movementLocked = false;
-
-    let loaded = false;
 
     this.lockMovement = () => {
         movementLocked = true;
@@ -195,13 +197,13 @@ function SomethingDifferentRenderer() {
         }
     }
 
-    this.loadBattleSpecifics = loader => {
-        if(loaded) {
-            throw Error("Battle specifications have already been applied!");
-        }
-        loader.call(this,[foregroundLayer1,foregroundLayer2,foregroundLayer3]);
-        loaded = true;
-    }
+    opponentSequencer.call(this,specification=>{
+        console.log();
+        SomethingDifferentApplicator.call(this,
+            [foregroundLayer1,foregroundLayer2,foregroundLayer3],
+            specification
+        );
+    });
 
     const renderSky = () => context.drawImage(this.tileset,48,16,16,16,0,0,fullWidth,fullHeight);
 

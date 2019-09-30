@@ -12,7 +12,6 @@ import MovePreview from "./components/world/move-preview.js";
 import ChapterPreview from "./components/world/chapter-preview.js";
 import Moves from "../runtime/battle/moves.js";
 import Chapters from "../runtime/chapters.js";
-import BattleScreenRenderer from "./battle-screen.js";
 import BattleFaderEffect from "./components/battle-fader-effect.js";
 import ChapterManager from "../runtime/chapter-manager.js";
 import MainMenuRenderer from "./main-menu.js";
@@ -21,6 +20,7 @@ import {FadeIn,FadeOut} from "./components/world/fade.js";
 import ObjectiveHUD from "./components/world/objective-hud.js";
 import BoxFaderEffect from "./components/box-fader-effect.js";
 import ApplyTimeoutManager from "./components/inline-timeout.js";
+import SomethingDifferentRenderer from "./something-different.js";
 
 const CHAPTER_NAME_LOOKUP = [
     "an impossible chapter that cannot exist",
@@ -1195,7 +1195,7 @@ function WorldRenderer() {
             returnToWorld();
         }
         const opponent = getOpponent(battleID,...battleParameters);
-        this.managedFaderTransition(BattleScreenRenderer,win,lose,opponent);
+        this.managedFaderTransition(SomethingDifferentRenderer,win,lose,opponent);
     }
 
     this.updateSize = function() {

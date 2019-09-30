@@ -4,7 +4,6 @@ import BoxFaderEffect from "./renderers/components/box-fader-effect.js";
 import DragTestRenderer from "./renderers/drag-test.js";
 import SomethingDifferentRenderer from "./renderers/something-different.js";
 import "./runtime/battle/opponents/manifest.js";
-import SomethingDifferentTest from "./runtime/something-different-test.js";
 
 drawLoadingText();
 establishMapLinks();
@@ -17,8 +16,9 @@ function loadCallback() {
             firstRendererState = new DragTestRenderer();
             break;
         case "something-different":
-            firstRendererState = new SomethingDifferentRenderer();
-            firstRendererState.loadBattleSpecifics(SomethingDifferentTest);
+            firstRendererState = new SomethingDifferentRenderer(
+                null,null,getOpponent("test-battle")
+            );
             break;
         default:
             firstRendererState = new MainMenuRenderer();

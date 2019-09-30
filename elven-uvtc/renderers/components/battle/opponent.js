@@ -5,24 +5,32 @@ const opponentYVelocity = 0.01;
 const opponentSpriteKnockbackAmount = -7;
 const spriteScale = 120;
 
+const TEXT_BOX_MARGIN = 5;
+const TEXT_BOX_WIDTH = 300;
+const TEXT_BOX_HEIGHT = 150;
+const TEXT_BOX_HALF_WIDTH = TEXT_BOX_WIDTH / 2;
+const TEXT_BOX_HALF_HEIGHT = TEXT_BOX_HEIGHT / 2;
+const TEXT_BOX_RENDER_WIDTH = TEXT_BOX_WIDTH + TEXT_BOX_MARGIN * 2;
+const TEXT_BOX_RENDER_HEIGHT = TEXT_BOX_HEIGHT + TEXT_BOX_MARGIN * 2;
+const TEXT_BOX_TEXT_SCALE = 3;
+
 function CustomTextRenderer(battleRenderer) {
-    const margin = 5;
-    const width = 300;
-    const height = 150;
-
-    const x = battleRenderer.lastOpponentCenterX - width / 2;
-    const y = halfHeight - height / 2;
-
+    const x = halfWidth - TEXT_BOX_HALF_WIDTH
+    const y = halfHeight - TEXT_BOX_HALF_HEIGHT;
 
     context.fillStyle = "white";
-    context.fillRect(x-margin,y-margin,width+margin+margin,height+margin+margin);
-
+    context.fillRect(
+        x-TEXT_BOX_MARGIN,
+        y-TEXT_BOX_MARGIN,
+        TEXT_BOX_RENDER_WIDTH,
+        TEXT_BOX_RENDER_HEIGHT
+    );
 
     BitmapText.drawTextWrappingLookAheadBlack(
         this.textFeed,
         x,y,
-        width,
-        3
+        TEXT_BOX_WIDTH,
+        TEXT_BOX_TEXT_SCALE
     );
 }
 
@@ -64,79 +72,71 @@ function GetOpponent() {
             }
         },
         moveBy: function(direction,amount) {
+            this.xTarget = null;
+            this.yTarget = null;
             return new Promise(resolve => {
-                this.xTarget = null;
-                this.yTarget = null;
+                let newDirection = direction;
                 switch(direction) {
-                    default:
-                        return;
+                    default: return;
+
                     case "up":
-                        this.updateDirection("down");
-                        this.setWalking(true);
-                        this.yTarget = this.y - amount;
-                        break;
+                        newDirection = "down";
+                        this.yTarget = this.y - amount; break;
+
                     case "down":
-                        this.updateDirection("down");
-                        this.setWalking(true);
-                        this.yTarget = this.y + amount;
-                        break;
+                        this.yTarget = this.y + amount; break;
+
                     case "left":
-                        this.updateDirection("left");
-                        this.setWalking(true);
-                        this.xTarget = this.x + amount;
-                        break;
+                        this.xTarget = this.x + amount; break;
+
                     case "right":
-                        this.updateDirection("right");
-                        this.setWalking(true);
-                        this.xTarget = this.x - amount;
-                        break;
+                        this.xTarget = this.x - amount; break;
                 }
+                this.updateDirection(newDirection);
+                this.setWalking(true);
                 this.resolver = resolve;
             });
+        },
+        movementLoop: function(source,target,velocity) {
+            let shouldEnd = false;
+            if(target < source) {
+                source -= velocity;
+                if(source < target) {
+                    shouldEnd = true;
+                }
+            } else if(target > source) {
+                source += velocity;
+                if(source > target) {
+                    shouldEnd = true;
+                }
+            }
+            if(shouldEnd) {
+                source = target;
+                target = null;
+                this.updateDirection("down");
+                this.setWalking(false);
+                this.resolver();
+            }
+            return {
+                source: source,
+                target: target
+            }
+        },
+        mapSourceAndTarget: function(property,tuple) {
+            this[property + "Target"] = tuple.target;
+            this[property] = tuple.source;
         },
         movementLogic: function(delta) {
             if(this.xTarget !== null) {
                 const xVelocity = delta * opponentXVelocity;
-                if(this.xTarget < this.x) {
-                    this.x -= xVelocity;
-                    if(this.x < this.xTarget) {
-                        this.x = this.xTarget;
-                        this.xTarget = null;
-                        this.updateDirection("down");
-                        this.setWalking(false);
-                        this.resolver();
-                    }
-                } else if(this.xTarget > this.x) {
-                    this.x += xVelocity;
-                    if(this.x > this.xTarget) {
-                        this.x = this.xTarget;
-                        this.xTarget = null;
-                        this.updateDirection("down");
-                        this.setWalking(false);
-                        this.resolver();
-                    }
-                }
+                this.mapSourceAndTarget(
+                    "x",this.movementLoop(this.x,this.xTarget,xVelocity)
+                );
             } else if(this.yTarget !== null) {
                 const yVelocity = delta * opponentYVelocity;
-                if(this.yTarget < this.y) {
-                    this.y -= yVelocity;
-                    if(this.y < this.yTarget) {
-                        this.y = this.yTarget;
-                        this.yTarget = null;
-                        this.updateDirection("down");
-                        this.setWalking(false);
-                        this.resolver();
-                    }
-                } else if(this.yTarget > this.y) {
-                    this.y += yVelocity;
-                    if(this.y > this.yTarget) {
-                        this.y = this.yTarget;
-                        this.yTarget = null;
-                        this.updateDirection("down");
-                        this.setWalking(false);
-                        this.resolver();
-                    }
-                }         
+                this.mapSourceAndTarget(
+                    "y",this.movementLoop(this.y,this.yTarget,yVelocity)
+                );
             }
         },
         battleRenderer: this,
