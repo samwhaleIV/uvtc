@@ -332,8 +332,8 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
     let specialRow = null;
 
     this.setSpecialFrame = function(frameID) {
-        currentColumn = (Math.floor(frameID / rowCount)+4) * columnWidth;
-        specialRow = frameID % rowCount * columnWidth;
+        currentColumn = 4 * columnWidth + Math.floor(frameID / 4);
+        specialRow = (frameID % 4) * rowHeight;
     }
 
     this.updateDirection = function(direction) {

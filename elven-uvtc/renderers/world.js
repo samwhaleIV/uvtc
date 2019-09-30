@@ -20,6 +20,7 @@ import ElvesFillIn from "./components/elves-fill-in.js";
 import {FadeIn,FadeOut} from "./components/world/fade.js";
 import ObjectiveHUD from "./components/world/objective-hud.js";
 import BoxFaderEffect from "./components/box-fader-effect.js";
+import ApplyTimeoutManager from "./components/inline-timeout.js";
 
 const CHAPTER_NAME_LOOKUP = [
     "an impossible chapter that cannot exist",
@@ -78,32 +79,7 @@ function WorldRenderer() {
     let alert = null;
     let objectiveHUD = null;
 
-    const timeoutThreads = [];
-    let timeoutHandle = 0;
-
-    this.setTimeout = (action,delay,...parameters) => {
-        const thisHandle = timeoutHandle;
-        timeoutHandle++;
-        timeoutThreads.push({
-            action: () => {
-                action(...parameters);
-            },
-            endTime: performance.now() + delay,
-            handle: thisHandle
-        });
-        return thisHandle;
-    }
-    this.clearTimeout = handle => {
-        let i = 0;
-        while(i<timeoutThreads.length) {
-            const thread = timeoutThreads[i];
-            if(thread.handle === handle) {
-                timeoutThreads.splice(i,1);
-                break;
-            }
-            i++;
-        }
-    }
+    ApplyTimeoutManager(this);
 
     this.showAlert = (message,duration=ALERT_TIME,noSound=false) => {
         alert = new UIAlert(message.toLowerCase(),duration,noSound);
@@ -1372,17 +1348,7 @@ function WorldRenderer() {
     }
 
     this.render = function(timestamp) {
-
-        let timeoutThreadIndex = 0;
-        while(timeoutThreadIndex < timeoutThreads.length) {
-            const timeoutThread = timeoutThreads[timeoutThreadIndex];
-            if(timestamp >= timeoutThread.endTime) {
-                timeoutThreads.splice(timeoutThreadIndex,1);
-                timeoutThread.action();
-                timeoutThreadIndex--;
-            }
-            timeoutThreadIndex++;
-        }
+        this.processThreads(timestamp);
 
         if(tileRenderingEnabled) {
         

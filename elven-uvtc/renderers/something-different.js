@@ -3,6 +3,7 @@ import TheseHands from "./components/battle/these-hands.js";
 import LoveAndCrystals from "./components/battle/love-and-crystals.js";
 import GetOpponent from "./components/battle/opponent.js";
 import GetPunchImpactEffect from "./components/battle/punch-effect.js";
+import ApplyTimeoutManager from "./components/inline-timeout.js";
 
 const textureSize = 16;
 const halftextureSize = textureSize / 2;
@@ -51,8 +52,8 @@ const headconIconSize =     90;
 const headconMargin =       5;
 const innerHeadconSize = headconHeight - headconMargin - headconMargin;
 
-const minimumYPunchDistance = 0.4;
-const minimumXPunchDistance = 80;
+const minimumYPunchDistance = 0.6;
+const minimumXPunchDistance = 120;
 
 const selfImpactDuration =  80;
 const selfImpactIntensity = 0.4;
@@ -60,6 +61,8 @@ const selfImpactIntensity = 0.4;
 const damageSoundPunchDuration = 0.15;
 
 function SomethingDifferentRenderer() {
+
+    ApplyTimeoutManager(this);
 
     let x = xStart;
     let y = yStart;
@@ -235,7 +238,7 @@ function SomethingDifferentRenderer() {
         context.fillStyle = this.fogColor;
         context.fillRect(-xPixelOffset,-yPixelOffset,fullWidth+xPixelOffset*2,fullHeight+yPixelOffset*2);
     }
-    let lastOpponentCenterX = 0;
+    this.lastOpponentCenterX = 0;
     const renderForeground = (timestamp,xNormal,depthNormal,xPixelOffset,yPixelOffset) => {
         depthNormal = foregroundYRetargetStart + (foregroundYRetargetEnd - foregroundYRetargetStart) * depthNormal;
 
@@ -287,7 +290,7 @@ function SomethingDifferentRenderer() {
         firstDepthY += yPixelOffset;
         fourthDepthY += yPixelOffset;
 
-        lastOpponentCenterX = fourthDepthX + (fullWidth * fourthDepthScale / 2);
+        this.lastOpponentCenterX = fourthDepthX + (fullWidth * fourthDepthScale / 2);
         
         let i;
         context.save();
@@ -348,10 +351,26 @@ function SomethingDifferentRenderer() {
         }
     }
 
-    this.processClick = () => {
+    this.getPlayerOpponentDistance = () => {
         const yDistance = Math.max(0,1 - y - this.opponent.y);
-        const xDistance = Math.abs(halfWidth - lastOpponentCenterX);
-        if(yDistance <= minimumYPunchDistance && xDistance <= minimumXPunchDistance) {
+        const xDistance = Math.abs(halfWidth - this.lastOpponentCenterX);
+        const inRange = yDistance <= minimumYPunchDistance && xDistance <= minimumXPunchDistance;
+        return {
+            xDistance: xDistance,
+            yDistance: yDistance,
+            inRange: inRange
+        };
+    }
+
+    this.processClick = () => {
+        if(this.showingMessage) {
+            this.hands.punch();
+            noPunchEffect = true;
+            playSound("damage",damageSoundPunchDuration);
+            this.showingMessage.progress();
+            return;
+        }
+        if(this.getPlayerOpponentDistance().inRange) {
             this.hands.punch(()=>{
                 playSound("damage",damageSoundPunchDuration);
                 this.foregroundEffects.addLayer(GetPunchImpactEffect.call(this));
@@ -452,9 +471,10 @@ function SomethingDifferentRenderer() {
     let impactStart = null;
     this.playerImpact = () => {
         impactStart = performance.now();
-        playSound("damage");
+        playSound("ouch");
     }
     this.render = timestamp => {
+        this.processThreads(timestamp);
         let delta = timestamp - lastFrame;
         if(delta > maxFrameDifference) {
             delta = maxFrameDifference;

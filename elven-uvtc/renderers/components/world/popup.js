@@ -11,7 +11,7 @@ function applySonographToPopupFeed(popupFeed) {
     return popupFeed;
 }
 
-function WorldPopup(pages,callback,prefix,isInstant=false,world) {
+function WorldPopup(pages,callback,prefix,isInstant=false,world,autoCallback) {
 
     prefix = prefix ? prefix : "";
 
@@ -99,7 +99,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world) {
         pages[i] = applySonographToPopupFeed(newPage);
     }
 
-    let textFeed = [];
+    this.textFeed = [];
     let timeout = -1;
 
     const playTextSound = () => {
@@ -117,9 +117,9 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world) {
         }
     }
 
-    let timeoutMethod = function() {
+    let timeoutMethod = () => {
         const pageValue = pages[pageIndex][characterIndex];
-        textFeed = pageValue.textFeed;
+        this.textFeed = pageValue.textFeed;
         if(++characterIndex < pages[pageIndex].length) {
             const lookAhead = pages[pageIndex][characterIndex];
             if(lookAhead) {
@@ -142,13 +142,16 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world) {
         } else {
             if(pageIndex + 1 >= pageCount) {
                 readyToTerminate = true;
+                if(autoCallback) {
+                    autoCallback();
+                }
             }
             pageComplete = true;
         }
     }
 
     timeoutMethod();
-    this.progress = function() {
+    this.progress = () => {
         world.clearTimeout(timeout);
         if(readyToTerminate) {
             if(terminated) {
@@ -171,7 +174,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world) {
             }
         } else {
             const page = pages[pageIndex];
-            textFeed = page[page.length-1].textFeed;
+            this.textFeed = page[page.length-1].textFeed;
             pageComplete = true;
             playAutoCompleteTextSound();
             if(pageIndex + 1 >= pageCount) {
@@ -180,7 +183,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world) {
         }
     }
     this.startY = 0;
-    this.render = function() {
+    this.render = () => {
         if(terminated) {
             return;
         }
@@ -206,7 +209,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world) {
             popupWidth,popupHeight
         );
         BitmapText.drawTextWrappingLookAheadBlack(
-            textFeed,popupX + 20,
+            this.textFeed,popupX + 20,
             popupY + 20,
             popupWidth-40,
             4

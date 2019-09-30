@@ -1,7 +1,30 @@
+import WorldPopup from "../world/popup.js";
+
 const opponentXVelocity = 0.01;
 const opponentYVelocity = 0.01;
 const opponentSpriteKnockbackAmount = -17.5;
 const spriteScale = 120;
+
+function CustomTextRenderer(battleRenderer) {
+    const margin = 5;
+    const width = 300;
+    const height = 150;
+
+    const x = battleRenderer.lastOpponentCenterX - width / 2;
+    const y = halfHeight - height / 2;
+
+
+    context.fillStyle = "white";
+    context.fillRect(x-margin,y-margin,width+margin+margin,height+margin+margin);
+
+
+    BitmapText.drawTextWrappingLookAheadBlack(
+        this.textFeed,
+        x,y,
+        width,
+        3
+    );
+}
 
 function GetOpponent() {
     return {
@@ -10,6 +33,19 @@ function GetOpponent() {
         xTarget: null,
         yTarget: null,
         resolver: null,
+        say: text => {
+            if(this.showingMessage) {
+                this.showingMessage.terminate();
+                this.showingMessage = null;
+            }
+            const effect = new WorldPopup([text],()=>{
+                this.showingMessage.terminate();
+                this.showingMessage = null;
+            },null,false,this);
+            effect.render = CustomTextRenderer.bind(effect,this);
+            this.showingMessage = effect;
+            this.foregroundEffects.addLayer(effect);
+        },
         setWalking: isWalking => this.opponentSprite.sprite.setWalking(isWalking),
         updateDirection: direction => this.opponentSprite.sprite.updateDirection(direction),
         move: async function(x,y) {

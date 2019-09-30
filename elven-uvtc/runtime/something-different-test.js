@@ -28,17 +28,8 @@ function SomethingDifferentTest(layers) {
     //this.fogColor = defaultFogColor;
     
     (async function(){
-        await delay(100);
-        while(true) {
-            await this.opponent.move(0.5);
-            await delay(500);
-            await this.opponent.move(-0.5);
-            await delay(500);
-            await this.opponent.move(-0.5);
-            await delay(500);
-            await this.opponent.move(0.5);
-            await delay(500);
-        }
+        await delay(1000);
+        await this.opponent.say("Go easy on me.. I'm new to fighting.");
     }).call(this);
 }
 export default SomethingDifferentTest;
