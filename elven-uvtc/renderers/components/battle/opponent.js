@@ -2,7 +2,7 @@ import WorldPopup from "../world/popup.js";
 
 const opponentXVelocity = 0.01;
 const opponentYVelocity = 0.01;
-const opponentSpriteKnockbackAmount = -17.5;
+const opponentSpriteKnockbackAmount = -7;
 const spriteScale = 120;
 
 function CustomTextRenderer(battleRenderer) {
@@ -139,13 +139,40 @@ function GetOpponent() {
                 }         
             }
         },
-        render: (timestamp,showPunchEffect) => {
+        battleRenderer: this,
+        lastSpecialFrame: null,
+        render: function(timestamp,showPunchEffect) {
+            const opponentLevelSprite = this.battleRenderer.opponentSprite;
+            const sprite = opponentLevelSprite.sprite;
             let adjustedScale = spriteScale;
             let extraScale = 0;
             if(showPunchEffect) {
                 extraScale = opponentSpriteKnockbackAmount;
+                if(!this.lastSpecialFrame && this.impactFrame >= 0 && sprite.direction === "down") {
+                    const currentSpecialFrame = sprite.getSpecialFrame();
+                    if(currentSpecialFrame === null) {
+                        this.lastSpecialFrame = -1;
+                    } else {
+                        this.lastSpecialFrame = currentSpecialFrame;
+                    }
+                    sprite.setSpecialFrame(this.impactFrame);
+                }
+                if(this.impactFrame >= 0 &&
+                   sprite.direction === "down" &&
+                  !this.lastSpecialFrame &&
+                  (this.lastSpecialFrame = sprite.getSpecialFrame()) !== null
+                ) {
+                    sprite.setSpecialFrame(this.impactFrame);
+                }
+            } else if(this.lastSpecialFrame !== null) {
+                if(this.lastSpecialFrame >= 0) {
+                    sprite.setSpecialFrame(this.lastSpecialFrame);
+                } else {
+                    sprite.updateDirection("down");
+                }
+                this.lastSpecialFrame = null;
             }
-            this.opponentSprite.render(timestamp,adjustedScale,extraScale);
+            opponentLevelSprite.render(timestamp,adjustedScale,extraScale);
         }
     }
 }

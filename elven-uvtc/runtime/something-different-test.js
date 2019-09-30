@@ -26,6 +26,8 @@ function SomethingDifferentTest(layers) {
     this.opponentSprite = new SpriteForeground("wimpy-red-elf",true,null,null,0.2);
     this.tileset = imageDictionary["battle/test-tileset"];
     //this.fogColor = defaultFogColor;
+
+    this.opponent.impactFrame = 2;
     
     (async function(){
         await delay(1000);
