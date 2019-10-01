@@ -5,14 +5,14 @@ const opponentYVelocity = 0.01;
 const opponentSpriteKnockbackAmount = -7;
 const spriteScale = 120;
 
-const TEXT_BOX_MARGIN = 5;
-const TEXT_BOX_WIDTH = 300;
+const TEXT_BOX_MARGIN = 4;
+const TEXT_BOX_WIDTH = 225;
 const TEXT_BOX_HEIGHT = 150;
 const TEXT_BOX_HALF_WIDTH = TEXT_BOX_WIDTH / 2;
 const TEXT_BOX_HALF_HEIGHT = TEXT_BOX_HEIGHT / 2;
 const TEXT_BOX_RENDER_WIDTH = TEXT_BOX_WIDTH + TEXT_BOX_MARGIN * 2;
 const TEXT_BOX_RENDER_HEIGHT = TEXT_BOX_HEIGHT + TEXT_BOX_MARGIN * 2;
-const TEXT_BOX_TEXT_SCALE = 3;
+const TEXT_BOX_TEXT_SCALE = 2;
 
 function CustomTextRenderer(battleRenderer) {
     const x = halfWidth - TEXT_BOX_HALF_WIDTH
