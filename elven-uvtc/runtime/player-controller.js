@@ -1,3 +1,6 @@
+const narrowResolutionThreshold = 0.15;
+const inverseNarrowResolutionThreshold = 1 - narrowResolutionThreshold;
+
 function PlayerController(world) {
 
     this.world = world;
@@ -270,6 +273,46 @@ function PlayerController(world) {
         }
     }
 
+    const narrowResolutionHandler = () => {
+        let polarity = 1;
+        switch(player.direction) {
+            case "up":
+                polarity = -1;
+            case "down":
+                if(player.yOffset === 0) {
+                    const ab = Math.abs(player.xOffset);
+                    const collisionX = Math.round(player.xOffset + player.x);
+                    if(ab < narrowResolutionThreshold || ab > inverseNarrowResolutionThreshold) {
+                        const collisionTest =
+                            world.collides(collisionX,player.y+polarity,player.ID) ||
+                            world.collides(collisionX,player.y,player.ID);
+                        if(!collisionTest) {
+                            player.xOffset = 0;
+                            world.moveObject(player.ID,collisionX,player.y);
+                        }
+                    }
+                }
+                break;
+            case "left":
+                polarity = -1;
+            case "right":
+                if(player.xOffset === 0) {
+                    const ab = Math.abs(player.yOffset);
+                    const collisionY = Math.round(player.yOffset + player.y);
+                    if(ab < narrowResolutionThreshold || ab > inverseNarrowResolutionThreshold) {
+                        const collisionTest =
+                            world.collides(player.x+polarity,collisionY,player.ID) ||
+                            world.collides(player.x,collisionY,player.ID);
+                        if(!collisionTest) {
+                            player.yOffset = 0;
+                            world.moveObject(player.ID,player.x,collisionY);
+                        }
+                    }
+                }
+                break;
+        }
+    }
+
     const movementMethod = timestamp => {
         if(pendingDirection) {
             player.updateDirection(pendingDirection);
@@ -304,18 +347,23 @@ function PlayerController(world) {
         }
         const movementDistance = delta / 1000 * tilesPerSecond;
 
+        let walking = false;
         if(this.horizontalVelocity > 0) {
-            player.setWalking(tryMove(movementDistance,1,0));
+            walking = tryMove(movementDistance,1,0);
         } else if(this.horizontalVelocity < 0) {
-            player.setWalking(tryMove(-movementDistance,-1,0));
+            walking = tryMove(-movementDistance,-1,0);
         }
         if(this.verticalVelocity > 0) {
-            player.setWalking(tryMove(movementDistance,0,1));
+            walking = tryMove(movementDistance,0,1);
         } else if(this.verticalVelocity < 0) {
-            player.setWalking(tryMove(-movementDistance,0,-1));
+            walking = tryMove(-movementDistance,0,-1);
         }
         if(player.triggerState) {
             player.impulseTrigger(this.world,false);
+        }
+        player.setWalking(walking);
+        if(!walking) {
+            narrowResolutionHandler();
         }
     }
 
