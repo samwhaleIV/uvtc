@@ -1,6 +1,6 @@
 import CrazyFlyingShitEffect from "../../../renderers/components/crazy-flying-shit.js";
 
-function TestBattle(applicator,...battleParameters) {
+addOpponent("test-battle",function(applicator,...battleParameters) {
     const getTree = posX => {
         return this.getForegroundObject(116,2,4,posX,8);
     }
@@ -58,5 +58,4 @@ function TestBattle(applicator,...battleParameters) {
             }
         }
     });
-}
-addOpponent(TestBattle,"test-battle");
+});

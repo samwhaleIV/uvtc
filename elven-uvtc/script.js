@@ -27,8 +27,13 @@ function loadCallback() {
     setRendererState(firstRendererState);
     startRenderer();
     if(rendererState.song) {
-        playMusic(rendererState.song);
+        if(rendererState.songIntro) {
+            playMusicWithIntro(rendererState.song,rendererState.songIntro)
+        } else {
+            playMusic(rendererState.song);
+        }
     }
+
 }
 
 setPageTitle("You Versus Earth");

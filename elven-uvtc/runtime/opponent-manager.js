@@ -1,5 +1,5 @@
 const opponents = {};
-const addOpponent = (opponent,battleID) => {
+const addOpponent = (battleID,opponent) => {
     opponents[battleID] = opponent;
 }
 const speechEventMap = speech => {return{type:"speech",text:speech}};
@@ -13,6 +13,14 @@ const getOpponent = (battleID,...battleParameters) => {
         throw Error(`Missing opponent generator for battleID '${battleID}'`);
     }
     return function(applicator) {
+        const song = BattleMusicLinkingManifest[battleID]
+        if(song) {
+            this.song = song;
+            const songIntro = SONG_INTRO_LOOKUP[song];
+            if(songIntro) {
+                this.songIntro = songIntro;
+            }
+        }
         opponentGenerator.call(this,applicator,...parameters);
     }
 };
