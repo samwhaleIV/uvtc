@@ -35,7 +35,22 @@ function TestBattle(applicator,...battleParameters) {
             impactFrame: 2
         },
         tileset: "test-tileset",
-        fogColor: null
+        fogColor: null,
+
+        endPoints: {
+            opponentInjured: function(amount) {
+
+            },
+            roundEnd: function(roundNumber) {
+    
+            },
+            roundStart: function(roundNumber) {
+    
+            },
+            gameOver: function(playerWon) {
+    
+            }
+        }
     });
     
     (async function(){

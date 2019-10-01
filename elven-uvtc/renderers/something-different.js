@@ -61,10 +61,9 @@ const selfImpactIntensity = 0.4;
 
 const damageSoundPunchDuration = 0.15;
 
-function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) {
+const MAX_HEALTH = 10;
 
-    this.winCallback = winCallback;
-    this.loseCallback = loseCallback;
+function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) {
 
     ApplyTimeoutManager(this);
 
@@ -102,8 +101,12 @@ function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) 
     this.globalEffects = new MultiLayer();
 
     this.hands = new TheseHands(this,null);//todo supply slots
-    this.playerHeart = new LoveAndCrystals(this,null);//todo slots
-    this.opponentHeart = new LoveAndCrystals(this,null);//todo slots
+
+    let playerHealth = MAX_HEALTH;
+    let opponentHealth = MAX_HEALTH;
+
+    this.playerHeart = new LoveAndCrystals(0);
+    this.opponentHeart = new LoveAndCrystals(1);
 
     this.forcedSizeMode = "fit";
     this.tileset = null;
@@ -364,6 +367,23 @@ function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) 
         };
     }
 
+    this.damageOpponent = healthAmount => {
+        opponentHealth -= healthAmount;
+        this.opponentInjured(healthAmount);
+        if(opponentHealth <= 0) {
+            opponentHealth = 0;
+            //todo
+        }
+    }
+    this.damagePlayer = healthAmount => {
+        this.playerImpact();
+        playerHealth -= healthAmount;
+        if(playerHealth <= 0) {
+            playerHealth = 0;
+            //todo
+        }
+    }
+
     this.processClick = () => {
         if(this.showingMessage) {
             this.hands.punch();
@@ -374,9 +394,11 @@ function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) 
         }
         if(this.getPlayerOpponentDistance().inRange) {
             this.hands.punch(()=>{
-                playSound("damage",damageSoundPunchDuration);
                 this.foregroundEffects.addLayer(GetPunchImpactEffect.call(this));
+                playSound("damage",damageSoundPunchDuration);
+                this.damageOpponent(1);
             });
+            this.opponentInjured
             noPunchEffect = false;
         } else if(!this.hands.punching) {
             this.hands.punch();
@@ -531,8 +553,9 @@ function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) 
 
         renderHeadcons();
 
-        //this.opponentHeart.render(timestamp); TODO
-        //this.playerHeart.render(timestamp); TODO
+        this.opponentHeart.render(timestamp,100,100,100,opponentHealth/MAX_HEALTH);
+        this.playerHeart.render(timestamp,fullWidth-100,fullHeight-100,100,playerHealth/MAX_HEALTH);
+
         if(this.globalEffects) {
             this.globalEffects.render(timestamp);
         }

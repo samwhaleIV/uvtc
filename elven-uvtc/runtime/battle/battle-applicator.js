@@ -1,5 +1,41 @@
 import SpriteForeground from "../../renderers/components/battle/sprite-foreground.js";
 
+const endPoints = [
+    "opponentInjured",
+    "roundEnd",
+    "roundStart",
+    "gameOver"
+];
+
+const bindEndPoints = (target,endPointSpecification) => {
+    const fallbackEndPoint = function() {
+        void undefined;
+    }
+    let skipEndPointCheck = false;
+    if(!endPointSpecification) {
+        endPointSpecification = endPoints.reduce((pv,cv)=>{
+            pv[cv] = fallbackEndPoint;
+            return pv;
+        },{});
+        skipEndPointCheck = true;
+    }
+    Object.entries(endPointSpecification).forEach(entry => {
+        const name = entry[0];
+        let method = entry[1];
+        if(!method) {
+            method = fallbackEndPoint;
+        }
+        target[name] = method.bind(target);
+    })
+    if(!skipEndPointCheck) {
+        endPoints.forEach(name => {
+            if(!target[name]) {
+                target[name] = fallbackEndPoint.bind(target);
+            }
+        });
+    }
+}
+
 function SomethingDifferentApplicator(layers,specification) {
     function ApplyEffectsList(list,target) {
         if(!list.length) {
@@ -54,5 +90,6 @@ function SomethingDifferentApplicator(layers,specification) {
     if(specification.fogColor) {
         this.fogColor = specification.fogColor;
     }
+    bindEndPoints(this,specification.endPoints);
 }
 export default SomethingDifferentApplicator;
