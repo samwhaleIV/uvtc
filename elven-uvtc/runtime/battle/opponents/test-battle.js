@@ -36,6 +36,8 @@ function TestBattle(applicator,...battleParameters) {
         },
         tileset: "test-tileset",
         fogColor: null,
+        opponentMaxHealth: 100,
+        playerMaxHealth: 10,
 
         endPoints: {
             opponentInjured: function(amount) {

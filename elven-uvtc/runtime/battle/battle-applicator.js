@@ -91,6 +91,12 @@ function SomethingDifferentApplicator(layers,specification) {
     if(specification.fogColor) {
         this.fogColor = specification.fogColor;
     }
+    if(specification.opponentMaxHealth >= 0) {
+        this.opponentMaxHealth = specification.opponentMaxHealth;
+    }
+    if(specification.playerMaxHealth >= 0) {
+        this.playerMaxHealth = specification.playerMaxHealth;
+    }
     bindEndPoints(this,specification.endPoints);
 }
 export default SomethingDifferentApplicator;

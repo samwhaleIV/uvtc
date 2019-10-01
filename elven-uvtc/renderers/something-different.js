@@ -61,7 +61,7 @@ const selfImpactIntensity = 0.4;
 
 const damageSoundPunchDuration = 0.15;
 
-const MAX_HEALTH = 10;
+const DEFAULT_MAX_HEALTH = 10;
 
 function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) {
 
@@ -101,9 +101,6 @@ function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) 
     this.globalEffects = new MultiLayer();
 
     this.hands = new TheseHands(this,null);//todo supply slots
-
-    let playerHealth = MAX_HEALTH;
-    let opponentHealth = MAX_HEALTH;
 
     this.playerHeart = new LoveAndCrystals(0);
     this.opponentHeart = new LoveAndCrystals(1);
@@ -207,6 +204,12 @@ function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) 
             specification
         );
     });
+
+    const playerMaxHealth = this.playerMaxHealth || DEFAULT_MAX_HEALTH;
+    const opponentMaxHealth = this.opponentMaxHealth || DEFAULT_MAX_HEALTH;
+
+    let playerHealth = playerMaxHealth;
+    let opponentHealth = opponentMaxHealth;
 
     const renderSky = () => context.drawImage(this.tileset,48,16,16,16,0,0,fullWidth,fullHeight);
 
@@ -390,22 +393,22 @@ function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) 
 
     this.healPlayer = amount => {
         playerHealth += amount;
-        if(playerHealth > MAX_HEALTH) {
-            playerHealth = MAX_HEALTH;
+        if(playerHealth > playerMaxHealth) {
+            playerHealth = playerMaxHealth;
         }   
     }
     this.healOpponent = amount => {
         opponentHealth += amount;
-        if(opponentHealth > MAX_HEALTH) {
-            opponentHealth = MAX_HEALTH;
+        if(opponentHealth > opponentMaxHealth) {
+            opponentHealth = opponentMaxHealth;
         }
     }
 
     this.restorePlayerHealth = () => {
-        playerHealth = MAX_HEALTH;
+        playerHealth = playerMaxHealth;
     }
     this.restoreOpponentHealth = () => {
-        opponentHealth = MAX_HEALTH;
+        opponentHealth = opponentMaxHealth;
     }
 
     this.processClick = () => {
@@ -580,8 +583,8 @@ function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) 
 
         renderHeadcons();
 
-        this.opponentHeart.render(timestamp,100,100,100,opponentHealth/MAX_HEALTH);
-        this.playerHeart.render(timestamp,fullWidth-100,fullHeight-100,100,playerHealth/MAX_HEALTH);
+        this.opponentHeart.render(timestamp,100,100,100,opponentHealth/opponentMaxHealth);
+        this.playerHeart.render(timestamp,fullWidth-100,fullHeight-100,100,playerHealth/playerMaxHealth);
 
         if(this.globalEffects) {
             this.globalEffects.render(timestamp);
