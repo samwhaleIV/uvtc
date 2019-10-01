@@ -372,19 +372,46 @@ function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) 
         this.opponentInjured(healthAmount);
         if(opponentHealth <= 0) {
             opponentHealth = 0;
-            //todo
+            //todo end round round or match
         }
     }
     this.damagePlayer = healthAmount => {
         this.playerImpact();
         playerHealth -= healthAmount;
+        this.playerInjured(healthAmount);
         if(playerHealth <= 0) {
             playerHealth = 0;
-            //todo
+            //todo end round or match
         }
     }
 
+    this.getPlayerHealth = () => playerHealth;
+    this.getOpponentHealth = () => opponentHealth;
+
+    this.healPlayer = amount => {
+        playerHealth += amount;
+        if(playerHealth > MAX_HEALTH) {
+            playerHealth = MAX_HEALTH;
+        }   
+    }
+    this.healOpponent = amount => {
+        opponentHealth += amount;
+        if(opponentHealth > MAX_HEALTH) {
+            opponentHealth = MAX_HEALTH;
+        }
+    }
+
+    this.restorePlayerHealth = () => {
+        playerHealth = MAX_HEALTH;
+    }
+    this.restoreOpponentHealth = () => {
+        opponentHealth = MAX_HEALTH;
+    }
+
     this.processClick = () => {
+        if(movementLocked) {
+            return;
+        }
         if(this.showingMessage) {
             this.hands.punch();
             noPunchEffect = true;

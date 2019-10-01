@@ -4,7 +4,8 @@ const endPoints = [
     "opponentInjured",
     "roundEnd",
     "roundStart",
-    "gameOver"
+    "gameOver",
+    "playerInjured"
 ];
 
 const bindEndPoints = (target,endPointSpecification) => {
