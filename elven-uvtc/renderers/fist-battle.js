@@ -1,13 +1,16 @@
 import MultiLayer from "./components/multi-layer.js";
 import TheseHands from "./components/battle/these-hands.js";
-import LoveAndCrystals from "./components/battle/love-and-crystals.js";
+import HeartDisplay from "./components/battle/heart-display.js";
 import GetOpponent from "./components/battle/opponent.js";
 import GetPunchImpactEffect from "./components/battle/punch-effect.js";
 import ApplyTimeoutManager from "./components/inline-timeout.js";
-import SomethingDifferentApplicator from "../runtime/battle/battle-applicator.js";
+import FistBattleApplicator from "../runtime/battle/battle-applicator.js";
+import RoundSplashEffect from "./components/battle/round-splash.js";
 
 const textureSize = 16;
 const halftextureSize = textureSize / 2;
+
+const START_DELAY = 500;
 
 const xLimit =      0.35;
 const minimumX =   -xLimit;
@@ -63,7 +66,7 @@ const damageSoundPunchDuration = 0.15;
 
 const DEFAULT_MAX_HEALTH = 10;
 
-function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) {
+function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
 
     ApplyTimeoutManager(this);
 
@@ -77,7 +80,7 @@ function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) 
     let yVelocity = 0;
 
     let lastFrame = 0;
-    let movementLocked = false;
+    let movementLocked = true;
 
     this.lockMovement = () => {
         movementLocked = true;
@@ -102,8 +105,8 @@ function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) 
 
     this.hands = new TheseHands(this,null);//todo supply slots
 
-    this.playerHeart = new LoveAndCrystals(0);
-    this.opponentHeart = new LoveAndCrystals(1);
+    this.playerHeart = new HeartDisplay(0);
+    this.opponentHeart = new HeartDisplay(1);
 
     this.forcedSizeMode = "fit";
     this.tileset = null;
@@ -140,6 +143,35 @@ function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) 
         } else {
             console.warn("No headcon at index " + index);
         }
+    }
+
+    let opponentLives = 3;
+    const updateOpponentLives = () => {
+        let l1 = true, l2 = true, l3 = true;
+        switch(opponentLives) {
+            default:
+            case 3: l3 = false;
+            case 2: l2 = false;
+            case 1: l1 = false;
+            case 0: break;
+        }
+        this.setHeadconLost(0,l3);
+        this.setHeadconLost(1,l2);
+        this.setHeadconLost(2,l1);
+    }
+    let playerLives = 3;
+    const updatePlayerLives = () => {
+        let l1 = true, l2 = true, l3 = true;
+        switch(opponentLives) {
+            default:
+            case 3: l3 = false;
+            case 2: l2 = false;
+            case 1: l1 = false;
+            case 0: break;
+        }
+        this.setHeadconLost(5,l3);
+        this.setHeadconLost(4,l2);
+        this.setHeadconLost(3,l1);
     }
 
     const renderHeadcons = () => {
@@ -198,8 +230,7 @@ function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) 
     }
 
     opponentSequencer.call(this,specification=>{
-        console.log();
-        SomethingDifferentApplicator.call(this,
+        FistBattleApplicator.call(this,
             [foregroundLayer1,foregroundLayer2,foregroundLayer3],
             specification
         );
@@ -375,7 +406,7 @@ function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) 
         this.opponentInjured(healthAmount);
         if(opponentHealth <= 0) {
             opponentHealth = 0;
-            //todo end round round or match
+            this.endRound(true);
         }
     }
     this.damagePlayer = healthAmount => {
@@ -384,7 +415,7 @@ function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) 
         this.playerInjured(healthAmount);
         if(playerHealth <= 0) {
             playerHealth = 0;
-            //todo end round or match
+            this.endRound(false);
         }
     }
 
@@ -412,14 +443,14 @@ function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) 
     }
 
     this.processClick = () => {
-        if(movementLocked) {
-            return;
-        }
         if(this.showingMessage) {
             this.hands.punch();
             noPunchEffect = true;
             playSound("damage",damageSoundPunchDuration);
             this.showingMessage.progress();
+            return;
+        }
+        if(movementLocked) {
             return;
         }
         if(this.getPlayerOpponentDistance().inRange) {
@@ -522,6 +553,55 @@ function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) 
             timestamp
         );
     }
+
+    let roundNumber = 1;
+    this.endRound = async playerWon => {
+        this.lockMovement();
+        if(playerWon) {
+            opponentLives--;
+            updateOpponentLives();
+        } else {
+            playerLives--;
+            updatePlayerLives();
+        }
+        if(playerLives <= 0 || opponentLives <= 0) {
+            await this.gameOver(playerWon,roundNumber);
+            if(playerWon) {
+                winCallback.call(null);
+            } else {
+                loseCallback.call(null);
+            }
+            return;
+        }
+        await this.roundEnd(playerWon,roundNumber);
+        roundNumber++;
+        await delay(1000);
+        await this.showRoundBanner(roundNumber);
+        playerHealth = playerMaxHealth;
+        opponentHealth = opponentMaxHealth;
+        await this.roundStart(roundNumber);
+        this.unlockMovement();
+    }
+    (async ()=>{
+        await delay(faderTime/2+START_DELAY);
+        await this.gameStart();
+        await delay(500);
+        await this.showRoundBanner(roundNumber);
+        this.unlockMovement();
+    })();
+
+    this.showRoundBanner = roundNumber => {
+        return new Promise(resolve => {
+            let effect;
+            const clearEffect = () => {
+                effect.terminate();
+                resolve();
+            }
+            effect = new RoundSplashEffect(roundNumber,clearEffect);
+            this.globalEffects.addLayer(effect);
+        });
+    }
+
     let impactStart = null;
     this.playerImpact = () => {
         impactStart = performance.now();
@@ -591,4 +671,4 @@ function SomethingDifferentRenderer(winCallback,loseCallback,opponentSequencer) 
         }
     }
 }
-export default SomethingDifferentRenderer;
+export default FistBattleRenderer;

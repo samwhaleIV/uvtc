@@ -6,7 +6,7 @@ const HALF_IMPACT_AMOUNT = MAX_IMPACT_AMOUNT / 2;
 
 const getImpactAmount = () => Math.random() * MAX_IMPACT_AMOUNT - HALF_IMPACT_AMOUNT;
 
-function LoveAndCrystals(heartID=0) {
+function HeartDisplay(heartID=0) {
     const heartSprites = imageDictionary[TEXTURE_NAME];
     const textureX = heartID * TEXTURE_SIZE;
     let impactStart = null;
@@ -62,4 +62,4 @@ function LoveAndCrystals(heartID=0) {
         )
     }
 }
-export default LoveAndCrystals;
+export default HeartDisplay;

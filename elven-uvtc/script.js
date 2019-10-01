@@ -2,7 +2,7 @@
 import MainMenuRenderer from "./renderers/main-menu.js";
 import BoxFaderEffect from "./renderers/components/box-fader-effect.js";
 import DragTestRenderer from "./renderers/drag-test.js";
-import SomethingDifferentRenderer from "./renderers/something-different.js";
+import FistBattleRenderer from "./renderers/fist-battle.js";
 import "./runtime/battle/opponents/manifest.js";
 
 drawLoadingText();
@@ -15,9 +15,9 @@ function loadCallback() {
         case "drag-test":
             firstRendererState = new DragTestRenderer();
             break;
-        case "something-different":
-            firstRendererState = new SomethingDifferentRenderer(
-                null,null,getOpponent("test-battle")
+        case "fist-battle":
+            firstRendererState = new FistBattleRenderer(
+                ()=>alert("Player won!"),()=>alert("Opponent won!"),getOpponent("test-battle")
             );
             break;
         default:

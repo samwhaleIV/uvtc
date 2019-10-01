@@ -36,28 +36,27 @@ function TestBattle(applicator,...battleParameters) {
         },
         tileset: "test-tileset",
         fogColor: null,
-        opponentMaxHealth: 100,
+        opponentMaxHealth: 10,
         playerMaxHealth: 10,
 
         endPoints: {
+            gameStart: async function() {
+                await delay(1000);
+                await this.opponent.say("Go easy on me.. I'm new to fighting.");
+            },
             opponentInjured: function(amount) {
 
             },
-            roundEnd: function(roundNumber) {
+            roundEnd: function(playerWon,roundNumber) {
     
             },
-            roundStart: function(roundNumber) {
+            roundStart: function(playerWon,roundNumber) {
     
             },
-            gameOver: function(playerWon) {
+            gameOver: function(playerWon,roundNumber) {
     
             }
         }
     });
-    
-    (async function(){
-        await delay(1000);
-        await this.opponent.say("Go easy on me.. I'm new to fighting.");
-    }).call(this);
 }
 addOpponent(TestBattle,"test-battle");

@@ -8,6 +8,6 @@ const ENV_FLAGS = {
     MOVEMENT_FRAME_WARNING: true,
     CONVOY_TRACE: true,
     DEBUG_PLAYER_CONVOY: false,
-    TEST: "something-different",
+    TEST: "fist-battle",
     NO_CONTEXT_MENU: true
 }

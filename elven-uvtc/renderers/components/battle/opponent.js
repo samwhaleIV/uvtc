@@ -42,17 +42,26 @@ function GetOpponent() {
         yTarget: null,
         resolver: null,
         say: text => {
-            if(this.showingMessage) {
-                this.showingMessage.terminate();
-                this.showingMessage = null;
-            }
-            const effect = new WorldPopup([text],()=>{
-                this.showingMessage.terminate();
-                this.showingMessage = null;
-            },null,false,this);
-            effect.render = CustomTextRenderer.bind(effect,this);
-            this.showingMessage = effect;
-            this.foregroundEffects.addLayer(effect);
+            return new Promise(callback=>{
+                if(this.showingMessage) {
+                    if(this.showingMessage.callback) {
+                        this.showingMessage.callback();
+                    }
+                    this.showingMessage.terminate();
+                    this.showingMessage = null;
+                }
+                const effect = new WorldPopup([text],()=>{
+                    if(this.showingMessage.callback) {
+                        this.showingMessage.callback();
+                    }
+                    this.showingMessage.terminate();
+                    this.showingMessage = null;
+                },null,false,this);
+                effect.callback = callback;
+                effect.render = CustomTextRenderer.bind(effect,this);
+                this.showingMessage = effect;
+                this.foregroundEffects.addLayer(effect);
+            });
         },
         setWalking: isWalking => this.opponentSprite.sprite.setWalking(isWalking),
         updateDirection: direction => this.opponentSprite.sprite.updateDirection(direction),

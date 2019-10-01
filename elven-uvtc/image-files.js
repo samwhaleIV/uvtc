@@ -17,6 +17,7 @@ ImagePaths.push(
     getFile("battle/headcon.png",FileTypes.Image),
     getFile("battle/love.png",FileTypes.Image),
     getFile("battle/moves.png",FileTypes.Image),
+    getFile("battle/round-splash.png",FileTypes.Image),
     getFile("battle/statuses.png",FileTypes.Image),
     getFile("battle/test-tileset.png",FileTypes.Image),
     getFile("collision-tileset.png",FileTypes.Image),

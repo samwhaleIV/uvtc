@@ -20,7 +20,7 @@ import {FadeIn,FadeOut} from "./components/world/fade.js";
 import ObjectiveHUD from "./components/world/objective-hud.js";
 import BoxFaderEffect from "./components/box-fader-effect.js";
 import ApplyTimeoutManager from "./components/inline-timeout.js";
-import SomethingDifferentRenderer from "./something-different.js";
+import FistBattleRenderer from "./fist-battle.js";
 
 const CHAPTER_NAME_LOOKUP = [
     "an impossible chapter that cannot exist",
@@ -1195,7 +1195,7 @@ function WorldRenderer() {
             returnToWorld();
         }
         const opponent = getOpponent(battleID,...battleParameters);
-        this.managedFaderTransition(SomethingDifferentRenderer,win,lose,opponent);
+        this.managedFaderTransition(FistBattleRenderer,win,lose,opponent);
     }
 
     this.updateSize = function() {

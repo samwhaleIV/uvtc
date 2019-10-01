@@ -5,7 +5,8 @@ const endPoints = [
     "roundEnd",
     "roundStart",
     "gameOver",
-    "playerInjured"
+    "playerInjured",
+    "gameStart"
 ];
 
 const bindEndPoints = (target,endPointSpecification) => {
@@ -37,7 +38,7 @@ const bindEndPoints = (target,endPointSpecification) => {
     }
 }
 
-function SomethingDifferentApplicator(layers,specification) {
+function FistBattleApplicator(layers,specification) {
     function ApplyEffectsList(list,target) {
         if(!list.length) {
             list = [list];
@@ -99,4 +100,4 @@ function SomethingDifferentApplicator(layers,specification) {
     }
     bindEndPoints(this,specification.endPoints);
 }
-export default SomethingDifferentApplicator;
+export default FistBattleApplicator;
