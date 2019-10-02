@@ -66,6 +66,7 @@ function GetOpponent() {
         setWalking: isWalking => this.opponentSprite.sprite.setWalking(isWalking),
         updateDirection: direction => this.opponentSprite.sprite.updateDirection(direction),
         move: async function(x,y) {
+            console.log("STARTED WALKING");
             if(x) {
                 if(x > 0) {
                     await this.moveBy("left",x);
@@ -79,6 +80,18 @@ function GetOpponent() {
                     await this.moveBy("up",-y);
                 }
             }
+        },
+        resolver: null,
+        stopMove: function() {
+            console.log("STOPPED WALKING");
+            if(this.resolver) {
+                this.resolver();
+                this.resolver = null;
+            }
+            this.xTarget = null;
+            this.yTarget = null;
+            this.updateDirection("down");
+            this.setWalking(false);
         },
         moveBy: function(direction,amount) {
             this.xTarget = null;
@@ -137,6 +150,7 @@ function GetOpponent() {
         },
         movementLogic: function(delta) {
             if(this.xTarget !== null) {
+                console.log("WALKING");
                 const xVelocity = delta * opponentXVelocity;
                 this.mapSourceAndTarget(
                     "x",this.movementLoop(this.x,this.xTarget,xVelocity)

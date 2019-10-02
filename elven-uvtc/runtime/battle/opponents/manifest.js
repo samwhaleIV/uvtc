@@ -1,1 +1,1 @@
-import "./test-battle.js";
+import "./wimpy-red-elf.js";

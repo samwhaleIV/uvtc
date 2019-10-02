@@ -65,6 +65,7 @@ const selfImpactIntensity = 0.4;
 const damageSoundPunchDuration = 0.15;
 
 const DEFAULT_MAX_HEALTH = 10;
+const HEAL_RATE_FACTOR = 100;
 
 function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
 
@@ -104,9 +105,6 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
     this.globalEffects = new MultiLayer();
 
     this.hands = new TheseHands(this,null);//todo supply slots
-
-    this.playerHeart = new HeartDisplay(0);
-    this.opponentHeart = new HeartDisplay(1);
 
     this.forcedSizeMode = "fit";
     this.tileset = null;
@@ -235,6 +233,9 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
             specification
         );
     });
+
+    this.playerHeart = new HeartDisplay(this.playerHeartID || 0);
+    this.opponentHeart = new HeartDisplay(this.opponentHeartID || 1);
 
     const playerMaxHealth = this.playerMaxHealth || DEFAULT_MAX_HEALTH;
     const opponentMaxHealth = this.opponentMaxHealth || DEFAULT_MAX_HEALTH;
@@ -444,10 +445,11 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
 
     this.processClick = () => {
         if(this.showingMessage) {
-            this.hands.punch();
-            noPunchEffect = true;
-            playSound("damage",damageSoundPunchDuration);
-            this.showingMessage.progress();
+            this.hands.punch(()=>{
+                playSound("damage",damageSoundPunchDuration);
+                this.showingMessage.progress();
+                noPunchEffect = true;
+            });
             return;
         }
         if(movementLocked) {
@@ -458,9 +460,8 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
                 this.foregroundEffects.addLayer(GetPunchImpactEffect.call(this));
                 playSound("damage",damageSoundPunchDuration);
                 this.damageOpponent(1);
+                noPunchEffect = false;
             });
-            this.opponentInjured
-            noPunchEffect = false;
         } else if(!this.hands.punching) {
             this.hands.punch();
             noPunchEffect = true;
@@ -555,7 +556,7 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
     }
 
     let roundNumber = 1;
-    this.endRound = async playerWon => {
+    this.endRound = playerWon => {
         this.lockMovement();
         if(playerWon) {
             opponentLives--;
@@ -564,23 +565,25 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
             playerLives--;
             updatePlayerLives();
         }
-        if(playerLives <= 0 || opponentLives <= 0) {
-            await this.gameOver(playerWon,roundNumber);
-            if(playerWon) {
-                winCallback.call(null);
-            } else {
-                loseCallback.call(null);
+        (async ()=>{
+            if(playerLives <= 0 || opponentLives <= 0) {
+                await this.gameOver(playerWon,roundNumber);
+                if(playerWon) {
+                    winCallback.call(null);
+                } else {
+                    loseCallback.call(null);
+                }
+                return;
             }
-            return;
-        }
-        await this.roundEnd(playerWon,roundNumber);
-        roundNumber++;
-        await delay(1000);
-        await this.showRoundBanner(roundNumber);
-        playerHealth = playerMaxHealth;
-        opponentHealth = opponentMaxHealth;
-        await this.roundStart(roundNumber);
-        this.unlockMovement();
+            await this.roundEnd(playerWon,roundNumber);
+            roundNumber++;
+            await delay(1000);
+            this.healBattlers = true;
+            await this.showRoundBanner(roundNumber);
+            this.healBattlers = false;
+            await this.roundStart(playerWon,roundNumber);
+            this.unlockMovement();
+        })();
     }
     (async ()=>{
         await delay(faderTime/2+START_DELAY);
@@ -662,6 +665,24 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
         }
 
         renderHeadcons();
+
+        if(this.healBattlers) {
+            const opponentHealDelta = opponentMaxHealth / HEAL_RATE_FACTOR * delta;
+            if(opponentHealth < opponentMaxHealth) {
+                opponentHealth += opponentHealDelta;
+            }
+            if(opponentHealth >= opponentMaxHealth) {
+                opponentHealth = opponentMaxHealth;
+            }
+
+            const playerHealDelta = playerMaxHealth / HEAL_RATE_FACTOR * delta;
+            if(playerHealth < playerMaxHealth) {
+                playerHealth += playerHealDelta;
+            }
+            if(playerHealth >= playerMaxHealth) {
+                playerHealth = playerMaxHealth;
+            }
+        }
 
         this.opponentHeart.render(timestamp,100,100,100,opponentHealth/opponentMaxHealth);
         this.playerHeart.render(timestamp,fullWidth-100,fullHeight-100,100,playerHealth/playerMaxHealth);

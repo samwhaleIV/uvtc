@@ -98,6 +98,12 @@ function FistBattleApplicator(layers,specification) {
     if(specification.playerMaxHealth >= 0) {
         this.playerMaxHealth = specification.playerMaxHealth;
     }
+    if(specification.opponentHeartID >= 0) {
+        this.opponentHeartID = 1;
+    }
+    if(specification.playerHeartID >= 0) {
+        this.playerHeartID = specification.playerHeartID;
+    }
     bindEndPoints(this,specification.endPoints);
 }
 export default FistBattleApplicator;

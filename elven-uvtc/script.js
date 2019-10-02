@@ -17,7 +17,7 @@ function loadCallback() {
             break;
         case "fist-battle":
             firstRendererState = new FistBattleRenderer(
-                ()=>alert("Player won!"),()=>alert("Opponent won!"),getOpponent("test-battle")
+                ()=>alert("Player won!"),()=>alert("Opponent won!"),getOpponent("wimpy-red-elf")
             );
             break;
         default:
