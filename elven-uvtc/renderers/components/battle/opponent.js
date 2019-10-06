@@ -191,7 +191,7 @@ function GetOpponent() {
                 if(this.lastSpecialFrame >= 0) {
                     sprite.setSpecialFrame(this.lastSpecialFrame);
                 } else {
-                    sprite.updateDirection("down");
+                    sprite.updateDirection(sprite.direction);
                 }
                 this.lastSpecialFrame = null;
             }

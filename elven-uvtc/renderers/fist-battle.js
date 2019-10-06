@@ -67,6 +67,46 @@ const damageSoundPunchDuration = 0.15;
 const DEFAULT_MAX_HEALTH = 10;
 const HEAL_RATE_FACTOR = 100;
 
+function HealthController(maxHealth,heartRenderID,damageCallback,fatalCallback) {
+    if(!maxHealth) {
+        maxHealth = DEFAULT_MAX_HEALTH;
+    }
+
+    let health = maxHealth;
+    this.getValue = () => health;
+    this.getNormal = () => health / maxHealth;
+
+    this.damage = amount => {
+        health -= amount;
+        damageCallback.call(null,amount);
+        if(health <= 0) {
+            health = 0;
+            fatalCallback.call(null);
+        }
+    }
+
+    this.heal = amount => {
+        health += amount;
+        if(health > maxHealth) {
+            health = maxHealth;
+        }
+    }
+
+    this.restore = () => health = maxHealth;
+
+    const heartDisplay = new HeartDisplay(heartRenderID);
+    this.render = (timestamp,x,y,size) => heartDisplay.render(timestamp,x,y,size,health / maxHealth);
+    this.healCycle = delta => {
+        const healDelta = maxHealth / HEAL_RATE_FACTOR * delta;
+        if(health < maxHealth) {
+            health += healDelta;
+        }
+        if(health > maxHealth) {
+            health = maxHealth;
+        }
+    }
+}
+
 function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
 
     ApplyTimeoutManager(this);
@@ -144,21 +184,9 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
     }
 
     let opponentLives = 3;
-    const updateOpponentLives = () => {
-        let l1 = true, l2 = true, l3 = true;
-        switch(opponentLives) {
-            default:
-            case 3: l3 = false;
-            case 2: l2 = false;
-            case 1: l1 = false;
-            case 0: break;
-        }
-        this.setHeadconLost(0,l3);
-        this.setHeadconLost(1,l2);
-        this.setHeadconLost(2,l1);
-    }
     let playerLives = 3;
-    const updatePlayerLives = () => {
+
+    const updateLives = isPlayer => {
         let l1 = true, l2 = true, l3 = true;
         switch(opponentLives) {
             default:
@@ -167,10 +195,19 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
             case 1: l1 = false;
             case 0: break;
         }
-        this.setHeadconLost(5,l3);
-        this.setHeadconLost(4,l2);
-        this.setHeadconLost(3,l1);
+        if(isPlayer) {
+            this.setHeadconLost(5,l3);
+            this.setHeadconLost(4,l2);
+            this.setHeadconLost(3,l1);
+        } else {
+            this.setHeadconLost(0,l3);
+            this.setHeadconLost(1,l2);
+            this.setHeadconLost(2,l1);
+        }
+
     }
+    const updateOpponentLives = () => updateLives(false);
+    const updatePlayerLives = () => updateLives(true);
 
     const renderHeadcons = () => {
         context.translate(halfWidth-halfHeadconWidth,0);
@@ -233,15 +270,6 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
             specification
         );
     });
-
-    this.playerHeart = new HeartDisplay(this.playerHeartID || 0);
-    this.opponentHeart = new HeartDisplay(this.opponentHeartID || 1);
-
-    const playerMaxHealth = this.playerMaxHealth || DEFAULT_MAX_HEALTH;
-    const opponentMaxHealth = this.opponentMaxHealth || DEFAULT_MAX_HEALTH;
-
-    let playerHealth = playerMaxHealth;
-    let opponentHealth = opponentMaxHealth;
 
     const renderSky = () => context.drawImage(this.tileset,48,16,16,16,0,0,fullWidth,fullHeight);
 
@@ -400,47 +428,6 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
             yDistance: yDistance,
             inRange: inRange
         };
-    }
-
-    this.damageOpponent = healthAmount => {
-        opponentHealth -= healthAmount;
-        this.opponentInjured(healthAmount);
-        if(opponentHealth <= 0) {
-            opponentHealth = 0;
-            this.endRound(true);
-        }
-    }
-    this.damagePlayer = healthAmount => {
-        this.playerImpact();
-        playerHealth -= healthAmount;
-        this.playerInjured(healthAmount);
-        if(playerHealth <= 0) {
-            playerHealth = 0;
-            this.endRound(false);
-        }
-    }
-
-    this.getPlayerHealth = () => playerHealth;
-    this.getOpponentHealth = () => opponentHealth;
-
-    this.healPlayer = amount => {
-        playerHealth += amount;
-        if(playerHealth > playerMaxHealth) {
-            playerHealth = playerMaxHealth;
-        }   
-    }
-    this.healOpponent = amount => {
-        opponentHealth += amount;
-        if(opponentHealth > opponentMaxHealth) {
-            opponentHealth = opponentMaxHealth;
-        }
-    }
-
-    this.restorePlayerHealth = () => {
-        playerHealth = playerMaxHealth;
-    }
-    this.restoreOpponentHealth = () => {
-        opponentHealth = opponentMaxHealth;
     }
 
     this.processClick = () => {
@@ -610,6 +597,27 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
         impactStart = performance.now();
         playSound("ouch");
     }
+    const playerHealthController = new HealthController(
+        this.playerMaxHealth,this.playerHeartID || 0,
+        damageAmount => {
+            this.playerImpact();
+            this.playerInjured(damageAmount);
+        },
+        this.endRound.bind(this,false)
+    );
+    const opponentHealthController = new HealthController(
+        this.opponentMaxHealth,this.opponentHeartID || 1,
+        this.opponentInjured,
+        this.endRound.bind(this,true)
+    );
+
+    this.damagePlayer = amount => playerHealthController.damage(amount);
+    this.damageOpponent = amount => opponentHealthController.damage(amount);
+    this.healPlayer = amount => playerHealthController.heal(amount);
+    this.healOpponent = amount => opponentHealthController.heal(amount);
+    this.restorePlayerHealth = () => playerHealthController.restore();
+    this.restoreOpponentHealth = () => opponentHealthController.restore();
+
     this.render = timestamp => {
         this.processThreads(timestamp);
         let delta = timestamp - lastFrame;
@@ -667,25 +675,12 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
         renderHeadcons();
 
         if(this.healBattlers) {
-            const opponentHealDelta = opponentMaxHealth / HEAL_RATE_FACTOR * delta;
-            if(opponentHealth < opponentMaxHealth) {
-                opponentHealth += opponentHealDelta;
-            }
-            if(opponentHealth >= opponentMaxHealth) {
-                opponentHealth = opponentMaxHealth;
-            }
-
-            const playerHealDelta = playerMaxHealth / HEAL_RATE_FACTOR * delta;
-            if(playerHealth < playerMaxHealth) {
-                playerHealth += playerHealDelta;
-            }
-            if(playerHealth >= playerMaxHealth) {
-                playerHealth = playerMaxHealth;
-            }
+            playerHealthController.healCycle(delta);
+            opponentHealthController.healCycle(delta);
         }
 
-        this.opponentHeart.render(timestamp,100,100,100,opponentHealth/opponentMaxHealth);
-        this.playerHeart.render(timestamp,fullWidth-100,fullHeight-100,100,playerHealth/playerMaxHealth);
+        opponentHealthController.render(timestamp,100,100,100);
+        playerHealthController.render(timestamp,fullWidth-100,fullHeight-100,100);
 
         if(this.globalEffects) {
             this.globalEffects.render(timestamp);
