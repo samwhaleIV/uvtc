@@ -9,5 +9,6 @@ const ENV_FLAGS = {
     CONVOY_TRACE: true,
     DEBUG_PLAYER_CONVOY: false,
     TEST: "fist-battle",
-    NO_CONTEXT_MENU: true
+    NO_CONTEXT_MENU: true,
+    STATIC_BACKGROUND: true
 }

@@ -104,7 +104,6 @@ addOpponent("wimpy-red-elf",function(applicator,...battleParameters) {
 
         endPoints: {
             gameStart: async function() {
-                await delay(1000);
                 await this.opponent.say("We won't let you forget your injustice against elves so easily!");
                 await this.opponent.say("Bring it!");
             },

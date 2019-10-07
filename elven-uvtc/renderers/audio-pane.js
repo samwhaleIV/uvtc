@@ -72,6 +72,7 @@ function AudioPane(callback,parent,inverted=false) {
 
     this.exit = () => {
         if(callback) {
+            saveVolumeChanges();
             this.transitioning = true;
             fadeOutStart = performance.now();
             this.fadeOutEnd = () => {
@@ -129,7 +130,6 @@ function AudioPane(callback,parent,inverted=false) {
                 updateMusicVolume(
                     getVolumeNormal(x,slider1.x,slider1.width),true
                 );
-                saveVolumeChanges();
                 break;
             case hoverTypes.elfSlider2:
             case hoverTypes.slider2:
@@ -137,7 +137,6 @@ function AudioPane(callback,parent,inverted=false) {
                 updateSoundVolume(
                     getVolumeNormal(x,slider2.x,slider2.width),true
                 );
-                saveVolumeChanges();
                 break;
             case hoverTypes.exitLabel:
                 this.exit();

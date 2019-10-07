@@ -540,13 +540,14 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
             this.unlockMovement();
         })();
     }
-    (async ()=>{
-        await this.delay(faderTime/2+START_DELAY);
+
+    this.start = async () => {
+        await this.delay(faderTime+START_DELAY);
         await this.gameStart();
         await this.delay(500);
         await this.showRoundBanner(roundNumber);
         this.unlockMovement();
-    })();
+    }
 
     this.showRoundBanner = roundNumber => {
         return new Promise(resolve => {
