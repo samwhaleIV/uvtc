@@ -532,7 +532,7 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
             }
             await this.roundEnd(playerWon,roundNumber);
             roundNumber++;
-            await delay(1000);
+            await this.delay(1000);
             this.healBattlers = true;
             await this.showRoundBanner(roundNumber);
             this.healBattlers = false;
@@ -541,9 +541,9 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
         })();
     }
     (async ()=>{
-        await delay(faderTime/2+START_DELAY);
+        await this.delay(faderTime/2+START_DELAY);
         await this.gameStart();
-        await delay(500);
+        await this.delay(500);
         await this.showRoundBanner(roundNumber);
         this.unlockMovement();
     })();

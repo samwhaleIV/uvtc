@@ -1,7 +1,9 @@
 function ApplyTimeoutManager(target) {
     const timeoutThreads = [];
     let timeoutHandle = 0;
-
+    target.delay = duration => new Promise(
+        resolve => target.setTimeout(resolve,duration)
+    );
     target.setTimeout = (action,delay,...parameters) => {
         const thisHandle = timeoutHandle;
         timeoutHandle++;
@@ -25,7 +27,6 @@ function ApplyTimeoutManager(target) {
             i++;
         }
     }
-
     target.processThreads = timestamp => {
         let timeoutThreadIndex = 0;
         while(timeoutThreadIndex < timeoutThreads.length) {
