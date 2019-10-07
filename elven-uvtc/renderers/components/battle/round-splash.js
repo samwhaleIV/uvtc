@@ -11,17 +11,6 @@ const INVERSE_TRANSITION_PERIOD = 1 - TRANSITION_PERIOD;
 const BANNER_TEXTURE_HEIGHT = 13;
 const BANNER_TEXTURE_WIDTH = 21;
 
-const TEXTURE_SCALE = 10;
-
-const INNER_HEIGHT = BANNER_TEXTURE_HEIGHT * TEXTURE_SCALE;
-const INNER_WIDTH = BANNER_TEXTURE_WIDTH * TEXTURE_SCALE;
-
-const HALF_INNER_WIDTH = INNER_WIDTH / 2;
-const BANNER_PADDING = TEXTURE_SCALE;
-
-const BANNER_HEIGHT = INNER_HEIGHT + BANNER_PADDING + BANNER_PADDING;
-const BANNER_HALF_HEIGHT = BANNER_HEIGHT / 2;
-
 const FIGHT_TEXTURE_Y = 6 * BANNER_TEXTURE_HEIGHT;
 
 function RoundSplashEffect(roundNumber,callback) {
@@ -31,8 +20,16 @@ function RoundSplashEffect(roundNumber,callback) {
 
     const startTime = performance.now();
     this.render = timestamp => {
-        const timeDifference = timestamp - startTime;
 
+        const TEXTURE_SCALE = 6 * (fullWidth / internalWidth);
+        const INNER_HEIGHT = BANNER_TEXTURE_HEIGHT * TEXTURE_SCALE;
+        const INNER_WIDTH = BANNER_TEXTURE_WIDTH * TEXTURE_SCALE;
+        const HALF_INNER_WIDTH = INNER_WIDTH / 2;
+        const BANNER_PADDING = TEXTURE_SCALE;
+        const BANNER_HEIGHT = INNER_HEIGHT + BANNER_PADDING + BANNER_PADDING;
+        const BANNER_HALF_HEIGHT = BANNER_HEIGHT / 2;
+
+        const timeDifference = timestamp - startTime;
         let globalDelta = timeDifference / TOTAL_DURATION;
         if(globalDelta > 1) {
             globalDelta = 1;
@@ -59,7 +56,7 @@ function RoundSplashEffect(roundNumber,callback) {
         }
 
         context.fillStyle = "black";
-        context.fillRect(0,centerY+yOffset,fullWidth,BANNER_HEIGHT);
+        context.fillRect(0,Math.floor(centerY+yOffset),fullWidth,Math.ceil(BANNER_HEIGHT));
 
         context.drawImage(
             texture,
@@ -67,7 +64,8 @@ function RoundSplashEffect(roundNumber,callback) {
             BANNER_TEXTURE_WIDTH,BANNER_TEXTURE_HEIGHT,
             splashCenterX,
             BANNER_PADDING + centerY + yOffset,
-            INNER_WIDTH,INNER_HEIGHT
+            INNER_WIDTH,
+            INNER_HEIGHT
         );
     }
 }

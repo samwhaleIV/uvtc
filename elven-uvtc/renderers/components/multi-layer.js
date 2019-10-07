@@ -18,10 +18,10 @@ function MultiLayer() {
         delete layersLookup[ID];
         cacheLayers();
     }
-    this.render = timestamp => {
+    this.render = (timestamp,...parameters) => {
         for(let i = 0;i<layerSize;i++) {
             const layer = layers[i];
-            layer.render.call(layer,timestamp);
+            layer.render.call(layer,timestamp,...parameters);
         }
     }
 }

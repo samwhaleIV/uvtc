@@ -186,6 +186,9 @@ function TheseHands(battleRenderer,slots) {
             yOffset += IDLE_SWAY_HEIGHT * Math.sin(timestamp / IDLE_SWAY_LOOP_TIME % 1 * PI2); 
         }
 
+        const scale = fullHeight / internalHeight;
+        context.transform(scale,0,0,scale,(fullWidth - fullWidth*scale) / 2,(fullHeight - fullHeight*scale)/100);
+
         context.translate(0,yOffset);
         renderFists(timestamp);
         context.resetTransform();

@@ -20,12 +20,6 @@ const maximumY =    0.7;
 
 const foregroundYRetargetStart =    1.4;
 const foregroundYRetargetEnd =      2.5;
-const depthFactor =                 0.5;
-const foregroundYContrast =         100;
-const foregroundYOffset =          -100;
-const topLayerYOffset =            -150;
-const frontLayerDepthAdjustment =   2.5;
-const frontLayerSpecialModifier =   10;
 
 const skewAmount =          0.5;
 const skewCenterPush =      200;
@@ -49,13 +43,6 @@ const deltaBase = 1000 / 60;
 const xStart = 0;
 const yStart = 0;
 
-const halfHeadconWidth =    180;
-const headconDistance =     60;
-const headconHeight =       60;
-const headconIconSize =     90;
-const headconMargin =       5;
-const innerHeadconSize = headconHeight - headconMargin - headconMargin;
-
 const minimumYPunchDistance = 0.6;
 const minimumXPunchDistance = 120;
 
@@ -66,6 +53,9 @@ const damageSoundPunchDuration = 0.15;
 
 const DEFAULT_MAX_HEALTH = 10;
 const HEAL_RATE_FACTOR = 100;
+
+const headconIconSize = 90;
+const headconMargin = 5;
 
 function HealthController(maxHealth,heartRenderID,damageCallback,fatalCallback) {
     if(!maxHealth) {
@@ -146,7 +136,6 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
 
     this.hands = new TheseHands(this,null);//todo supply slots
 
-    this.forcedSizeMode = "fit";
     this.tileset = null;
     const worldTileset = imageDictionary["world-tileset"];
     const headcons = imageDictionary["battle/headcon"];
@@ -210,6 +199,10 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
     const updatePlayerLives = () => updateLives(true);
 
     const renderHeadcons = () => {
+        const halfHeadconWidth = Math.ceil((150 * (fullWidth / internalWidth))/3)*3;
+        const headconHeight = halfHeadconWidth / 3;
+        const innerHeadconSize = headconHeight - headconMargin - headconMargin;
+
         context.translate(halfWidth-halfHeadconWidth,0);
         context.fillStyle = "black";
         context.fillRect(0,0,halfHeadconWidth,headconHeight);
@@ -225,7 +218,7 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
                 headcons,
                 iconX,iconY,
                 headconIconSize,headconIconSize,
-                i*headconDistance,0,
+                i*headconHeight,0,
                 innerHeadconSize,innerHeadconSize
             );
         }
@@ -242,7 +235,7 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
             foregroundObject.textureHeight,
 
             foregroundObject.renderXPercent * fullWidth + foregroundObject.renderXOffset,
-            halfHeight + foregroundObject.renderYOffset,
+            fullHeight - foregroundObject.renderHeight,
             foregroundObject.renderWidth,
             foregroundObject.renderHeight
         );
@@ -259,8 +252,7 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
             renderWidth: renderWidth,
             renderHeight: renderHeight,
             renderXPercent: posX,
-            renderXOffset: -renderWidth / 2,
-            renderYOffset: -renderHeight / 2
+            renderXOffset: -renderWidth / 2
         }
     }
 
@@ -302,101 +294,72 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
         );
         context.restore();
     }
-    const renderFog = (xPixelOffset,yPixelOffset) => {
+    const renderFog = () => {
         context.fillStyle = this.fogColor;
-        context.fillRect(-xPixelOffset,-yPixelOffset,fullWidth+xPixelOffset*2,fullHeight+yPixelOffset*2);
+        context.fillRect(0,0,fullWidth,fullHeight);
     }
     this.lastOpponentCenterX = 0;
+
+    const getLayerTransformMatrix = (scale,xNormal,xOffset,yOffset,verticalShift,center) => {
+        const newWidth = fullWidth * scale;
+        const newHeight = fullHeight * scale;
+        let newY;
+        if(center) {
+            newY = (fullHeight - newHeight) / 2;
+        } else {
+            newY = fullHeight - newHeight + scale * verticalShift;
+        }
+        let newX = (fullWidth - newWidth) / 2;
+        newX += xNormal * newWidth / 2;
+        return [scale,0,0,scale,newX + xOffset,newY + yOffset];
+    }
+    const renderLayer = (transformMatrix,objects,postFog) => {
+        context.setTransform.apply(context,transformMatrix);
+        for(let i = 0;i<objects.length;i++) {
+            renderForegroundObject(objects[i]);
+        }
+        context.resetTransform();
+        if(postFog) {
+            renderFog();
+        }
+    }
     const renderForeground = (timestamp,xNormal,depthNormal,xPixelOffset,yPixelOffset) => {
         depthNormal = foregroundYRetargetStart + (foregroundYRetargetEnd - foregroundYRetargetStart) * depthNormal;
 
-        const firstDepthScale = Math.pow(depthNormal / 8,depthFactor);
-        const secondDepthScale = Math.pow(depthNormal / 4,depthFactor);
-        const thirdDepthScale = Math.pow(depthNormal / 2,depthFactor);
-        const fourthDepthScale = depthNormal + this.opponent.y;
+        const widthFovScale = fullWidth / 1000;
+        depthNormal *= widthFovScale;
+        xNormal /= widthFovScale;
 
-        const xOffset = halfWidth * xNormal;
-
-        const firstDepthHeight = firstDepthScale * fullHeight;
-        const secondDepthHeight = secondDepthScale * fullHeight;
-        const thirdDepthHeight = thirdDepthScale * fullHeight;
-        const fourthDepthHeight = fourthDepthScale * fullHeight;
-
-        const opponentXOffset = this.opponent.x * halfWidth;
-        
-        let thirdDepthX = (fullWidth - thirdDepthScale * fullWidth) / 2;
-        thirdDepthX += xOffset * thirdDepthScale;
-        let thirdDepthY = (fullHeight - thirdDepthHeight) / 2;
-        thirdDepthX += foregroundYContrast / thirdDepthScale + foregroundYOffset;
-        
-        let secondDepthX = (fullWidth - secondDepthScale * fullWidth) / 2
-        secondDepthX += xOffset * secondDepthScale;
-        let secondDepthY = (fullHeight - secondDepthHeight) / 2;
-        secondDepthY += foregroundYContrast / secondDepthScale + foregroundYOffset;
-        
-        let firstDepthX = (fullWidth - firstDepthScale * fullWidth) / 2;
-        firstDepthX += xOffset * firstDepthScale;
-        let firstDepthY = (fullHeight - firstDepthHeight) / 2;
-        firstDepthY += foregroundYContrast / firstDepthScale + topLayerYOffset;
-        
-        let fourthDepthX = (fullWidth - fourthDepthScale * fullWidth) / 2;
-        fourthDepthX += xOffset * fourthDepthScale - opponentXOffset;
-        let fourthDepthY = (fullHeight - fourthDepthHeight) / 2;
-
-        const adjustedFourthLayerDepth = Math.min(
-            depthNormal - frontLayerDepthAdjustment,0
+        const opponentXOffset = -this.opponent.x * halfWidth;
+        const layer4 = getLayerTransformMatrix(
+            depthNormal + this.opponent.y,
+            xNormal,
+            xPixelOffset + opponentXOffset,
+            yPixelOffset,null,true
         );
-        fourthDepthY -= adjustedFourthLayerDepth * frontLayerSpecialModifier;
 
-        thirdDepthX += xPixelOffset;
-        secondDepthX += xPixelOffset;
-        firstDepthX += xPixelOffset;
-        fourthDepthX += xPixelOffset;
+        yPixelOffset -= fullHeight / groundHeightFactor;
 
-        thirdDepthY += yPixelOffset;
-        secondDepthY += yPixelOffset;
-        firstDepthY += yPixelOffset;
-        fourthDepthY += yPixelOffset;
+        const baseVerticalShift = 50;
+        const layer1 = getLayerTransformMatrix(Math.pow(depthNormal / 8,0.9),xNormal,xPixelOffset,yPixelOffset,baseVerticalShift);
+        const layer2 = getLayerTransformMatrix(Math.pow(depthNormal / 4,0.7),xNormal,xPixelOffset,yPixelOffset,baseVerticalShift);
+        const layer3 = getLayerTransformMatrix(Math.pow(depthNormal / 2,0.5),xNormal,xPixelOffset,yPixelOffset,baseVerticalShift);
 
-        this.lastOpponentCenterX = fourthDepthX + (fullWidth * fourthDepthScale / 2);
+        const layer4Scale = layer4[0];
+        this.lastOpponentCenterX = layer4[4] + (fullWidth * layer4Scale / 2);
         
-        let i;
         context.save();
-        context.setTransform(
-            firstDepthScale,0,0,
-            firstDepthScale,firstDepthX,firstDepthY
-        );
-        for(i = 0;i<foregroundLayer1.length;i++) {
-            renderForegroundObject(foregroundLayer1[i]);
-        }
-        context.resetTransform();
-        renderFog(xPixelOffset,yPixelOffset);
-        context.setTransform(
-            secondDepthScale,0,0,
-            secondDepthScale,secondDepthX,secondDepthY
-        );
-        for(i = 0;i<foregroundLayer2.length;i++) {
-            renderForegroundObject(foregroundLayer2[i]);
-        }
-        context.resetTransform();
-        renderFog(xPixelOffset,yPixelOffset);
-        context.setTransform(
-            thirdDepthScale,0,0,
-            thirdDepthScale,thirdDepthX,thirdDepthY
-        );
-        for(i = 0;i<foregroundLayer3.length;i++) {
-            renderForegroundObject(foregroundLayer3[i]);
-        }
-        context.setTransform(
-            fourthDepthScale,0,0,
-            fourthDepthScale,fourthDepthX,fourthDepthY
-        );
+        renderLayer(layer1,foregroundLayer1,true);
+        renderLayer(layer2,foregroundLayer2,true);
+        renderLayer(layer3,foregroundLayer3,false);
+
+        context.setTransform.apply(context,layer4);
         if(this.backgroundEffects) {
-            this.backgroundEffects.render(timestamp)
+            this.backgroundEffects.render(timestamp,layer4Scale)
         }
         this.opponent.render(timestamp,showPunchEffect());
         if(this.foregroundEffects) {
-            this.foregroundEffects.render(timestamp);
+            this.foregroundEffects.render(timestamp,layer4Scale);
         }
         context.restore();
     }
@@ -422,7 +385,7 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
     this.getPlayerOpponentDistance = () => {
         const yDistance = Math.max(0,1 - y - this.opponent.y);
         const xDistance = Math.abs(halfWidth - this.lastOpponentCenterX);
-        const inRange = yDistance <= minimumYPunchDistance && xDistance <= minimumXPunchDistance;
+        const inRange = yDistance <= minimumYPunchDistance && xDistance <= minimumXPunchDistance * (fullWidth / internalWidth);
         return {
             xDistance: xDistance,
             yDistance: yDistance,
@@ -679,8 +642,12 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
             opponentHealthController.healCycle(delta);
         }
 
-        opponentHealthController.render(timestamp,100,100,100);
-        playerHealthController.render(timestamp,fullWidth-100,fullHeight-100,100);
+        context.resetTransform();
+
+        const margin = 100;
+        const size = 150;
+        opponentHealthController.render(timestamp,margin,margin,size);
+        playerHealthController.render(timestamp,fullWidth-margin,fullHeight-margin,size);
 
         if(this.globalEffects) {
             this.globalEffects.render(timestamp);

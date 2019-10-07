@@ -5,18 +5,19 @@ const opponentYVelocity = 0.01;
 const opponentSpriteKnockbackAmount = -7;
 const spriteScale = 120;
 
-const TEXT_BOX_MARGIN = 4;
-const TEXT_BOX_WIDTH = 225;
-const TEXT_BOX_HEIGHT = 150;
+const TEXT_BOX_MARGIN = 12;
+const TEXT_BOX_WIDTH = 600;
+const TEXT_BOX_HEIGHT = 400;
 const TEXT_BOX_HALF_WIDTH = TEXT_BOX_WIDTH / 2;
 const TEXT_BOX_HALF_HEIGHT = TEXT_BOX_HEIGHT / 2;
 const TEXT_BOX_RENDER_WIDTH = TEXT_BOX_WIDTH + TEXT_BOX_MARGIN * 2;
 const TEXT_BOX_RENDER_HEIGHT = TEXT_BOX_HEIGHT + TEXT_BOX_MARGIN * 2;
-const TEXT_BOX_TEXT_SCALE = 2;
+const TEXT_BOX_TEXT_SCALE = 6;
 
-function CustomTextRenderer(battleRenderer) {
-    const x = halfWidth - TEXT_BOX_HALF_WIDTH
-    const y = halfHeight - TEXT_BOX_HALF_HEIGHT;
+function CustomTextRenderer() {
+
+    const x = Math.round(halfWidth - TEXT_BOX_HALF_WIDTH);
+    const y = Math.round(halfHeight - TEXT_BOX_HALF_HEIGHT);
 
     context.fillStyle = "white";
     context.fillRect(
@@ -58,9 +59,9 @@ function GetOpponent() {
                     this.showingMessage = null;
                 },null,false,this);
                 effect.callback = callback;
-                effect.render = CustomTextRenderer.bind(effect,this);
+                effect.render = CustomTextRenderer;
                 this.showingMessage = effect;
-                this.foregroundEffects.addLayer(effect);
+                this.globalEffects.addLayer(effect);
             });
         },
         setWalking: isWalking => this.opponentSprite.sprite.setWalking(isWalking),
