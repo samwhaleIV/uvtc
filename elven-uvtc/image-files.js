@@ -19,7 +19,7 @@ ImagePaths.push(
     getFile("battle/moves.png",FileTypes.Image),
     getFile("battle/round-splash.png",FileTypes.Image),
     getFile("battle/statuses.png",FileTypes.Image),
-    getFile("battle/test-tileset.png",FileTypes.Image),
+    getFile("battle/tumble-showdown.png",FileTypes.Image),
     getFile("collision-tileset.png",FileTypes.Image),
     getFile("sprites/alert.png",FileTypes.Image),
     getFile("sprites/boney-elf.png",FileTypes.Image),

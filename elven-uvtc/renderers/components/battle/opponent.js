@@ -36,12 +36,19 @@ function CustomTextRenderer() {
 }
 
 function GetOpponent() {
+    //Anonymous functions are in the global battle rendererer scope, function expressions are in the opponent scope
+    //For instance, "this" of "say(text)" is global while "this" of "move(x,y)" is local
+    //To access the battle renderer from local, use "this.battleRenderer"
+    //To access local from global, use "this.opponent"
     return {
         y: 0,
         x: 0,
         xTarget: null,
         yTarget: null,
         resolver: null,
+        sprite: null,
+        battleRenderer: this,
+        lastSpecialFrame: null,
         say: text => {
             return new Promise(callback=>{
                 if(this.showingMessage) {
@@ -64,10 +71,7 @@ function GetOpponent() {
                 this.globalEffects.addLayer(effect);
             });
         },
-        setWalking: isWalking => this.opponentSprite.sprite.setWalking(isWalking),
-        updateDirection: direction => this.opponentSprite.sprite.updateDirection(direction),
         move: async function(x,y) {
-            console.log("STARTED WALKING");
             if(x) {
                 if(x > 0) {
                     await this.moveBy("left",x);
@@ -82,17 +86,15 @@ function GetOpponent() {
                 }
             }
         },
-        resolver: null,
         stopMove: function() {
-            console.log("STOPPED WALKING");
             if(this.resolver) {
                 this.resolver();
                 this.resolver = null;
             }
             this.xTarget = null;
             this.yTarget = null;
-            this.updateDirection("down");
-            this.setWalking(false);
+            this.sprite.updateDirection("down");
+            this.sprite.setWalking(false);
         },
         moveBy: function(direction,amount) {
             this.xTarget = null;
@@ -101,22 +103,18 @@ function GetOpponent() {
                 let newDirection = direction;
                 switch(direction) {
                     default: return;
-
                     case "up":
                         newDirection = "down";
                         this.yTarget = this.y - amount; break;
-
                     case "down":
                         this.yTarget = this.y + amount; break;
-
                     case "left":
                         this.xTarget = this.x + amount; break;
-
                     case "right":
                         this.xTarget = this.x - amount; break;
                 }
-                this.updateDirection(newDirection);
-                this.setWalking(true);
+                this.sprite.updateDirection(newDirection);
+                this.sprite.setWalking(true);
                 this.resolver = resolve;
             });
         },
@@ -136,8 +134,8 @@ function GetOpponent() {
             if(shouldEnd) {
                 source = target;
                 target = null;
-                this.updateDirection("down");
-                this.setWalking(false);
+                this.sprite.updateDirection("down");
+                this.sprite.setWalking(false);
                 this.resolver();
             }
             return {
@@ -151,7 +149,6 @@ function GetOpponent() {
         },
         movementLogic: function(delta) {
             if(this.xTarget !== null) {
-                console.log("WALKING");
                 const xVelocity = delta * opponentXVelocity;
                 this.mapSourceAndTarget(
                     "x",this.movementLoop(this.x,this.xTarget,xVelocity)
@@ -163,40 +160,36 @@ function GetOpponent() {
                 );
             }
         },
-        battleRenderer: this,
-        lastSpecialFrame: null,
         render: function(timestamp,showPunchEffect) {
-            const opponentLevelSprite = this.battleRenderer.opponentSprite;
-            const sprite = opponentLevelSprite.sprite;
             let adjustedScale = spriteScale;
             let extraScale = 0;
             if(showPunchEffect) {
                 extraScale = opponentSpriteKnockbackAmount;
-                if(!this.lastSpecialFrame && this.impactFrame >= 0 && sprite.direction === "down") {
-                    const currentSpecialFrame = sprite.getSpecialFrame();
+                if(!this.lastSpecialFrame && this.impactFrame >= 0 && this.sprite.direction === "down") {
+                    const currentSpecialFrame = this.sprite.getSpecialFrame();
                     if(currentSpecialFrame === null) {
                         this.lastSpecialFrame = -1;
                     } else {
                         this.lastSpecialFrame = currentSpecialFrame;
                     }
-                    sprite.setSpecialFrame(this.impactFrame);
+                    this.sprite.setSpecialFrame(this.impactFrame);
                 }
                 if(this.impactFrame >= 0 &&
-                   sprite.direction === "down" &&
+                   this.sprite.direction === "down" &&
                   !this.lastSpecialFrame &&
-                  (this.lastSpecialFrame = sprite.getSpecialFrame()) !== null
+                  (this.lastSpecialFrame = this.sprite.getSpecialFrame()) !== null
                 ) {
-                    sprite.setSpecialFrame(this.impactFrame);
+                    this.sprite.setSpecialFrame(this.impactFrame);
                 }
             } else if(this.lastSpecialFrame !== null) {
                 if(this.lastSpecialFrame >= 0) {
-                    sprite.setSpecialFrame(this.lastSpecialFrame);
+                    this.sprite.setSpecialFrame(this.lastSpecialFrame);
                 } else {
-                    sprite.updateDirection(sprite.direction);
+                    this.sprite.updateDirection(this.sprite.direction);
                 }
                 this.lastSpecialFrame = null;
             }
-            opponentLevelSprite.render(timestamp,adjustedScale,extraScale);
+            this.sprite.renderToForeground(timestamp,adjustedScale,extraScale);
         }
     }
 }

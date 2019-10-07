@@ -96,7 +96,7 @@ addOpponent("wimpy-red-elf",function(applicator,...battleParameters) {
             yOffset: 0.2,
             impactFrame: 2
         },
-        tileset: "test-tileset",
+        tileset: "tumble-showdown",
         fogColor: null,
         opponentMaxHealth: 10,
         playerMaxHealth: 10,

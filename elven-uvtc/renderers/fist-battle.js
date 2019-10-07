@@ -6,6 +6,7 @@ import GetPunchImpactEffect from "./components/battle/punch-effect.js";
 import ApplyTimeoutManager from "./components/inline-timeout.js";
 import FistBattleApplicator from "../runtime/battle/battle-applicator.js";
 import RoundSplashEffect from "./components/battle/round-splash.js";
+import SpriteForeground from "./components/battle/sprite-foreground.js";
 
 const textureSize = 16;
 const halftextureSize = textureSize / 2;
@@ -127,7 +128,6 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
 
     let noPunchEffect = true;
 
-    this.opponentSprite = null;
     this.opponent = GetOpponent.call(this);
 
     this.backgroundEffects = new MultiLayer();
@@ -262,6 +262,7 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
             specification
         );
     });
+    this.opponent.sprite = new SpriteForeground(...this.opponentSpriteParameters);
 
     const renderSky = () => context.drawImage(this.tileset,48,16,16,16,0,0,fullWidth,fullHeight);
 
@@ -364,21 +365,23 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
         context.restore();
     }
 
-    let wDown, sDown, aDown, dDown;
+    let wDown, sDown, aDown, dDown, enterDown;
     this.processKey = key => {
         switch(key) {
-            case kc.up:    if(wDown) return; yDelta--; wDown = true; break;
-            case kc.down:  if(sDown) return; yDelta++; sDown = true; break;
-            case kc.left:  if(aDown) return; xDelta--; aDown = true; break;
-            case kc.right: if(dDown) return; xDelta++; dDown = true; break;
+            case kc.up:     if(wDown) return; yDelta--; wDown = true; break;
+            case kc.down:   if(sDown) return; yDelta++; sDown = true; break;
+            case kc.left:   if(aDown) return; xDelta--; aDown = true; break;
+            case kc.right:  if(dDown) return; xDelta++; dDown = true; break;
+            case kc.accept: if(enterDown) return; enterDown = true; tryPlayerInput(); break;
         }
     }
     this.processKeyUp = key => {
         switch(key) {
-            case kc.up:    if(wDown) yDelta++; wDown = false; break;
-            case kc.down:  if(sDown) yDelta--; sDown = false; break;
-            case kc.left:  if(aDown) xDelta++; aDown = false; break;
-            case kc.right: if(dDown) xDelta--; dDown = false; break;
+            case kc.up:     if(wDown) yDelta++; wDown = false; break;
+            case kc.down:   if(sDown) yDelta--; sDown = false; break;
+            case kc.left:   if(aDown) xDelta++; aDown = false; break;
+            case kc.right:  if(dDown) xDelta--; dDown = false; break;
+            case kc.accept: enterDown = false; break;
         }
     }
 
@@ -392,8 +395,8 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
             inRange: inRange
         };
     }
-
-    this.processClick = () => {
+    
+    const tryPlayerInput = () => {
         if(this.showingMessage) {
             this.hands.punch(()=>{
                 playSound("damage",damageSoundPunchDuration);
@@ -417,6 +420,8 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
             noPunchEffect = true;
         }
     }
+
+    this.processClick = () => tryPlayerInput();
 
     const velocityLimiter = (velocity,maxVelocity) => {
         if(velocity > maxVelocity) {
@@ -635,14 +640,12 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
             context.fillRect(0,0,fullWidth,fullHeight);
         }
 
-        renderHeadcons();
+        context.resetTransform();
 
         if(this.healBattlers) {
             playerHealthController.healCycle(delta);
             opponentHealthController.healCycle(delta);
         }
-
-        context.resetTransform();
 
         const margin = 100;
         const size = 150;
@@ -652,6 +655,10 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
         if(this.globalEffects) {
             this.globalEffects.render(timestamp);
         }
+
+
+
+        renderHeadcons();
     }
 }
 export default FistBattleRenderer;

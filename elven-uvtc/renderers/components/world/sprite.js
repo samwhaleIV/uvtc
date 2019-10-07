@@ -1,4 +1,5 @@
 import { AlertSound } from "../../../runtime/tones.js";
+import MultiLayer from "../multi-layer.js";
 
 const SPRITE_WIDTH = 16;
 const SPRITE_HEIGHT = 16;
@@ -411,6 +412,8 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
 
     this.skipRenderLogic = true;
 
+    this.overlay = new MultiLayer();
+
     const processRenderLogicForFrame = timestamp => {
         if(this.skipRenderLogic) {
             this.skipRenderLogic = false;
@@ -421,8 +424,8 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
     let startX, startY, recentTimestamp;
     if(customSize) {
         this.renderSelf = function(x,y,width,height) {
-            const renderWidth = width * worldScaleTranslation;
-            const renderHeight = customWidthRatio * renderWidth;
+            let renderWidth = width * worldScaleTranslation;
+            let renderHeight = customWidthRatio * renderWidth;
 
             const renderXOffset = (width - renderWidth) / 2;
             const renderYOffset = height - renderHeight;
@@ -434,13 +437,16 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
                 Math.floor(recentTimestamp / this.animationFrameTime) % rowCount * rowHeight
             : 0;
 
+            renderWidth = Math.round(renderWidth);
+            renderHeight = Math.round(renderHeight);
+
             context.drawImage(
                 sprite,currentColumn,animationRow,columnWidth,rowHeight,
                 destinationX,destinationY,
-                Math.round(renderWidth),
-                Math.round(renderHeight)
+                renderWidth,
+                renderHeight
             );
-
+            this.overlay.render(recentTimestamp,destinationX,destinationY,renderWidth,renderHeight);
             if(showingAlert) {
                 context.drawImage(
                     alertSprite,x,destinationY-height,width,height
@@ -451,17 +457,18 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         this.renderSelf = function(x,y,width,height) {
             const destinationX = this.xOffset * width + x + (this.x - startX) * width;
             const destinationY = this.yOffset * height + y + (this.y - startY) * height;
-            if(showingAlert) {
-                context.drawImage(
-                    alertSprite,destinationX,destinationY-height,width,height
-                );
-            }
             const animationRow = specialRow !== null ? specialRow : !this.walkingOverride && walking ? 
                 Math.floor(recentTimestamp / this.animationFrameTime) % rowCount * rowHeight
             : 0;
             context.drawImage(
                 sprite,currentColumn,animationRow,columnWidth,rowHeight,destinationX,destinationY,width,height
             );
+            this.overlay.render(recentTimestamp,destinationX,destinationY,width,height);
+            if(showingAlert) {
+                context.drawImage(
+                    alertSprite,destinationX,destinationY-height,width,height
+                );
+            }
         }
     }
     this.render = function(timestamp,x,y,width,height) {

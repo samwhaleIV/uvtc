@@ -73,20 +73,23 @@ function FistBattleApplicator(layers,specification) {
             parameters.isElf = true;
             parameters.customHeight = null;
             parameters.customWidth = null;
+            parameters.yOffset = 0.2;
         }
         if(parameters.isElf) {
             parameters.customWidth = null;
             parameters.customHeight = null;
         }
-        this.opponentSprite = new SpriteForeground(
+        this.opponentSpriteParameters = [
             parameters.name,
             parameters.isElf || false,
             parameters.customWidth || null,
             parameters.customHeight || null,
             parameters.yOffset || 0
-        );
+        ];
+    } else {
+        throw Error("Missing opponent sprite specification in master specification:",specification);
     }
-    if(specification.tileset || (specification.tileset = "test-tileset")) {
+    if(specification.tileset || (specification.tileset = "tumble-showdown")) {
         this.tileset = imageDictionary[`battle/${specification.tileset}`];
     }
     if(specification.fogColor) {
