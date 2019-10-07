@@ -30,6 +30,16 @@ function CrazyFlyingShitEffect(particleRadius,particleVelocity,maxParticleDecay,
     }
     this.addParticles(count);
 
+    const renderParticle = (x,y,radius) => {
+        context.beginPath();
+        context.arc(
+            x / internalWidth * fullWidth,
+            y / internalHeight * fullHeight,
+            radius,0,PI2
+        );
+        context.fill();
+    }
+
     let lastUpdate = 0;
     this.render = timestamp => {
         const timeDifference = timestamp - lastUpdate;
@@ -60,9 +70,7 @@ function CrazyFlyingShitEffect(particleRadius,particleVelocity,maxParticleDecay,
                     particle.nextHorizontalVelocity = particle.horizontalVelocity * Math.random();
                     particle.nextVerticalVelocity = particle.verticalVelocity * Math.random();
     
-                    context.beginPath();
-                    context.arc(particle.x,particle.y,particleRadius*particle.size,0,PI2);
-                    context.fill();
+                    renderParticle(particle.x,particle.y,particleRadius*particle.size);
                 }
                 i++;
             }
@@ -78,9 +86,7 @@ function CrazyFlyingShitEffect(particleRadius,particleVelocity,maxParticleDecay,
                 const approximateY = particle.y + (particle.nextVerticalVelocity * timeNormal);
 
                 if(approximatedSize > 0) {
-                    context.beginPath();
-                    context.arc(approximatedX,approximateY,particleRadius*approximatedSize,0,PI2);
-                    context.fill();
+                    renderParticle(approximatedX,approximateY,particleRadius*approximatedSize);
                 }
 
                 i++;
