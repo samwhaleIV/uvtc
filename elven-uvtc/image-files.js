@@ -6,6 +6,7 @@ ImagePaths.push(
     getFile("checkered-dark.png",FileTypes.BackgroundImage),
     getFile("checkered.png",FileTypes.BackgroundImage),
     getFile("corrupt.png",FileTypes.BackgroundImage),
+    getFile("other-world.png",FileTypes.BackgroundImage),
     getFile("spiral-large.png",FileTypes.BackgroundImage),
     getFile("spiral-menu.png",FileTypes.BackgroundImage),
     getFile("spiral-move-select - Copy.png",FileTypes.BackgroundImage),

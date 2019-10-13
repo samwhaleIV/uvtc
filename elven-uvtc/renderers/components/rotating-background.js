@@ -18,8 +18,8 @@ function RotatingBackground(imageName,yOffset=0) {
             context.rotate((this.rotationTime-timestamp / this.rotationTime) % 1 * PI2);
         }
         context.translate(-halfWidth,-centerY);
-        const diameter = Math.round(largestDimension * 1.5);
-        const radius = Math.round(diameter / 2);
+        const diameter = largestDimension * 1.5;
+        const radius = diameter / 2;
         context.drawImage(
             image,0,0,imageWidth,imageHeight,
             halfWidth-radius,

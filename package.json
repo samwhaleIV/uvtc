@@ -1,8 +1,8 @@
 {
   "name": "uvtc",
-  "productName": "You Versus Trading Cards",
+  "productName": "You Versus Earth",
   "version": "1.0.0",
-  "description": "The trading cards have turned",
+  "description": "What? What are trading cards?",
   "main": "app.js",
   "scripts": {
     "start": "electron .",
@@ -11,7 +11,7 @@
   "author": "mistopportunity",
   "license": "CC-BY-NC-4.0",
   "devDependencies": {
-    "electron": "^4.0.5",
+    "electron": "^6.0.11",
     "express": "^4.16.4"
   }
 }

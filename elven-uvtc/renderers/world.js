@@ -1096,6 +1096,8 @@ function WorldRenderer() {
         this.playSong(roomSong);
     }
 
+    let backgroundRenderer = null;
+
     this.updateMap = function(newMapName,data={}) {
         console.log(`World: Loading '${newMapName}'`);
         enterReleased = true;
@@ -1108,6 +1110,11 @@ function WorldRenderer() {
             data.sourceRoom = this.renderMap.name;
         }
         const newMap = worldMaps[newMapName];
+        if(newMap.background) {
+            backgroundRenderer = new newMap.background();
+        } else {
+            backgroundRenderer = null;
+        }
         if(this.map) {
             if(this.map.unload) {
                 this.map.unload(this);
@@ -1147,6 +1154,8 @@ function WorldRenderer() {
             this.objectsLookup[y] = newRow;
             this.decals[y] = newDecalRow;
         }
+
+        this.updateSize();
 
         if(runLoadCode) {
             this.customLoader(resumeRenderer,true,data.sourceRoom);
@@ -1200,7 +1209,7 @@ function WorldRenderer() {
 
     this.updateSize = function() {
 
-        let adjustedTileSize = WorldTileSize;
+        let adjustedTileSize = WorldTileSize * this.renderMap.renderScale;
         if(fullWidth < smallScaleSnapPoint) {
             adjustedTileSize *= 1.5;
         } else if(fullWidth < mediumScaleSnapPoint) {
@@ -1350,6 +1359,13 @@ function WorldRenderer() {
     this.render = function(timestamp) {
         this.processThreads(timestamp);
 
+        if(backgroundRenderer) {
+            backgroundRenderer.render(timestamp);
+        } else {
+            context.fillStyle = "black";
+            context.fillRect(0,0,fullWidth,fullHeight);
+        }
+
         if(tileRenderingEnabled) {
         
             const movementLocked = playerInteractionLocked();
@@ -1363,10 +1379,6 @@ function WorldRenderer() {
             }
 
             const animationTileOffset = Math.floor(timestamp % ANIMATION_CYCLE_DURATION / ANIMATION_FRAME_TIME);
-
-            context.fillStyle = "black";
-            context.fillRect(0,0,fullWidth,fullHeight);
-
             this.updateCamera(timestamp,movementLocked);
 
             let verticalTileCount = verticalTiles;

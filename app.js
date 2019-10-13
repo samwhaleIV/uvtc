@@ -5,18 +5,21 @@ const {
 
 let window;
 
+app.commandLine.appendSwitch("--disable-background-timer-throttling");
+app.commandLine.appendSwitch("--disable-backgrounding-occluded-windows");
+
 function createWindow() {
     window = new BrowserWindow({
         width: 748,
         height: 668,
         nodeIntegration: true,
-        backgroundColor: "#000000",
         backgroundThrottling: false,
-        show: false
+        show: false,
+        backgroundColor: "#000000"
     });
     window.webContents.openDevTools();
     window.setMenu(null);
-    window.loadFile("index.html");
+    window.loadURL("http://localhost/uvtc/");
     window.on("closed",() => {
         window = null;
     });

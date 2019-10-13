@@ -8,7 +8,7 @@ const ENV_FLAGS = {
     MOVEMENT_FRAME_WARNING: true,
     CONVOY_TRACE: true,
     DEBUG_PLAYER_CONVOY: false,
-    TEST: "fist-battle",
+    TEST: "drag-test",
     NO_CONTEXT_MENU: true,
     STATIC_BACKGROUND: true
 }

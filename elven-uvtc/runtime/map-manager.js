@@ -29,6 +29,10 @@ function addMap(map) {
     map.horizontalUpperBound = !isNaN(map.maxCameraX) ? map.maxCameraX : map.finalColumn;
     map.verticalUpperBound = !isNaN(map.maxCameraY) ? map.maxCameraY : map.finalRow;
 
+    if(!map.renderScale) {
+        map.renderScale = 1;
+    }
+
     delete rawMapData[map.name];
 
     if(!map.doors) {
