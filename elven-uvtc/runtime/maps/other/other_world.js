@@ -3,15 +3,14 @@ import RotatingBackground from "../../../renderers/components/rotating-backgroun
 addMap({
     WorldState: function(world) {
         this.load = () => {
-            world.addPlayer(20,20,"up");
+            world.addPlayer(14,14,"up");
         }
     },
     useCameraPadding: true,
     renderScale: 0.9,
     background: function() {
-        RotatingBackground.call(this,"other-world",0);
-        this.clockwise = true;
-        this.rotationTime = 500000;
+        const image = imageDictionary["backgrounds/other-world"];
+        this.render = () => context.drawImage(image,0,0,image.width,image.height,0,0,fullWidth,fullHeight);
     },
     name: "other_world"
 });
