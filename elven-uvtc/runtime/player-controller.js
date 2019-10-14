@@ -28,7 +28,7 @@ function PlayerController(world) {
                 player = newPlayer;
             }
         }
-    })
+    });
 
     let wDown = false;
     let sDown = false;
@@ -41,43 +41,21 @@ function PlayerController(world) {
     const checkForSoloMovement = function() {
         let count = 0;
         let register = -1;
-        if(wDown) {
-            register = 0;
-            count++;
-        }
-        if(sDown) {
-            register = 1;
-            count++;
-        }
-        if(aDown) {
-            register = 2;
-            count++;
-        }
-        if(dDown) {
-            register = 3;
-            count++;
-        }
-        if(count >= 1) {
-            return register;
-        } else {
-            return -1;
-        }
+
+        if(wDown) {register = 0; count++;}
+        if(sDown) {register = 1; count++;}
+        if(aDown) {register = 2; count++;}
+        if(dDown) {register = 3; count++;}
+
+        return count >= 1 ? register : -1;
     }
 
     const addDirectionToCoordinate = function(x,y,direction) {
         switch(direction) {
-            case "up":
-                y--;
-                break;
-            case "down":
-                y++;
-                break;
-            case "left":
-                x--;
-                break;
-            case "right":
-                x++;
-                break;
+            case "up":    y--; break;
+            case "down":  y++; break;
+            case "left":  x--; break;
+            case "right": x++; break;
         }
         return {x:x,y:y};
     }
@@ -253,18 +231,10 @@ function PlayerController(world) {
         const soloMovementRegister = checkForSoloMovement();
         if(soloMovementRegister >= 0) {
             switch(soloMovementRegister) {
-                case 0:
-                    tryUpdateDirection("up");
-                    break;
-                case 1:
-                    tryUpdateDirection("down");
-                    break;
-                case 2:
-                    tryUpdateDirection("left");
-                    break;
-                case 3:
-                    tryUpdateDirection("right");
-                    break;
+                case 0: tryUpdateDirection("up");    break;
+                case 1: tryUpdateDirection("down");  break;
+                case 2: tryUpdateDirection("left");  break;
+                case 3: tryUpdateDirection("right"); break;
             }
             applyPlayerVelocities();
             return true;
@@ -381,25 +351,14 @@ function PlayerController(world) {
         player.setWalking(false);
     }
 
-    const applyPlayerVelocities = none => {
+    const applyPlayerVelocities = () => {
         this.horizontalVelocity = 0;
         this.verticalVelocity = 0;
-        if(none) {
-            return;
-        }
         switch(player.direction) {
-            case "up":
-                this.verticalVelocity = -1;
-                break;
-            case "down":
-                this.verticalVelocity = 1;
-                break;
-            case "left":
-                this.horizontalVelocity = -1;
-                break;
-            case "right":
-                this.horizontalVelocity = 1;
-                break;
+            case "up":    this.verticalVelocity = -1;   break;
+            case "down":  this.verticalVelocity = 1;    break;
+            case "left":  this.horizontalVelocity = -1; break;
+            case "right": this.horizontalVelocity = 1;  break;
         }
     }
 
@@ -416,36 +375,26 @@ function PlayerController(world) {
         switch(key) {
             case kc.up:
                 wDown = true;
-                if(!worldHasPlayer) {
-                    return;
-                }
+                if(!worldHasPlayer) return;
                 tryUpdateDirection("up");
                 break;
             case kc.down:
                 sDown = true;
-                if(!worldHasPlayer) {
-                    return;
-                }
+                if(!worldHasPlayer) return;
                 tryUpdateDirection("down");
                 break;
             case kc.left:
                 aDown = true;
-                if(!worldHasPlayer) {
-                    return;
-                }
+                if(!worldHasPlayer) return;
                 tryUpdateDirection("left");
                 break;
             case kc.right:
                 dDown = true;
-                if(!worldHasPlayer) {
-                    return;
-                }
+                if(!worldHasPlayer) return;
                 tryUpdateDirection("right");
                 break;
             case kc.accept:
-                if(!worldHasPlayer) {
-                    return;
-                }
+                if(!worldHasPlayer) return;
                 processEnter();
                 return;
         }
@@ -455,27 +404,14 @@ function PlayerController(world) {
         }
     }
     this.processKeyUp = function(key) {
-        const worldHasPlayer = player ? true : false;
         switch(key) {
-            case kc.up:
-                wDown = false;
-                break;
-            case kc.down:
-                sDown = false;
-                break;
-            case kc.left:
-                aDown = false;
-                break;
-            case kc.right:
-                dDown = false;
-                break;
-            default:
-                return;
+            case kc.up:    wDown = false; break;
+            case kc.down:  sDown = false; break;
+            case kc.left:  aDown = false; break;
+            case kc.right: dDown = false; break;
+            default: return;
         }
-        if(!worldHasPlayer) {
-            return;
-        }
-        if(!tryApplySoloMovementRegister()) {
+        if(player && !tryApplySoloMovementRegister()) {
             pendingDirection = null;
             stopMovementLoop();
         }
