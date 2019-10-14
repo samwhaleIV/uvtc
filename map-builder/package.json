@@ -7,5 +7,9 @@
     "start": "node index.js"
   },
   "author": "Samuel Robinson (mistopportunity)",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "fast-xml-parser": "^3.13.0",
+    "he": "^1.2.0"
+  }
 }

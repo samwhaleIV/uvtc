@@ -10,5 +10,6 @@ const ENV_FLAGS = {
     DEBUG_PLAYER_CONVOY: false,
     TEST: "drag-test",
     NO_CONTEXT_MENU: true,
-    STATIC_BACKGROUND: true
+    STATIC_BACKGROUND: true,
+    ENABLE_DEV_F12: true
 }
