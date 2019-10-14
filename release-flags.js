@@ -3,6 +3,6 @@ const ENV_FLAGS = {
     CONTROLLER_DISABLED: false,
     DO_STEAM_SETUP: false,
     STATIC_BACKGROUND: true,
-    NO_CONTEXT_MENU: true,
+    NO_CONTEXT_MENU: false,
     ENABLE_DEV_F12: true
 }

@@ -541,8 +541,8 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
         })();
     }
 
-    this.start = async () => {
-        await this.delay(faderTime+START_DELAY);
+    this.faderCompleted = async () => {
+        await this.delay(START_DELAY);
         await this.gameStart();
         await this.delay(500);
         await this.showRoundBanner(roundNumber);
