@@ -22,6 +22,7 @@ import BoxFaderEffect from "./components/box-fader-effect.js";
 import ApplyTimeoutManager from "./components/inline-timeout.js";
 import FistBattleRenderer from "./fist-battle.js";
 import Gradient from "./components/gradient.js";
+import MultiLayer from "./components/multi-layer.js";
 
 const CHAPTER_NAME_LOOKUP = [
     "an impossible chapter that cannot exist",
@@ -98,7 +99,10 @@ function WorldRenderer() {
     const safeFade = (duration,fadeIn) => {
         return new Promise(resolve => {
             const fader = fadeIn ? FadeIn : FadeOut;
-            this.pushCustomRenderer(new fader(duration,null,resolve));
+            let ID;
+            ID = this.addCustomRenderer(new fader(duration,null,()=>{
+                resolve(ID);
+            }));
         });
     }
 
@@ -129,8 +133,8 @@ function WorldRenderer() {
 
     this.chapterComplete = async (noSound=!CHAPTER_COMPLETE_SOUND_SOUND_BY_DEFAULT) => {
         const method = noSound ? this.showInstantPopup : this.showInstantPopupSound;
-        this.pushCustomRenderer(new FadeOut(2000));
-        this.pushCustomRenderer(new ChapterPreview(activeChapter,this.getItemPreviewBounds));
+        this.addCustomRenderer(new FadeOut(2000));
+        this.addCustomRenderer(new ChapterPreview(activeChapter,this.getItemPreviewBounds));
         ChapterManager.setActiveChapterCompleted();
         let message = null;
         if(activeChapter === FINAL_CHAPTER_NUMBER) {
@@ -384,7 +388,9 @@ function WorldRenderer() {
             if(!alreadyHasMove) {
                 this.movesManager.unlockMove(moveName);
             }
-            this.pushCustomRenderer(new MovePreview(moveName,this.getItemPreviewBounds));
+            const movePreviewID = this.addCustomRenderer(
+                new MovePreview(moveName,this.getItemPreviewBounds)
+            );
             let messages = [`You received the move ${moveName}!`];
             if(!alreadyHasMove) {
                 let move = Moves[moveName];
@@ -404,7 +410,7 @@ function WorldRenderer() {
             }
             playSound("energy");
             await this.showInstantPopups(messages);
-            this.popCustomRenderer();
+            this.removeCustomRenderer(movePreviewID);
             resolve();
         });
     }
@@ -443,26 +449,29 @@ function WorldRenderer() {
     this.popup = null;
     this.prompt = null;
 
-    const customRendererStack = [];
-    let customRendererStackSize = 0;
+    const customRendererStackIDLIFO = [];
+
+    const customRendererStack = new MultiLayer();
+    this.addCustomRenderer = customRenderer => {
+        return customRendererStack.addLayer(customRenderer);
+    }
+    this.removeCustomRenderer = ID => {
+        customRendererStack.removeLayer(ID);
+    }
     this.pushCustomRenderer = customRenderer => {
-        if(!customRenderer.render) {
-            console.warn(`Custom renderer '${String(customRenderer)}' does not have a render method!`);
-            return;
-        }
-        customRendererStack.push(customRenderer);
-        customRendererStackSize = customRendererStack.length;
+        const ID = customRendererStack.addLayer(customRenderer);
+        customRendererStackIDLIFO.push(ID);
+        return ID;
     }
     this.popCustomRenderer = () => {
-        customRendererStack.pop();
-        customRendererStackSize = customRendererStack.length;
+        const ID = customRendererStackIDLIFO.pop();
+        if(ID !== undefined) {
+            customRendererStack.removeLayer(ID);
+        }
     }
     this.clearCustomRendererStack = () => {
-        this.customRenderer = null;
-        while(customRendererStack.length) {
-            customRendererStack.pop();
-        }
-        customRendererStackSize = 0;
+        customRendererStack.clearLayers();
+        customRendererStackIDLIFO.splice(0);
     }
 
     let playerMovementLocked = false;
@@ -1271,7 +1280,7 @@ function WorldRenderer() {
         if(!noDelay) {
             await delay(500);
         }
-        this.pushCustomRenderer(new FadeOut(2000));
+        this.addCustomRenderer(new FadeOut(2000));
         await delay(5000);
         setFaderEffectsRenderer(new BoxFaderEffect());
         faderEffectsRenderer.fillInLayer = new ElvesFillIn();
@@ -1644,11 +1653,7 @@ function WorldRenderer() {
         if(objectiveHUD) {
             objectiveHUD.render(timestamp);
         }
-        let i = 0;
-        while(i < customRendererStackSize) {
-            customRendererStack[i].render(timestamp);
-            i++;
-        }
+        customRendererStack.render(timestamp);
         if(this.customRenderer) {
             this.customRenderer.render(timestamp);
         }

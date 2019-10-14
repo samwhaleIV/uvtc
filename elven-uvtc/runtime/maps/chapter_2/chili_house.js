@@ -184,8 +184,8 @@ addMap({
                             ScriptedSongLinkingManifest["party-song"]
                         );
                     }
-                    await world.fadeFromBlack(2000);
-                    world.popCustomRenderer();
+                    const faderID = await world.fadeFromBlack(2000);
+                    world.removeCustomRenderer(faderID);
                     if(!musicMuted) {
                         await delay(1500);
                         world.stopMusic();
@@ -257,11 +257,7 @@ addMap({
                 await delay(200);
 
                 await chili.say("Hit the lights!");
-                world.pushCustomRenderer({render:()=>{
-                    context.fillStyle = "black";
-                    context.fillRect(0,0,fullWidth,fullHeight);
-                }});       
-
+                world.disableTileRenderering();
                 await world.showInstantPopup("...");
                 await world.showInstantPopup("Light footsteps are heard entering through the door.");
 
@@ -318,7 +314,7 @@ addMap({
                 world.playSong(
                     ScriptedSongLinkingManifest["lights-off-meet-elves"]
                 );
-                world.popCustomRenderer();
+                world.enableTileRenderering();
                 await delay(800);
                 await wimpyRed.say("Why... Hello there.");
                 await wimpyRed.say("Pleasure to meet you all.");
