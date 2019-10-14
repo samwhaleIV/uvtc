@@ -1468,13 +1468,6 @@ function WorldRenderer() {
     this.render = function(timestamp) {
         this.processThreads(timestamp);
 
-        if(backgroundRenderer) {
-            backgroundRenderer.render(timestamp);
-        } else {
-            context.fillStyle = "black";
-            context.fillRect(0,0,fullWidth,fullHeight);
-        }
-
         if(tileRenderingEnabled) {
         
             const movementLocked = playerInteractionLocked();
@@ -1485,6 +1478,13 @@ function WorldRenderer() {
                     //This ensures that the world is not rendered before the loading segment plays, such as when the player changes map by a trigger.
                     return;
                 }
+            }
+
+            if(backgroundRenderer) {
+                backgroundRenderer.render(timestamp);
+            } else {
+                context.fillStyle = "black";
+                context.fillRect(0,0,fullWidth,fullHeight);
             }
 
             const animationTileOffset = Math.floor(timestamp % ANIMATION_CYCLE_DURATION / ANIMATION_FRAME_TIME);
@@ -1633,6 +1633,13 @@ function WorldRenderer() {
                 }
             }
 
+        } else {
+            if(backgroundRenderer) {
+                backgroundRenderer.render(timestamp);
+            } else {
+                context.fillStyle = "black";
+                context.fillRect(0,0,fullWidth,fullHeight);
+            }
         }
         if(objectiveHUD) {
             objectiveHUD.render(timestamp);
