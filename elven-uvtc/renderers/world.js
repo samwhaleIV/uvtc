@@ -1221,36 +1221,39 @@ function WorldRenderer() {
 
     const maxIntensity = 100;
     
-    const getIntenseWhite = intensity => {
-        return `rgba(255,255,255,${intensity/maxIntensity})`;
+    const getIntenseColor = (r,g,b,intensity) => {
+        return `rgba(${r},${g},${b},${intensity/maxIntensity})`;
     }
-    const getIntenseBlack = intensity => {
-        return `rgba(0,0,0,${intensity/maxIntensity})`;
-    }
-
-    const getWhiteStops = intensity => {
+    const getColoredStops = (r,g,b,intensity) => {
         return [
-            [getIntenseWhite(intensity),0],
-            [getIntenseWhite(0),1]
+            [getIntenseColor(r,g,b,intensity),0],
+            [getIntenseColor(r,g,b,0),1]
         ];
+    }
+    const getWhiteStops = intensity => {
+        return getColoredStops(255,255,255,intensity);
     }
     const getBlackStops = intensity => {
-        return [
-            [getIntenseBlack(intensity),0],
-            [getIntenseBlack(0),1]
-        ];
+        return getColoredStops(0,0,0,intensity);
     }
-    
+
     const updateHighDPIGradients = () => {
         const size = horizontalTileSize * 2;
-        gradientManifest[0] = new Gradient(getBlackStops(100),size);
-        gradientManifest[1] = new Gradient(getWhiteStops(100),size);
-        gradientManifest[2] = new Gradient(getBlackStops(50),size);
-        gradientManifest[3] = new Gradient(getWhiteStops(50),size);
-        gradientManifest[4] = new Gradient(getBlackStops(25),size);
-        gradientManifest[5] = new Gradient(getWhiteStops(25),size);
-        gradientManifest[6] = new Gradient(getBlackStops(75),size);
-        gradientManifest[7] = new Gradient(getWhiteStops(75),size);
+        gradientManifest[0] =  new Gradient(getBlackStops(100),size);
+        gradientManifest[1] =  new Gradient(getWhiteStops(100),size);
+        gradientManifest[2] =  new Gradient(getBlackStops(50),size);
+        gradientManifest[3] =  new Gradient(getWhiteStops(50),size);
+        gradientManifest[4] =  new Gradient(getBlackStops(25),size);
+        gradientManifest[5] =  new Gradient(getWhiteStops(25),size);
+        gradientManifest[6] =  new Gradient(getBlackStops(75),size);
+        gradientManifest[7] =  new Gradient(getWhiteStops(75),size);
+        gradientManifest[8] =  new Gradient(getColoredStops(147,255,255,75),size);
+        gradientManifest[9] =  new Gradient(getColoredStops(255,0,0,75),size);
+        gradientManifest[10] = new Gradient(getColoredStops(0,255,0,75),size);
+        gradientManifest[11] = new Gradient(getColoredStops(219,166,105,75),size);
+        gradientManifest[12] = new Gradient(getColoredStops(255,233,0,75),size);
+        gradientManifest[13] = new Gradient(getColoredStops(124,55,255,75),size);
+        gradientManifest[14] = new Gradient(getColoredStops(198,0,151,75),size);
     }
 
     this.refreshWorldTileset = () => {
