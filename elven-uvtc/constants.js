@@ -35,6 +35,6 @@ const FALLBACK_MAP_ID = "missing_map";
 
 const OVERWORLD_MUSIC_FADE_TIME = 100;
 const FAKE_OVERWORLD_LOAD_TIME = 500;
-const VERSION_STRING = "you versus earth, v0.2.3";
+const VERSION_STRING = "you versus earth, v0.3";
 
 const TRIGGER_ACTIVATED = Symbol("TRIGGER_ACTIVATED");
