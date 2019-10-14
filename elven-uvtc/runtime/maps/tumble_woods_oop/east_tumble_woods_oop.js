@@ -80,14 +80,14 @@ addMap({
                 RockMoveStartSound();
                 await moveRock(rock,xDelta,yDelta);
                 const isElfRock = rock.tileID === elfRockTile;
-                world.changeBackgroundTile(brokenIceTile,hitX,hitY);
+                world.setBackgroundTile(brokenIceTile,hitX,hitY);
                 if(isElfRock) {
                     await delay(500);
                     IceSmashSound();
                     world.removeObject(rock.ID);
                     await delay(1000);
-                    world.changeBackgroundTile(iceElfSpyTile,hitX,hitY);
-                    world.changeBackgroundTile(iceElfSpyTileTop,hitX,hitY-1);
+                    world.setBackgroundTile(iceElfSpyTile,hitX,hitY);
+                    world.setBackgroundTile(iceElfSpyTileTop,hitX,hitY-1);
                     world.setCollisionTile(elfInIceCollisionType,hitX,hitY);
                     AlertSound();
                     await delay(1000);
@@ -162,8 +162,8 @@ addMap({
                                 t1 = noodleIceTileLeft;
                                 t2 = noodleIceTileAboveLeft;
                             }
-                            world.changeBackgroundTile(t1,x,y);
-                            world.changeBackgroundTile(t2,x,y-1);
+                            world.setBackgroundTile(t1,x,y);
+                            world.setBackgroundTile(t2,x,y-1);
                             const shouldPass = Math.round(Math.random());
                             await delay(1000);
                             playTone(100,0.5);
@@ -180,8 +180,8 @@ addMap({
                             } else {
                                 await world.showPopup("Darn! The water was too shy. Try again later.");
                             }
-                            world.changeBackgroundTile(brokenIceTile,x,y);
-                            world.changeBackgroundTile(regularIceTile,x,y-1);
+                            world.setBackgroundTile(brokenIceTile,x,y);
+                            world.setBackgroundTile(regularIceTile,x,y-1);
                         }
                         world.unlockPlayerMovement();
                     } else {
