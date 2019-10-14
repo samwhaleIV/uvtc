@@ -39,6 +39,8 @@ const ANIMATION_FRAME_TIME = ANIMATION_CYCLE_DURATION / ANIMATION_TILE_COUNT;
 const FINAL_CHAPTER_NUMBER = 12;
 const CHAPTER_COMPLETE_SOUND_SOUND_BY_DEFAULT = false;
 
+const TILESET_NAME = "world-tileset";
+
 function WorldRenderer() {
 
     const activeChapter = GlobalState.data.activeChapter;
@@ -717,7 +719,7 @@ function WorldRenderer() {
         return collisionState.map >= 1 || collisionState.object ? true : false;
     }
 
-    const tileset = imageDictionary["world-tileset"];
+    let tileset = imageDictionary[TILESET_NAME];
 
     this.map = null;
     this.objects = {};
@@ -1240,6 +1242,26 @@ function WorldRenderer() {
         gradientManifest[5] = new Gradient(getWhiteStops(25),size);
         gradientManifest[6] = new Gradient(getBlackStops(75),size);
         gradientManifest[7] = new Gradient(getWhiteStops(75),size);
+    }
+
+    this.refreshWorldTileset = () => {
+        let startedLocked = playerMovementLocked;
+        this.lockPlayerMovement();
+        let didFinishLoading = false;
+        (async ()=>{
+            while(!didFinishLoading) {
+                playTone(600,0.6);
+                await delay(100);
+            }
+        })();
+        ImageManager.loadImages(()=>{
+            didFinishLoading = true;
+            tileset = imageDictionary[TILESET_NAME];
+            playSound("energy");
+            if(!startedLocked) {
+                this.unlockPlayerMovement();
+            }
+        });
     }
 
     this.disableAdaptiveFill = true;
