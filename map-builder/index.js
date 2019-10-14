@@ -13,6 +13,7 @@ const TILED_PATH = `"C:\\Program Files\\Tiled\\tiled.exe"`;
 
 const MAP_VALUE_OFFSET = -1;
 const MAP_COLLISION_OFFSET = -4097;
+const MAP_LIGHTING_OFFSET = -4121;
 
 const devMapFiles = [];
 const shortDevMapFileList = [];
@@ -58,6 +59,9 @@ function processMapData(rawMap,name) {
     map.background = rawMap.layers[0].data;
     map.foreground = rawMap.layers[1].data;
     map.collision = rawMap.layers[2].data;
+    if(rawMap.layers[3]) {
+        map.lighting = rawMap.layers[3].data;
+    }
 
     map.columns = rawMap.width;
     map.rows = rawMap.height;
@@ -67,6 +71,11 @@ function processMapData(rawMap,name) {
         map.foreground[i] = (map.foreground[i] || 1) + MAP_VALUE_OFFSET;
         if(map.collision[i] !== 0) {
             map.collision[i] = map.collision[i] + MAP_COLLISION_OFFSET;
+        }
+        if(map.lighting) {
+            if(map.lighting[i] !== 0) {
+                map.lighting[i] = map.lighting[i] + MAP_LIGHTING_OFFSET;
+            }
         }
     }
 

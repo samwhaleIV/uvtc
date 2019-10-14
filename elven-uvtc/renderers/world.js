@@ -21,6 +21,7 @@ import ObjectiveHUD from "./components/world/objective-hud.js";
 import BoxFaderEffect from "./components/box-fader-effect.js";
 import ApplyTimeoutManager from "./components/inline-timeout.js";
 import FistBattleRenderer from "./fist-battle.js";
+import Gradient from "./components/gradient.js";
 
 const CHAPTER_NAME_LOOKUP = [
     "an impossible chapter that cannot exist",
@@ -1005,17 +1006,29 @@ function WorldRenderer() {
         }
     }
 
-    this.getCollisionTile = (x,y) => getLayer(this.renderMap.collision,x,y);
+    let lightingLayerActive = false;
+    const lightingLayerFilter = () => {
+        if(lightingLayerFilter) {
+            return this.renderMap.lighting;
+        } else {
+            throw Error("This map does not have a lighting layer!");
+        }
+    }
+
+    this.getCollisionTile = (x,y) =>  getLayer(this.renderMap.collision,x,y);
     this.getForegroundTile = (x,y) => getLayer(this.renderMap.foreground,x,y);
     this.getBackgroundTile = (x,y) => getLayer(this.renderMap.background,x,y);
+    this.getLightingTile = (x,y) =>   getLayer(lightingLayerFilter(),x,y);
 
     this.setCollisionTile =  (value,x,y) => changeLayer(this.renderMap.collision,value,x,y);
     this.setForegroundTile = (value,x,y) => changeLayer(this.renderMap.foreground,value,x,y);
-    this.changeBackgroundTile = (value,x,y) => changeLayer(this.renderMap.background,value,x,y);
+    this.setBackgroundTile = (value,x,y) => changeLayer(this.renderMap.background,value,x,y);
+    this.setLightingTile =   (value,x,y) => changeLayer(lightingLayerFilter(),value,x,y);
 
-    this.setCollisionTileFilter = (value,x,y,filter) => changeLayerFilter(this.renderMap.collision,value,x,y,filter);
+    this.setCollisionTileFilter =  (value,x,y,filter) => changeLayerFilter(this.renderMap.collision,value,x,y,filter);
     this.setForegroundTileFilter = (value,x,y,filter) => changeLayerFilter(this.renderMap.foreground,value,x,y,filter);
     this.setBackgroundTileFilter = (value,x,y,filter) => changeLayerFilter(this.renderMap.background,value,x,y,filter);
+    this.setLightingTileFilter =   (value,x,y,filter) => changeLayerFilter(lightingLayerFilter(),value,x,y,filter);
 
     this.updateMapEnd = function() {
         pendingPlayerObject = null;
@@ -1097,7 +1110,6 @@ function WorldRenderer() {
     }
 
     let backgroundRenderer = null;
-
     this.updateMap = function(newMapName,data={}) {
         console.log(`World: Loading '${newMapName}'`);
         enterReleased = true;
@@ -1138,10 +1150,15 @@ function WorldRenderer() {
             this.camera.xOffset = 0;
             this.camera.yOffset = 0;
         }
+        lightingLayerActive = false;
         this.renderMap = newMap;
         this.renderMap.background = newMap.baseData.background.slice();
         this.renderMap.foreground = newMap.baseData.foreground.slice();
         this.renderMap.collision = newMap.baseData.collision.slice();
+        if(newMap.baseData.lighting) {
+            this.renderMap.lighting = newMap.baseData.lighting.slice();
+            lightingLayerActive = true;
+        }
         this.objectsLookup = [];
 
         for(let y = 0;y < newMap.columns;y++) {
@@ -1165,7 +1182,44 @@ function WorldRenderer() {
     let horizontalTiles,     verticalTiles,
         horizontalOffset,    verticalOffset,
         horizontalTileSize,  verticalTileSize, 
-        halfHorizontalTiles, halfVerticalTiles;
+        halfHorizontalTiles, halfVerticalTiles,
+        halfHorizontalTileSize, halfVerticalTileSize;
+
+    const gradientManifest = {};
+
+    const maxIntensity = 100;
+    
+    const getIntenseWhite = intensity => {
+        return `rgba(255,255,255,${intensity/maxIntensity})`;
+    }
+    const getIntenseBlack = intensity => {
+        return `rgba(0,0,0,${intensity/maxIntensity})`;
+    }
+
+    const getWhiteStops = intensity => {
+        return [
+            [getIntenseWhite(intensity),0],
+            [getIntenseWhite(0),1]
+        ];
+    }
+    const getBlackStops = intensity => {
+        return [
+            [getIntenseBlack(intensity),0],
+            [getIntenseBlack(0),1]
+        ];
+    }
+    
+    const updateHighDPIGradients = () => {
+        const size = horizontalTileSize * 2;
+        gradientManifest[0] = new Gradient(getBlackStops(100),size);
+        gradientManifest[1] = new Gradient(getWhiteStops(100),size);
+        gradientManifest[2] = new Gradient(getBlackStops(50),size);
+        gradientManifest[3] = new Gradient(getWhiteStops(50),size);
+        gradientManifest[4] = new Gradient(getBlackStops(25),size);
+        gradientManifest[5] = new Gradient(getWhiteStops(25),size);
+        gradientManifest[6] = new Gradient(getBlackStops(75),size);
+        gradientManifest[7] = new Gradient(getWhiteStops(75),size);
+    }
 
     this.disableAdaptiveFill = true;
     this.noPixelScale = true;
@@ -1208,7 +1262,9 @@ function WorldRenderer() {
     }
 
     this.updateSize = function() {
-
+        if(backgroundRenderer && backgroundRenderer.updateSize) {
+            backgroundRenderer.updateSize();
+        }
         let adjustedTileSize = WorldTileSize * this.renderMap.renderScale;
         if(fullWidth < smallScaleSnapPoint) {
             adjustedTileSize *= 1.5;
@@ -1239,6 +1295,9 @@ function WorldRenderer() {
         halfHorizontalTiles = Math.floor(horizontalTiles / 2);
         halfVerticalTiles = Math.floor(verticalTiles / 2);
 
+        halfHorizontalTileSize = horizontalTileSize / 2;
+        halfVerticalTileSize = verticalTileSize / 2;
+
         if(this.renderMap.fixedCamera) {
             if(verticalTiles < this.renderMap.rows || horizontalTiles < this.renderMap.columns) {
                 this.fixedCameraOverride = true;
@@ -1251,6 +1310,10 @@ function WorldRenderer() {
                 }
                 this.fixedCameraOverride = false;
             }
+        }
+
+        if(lightingLayerActive) {
+            updateHighDPIGradients();
         }
     }
 
@@ -1409,6 +1472,7 @@ function WorldRenderer() {
 
             const decalBuffer = [];
             const objectBuffer = [];
+            const lightBuffer = [];
 
             let y = yStart, x;
 
@@ -1464,6 +1528,16 @@ function WorldRenderer() {
                             objectBuffer.push(objectRegister,xDestination,yDestination);
                         }
 
+                        if(lightingLayerActive) {
+                            const lightingValue = this.renderMap.lighting[mapIndex];
+                            if(lightingValue) {
+                                lightBuffer.push(
+                                    lightingValue-1,
+                                    xDestination,
+                                    yDestination
+                                );
+                            }
+                        }
                     }
                     x++;
                 }
@@ -1480,28 +1554,39 @@ function WorldRenderer() {
                 );
                 i++;
             }
-            let decalBufferIndex = 0;
-            while(decalBufferIndex < decalBuffer.length) {
-                decalBuffer[decalBufferIndex].render(
+            i = 0;
+            while(i < decalBuffer.length) {
+                decalBuffer[i].render(
                     timestamp,
-                    decalBuffer[decalBufferIndex+1],
-                    decalBuffer[decalBufferIndex+2],
+                    decalBuffer[i+1],
+                    decalBuffer[i+2],
                     horizontalTileSize,
                     verticalTileSize
                 );
-                decalBufferIndex += 3;
+                i += 3;
             }
-            let objectBufferIndex = 0;
-            while(objectBufferIndex < objectBuffer.length) {
-                objectBuffer[objectBufferIndex].render(
+            i = 0;
+            while(i < objectBuffer.length) {
+                objectBuffer[i].render(
                     timestamp,
-                    objectBuffer[objectBufferIndex+1],
-                    objectBuffer[objectBufferIndex+2],
+                    objectBuffer[i+1],
+                    objectBuffer[i+2],
                     horizontalTileSize,
                     verticalTileSize
                 );
-                objectBufferIndex += 3;
+                i += 3;
             }
+            if(lightingLayerActive) {
+                i = 0;
+                while(i < lightBuffer.length) {
+                    gradientManifest[lightBuffer[i]].render(
+                        lightBuffer[i+1],
+                        lightBuffer[i+2]
+                    );
+                    i += 3;
+                }
+            }
+
         }
         if(objectiveHUD) {
             objectiveHUD.render(timestamp);

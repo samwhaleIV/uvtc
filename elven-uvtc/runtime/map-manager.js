@@ -16,6 +16,9 @@ function addMap(map) {
         collision: tilemaps.collision,
         foreground: tilemaps.foreground
     };
+    if(tilemaps.lighting) {
+        map.baseData.lighting = tilemaps.lighting;
+    }
 
     map.rows = tilemaps.rows;
     map.columns = tilemaps.columns;
@@ -45,7 +48,7 @@ function addMap(map) {
             const mapIndex = x + y * map.columns;
             if(map.baseData.collision[mapIndex] === 2) {
                 if(!map.doorLookup[x]) {
-                    map.doorLookup[x] = {}
+                    map.doorLookup[x] = {};
                 }
                 map.doorLookup[x][y] = map.doors[doorIndex++];
             }
