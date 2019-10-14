@@ -1143,11 +1143,6 @@ function WorldRenderer() {
             data.sourceRoom = this.renderMap.name;
         }
         const newMap = worldMaps[newMapName];
-        if(newMap.background) {
-            backgroundRenderer = new newMap.background();
-        } else {
-            backgroundRenderer = null;
-        }
         if(this.map) {
             if(this.map.unload) {
                 this.map.unload(this);
@@ -1179,6 +1174,11 @@ function WorldRenderer() {
         if(newMap.baseData.lighting) {
             this.renderMap.lighting = newMap.baseData.lighting.slice();
             lightingLayerActive = true;
+        }
+        if(newMap.fxBackground) {
+            backgroundRenderer = new newMap.fxBackground(this,data);
+        } else {
+            backgroundRenderer = null;
         }
         this.objectsLookup = [];
 

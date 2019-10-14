@@ -8,7 +8,7 @@ addMap({
     },
     useCameraPadding: true,
     renderScale: 0.9,
-    background: function() {
+    fxBackground: function(world) {
         const image = imageDictionary["backgrounds/other-world"];
         this.render = () => context.drawImage(image,0,0,image.width,image.height,0,0,fullWidth,fullHeight);
     },
