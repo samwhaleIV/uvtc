@@ -144,9 +144,14 @@ addMap({
                     await world.showPopup("The ice appears thinner here.");
                     break;
                 case noodleReadyCollisionType:
-                    const hasNoodle = world.globalState.hasPoolNoodle;
-                    const hasWaterBottle = true; //todo implement water bottle handling
+                    const hasNoodle =       world.globalState.hasPoolNoodle;
+                    const hasWaterBottle =  world.globalState.hasWaterBottle;
+                    const hasFilledBottle = world.globalState.hasFilledWaterBottle;
                     if(hasNoodle) {
+                        if(hasFilledBottle) {
+                            await world.showPopup("Your water bottle is already full. If you try to fill it any more it you'll pour it all over yourself.");
+                            break;
+                        }
                         if(!hasWaterBottle) {
                             await world.showPopup("You may be able to collect the water with your pool noodle, but you'll have nowhere to put it.");
                             break;
@@ -176,7 +181,8 @@ addMap({
                             await delay(1200);
                             if(shouldPass) {
                                 await world.showPopup("Success! You filled one water bottle.");
-                                //todo add one filled bottle from state and clear one empty bottle
+                                world.globalState.hasFilledWaterBottle = true;
+                                world.globalState.hasWaterBottle = false;
                             } else {
                                 await world.showPopup("Darn! The water was too shy. Try again later.");
                             }

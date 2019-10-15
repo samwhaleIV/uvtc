@@ -1,7 +1,5 @@
 import { TextSound } from "../../../runtime/tones.js";
 
-let lastTextSoundTime = 0;
-
 function applySonographToPopupFeed(popupFeed) {
     let even = false;
     for(let i = 0;i<popupFeed.length;i++) {
@@ -101,6 +99,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world,autoCallback) {
 
     this.textFeed = [];
     let timeout = -1;
+    let lastTextSoundTime = 0;
 
     const playTextSound = () => {
         TextSound();

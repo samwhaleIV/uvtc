@@ -441,7 +441,7 @@ addMap({
                             await world.showPopup("Interesting.");
                             await world.showPopup("How about this, if you can solve my riddle, you can have me.");
                             await world.showPopup("Can a present be opened tomorrow? Answer carefully, I don't give second chances!");
-                            const correctAnswer = await world.showPrompt("can a present be opened tomorrow?","yes","no") === 0 ? false : true;
+                            const correctAnswer = await world.showPrompt("can a present be opened tomorrow?","yes","no") !== 0;
                             await delay(500);
                             if(correctAnswer) {
                                 world.globalState.chiliMovePresent = true;
