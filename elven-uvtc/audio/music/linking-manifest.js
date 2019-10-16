@@ -29,6 +29,7 @@ const MAIN_MENU_SONG = "main-menu";
 //Be sure not to include the intro suffix string or your files are gonna have to be named like 'song_intro_intro'
 const SongsWithIntros = [
 	"cabin",
+	"tumble_town",
 	"tavern",
     "store",
     "elf_march",
