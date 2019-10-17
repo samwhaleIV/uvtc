@@ -13,6 +13,12 @@ const JSON_FILE_EXTENSION = ".json";
 const MAP_DEV_OUTPUT_FORMAT = "JSON";
 const TILED_PATH = `"C:\\Program Files\\Tiled\\tiled.exe"`;
 const TILED_COMPILE = false;
+const INVERSE_CIPHER_LOOKUP = (function(inverse=true){
+    const o="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
+    n=o.length,c=Math.pow(n,2),r={};for(let e=0;e<c;e++)
+    {const c=o[Math.floor(e/n)],f=o[e%n];inverse?r[e]=c+f:r[c+f]=e}return r;
+})();
+
 const XML_PARSE_OPTIONS = {
     attributeNamePrefix : "",
     attrNodeName: "attr",
@@ -116,6 +122,21 @@ if(TILED_COMPILE) {
     devMapFiles.forEach(self_compile_map_file);
 }
 
+const encodeLayer = layer => {
+    layer.forEach((value,index)=>{
+        layer[index] = INVERSE_CIPHER_LOOKUP[value];
+    });
+    return layer.join("");
+}
+const encodeMapLayers = map => {
+    map.background = encodeLayer(map.background);
+    map.foreground = encodeLayer(map.foreground);
+    map.collision =  encodeLayer(map.collision);
+    if(map.lighting) {
+        map.lighting = encodeLayer(map.lighting);
+    }
+}
+
 const compiledMapData = {};
 function processMapData(rawMap,name) {
     console.log("Compiling second pass: " + name)
@@ -144,6 +165,7 @@ function processMapData(rawMap,name) {
         }
     }
 
+    encodeMapLayers(map);
     compiledMapData[name] = map;
 }
 allMapData.forEach(rawMap => processMapData(rawMap.data,rawMap.name));

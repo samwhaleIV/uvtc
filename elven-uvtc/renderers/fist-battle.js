@@ -1,5 +1,5 @@
 import MultiLayer from "./components/multi-layer.js";
-import TheseHands from "./components/battle/these-hands.js";
+import Fists from "./components/battle/weapons/fists.js";
 import HeartDisplay from "./components/battle/heart-display.js";
 import GetOpponent from "./components/battle/opponent.js";
 import GetPunchImpactEffect from "./components/battle/punch-effect.js";
@@ -134,7 +134,7 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
     this.foregroundEffects = new MultiLayer();
     this.globalEffects = new MultiLayer();
 
-    this.hands = new TheseHands(this,null);//todo supply slots
+    this.hands = new Fists(this);
 
     this.tileset = null;
     const worldTileset = imageDictionary["world-tileset"];

@@ -34,19 +34,19 @@ addMap({
                     break;
                 case 12:
                     if(world.globalState.paintedLamp) {
-                        await world.showPopup([
+                        await world.showPopups([
                             "Thank you again. I finally feel like I belong here. And guess what? The couches are even treating me better, too.",
                             "How's that for a life lesson? If couches are treating you badly for being different, just become exactly like them!"
                         ]);
                     } else if(world.globalState.hasCanOfPaint) {
                         world.lockPlayerMovement();
                         await world.showPopup("Is.. Is that a can of Red Paint? Are you here to fulfil my dream of finally becoming a red lamp?");
-                        const readyToPaint = await world.prompt("paint the lamp?","yes","no") === 0;
+                        const readyToPaint = await world.showPrompt("paint the lamp?","yes","no") === 0;
                         await delay(500);
                         if(!readyToPaint) {
-                            await world.prompt("Oh.. I guess today is just gonna be another red-less day, then.. :(");
+                            await world.showPopup("Oh.. I guess today is just gonna be another red-less day, then.. :(");
                         } else {
-                            world.showPopup("Please. Don't hold back.");
+                            await world.showPopup("Please. Don't hold back.");
                             await delay(1000);
                             playTone(100,0.5);
                             await delay(200);
@@ -56,9 +56,10 @@ addMap({
                             await delay(200);
                             playTone(100,0.5);
                             await delay(200);
-                            playTone(100,0.5);
+                            playSound("energy");
                             paintLamp();
-                            world.globalState.paintLamp = true;
+                            world.globalState.paintedLamp = true;
+                            world.globalState.hasCanOfPaint = false;
                             await delay(1000);
                             await world.showPopups([
                                 "Oh. My. Lamp.",

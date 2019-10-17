@@ -3,7 +3,7 @@ import RenderMove from "../battle/move.js";
 
 const MAX_RENDER_SIZE = 450;
 
-function MovePreview(moveName,getArea) {
+function MovePreview(moveName,getArea,withName=false) {
     let move = Moves[moveName];
     if(!move) {
         move = Moves["Nothing"];
@@ -25,7 +25,7 @@ function MovePreview(moveName,getArea) {
             Math.round(area.x+area.width/2-halfMoveSize),
             Math.round(area.y+area.height/2-halfMoveSize),
             moveSize,
-            "white",true
+            "white",!withName
         );
     }
 }

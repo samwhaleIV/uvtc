@@ -71,7 +71,9 @@ const ChapterKeysManifest = {
         "secretDoorOpen",
         "hasCanOfPaint",
         "hasPoolNoodle",
-        "paintedLamp"
+        "paintedLamp",
+        "hasWaterBottle",
+        "hasFilledWaterBottle"
     ],
     4: [
 

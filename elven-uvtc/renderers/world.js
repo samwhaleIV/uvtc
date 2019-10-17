@@ -22,6 +22,7 @@ import BoxFaderEffect from "./components/box-fader-effect.js";
 import ApplyTimeoutManager from "./components/inline-timeout.js";
 import FistBattleRenderer from "./fist-battle.js";
 import Gradient from "./components/gradient.js";
+import MultiLayer from "./components/multi-layer.js";
 
 const CHAPTER_NAME_LOOKUP = [
     "an impossible chapter that cannot exist",
@@ -98,7 +99,10 @@ function WorldRenderer() {
     const safeFade = (duration,fadeIn) => {
         return new Promise(resolve => {
             const fader = fadeIn ? FadeIn : FadeOut;
-            this.pushCustomRenderer(new fader(duration,null,resolve));
+            let ID;
+            ID = this.addCustomRenderer(new fader(duration,null,()=>{
+                resolve(ID);
+            }));
         });
     }
 
@@ -129,8 +133,8 @@ function WorldRenderer() {
 
     this.chapterComplete = async (noSound=!CHAPTER_COMPLETE_SOUND_SOUND_BY_DEFAULT) => {
         const method = noSound ? this.showInstantPopup : this.showInstantPopupSound;
-        this.pushCustomRenderer(new FadeOut(2000));
-        this.pushCustomRenderer(new ChapterPreview(activeChapter,this.getItemPreviewBounds));
+        this.addCustomRenderer(new FadeOut(2000));
+        this.addCustomRenderer(new ChapterPreview(activeChapter,this.getItemPreviewBounds));
         ChapterManager.setActiveChapterCompleted();
         let message = null;
         if(activeChapter === FINAL_CHAPTER_NUMBER) {
@@ -384,27 +388,13 @@ function WorldRenderer() {
             if(!alreadyHasMove) {
                 this.movesManager.unlockMove(moveName);
             }
-            this.pushCustomRenderer(new MovePreview(moveName,this.getItemPreviewBounds));
-            let messages = [`You received the move ${moveName}!`];
-            if(!alreadyHasMove) {
-                let move = Moves[moveName];
-                if(!move) {
-                    move = Moves["Nothing"];
-                    console.error(`Move '${moveName}' does not exist!`);
-                }
-                let description = move.description;
-                let type = move.type;
-                if(description) {
-                    if(type) {
-                        type = type.substring(0,1).toUpperCase() + type.substring(1);
-                        description = `${type}: ${description}`;
-                    }
-                    messages.push(description);
-                }
-            }
+            const movePreviewID = this.addCustomRenderer(
+                new MovePreview(moveName,this.getItemPreviewBounds,true)
+            );
+            let messages = [`You received a ${alreadyHasMove?"":"new "}${move.type} slot!`];
             playSound("energy");
             await this.showInstantPopups(messages);
-            this.popCustomRenderer();
+            this.removeCustomRenderer(movePreviewID);
             resolve();
         });
     }
@@ -443,26 +433,29 @@ function WorldRenderer() {
     this.popup = null;
     this.prompt = null;
 
-    const customRendererStack = [];
-    let customRendererStackSize = 0;
+    const customRendererStackIDLIFO = [];
+
+    const customRendererStack = new MultiLayer();
+    this.addCustomRenderer = customRenderer => {
+        return customRendererStack.addLayer(customRenderer);
+    }
+    this.removeCustomRenderer = ID => {
+        customRendererStack.removeLayer(ID);
+    }
     this.pushCustomRenderer = customRenderer => {
-        if(!customRenderer.render) {
-            console.warn(`Custom renderer '${String(customRenderer)}' does not have a render method!`);
-            return;
-        }
-        customRendererStack.push(customRenderer);
-        customRendererStackSize = customRendererStack.length;
+        const ID = customRendererStack.addLayer(customRenderer);
+        customRendererStackIDLIFO.push(ID);
+        return ID;
     }
     this.popCustomRenderer = () => {
-        customRendererStack.pop();
-        customRendererStackSize = customRendererStack.length;
+        const ID = customRendererStackIDLIFO.pop();
+        if(ID !== undefined) {
+            customRendererStack.removeLayer(ID);
+        }
     }
     this.clearCustomRendererStack = () => {
-        this.customRenderer = null;
-        while(customRendererStack.length) {
-            customRendererStack.pop();
-        }
-        customRendererStackSize = 0;
+        customRendererStack.clearLayers();
+        customRendererStackIDLIFO.splice(0);
     }
 
     let playerMovementLocked = false;
@@ -1212,36 +1205,39 @@ function WorldRenderer() {
 
     const maxIntensity = 100;
     
-    const getIntenseWhite = intensity => {
-        return `rgba(255,255,255,${intensity/maxIntensity})`;
+    const getIntenseColor = (r,g,b,intensity) => {
+        return `rgba(${r},${g},${b},${intensity/maxIntensity})`;
     }
-    const getIntenseBlack = intensity => {
-        return `rgba(0,0,0,${intensity/maxIntensity})`;
-    }
-
-    const getWhiteStops = intensity => {
+    const getColoredStops = (r,g,b,intensity) => {
         return [
-            [getIntenseWhite(intensity),0],
-            [getIntenseWhite(0),1]
+            [getIntenseColor(r,g,b,intensity),0],
+            [getIntenseColor(r,g,b,0),1]
         ];
+    }
+    const getWhiteStops = intensity => {
+        return getColoredStops(255,255,255,intensity);
     }
     const getBlackStops = intensity => {
-        return [
-            [getIntenseBlack(intensity),0],
-            [getIntenseBlack(0),1]
-        ];
+        return getColoredStops(0,0,0,intensity);
     }
-    
+
     const updateHighDPIGradients = () => {
         const size = horizontalTileSize * 2;
-        gradientManifest[0] = new Gradient(getBlackStops(100),size);
-        gradientManifest[1] = new Gradient(getWhiteStops(100),size);
-        gradientManifest[2] = new Gradient(getBlackStops(50),size);
-        gradientManifest[3] = new Gradient(getWhiteStops(50),size);
-        gradientManifest[4] = new Gradient(getBlackStops(25),size);
-        gradientManifest[5] = new Gradient(getWhiteStops(25),size);
-        gradientManifest[6] = new Gradient(getBlackStops(75),size);
-        gradientManifest[7] = new Gradient(getWhiteStops(75),size);
+        gradientManifest[0] =  new Gradient(getBlackStops(100),size);
+        gradientManifest[1] =  new Gradient(getWhiteStops(100),size);
+        gradientManifest[2] =  new Gradient(getBlackStops(50),size);
+        gradientManifest[3] =  new Gradient(getWhiteStops(50),size);
+        gradientManifest[4] =  new Gradient(getBlackStops(25),size);
+        gradientManifest[5] =  new Gradient(getWhiteStops(25),size);
+        gradientManifest[6] =  new Gradient(getBlackStops(75),size);
+        gradientManifest[7] =  new Gradient(getWhiteStops(75),size);
+        gradientManifest[8] =  new Gradient(getColoredStops(147,255,255,75),size);
+        gradientManifest[9] =  new Gradient(getColoredStops(255,0,0,75),size);
+        gradientManifest[10] = new Gradient(getColoredStops(0,255,0,75),size);
+        gradientManifest[11] = new Gradient(getColoredStops(219,166,105,75),size);
+        gradientManifest[12] = new Gradient(getColoredStops(255,233,0,75),size);
+        gradientManifest[13] = new Gradient(getColoredStops(124,55,255,75),size);
+        gradientManifest[14] = new Gradient(getColoredStops(198,0,151,75),size);
     }
 
     this.refreshWorldTileset = () => {
@@ -1271,7 +1267,7 @@ function WorldRenderer() {
         if(!noDelay) {
             await delay(500);
         }
-        this.pushCustomRenderer(new FadeOut(2000));
+        this.addCustomRenderer(new FadeOut(2000));
         await delay(5000);
         setFaderEffectsRenderer(new BoxFaderEffect());
         faderEffectsRenderer.fillInLayer = new ElvesFillIn();
@@ -1644,11 +1640,7 @@ function WorldRenderer() {
         if(objectiveHUD) {
             objectiveHUD.render(timestamp);
         }
-        let i = 0;
-        while(i < customRendererStackSize) {
-            customRendererStack[i].render(timestamp);
-            i++;
-        }
+        customRendererStack.render(timestamp);
         if(this.customRenderer) {
             this.customRenderer.render(timestamp);
         }
