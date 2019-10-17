@@ -7,7 +7,7 @@ import BoxFaderEffect from "./components/box-fader-effect.js";
 
 const ICON_PART_1_WIDTH = 64;
 const ICON_PART_2_WIDTH = 58;
-const ICON_ROW_SCALE_FACTOR = 4;
+const ICON_ROW_SCALE_FACTOR = 7;
 const HORIZONTAL_FALLBACK_MARGIN = 50;
 
 function WorldUIRenderer(world) {
@@ -303,7 +303,7 @@ function WorldUIRenderer(world) {
         if(timeNormal < 0) {
             timeNormal = 0;
         }
-        let height = Math.max(Math.floor(fullHeight / ICON_ROW_SCALE_FACTOR / iconImage.height) * iconImage.height,iconImage.height*4);
+        let height = Math.max(ICON_ROW_SCALE_FACTOR * iconImage.height,iconImage.height*4);
 
         const testWidth = fullWidth - HORIZONTAL_FALLBACK_MARGIN;
         if(height * iconImageRatio > testWidth) {
