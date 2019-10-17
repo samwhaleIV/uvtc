@@ -1,5 +1,24 @@
 const worldMapList = [];
 const worldMaps = {};
+const CIPHER_LOOKUP = (function(inverse=false){
+    const o="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
+    n=o.length,c=Math.pow(n,2),r={};for(let e=0;e<c;e++)
+    {const c=o[Math.floor(e/n)],f=o[e%n];inverse?r[e]=c+f:r[c+f]=e}return r;
+})();
+
+function decodeMapLayer(layer) {
+    if(typeof layer !== "string") {
+        return layer;
+    }
+    const layerData = [];
+    for(let i = 0;i<layer.length;i+=2) {
+        const characterSet = layer.substring(i,i+2);
+        layerData.push(
+            CIPHER_LOOKUP[characterSet]
+        );
+    }
+    return layerData;
+}
 
 function addMap(map) {
 
@@ -12,12 +31,12 @@ function addMap(map) {
         return;
     }
     map.baseData = {
-        background: tilemaps.background,
-        collision: tilemaps.collision,
-        foreground: tilemaps.foreground
+        background: decodeMapLayer(tilemaps.background),
+        collision:  decodeMapLayer(tilemaps.collision),
+        foreground: decodeMapLayer(tilemaps.foreground)
     };
     if(tilemaps.lighting) {
-        map.baseData.lighting = tilemaps.lighting;
+        map.baseData.lighting = decodeMapLayer(tilemaps.lighting);
     }
 
     map.rows = tilemaps.rows;

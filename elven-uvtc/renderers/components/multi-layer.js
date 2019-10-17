@@ -15,8 +15,19 @@ function MultiLayer() {
         return ID;
     }
     this.removeLayer = ID => {
-        delete layersLookup[ID];
-        cacheLayers();
+        if(ID in layersLookup) {
+            delete layersLookup[ID];
+            cacheLayers();
+            return true;
+        } else {
+            return false;
+        }
+    }
+    this.clearLayers = () => {
+        const IDs = Object.keys(layersLookup);
+        IDs.forEach(ID => delete layersLookup[ID]);
+        layers.splice(0);
+        layerSize = 0;
     }
     this.render = (timestamp,...parameters) => {
         for(let i = 0;i<layerSize;i++) {

@@ -184,8 +184,8 @@ addMap({
                             ScriptedSongLinkingManifest["party-song"]
                         );
                     }
-                    await world.fadeFromBlack(2000);
-                    world.popCustomRenderer();
+                    const faderID = await world.fadeFromBlack(2000);
+                    world.removeCustomRenderer(faderID);
                     if(!musicMuted) {
                         await delay(1500);
                         world.stopMusic();
@@ -257,11 +257,7 @@ addMap({
                 await delay(200);
 
                 await chili.say("Hit the lights!");
-                world.pushCustomRenderer({render:()=>{
-                    context.fillStyle = "black";
-                    context.fillRect(0,0,fullWidth,fullHeight);
-                }});       
-
+                world.disableTileRenderering();
                 await world.showInstantPopup("...");
                 await world.showInstantPopup("Light footsteps are heard entering through the door.");
 
@@ -318,7 +314,7 @@ addMap({
                 world.playSong(
                     ScriptedSongLinkingManifest["lights-off-meet-elves"]
                 );
-                world.popCustomRenderer();
+                world.enableTileRenderering();
                 await delay(800);
                 await wimpyRed.say("Why... Hello there.");
                 await wimpyRed.say("Pleasure to meet you all.");
@@ -445,7 +441,7 @@ addMap({
                             await world.showPopup("Interesting.");
                             await world.showPopup("How about this, if you can solve my riddle, you can have me.");
                             await world.showPopup("Can a present be opened tomorrow? Answer carefully, I don't give second chances!");
-                            const correctAnswer = await world.showPrompt("can a present be opened tomorrow?","yes","no") === 0 ? false : true;
+                            const correctAnswer = await world.showPrompt("can a present be opened tomorrow?","yes","no") !== 0;
                             await delay(500);
                             if(correctAnswer) {
                                 world.globalState.chiliMovePresent = true;

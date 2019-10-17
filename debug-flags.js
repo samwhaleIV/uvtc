@@ -1,5 +1,6 @@
 const ENV_FLAGS = {
     MUSIC_FILE_FORMAT: "ogg",
+    DEFAULT_SIZE_MODE: "stretch",
     DEBUG: true,
     FAST_AS_FUCK_TRANSITIONS: true,
     CONTROLLER_DISABLED: false,

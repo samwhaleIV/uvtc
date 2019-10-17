@@ -60,17 +60,18 @@ addMap({
                         "This container is in the Christmas spirit.",
                         "Inside are cans of red paint, do you want to take one?"
                     ]);
-                    const wantsToTakeOne = world.showPrompt("take a can of Red Paint?","yes","no") === 0 ? "yes" : "no";
+                    const wantsToTakeOne = await world.showPrompt("take a can of red paint?","yes","no") === 0;
                     world.lockPlayerMovement();
                     await delay(500);
+                    const hasCanOfPaint = world.globalState.hasCanOfPaint;
                     if(wantsToTakeOne) {
-                        if(world.globalState.hasCanOfPaint) {
+                        if(hasCanOfPaint) {
                             await world.showPopups(["Hey. Wait. I've seen you before!","Don't be greedy. You already got your can of Red Paint!"]);
                         } else {
                             await world.showInstantPopupSound("You received one can of Red Paint.");
                             world.globalState.hasCanOfPaint = true;
                         }
-                    } else if(!world.globalState.hasCanOfPaint) {
+                    } else if(!hasCanOfPaint) {
                         await world.showPopup("Okay well if you change your mind you know where to find me!");
                     }
                     world.unlockPlayerMovement();
@@ -88,7 +89,7 @@ addMap({
                     if(!world.globalState.hasPoolNoodle) {
                         world.lockPlayerMovement();
                         await world.showPopup("It's a pool noodle. Do you want to take it?");
-                        const wantToTake = world.showPrompt("take pool noodle?","yes","no") === 0;
+                        const wantToTake = await world.showPrompt("take pool noodle?","yes","no") === 0;
                         await delay(500);
                         if(wantToTake) {
                             removePoolNoodle();

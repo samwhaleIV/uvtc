@@ -76,7 +76,7 @@ addMap({
                     break;
                 case 1:
                     if(direction === "down") {
-                        world.showPopup("You can't leave ȹTumble Townȹ yet! You have important things to do!");
+                        world.showPopup("There appears to be a plot blockage just outside the gate and it's not going to budge until a later time.");
                         return TRIGGER_ACTIVATED;
                     }
                     break;
