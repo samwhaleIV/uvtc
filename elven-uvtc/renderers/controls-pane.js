@@ -73,8 +73,8 @@ function ControlsPaneRenderer(callback,parent) {
         downButton: 4,
         leftButton: 5,
         rightButton: 6,
-        pictureButton: 7,
-        exitLabel: 8
+        special1Button: 7,
+        special2Button: 8
     };
 
     let hoverType = hoverTypes.none;
@@ -85,7 +85,8 @@ function ControlsPaneRenderer(callback,parent) {
     const downButton = getPlaceholderLocation();
     const leftButton = getPlaceholderLocation();
     const rightButton = getPlaceholderLocation();
-    const pictureButton = getPlaceholderLocation();
+    const special1Button = getPlaceholderLocation();
+    const special2Button = getPlaceholderLocation();
     let exitLabel = getPlaceholderLocation();
 
     const hoverLookup = {
@@ -95,7 +96,8 @@ function ControlsPaneRenderer(callback,parent) {
         4: downButton,
         5: leftButton,
         6: rightButton,
-        7: pictureButton
+        7: special1Button,
+        8: special2Button
     };
 
     const keyButtons = {
@@ -105,7 +107,8 @@ function ControlsPaneRenderer(callback,parent) {
         downButton: downButton,
         leftButton: leftButton,
         rightButton: rightButton,
-        pictureButton: pictureButton
+        special1Button: special1Button,
+        special2Button: special2Button
     };
     const keyAssociations = {};
     keyAssociations[kc.accept] = "acceptButton";
@@ -114,7 +117,8 @@ function ControlsPaneRenderer(callback,parent) {
     keyAssociations[kc.right] = "rightButton";
     keyAssociations[kc.down] = "downButton";
     keyAssociations[kc.up] = "upButton";
-    keyAssociations[kc.picture_mode] = "pictureButton";
+    keyAssociations[kc.special_1] = "special1Button";
+    keyAssociations[kc.special_2] = "special2Button";
 
     acceptButton.title = "Accept";
     backButton.title = "Back/Esc";
@@ -122,7 +126,8 @@ function ControlsPaneRenderer(callback,parent) {
     downButton.title = "DOWN";
     leftButton.title = "LEFT";
     rightButton.title = "RIGHT";
-    pictureButton.title = "Picture";
+    special1Button.title = "Special 1";
+    special2Button.title = "Special 2";
 
     acceptButton.association = kc.accept;
     backButton.association = kc.cancel;
@@ -130,7 +135,8 @@ function ControlsPaneRenderer(callback,parent) {
     downButton.association = kc.down;
     leftButton.association = kc.left;
     rightButton.association = kc.right;
-    pictureButton.association = kc.picture_mode;
+    special1Button.association = kc.special_1;
+    special2Button.association = kc.special_2;
 
     const keyNameColor = CONSISTENT_PINK;
     const backgroundColor = "rgba(89,89,89,0.25)";
@@ -238,8 +244,11 @@ function ControlsPaneRenderer(callback,parent) {
             case kc.right:
                 rightButton.pressed = pressed;
                 break;
-            case kc.picture_mode:
-                pictureButton.pressed = pressed;
+            case kc.special_1:
+                special1Button.pressed = pressed;
+                break;
+            case kc.special_2:
+                special2Button.pressed = pressed;
                 break;
         }
     }
@@ -365,8 +374,11 @@ function ControlsPaneRenderer(callback,parent) {
             case hoverTypes.rightButton:
                 setNewKey("rightButton");
                 break;
-            case hoverTypes.pictureButton:
-                setNewKey("pictureButton");
+            case hoverTypes.special1Button:
+                setNewKey("special1Button");
+                break;
+            case hoverTypes.special2Button:
+                setNewKey("special2Button");
                 break;
             case hoverTypes.exitLabel:
                 exit();
@@ -394,8 +406,10 @@ function ControlsPaneRenderer(callback,parent) {
             hoverType = hoverTypes.leftButton;
         } else if(contains(x,y,rightButton)) {
             hoverType = hoverTypes.rightButton;
-        } else if(contains(x,y,pictureButton)) {
-            hoverType = hoverTypes.pictureButton;
+        } else if(contains(x,y,special1Button)) {
+            hoverType = hoverTypes.special1Button;
+        } else if(contains(x,y,special2Button)) {
+            hoverType = hoverTypes.special2Button;
         } else if(contains(x,y,exitLabel)) {
             hoverType = hoverTypes.exitLabel;
         } else {
@@ -465,9 +479,8 @@ function ControlsPaneRenderer(callback,parent) {
         const row2Y = Math.floor(buttonAreaY + buttonAreaHeight / 2 - buttonHeight / 2);
         const row3Y = buttonAreaY + buttonAreaHeight - buttonHeight;
 
-        pictureButton.x = buttonAreaX;
-        pictureButton.y = row3Y;
-        pictureButton.width = buttonAreaWidth;
+        special1Button.y = row3Y;
+        special2Button.y = row3Y;
 
         upButton.y = row2Y;
         downButton.y = row2Y;
@@ -476,7 +489,8 @@ function ControlsPaneRenderer(callback,parent) {
         acceptButton.y = row1Y;
         backButton.y = row1Y;
 
-        pictureButton.height = buttonHeight;
+        special1Button.height = buttonHeight;
+        special2Button.height = buttonHeight;
         upButton.height = buttonHeight;
         downButton.height = buttonHeight;
         leftButton.height = buttonHeight;
@@ -503,6 +517,11 @@ function ControlsPaneRenderer(callback,parent) {
         downButton.width = quarterButtonWidth;
         leftButton.width = quarterButtonWidth;
 
+        special1Button.width = acceptButton.width;
+        special1Button.x = acceptButton.x;
+
+        special2Button.width = backButton.width;
+        special2Button.x = backButton.x;
 
         const hoverLookupResult = hoverLookup[hoverType];
         if(hoverLookupResult) {
@@ -515,7 +534,8 @@ function ControlsPaneRenderer(callback,parent) {
         renderButton(downButton);
         renderButton(leftButton);
         renderButton(rightButton);
-        renderButton(pictureButton);
+        renderButton(special1Button);
+        renderButton(special2Button);
 
         context.save();
         context.globalCompositeOperation = "difference";

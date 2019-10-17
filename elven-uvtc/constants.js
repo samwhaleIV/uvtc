@@ -1,4 +1,20 @@
 "use strict";
+const KEY_BINDS_KEY =      "KEY_BINDS_UVTC";
+const VOLUME_STORAGE_KEY = "VOLUME_UVTC";
+const SIZE_MODE_KEY =      "SIZE_MODE_KEY_UVTC";
+const SOUND_MUTED_KEY =    "SOUND_MUTED_UVTC";
+const MUSIC_MUTED_KEY =    "MUSIC_MUTED_UVTC";
+const DEFAULT_KEY_BINDS = JSON.stringify({
+    Enter: kc.accept,
+    Escape: kc.cancel,
+    Digit1: kc.special_1,
+    Digit2: kc.special_2,
+    KeyW: kc.up,
+    KeyD: kc.right,
+    KeyS: kc.down,
+    KeyA: kc.left,
+    F11: kc.fullscreen
+});
 const internalWidth = 800;
 const internalHeight = 600;
 

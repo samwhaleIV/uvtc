@@ -1,5 +1,6 @@
 const ENV_FLAGS = {
     MUSIC_FILE_FORMAT: "ogg",
+    DEFAULT_SIZE_MODE: "stretch",
     DEBUG: true,
     FAST_AS_FUCK_TRANSITIONS: true,
     CONTROLLER_DISABLED: false,
@@ -12,6 +13,6 @@ const ENV_FLAGS = {
     STATIC_BACKGROUND: true,
     ENABLE_DEV_F12: true,
     //Map test
-    TEST: "fisting",
+    TEST: "auto",
     DEBUG_MAP: "other_world"
 }
