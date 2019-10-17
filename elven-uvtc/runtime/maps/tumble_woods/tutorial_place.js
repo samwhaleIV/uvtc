@@ -102,7 +102,13 @@ addMap({
                     if(world.movesManager.hasSlotType("malice")) {
                         await iceman.say("Okay Burr, you know how to fight, right?");
                         await burr.say("Uhh, yeah. Totally dude.");
-                        await iceman.say("Okay! Great. You will be the perfect sparring partner for, uh- Well, I never got your name. ONWARDS AND UPWARDS.");
+                        if(!world.globalState.icemanDidGetYourName) {
+                            await iceman.say("Okay! Great. You will be the perfect sparring partner for, uh- Well, I never got your name.");
+                        } else {
+                            await iceman.say("Okay! Great. You will be the perfect sparring partner for Jim!");
+                            await iceman.say("Even though that's not your real name..");
+                        }
+                        await iceman.say("ONWARDS AND UPWARDS!");
                         world.startBattle("tutorial-burr",()=>{
                             world.globalState.completedTutorialBattle = true;
                         },()=>{

@@ -38,8 +38,10 @@ addMap({
     
                     const name = await world.showPrompt("what is your name?","jim","i forgot","none of your business");
                     let firstMessage;
+                    world.globalState.icemanDidGetYourName = false;
                     switch(name) {
                         case 0:
+                            world.globalState.icemanDidGetYourName = true;
                             firstMessage = "Jim? You look... different. New diet?";
                             break;
                         case 1:

@@ -43,7 +43,8 @@ const ChapterKeysManifest = {
         "unlockedReturnToSender",
         "beatTreeCoGame",
         "metLouis",
-        "pressedEnterObjective"
+        "pressedEnterObjective",
+        "icemanDidGetYourName"
     ],
     2: [
         "talkedToShiver",
