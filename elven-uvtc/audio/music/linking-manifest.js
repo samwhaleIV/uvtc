@@ -34,10 +34,11 @@ const SongsWithIntros = [
     "store",
     "elf_march",
     "elf_intro_theme",
-    "wimpy"
+    "wimpy",
+	"training_room"
 ];
 const BattleMusicLinkingManifest = {
-    "burr": null,
+    "burr": "training_room",
     "wimpy-red-elf": null,
     "wimpy-green-elf": null
 };
@@ -55,7 +56,7 @@ const MusicLinkingManifest = {
         song: "elf_march"
     },
     "tutorial_place": {
-        song: null
+        song: "training_room_short"
     },
     "tavern": {
         song: "tavern"
