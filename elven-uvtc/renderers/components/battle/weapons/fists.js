@@ -1,4 +1,5 @@
 import WeaponBase from "../weapon-base.js";
+import GetPunchImpactEffect from "../punch-effect.js";
 
 const FIST_CENTER_OFFSET = 115;
 const FIST_Y_OFFSET = 100;
@@ -14,13 +15,20 @@ const MOVEMENT_TIMEOUT = 30;
 const FIST_COLOR = "rgb(5,5,5)";
 const IDLE_FIST_ANGLE = Math.PI / 180 * 15;
 
+const PUNCH_SOUND_NAME = "damage";
+const PUNCH_SOUND_DURATION = 0.15;
+const PUNCH_DAMAGE = 1;
+
+function punchSound() {
+    playSound(PUNCH_SOUND_NAME,PUNCH_SOUND_DURATION);
+}
 function FistsWeapon(rendererState) {
-    WeaponBase.call(this,rendererState);
+    const battle = rendererState;
     let lastPunch = "right";
     let leftPunchStart = null;
     let rightPunchStart = null;
     let lastPunchEnd = 0;
-    this.customLayer.getPunching = () => {
+    const isAttacking = () => {
         const movementTimedOut = performance.now() - lastPunchEnd < MOVEMENT_TIMEOUT;
         return leftPunchStart !== null || rightPunchStart !== null || movementTimedOut
     }
@@ -60,7 +68,81 @@ function FistsWeapon(rendererState) {
             return {x:0,y:0};
         }
     }
-    this.customLayer.render = timestamp => {
+    const punch = (attacked,didNotAttack) => {
+        if(lastPunch === "right") {
+            if(leftPunchStart === null) {
+                leftPunchStart = performance.now();
+                lastPunch = "left";
+                if(attacked) {
+                    attacked();
+                }
+            } else if(didNotAttack) {
+                didNotAttack();
+            }
+        } else {
+            if(rightPunchStart === null) {
+                rightPunchStart = performance.now();
+                lastPunch = "right";
+                if(attacked) {
+                    attacked();
+                }
+            } else if(didNotAttack) {
+                didNotAttack();
+            }
+        }
+    }
+    const getAttackCallbackResult = (wasMessage=false) => {
+        return {
+            poppedMessage: wasMessage
+        }
+    }
+    const getNoAttackCallbackResult = () => {
+        return {}
+    };
+    const attack = (attacked,didNotAttack) => {
+        if(isAttacking()) {
+            if(didNotAttack) {
+                didNotAttack(getNoAttackCallbackResult());
+            }
+            return;
+        }
+        if(battle.tryPopVisibleMessage()) {
+            punch(()=>{
+                punchSound();
+                battle.noPunchEffect = true;
+                if(attacked) {
+                    attacked(getAttackCallbackResult());
+                }
+            });
+            return;
+        }
+        if(battle.isMovementLocked()) {
+            if(didNotAttack) {
+                didNotAttack(getNoAttackCallbackResult());
+            }
+            return;
+        }
+        if(battle.getPlayerOpponentDistance().inRange) {
+            punch(()=>{
+                battle.foregroundEffects.addLayer(
+                    GetPunchImpactEffect.call(battle)
+                );
+                punchSound();
+                battle.damageOpponent(PUNCH_DAMAGE);
+                if(attacked) {
+                    attacked(getAttackCallbackResult());
+                }
+            },didNotAttack);
+        } else {
+            punch(()=>{
+                battle.noPunchEffect = true;
+                if(attacked) {
+                    attacked(getAttackCallbackResult());
+                }
+            });
+        }
+    }
+    const render = timestamp => {
         let translationX = halfWidth - FIST_CENTER_OFFSET - FIST_WIDTH;
         let translationY = FIST_Y_OFFSET;
 
@@ -86,29 +168,11 @@ function FistsWeapon(rendererState) {
         context.scale(1,1);
         context.translate(-translationX,-translationY);
     }
-    this.customLayer.punch = (callback,errorCallback) => {
-        const now = performance.now();
-        if(lastPunch === "right") {
-            if(leftPunchStart === null) {
-                leftPunchStart = now;
-                lastPunch = "left";
-                if(callback) {
-                    callback();
-                }
-            } else if(errorCallback) {
-                errorCallback();
-            }
-        } else {
-            if(rightPunchStart === null) {
-                rightPunchStart = now;
-                lastPunch = "right";
-                if(callback) {
-                    callback();
-                }
-            } else if(errorCallback) {
-                errorCallback();
-            }
-        }
-    }
+    WeaponBase.call(this,{
+        isAttacking: isAttacking,
+        attack: attack,
+        render: render,
+        playerInput: key => console.log(`Key: ${key}`)
+    });
 }
 export default FistsWeapon;

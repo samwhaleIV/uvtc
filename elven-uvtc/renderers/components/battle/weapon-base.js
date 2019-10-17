@@ -5,13 +5,24 @@ const SWAY_INERTIA_ATTACK_RATE = 8;
 const SWAY_VELOCITY_TRACKING_MODIFIER = 1 / 4;
 const IDLE_SWAY_HEIGHT = 2;
 const IDLE_SWAY_LOOP_TIME = 2000;
+const ATTACKING_PROPERTY = "attacking";
 
-function WeaponBase(battleRenderer) {
-    this.battle = battleRenderer;
-    this.customLayer = {};
-    Object.defineProperty(this,"punching",{get:function(){
-        return this.customLayer.getPunching();
-    }});
+function WeaponBase(customLayer) {
+    if(customLayer) {
+        this.customLayer = customLayer;
+    } else {
+        this.customLayer = {
+            isAttacking: () => false,
+            attack: () => void 0,
+            render: () => void 0,
+            playerInput: key => console.log(`Key: ${key}`)
+        };
+    }
+    Object.defineProperty(this,ATTACKING_PROPERTY,{
+        get: function() {
+            return this.customLayer.isAttacking();
+        }
+    });
     let sway = 0;
     let swayStart = 0;
     let swayEndStart = 0;
@@ -41,8 +52,13 @@ function WeaponBase(battleRenderer) {
         }
         sway = swayNormal;
     }
-    this.punch = (callback,errorCallback) => {
-        this.customLayer.punch(callback,errorCallback);
+    this.attack = (attacked,didNotAttack) => {
+        return this.customLayer.attack(attacked,didNotAttack);
+    }
+    this.playerInput = key => {
+        if(this.customLayer.playerInput) {
+            this.customLayer.playerInput(key);
+        }
     }
     this.render = timestamp => {
         let yOffset = 0;
@@ -59,7 +75,7 @@ function WeaponBase(battleRenderer) {
             yOffset = SWAY_HEIGHT * Math.sin(angle) * sway;
         }
 
-        if(!this.punching) {
+        if(!this.attacking) {
             yOffset += IDLE_SWAY_HEIGHT * Math.sin(timestamp / IDLE_SWAY_LOOP_TIME % 1 * PI2); 
         }
 

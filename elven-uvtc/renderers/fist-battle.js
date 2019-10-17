@@ -50,8 +50,6 @@ const minimumXPunchDistance = 120;
 const selfImpactDuration =  80;
 const selfImpactIntensity = 0.4;
 
-const damageSoundPunchDuration = 0.15;
-
 const DEFAULT_MAX_HEALTH = 10;
 const HEAL_RATE_FACTOR = 100;
 
@@ -100,6 +98,9 @@ function HealthController(maxHealth,heartRenderID,damageCallback,fatalCallback) 
 
 function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
 
+    this.disableAdaptiveFill = false;
+    this.noPixelScale = true;
+
     ApplyTimeoutManager(this);
 
     let x = xStart;
@@ -121,12 +122,14 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
         movementLocked = false;
     }
 
-    const movementLockedOrPunching = () => movementLocked || this.hands.punching;
-    const showPunchEffect = () => this.hands.punching && !noPunchEffect;
+    this.isMovementLocked = () => movementLocked;
+
+    this.movementLockedOrAttacking = () => movementLocked || this.weapon.attacking;
+    const showPunchEffect = () => this.weapon.attacking && !this.noPunchEffect;
 
     this.fogColor = defaultFogColor;
 
-    let noPunchEffect = true;
+    this.noPunchEffect = true;
 
     this.opponent = GetOpponent.call(this);
 
@@ -134,7 +137,7 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
     this.foregroundEffects = new MultiLayer();
     this.globalEffects = new MultiLayer();
 
-    this.hands = new Fists(this);
+    this.weapon = new Fists(this);//todo change retrieval method
 
     this.tileset = null;
     const worldTileset = imageDictionary["world-tileset"];
@@ -365,63 +368,62 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
         context.restore();
     }
 
-    let wDown, sDown, aDown, dDown, enterDown;
+    let keyDownLookup = {};
     this.processKey = key => {
-        switch(key) {
-            case kc.up:     if(wDown) return; yDelta--; wDown = true; break;
-            case kc.down:   if(sDown) return; yDelta++; sDown = true; break;
-            case kc.left:   if(aDown) return; xDelta--; aDown = true; break;
-            case kc.right:  if(dDown) return; xDelta++; dDown = true; break;
-            case kc.accept: if(enterDown) return; enterDown = true; tryPlayerInput(); break;
+        if(key in keyDownLookup) {
+            return;
         }
+        keyDownLookup[key] = true;
+        switch(key) {
+            case kc.up:     yDelta--; break;
+            case kc.down:   yDelta++; break;
+            case kc.left:   xDelta--; break;
+            case kc.right:  xDelta++; break;
+            case kc.accept: tryPlayerAttack(); break;
+        }
+        this.weapon.playerInput(key);
     }
     this.processKeyUp = key => {
-        switch(key) {
-            case kc.up:     if(wDown) yDelta++; wDown = false; break;
-            case kc.down:   if(sDown) yDelta--; sDown = false; break;
-            case kc.left:   if(aDown) xDelta++; aDown = false; break;
-            case kc.right:  if(dDown) xDelta--; dDown = false; break;
-            case kc.accept: enterDown = false; break;
+        if(key in keyDownLookup) {
+            delete keyDownLookup[key];
+            switch(key) {
+                case kc.up:    yDelta++; break;
+                case kc.down:  yDelta--; break;
+                case kc.left:  xDelta++; break;
+                case kc.right: xDelta--; break;
+            }
         }
     }
 
     this.getPlayerOpponentDistance = () => {
         const yDistance = Math.max(0,1 - y - this.opponent.y);
         const xDistance = Math.abs(halfWidth - this.lastOpponentCenterX);
-        const inRange = yDistance <= minimumYPunchDistance && xDistance <= minimumXPunchDistance * (fullWidth / internalWidth);
+        const xInRange = xDistance <= minimumXPunchDistance * (fullWidth / internalWidth);
+        const yInRange = yDistance <= minimumYPunchDistance;
+        const inRange = xInRange && yInRange;
         return {
             xDistance: xDistance,
             yDistance: yDistance,
+            xInRange: xInRange,
+            yInRange: yInRange,
             inRange: inRange
         };
     }
-    
-    const tryPlayerInput = () => {
+
+    this.tryPopVisibleMessage = () => {
         if(this.showingMessage) {
-            this.hands.punch(()=>{
-                playSound("damage",damageSoundPunchDuration);
-                this.showingMessage.progress();
-                noPunchEffect = true;
-            });
-            return;
-        }
-        if(movementLocked) {
-            return;
-        }
-        if(this.getPlayerOpponentDistance().inRange) {
-            this.hands.punch(()=>{
-                this.foregroundEffects.addLayer(GetPunchImpactEffect.call(this));
-                playSound("damage",damageSoundPunchDuration);
-                this.damageOpponent(1);
-                noPunchEffect = false;
-            });
-        } else if(!this.hands.punching) {
-            this.hands.punch();
-            noPunchEffect = true;
+            this.showingMessage.progress();
+            return true;
+        } else {
+            return false;
         }
     }
+    
+    const tryPlayerAttack = () => {
+        this.weapon.attack();
+    }
 
-    this.processClick = () => tryPlayerInput();
+    this.processClick = () => tryPlayerAttack();
 
     const velocityLimiter = (velocity,maxVelocity) => {
         if(velocity > maxVelocity) {
@@ -467,7 +469,7 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
 
     const processMovement = (delta,timestamp) => {
 
-        const movementLocked = movementLockedOrPunching();
+        const movementLocked = this.movementLockedOrAttacking();
 
         const xDeltaMask = movementLocked ? 0 : xDelta;
         const yDeltaMask = movementLocked ? 0 : yDelta;
@@ -503,7 +505,7 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
         y = yHardLimitResult.value;
         yVelocity = yHardLimitResult.velocity;
 
-        this.hands.setSway(
+        this.weapon.setSway(
             Math.abs(xVelocity)/maxXVelocity,
             Math.abs(yVelocity)/maxYVelocity,
             timestamp
@@ -634,7 +636,7 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
         renderForeground(timestamp,x,renderY,foregroundXOffset,foregroundYOffset,delta);
 
 
-        this.hands.render(timestamp);
+        this.weapon.render(timestamp);
 
         if(impactDelta) {
             context.fillStyle = `rgba(255,0,0,${Math.abs(impactDelta)/2})`;

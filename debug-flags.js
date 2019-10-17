@@ -11,8 +11,8 @@ const ENV_FLAGS = {
     DEBUG_PLAYER_CONVOY: false,
     NO_CONTEXT_MENU: false,
     STATIC_BACKGROUND: true,
-    ENABLE_DEV_F12: true,
+    ENABLE_F_BUTTONS: true,
     //Map test
-    TEST: "auto",
+    TEST: "fisting",
     DEBUG_MAP: "other_world"
 }
