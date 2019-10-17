@@ -41,6 +41,7 @@ ImagePaths.push(
     getFile("sprites/wimpy-green-elf.png",FileTypes.Image),
     getFile("sprites/wimpy-red-elf.png",FileTypes.Image),
     getFile("sprites/wizard-elf.png",FileTypes.Image),
+    getFile("ui/atdesp.png",FileTypes.Image),
     getFile("ui/banner.png",FileTypes.Image),
     getFile("ui/card-icons.png",FileTypes.Image),
     getFile("ui/chapters/1.png",FileTypes.Image),

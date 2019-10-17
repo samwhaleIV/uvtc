@@ -16,8 +16,8 @@ const TILED_COMPILE = false;
 const INVERSE_CIPHER_LOOKUP = (function(inverse=true){
     const o="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
     n=o.length,c=Math.pow(n,2),r={};for(let e=0;e<c;e++)
-    {const c=o[Math.floor(e/n)],f=o[e%n];inverse?r[e]=c+f:r[c+f]=e}return r}
-)();
+    {const c=o[Math.floor(e/n)],f=o[e%n];inverse?r[e]=c+f:r[c+f]=e}return r;
+})();
 
 const XML_PARSE_OPTIONS = {
     attributeNamePrefix : "",

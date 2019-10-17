@@ -19,6 +19,8 @@ function loadCallback() {
         case "drag-test":
             firstRendererState = new DragTestRenderer();
             break;
+        case "fisting":
+        case "battle":
         case "fist-battle":
             firstRendererState = new FistBattleRenderer(
                 ()=>alert("Player won!"),()=>alert("Opponent won!"),getOpponent("wimpy-red-elf")

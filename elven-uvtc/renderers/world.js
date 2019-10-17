@@ -389,25 +389,9 @@ function WorldRenderer() {
                 this.movesManager.unlockMove(moveName);
             }
             const movePreviewID = this.addCustomRenderer(
-                new MovePreview(moveName,this.getItemPreviewBounds)
+                new MovePreview(moveName,this.getItemPreviewBounds,true)
             );
-            let messages = [`You received the move ${moveName}!`];
-            if(!alreadyHasMove) {
-                let move = Moves[moveName];
-                if(!move) {
-                    move = Moves["Nothing"];
-                    console.error(`Move '${moveName}' does not exist!`);
-                }
-                let description = move.description;
-                let type = move.type;
-                if(description) {
-                    if(type) {
-                        type = type.substring(0,1).toUpperCase() + type.substring(1);
-                        description = `${type}: ${description}`;
-                    }
-                    messages.push(description);
-                }
-            }
+            let messages = [`You received a ${alreadyHasMove?"":"new "}${move.type} slot!`];
             playSound("energy");
             await this.showInstantPopups(messages);
             this.removeCustomRenderer(movePreviewID);

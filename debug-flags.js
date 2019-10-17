@@ -12,6 +12,6 @@ const ENV_FLAGS = {
     STATIC_BACKGROUND: true,
     ENABLE_DEV_F12: true,
     //Map test
-    TEST: "auto",
+    TEST: "fisting",
     DEBUG_MAP: "other_world"
 }
