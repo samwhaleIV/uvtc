@@ -19,7 +19,7 @@ addMap({
                         "All the books are about elves and how awesome they are.",
                         "Some of them seem like they could be a bit controversial."
                     ]);
-                    await world.showInstantPopup('"Elf 2: The Musical Fan-Fic');
+                    await world.showInstantPopup('"Elf 2: The Musical Fan-Fic"');
                     await world.showInstantPopup('"We Don\'t Like Christmas and Here\'s What We\'re Doing About It"');
                     await world.showPopup("The first line reads: 'Dear humans, we hate you.'");
                     break;
