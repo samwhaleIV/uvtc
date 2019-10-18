@@ -64,6 +64,7 @@ addMap({
             world.camera.xOffset = 0.5;
             world.addPlayer(8,10,"up");
             world.playerObject.xOffset = 0.5;
+            world.playerObject.forcedStartPosition = true;
             this.start = async () => {
                 await delay(1000);
                 await enigma.say("Did you really think you could forget?");
