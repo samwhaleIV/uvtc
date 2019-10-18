@@ -31,7 +31,7 @@ const SongsWithIntros = [
 	"cabin",
 	"tumble_town",
 	"tavern",
-    "store",
+    "TreeCo",
     "elf_march",
     "elf_intro_theme",
     "wimpy",
@@ -62,7 +62,7 @@ const MusicLinkingManifest = {
         song: "tavern"
     },
     "store": {
-        song: "store"
+        song: "TreeCo"
     },
     "mail": {
         song: null
