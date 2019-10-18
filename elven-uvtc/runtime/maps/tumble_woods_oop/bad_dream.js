@@ -23,10 +23,6 @@ addMap({
             world.setForegroundTile(0,7,8);
         }
         const enigma = world.getStaticCharacter("enigma");
-        const quickDelay = delay => {
-            return new Promise(resolve => setTimeout(resolve,delay));
-        }
-
         let backgroundRemovalDone = false;
         const removeBackground = async () => {
             for(let y = 0;y<world.renderMap.rows;y++) {
@@ -41,7 +37,7 @@ addMap({
                     if(x !== 0 && x !== world.renderMap.finalColumn && y !== 0 && y !== world.renderMap.finalRow) {
                         world.setCollisionTile(0,x,y);
                     }
-                    await quickDelay(25);
+                    await delay(25);
                 }
             }
             backgroundRemovalDone = true;

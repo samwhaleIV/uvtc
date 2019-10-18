@@ -52,7 +52,9 @@ const MovesManager = new (function(){
     this.getUnlockedMoves = () => {
         const softCopy = {};
         Object.entries(GlobalState.data.unlockedMoves).forEach(entry => {
-            softCopy[entry[0]] = entry[1];
+            if(entry[1] && entry[0] in Moves) {
+                softCopy[entry[0]] = true;
+            }
         });
         return softCopy;
     }

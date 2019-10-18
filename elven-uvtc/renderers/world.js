@@ -385,13 +385,16 @@ function WorldRenderer() {
     this.unlockMove = moveName => {
         return new Promise(async resolve => {
             const alreadyHasMove = this.movesManager.hasMove(moveName);
+            const move = Moves[moveName];
             if(!alreadyHasMove) {
                 this.movesManager.unlockMove(moveName);
             }
             const movePreviewID = this.addCustomRenderer(
-                new MovePreview(moveName,this.getItemPreviewBounds,true)
+                new MovePreview(moveName,this.getItemPreviewBounds,false)
             );
-            let messages = [`You received a ${alreadyHasMove?"":"new "}${move.type} slot!`];
+            let messages = [
+                `You received ${moveName}, a ${alreadyHasMove?"":"new "}${move.type} slot!`
+            ];
             playSound("energy");
             await this.showInstantPopups(messages);
             this.removeCustomRenderer(movePreviewID);

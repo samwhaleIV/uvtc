@@ -15,7 +15,6 @@ const ClearChapter = () => {
     DeleteMapAndPlayerData();
     GlobalState.data.activeChapter = 0;
 }
-
 const ChapterManager = new (function(){
     this.setChapter = chapterID => {
         ClearChapter();

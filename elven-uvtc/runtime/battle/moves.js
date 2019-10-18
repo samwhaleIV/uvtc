@@ -12,7 +12,7 @@ const MovesList = [
         noTextBlur: true
     },
     {
-        name: "Wimpy Punch",
+        name: "Wimpy",
         type: "attack"
     },
     {

@@ -16,7 +16,7 @@ const Chapters = [
         title: "Culture Shock",
         unlockableMoves: [
             "Iced Whiskey",
-            "Wimpy Punch",
+            "Wimpy",
             "Red Apple",
             "Return to Sender"
         ],

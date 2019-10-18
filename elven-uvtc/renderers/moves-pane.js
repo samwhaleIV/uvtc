@@ -5,14 +5,6 @@ import MoveSelectRenderer from "./move-select.js";
 
 const ROW_TITLE_COLOR = "#2C2C2C";
 
-
-
-const COLUMN_COLOR = "#F2F2F2";
-
-const LOGIC_TEXT = "Logic";
-const MALICE_TEXT = "Malice";
-const FEAR_TEXT = "Fear";
-
 const ATTACK_TYPE = "attack";
 const DEFENSE_TYPE = "defense";
 const SPECIAL_TYPE = "special";
@@ -40,9 +32,20 @@ function MovesPaneRenderer(callback) {
     defenseSlot.value = MovesManager.getSlot(DEFENSE_TYPE);
     specialSlot.value = MovesManager.getSlot(SPECIAL_TYPE);
 
+    const tryRestoreToNone = target => {
+        if(!target.value) {
+            target.value = Moves.None;
+            MovesManager.setSlot(target.type,target.value.name);
+        }
+    }
+
     attackSlot.type = ATTACK_TYPE;
     defenseSlot.type = DEFENSE_TYPE;
     specialSlot.type = SPECIAL_TYPE;
+
+    tryRestoreToNone(attackSlot);
+    tryRestoreToNone(defenseSlot);
+    tryRestoreToNone(specialSlot);
 
     const updateValue = function(newValue) {
         this.value = Moves[newValue];
@@ -87,12 +90,16 @@ function MovesPaneRenderer(callback) {
                 break;
             default:
                 const slot = hoverType;
-                const moveOptions = Object.keys(MovesManager.getUnlockedMoves()).sort().map(
+                const unlockedMoves = MovesManager.getUnlockedMoves();
+                const moveOptions = Object.keys(unlockedMoves).sort().map(
                     moveName=>Moves[moveName]
                 ).filter(move=>{
                     return move && move.type === slot.type;
                 });
-                moveOptions.unshift(Moves.None);
+                const isAttackSlot = hoverType === hoverTypes.attackSlot;
+                if(!isAttackSlot || (isAttackSlot && moveOptions.length === 0)) {
+                    moveOptions.unshift(Moves.None);
+                }
                 playSound("click");
                 selectionModal = new MoveSelectRenderer(moveOptions,newMove=>{
                     exit();

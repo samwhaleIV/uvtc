@@ -548,6 +548,7 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
         await this.gameStart();
         await this.delay(500);
         await this.showRoundBanner(roundNumber);
+        await this.roundStart(null,roundNumber)
         this.unlockMovement();
     }
 

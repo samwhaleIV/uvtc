@@ -4,34 +4,24 @@ addMap({
         let burr;
         const informSlotting = async () => {
             const keyName = (Object.entries(keybindings).filter(entry=>entry[1]===kc.cancel)[0]||[])[0]||"None";
-            await world.showInstantPopup(`To slot your move press [${keyName}] to access the menu, click the "moves" button, then select a malice slot.`);
+            await world.showInstantPopup(`To change your attack slot press [${keyName}] to access the menu, click the "slot" button, then select the attack slot.`);
         }
         const tutorialSpeech = async () => {
             await iceman.say("There's only a few things you must know before you can fight.");
-            await world.showInstantPopup("Number 1: Moves");
-            await iceman.speech([
-                "There are three types of moves in fighting: Logical ones, malicious ones, and moves of cowardice/fear.",
-                "True, in the right situation, being fearful could be logical, but moves generally belong to one category.",
-                "Logic moves come from the mind. Malice moves come from the fist. Fear comes from emotion.",
-                "In this world, you may find moves that can help you in your future battles.",
-                "Master your moves and their functions and you will begin to find certain synergies between them."
-            ]);
-            await world.showInstantPopup("Number 2: Winning");
-            await iceman.speech([
-                "To win a battle, you must bring your opponent's health all the way down.",
-                "If that happens to you, you will lose. What that means depends on the situation you are in.",
-                "There may sometimes be a way to bargain or bribe your way into winning, but that all depends on you and your opponent."
-            ]);
-            await world.showInstantPopup("Number 3: Your turn");
-            await iceman.speech([
-                "Once it is your turn, you select which type of move you are going to use. (Malice, fear, or logic)",
-                "Then, you will choose one of your moves that have in your slots.",
-                "Oh! You don't know about slots yet!",
-                "Here, I will teach you."
-            ]);
+
+            await world.showInstantPopup("Number 1: The basics");
+            await iceman.say("Each battler has 3 lives. If one if you reaches 0, that battler loses.");
+            await iceman.say("Each round each battler's health is restored. If it becomes empty, you lose a life.");
+
+            await world.showInstantPopup("Number 2: Combat");
+            await iceman.say("There are many different types of attacks in the world of fighting, but today we are going to focus on hand to hand combat.");
+            await iceman.say("Your attacks can be changed by selecting a different slot.");
+            await iceman.say("Likewise, there are also defense slots and even special slots you may someday come across to aid you in your battles.");
+            await iceman.say("Oh! You don't know about slots yet?");
+
             await world.unlockMove("Wimpy Punch");
-            await iceman.say("I just gave you a malice move called Wimpy Punch! Now you can fight!");
-            await iceman.say("But first, you will need to slot your move.");
+            await iceman.say("Here, I just gave you an attack slot called Wimpy! Now you can fight!");
+            await iceman.say("But before you can fight, you will need to select your attack slot first.");
             await informSlotting();
             await iceman.say("If you are ready to battle, talk to Burr and you two can battle.");
             if(!world.globalState.icemanBattlePreamble) {
@@ -99,7 +89,7 @@ addMap({
             switch(type) {
                 case 8:
                     world.lockPlayerMovement();
-                    if(world.movesManager.hasSlotType("malice")) {
+                    if(world.movesManager.hasSlotType("attack")) {
                         await iceman.say("Okay Burr, you know how to fight, right?");
                         await burr.say("Uhh, yeah. Totally dude.");
                         if(!world.globalState.icemanDidGetYourName) {
@@ -116,7 +106,7 @@ addMap({
                             world.globalState.failedTutorialBattle = true;
                         });
                     } else {
-                        await iceman.say("Whoops. It looks like you don't have any malice moves slotted. Do you remember how?");
+                        await iceman.say("Whoops. It looks like you don't have an attack slot. Do you remember how to set it?");
                         await informSlotting();
                     }
                     world.unlockPlayerMovement();
