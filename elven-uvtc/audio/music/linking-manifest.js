@@ -38,7 +38,7 @@ const SongsWithIntros = [
 	"training_room"
 ];
 const BattleMusicLinkingManifest = {
-    "burr": "training_room",
+    "tutorial-burr": "training_room",
     "wimpy-red-elf": null,
     "wimpy-green-elf": null
 };

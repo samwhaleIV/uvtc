@@ -14,5 +14,6 @@ const ENV_FLAGS = {
     ENABLE_F_BUTTONS: true,
     //Map test
     TEST: "fisting",
+    DEBUG_BATTLE: "tutorial-burr",
     DEBUG_MAP: "other_world"
 }

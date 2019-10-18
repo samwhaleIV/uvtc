@@ -12,8 +12,12 @@ establishMapLinks();
 function loadCallback() {
     BitmapText.verifyBitmap();
     let firstRendererState;
-    if(ENV_FLAGS.TEST === "auto" && ENV_FLAGS.DEBUG_MAP) {
-        ENV_FLAGS.TEST = "world";
+    if(ENV_FLAGS.TEST === "auto") {
+        if(ENV_FLAGS.DEBUG_MAP) {
+            ENV_FLAGS.TEST = "world";
+        } else if(ENV_FLAGS.DEBUG_BATTLE) {
+            ENV_FLAGS.TEST = "battle";
+        }
     }
     switch(ENV_FLAGS.TEST) {
         case "drag-test":
@@ -22,8 +26,12 @@ function loadCallback() {
         case "fisting":
         case "battle":
         case "fist-battle":
+            let testBattle = ENV_FLAGS.DEBUG_BATTLE;
+            if(!testBattle) {
+                testBattle = "wimpy-red-elf";
+            }
             firstRendererState = new FistBattleRenderer(
-                ()=>alert("Player won!"),()=>alert("Opponent won!"),getOpponent("wimpy-red-elf")
+                ()=>alert("Player won!"),()=>alert("Opponent won!"),getOpponent(testBattle)
             );
             break;
         case "world":
@@ -47,16 +55,48 @@ function loadCallback() {
         });
         rendererState.updateSize();
     } else {
-        startRenderer();
-        if(rendererState.song) {
-            if(rendererState.songIntro) {
-                playMusicWithIntro(rendererState.song,rendererState.songIntro)
-            } else {
-                playMusic(rendererState.song);
+        const loadCallback = () => {
+            startRenderer();
+            if(rendererState.faderCompleted) {
+                rendererState.faderCompleted();
+            }
+            if(rendererState.song) {
+                if(rendererState.songIntro) {
+                    playMusicWithIntro(rendererState.song,rendererState.songIntro)
+                } else {
+                    playMusic(rendererState.song);
+                }
             }
         }
-        if(rendererState.faderCompleted) {
-            rendererState.faderCompleted();
+        let loadedSong = true;
+        let loadedIntro = true;
+        if(rendererState.song) {
+            if(!audioBuffers[rendererState.song] && !failedBuffers[rendererState.song]) {
+                loadSongOnDemand(rendererState.song);
+                loadedSong = false;
+            }
+        }
+        if(rendererState.songIntro) {
+            if(!audioBuffers[rendererState.songIntro] && !failedBuffers[rendererState.songIntro]) {
+                loadSongOnDemand(rendererState.songIntro);
+                loadedIntro = false;
+            }
+        }
+        if(loadedSong && loadedIntro) {
+            loadCallback();
+        } else {
+            audioBufferAddedCallback = function(name) {
+                if(name === rendererState.song) {
+                    loadedSong = true;
+                }
+                if(name === rendererState.songIntro) {
+                    loadedIntro = true;
+                }
+                if(loadedSong && loadedIntro) {
+                    audioBufferAddedCallback = null;
+                    loadCallback();
+                }
+            }
         }
     }
 }

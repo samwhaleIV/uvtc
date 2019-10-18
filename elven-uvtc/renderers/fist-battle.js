@@ -2,7 +2,6 @@ import MultiLayer from "./components/multi-layer.js";
 import Fists from "./components/battle/weapons/fists.js";
 import HeartDisplay from "./components/battle/heart-display.js";
 import GetOpponent from "./components/battle/opponent.js";
-import GetPunchImpactEffect from "./components/battle/punch-effect.js";
 import ApplyTimeoutManager from "./components/inline-timeout.js";
 import FistBattleApplicator from "../runtime/battle/battle-applicator.js";
 import RoundSplashEffect from "./components/battle/round-splash.js";
@@ -133,6 +132,7 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
 
     this.opponent = GetOpponent.call(this);
 
+    this.staticBackgroundEffects = new MultiLayer();
     this.backgroundEffects = new MultiLayer();
     this.foregroundEffects = new MultiLayer();
     this.globalEffects = new MultiLayer();
@@ -624,6 +624,7 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
         }
 
         renderSky();
+        this.staticBackgroundEffects.render(timestamp);
         renderGround(x,renderY);
 
         if(showPunchEffect()) {
@@ -632,10 +633,7 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
         }
 
         this.opponent.movementLogic(delta);
-
         renderForeground(timestamp,x,renderY,foregroundXOffset,foregroundYOffset,delta);
-
-
         this.weapon.render(timestamp);
 
         if(impactDelta) {
@@ -658,8 +656,6 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
         if(this.globalEffects) {
             this.globalEffects.render(timestamp);
         }
-
-
 
         renderHeadcons();
     }

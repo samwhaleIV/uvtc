@@ -161,7 +161,6 @@ function GetOpponent() {
             }
         },
         render: function(timestamp,showPunchEffect) {
-            let adjustedScale = spriteScale;
             let extraScale = 0;
             if(showPunchEffect) {
                 extraScale = opponentSpriteKnockbackAmount;
@@ -189,7 +188,7 @@ function GetOpponent() {
                 }
                 this.lastSpecialFrame = null;
             }
-            this.sprite.renderToForeground(timestamp,adjustedScale,extraScale);
+            this.sprite.renderToForeground(timestamp,extraScale);
         }
     }
 }

@@ -9,6 +9,9 @@ const endPoints = [
     "gameStart"
 ];
 
+const defaultRenderScale = 120;
+const elfYOffset = 0.2;
+
 const bindEndPoints = (target,endPointSpecification) => {
     const fallbackEndPoint = function() {
         void undefined;
@@ -46,6 +49,9 @@ function FistBattleApplicator(layers,specification) {
         list.forEach(target.addLayer);
     }
     if(specification.effects) {
+        if(specification.effects.staticBackground) {
+            ApplyEffectsList(specification.effects.staticBackground,this.staticBackgroundEffects);
+        }
         if(specification.effects.background) {
             ApplyEffectsList(specification.effects.background,this.backgroundEffects);
         }
@@ -65,7 +71,7 @@ function FistBattleApplicator(layers,specification) {
     }
     if(specification.opponentSprite) {
         const parameters = specification.opponentSprite;
-        if(parameters.impactFrame) {
+        if(!isNaN(parameters.impactFrame)) {
             this.opponent.impactFrame = parameters.impactFrame;
         }
         if(!parameters.name) {
@@ -73,18 +79,20 @@ function FistBattleApplicator(layers,specification) {
             parameters.isElf = true;
             parameters.customHeight = null;
             parameters.customWidth = null;
-            parameters.yOffset = 0.2;
+            parameters.yOffset = elfYOffset;
         }
         if(parameters.isElf) {
             parameters.customWidth = null;
             parameters.customHeight = null;
+            parameters.renderScale = defaultRenderScale;
         }
         this.opponentSpriteParameters = [
-            parameters.name,
+            parameters.name || "missing-opponent-name",
             parameters.isElf || false,
             parameters.customWidth || null,
             parameters.customHeight || null,
-            parameters.yOffset || 0
+            parameters.yOffset || 0,
+            parameters.renderScale || defaultRenderScale
         ];
     } else {
         throw Error("Missing opponent sprite specification in master specification:",specification);

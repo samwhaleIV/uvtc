@@ -129,6 +129,7 @@ function FistsWeapon(rendererState) {
                 );
                 punchSound();
                 battle.damageOpponent(PUNCH_DAMAGE);
+                battle.noPunchEffect = false;
                 if(attacked) {
                     attacked(getAttackCallbackResult());
                 }
