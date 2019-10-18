@@ -13,7 +13,7 @@ const ENV_FLAGS = {
     STATIC_BACKGROUND: true,
     ENABLE_F_BUTTONS: true,
     //Map test
-    TEST: "fisting",
+    TEST: "world",
     DEBUG_BATTLE: "tutorial-burr",
-    DEBUG_MAP: "other_world"
+    DEBUG_MAP: "bad_dream"
 }

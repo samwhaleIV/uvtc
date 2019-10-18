@@ -1,26 +1,9 @@
 function delay(time) {
-    if(rendererState && rendererState.setTimeout) {
-        return new Promise(resolve=>{
-            rendererState.setTimeout(resolve,time);
-        });
-    } else {
-        return new Promise(resolve=>{
-            setTimeout(resolve,time);
-        });
-    }
+    return new Promise(resolve=>setTimeout(resolve,time));
 }
-function inlineSetTimeout(callback,time) {
-    if(rendererState && rendererState.setTimeout) {
-        rendererState.setTimeout(callback,time);
-    } else {
-        setTimeout(callback,time);
-    }
-}
-
 function getRandomPolarity() {
     return Math.round(Math.random()) * 2 - 1;
 }
-
 const scripts = {
     popupFormatTest: async () => {
         let popup = rendererState.showPopup;

@@ -19,6 +19,7 @@ import "./tumble_woods/store.js";
 import "./tumble_woods/tavern.js";
 import "./tumble_woods/tumble_woods.js";
 import "./tumble_woods/tutorial_place.js";
+import "./tumble_woods_oop/bad_dream.js";
 import "./tumble_woods_oop/bedroom_1_oop.js";
 import "./tumble_woods_oop/bedroom_2_oop.js";
 import "./tumble_woods_oop/bedroom_3_oop.js";

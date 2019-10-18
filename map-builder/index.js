@@ -3,16 +3,12 @@ const path = require("path");
 const xmlParser = require("fast-xml-parser");
 const he = require("he");
 
-const {execSync} = require('child_process');
 const INPUT_FOLDER = "./input/";
 const OUTPUT_PATH = "../map-data.js";
 const OUTPUT_VARIABLE_PREFIX = "const rawMapData=";
 const MAP_DEV_FOLDER = "../map-dev/maps/";
 const MAP_DEV_INPUT_FORMAT = ".tmx";
 const JSON_FILE_EXTENSION = ".json";
-const MAP_DEV_OUTPUT_FORMAT = "JSON";
-const TILED_PATH = `"C:\\Program Files\\Tiled\\tiled.exe"`;
-const TILED_COMPILE = false;
 const INVERSE_CIPHER_LOOKUP = (function(inverse=true){
     const o="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
     n=o.length,c=Math.pow(n,2),r={};for(let e=0;e<c;e++)
@@ -35,10 +31,6 @@ const XML_PARSE_OPTIONS = {
     stopNodes: []
 }
 
-const MAP_VALUE_OFFSET = -1;
-const MAP_COLLISION_OFFSET = -4097;
-const MAP_LIGHTING_OFFSET = -4121;
-
 const devMapFiles = [];
 const shortDevMapFileList = [];
 fs.readdirSync(MAP_DEV_FOLDER).forEach(fileName => {
@@ -57,15 +49,6 @@ function process_csv_xml_data(layer) {
         data: layer.data.value.split(",").map(Number)
     };
 }
-function route_map_file_through_tiled(mapFile) {
-    const command = `${TILED_PATH} --export-map ${MAP_DEV_OUTPUT_FORMAT} "${mapFile.source}" "${mapFile.target}"`;
-    console.log("Compiling first pass: " + mapFile.targetName);
-    let result = execSync(command);
-    result = result.toString().trim();
-    if(result) {
-        console.log(result);
-    }
-}
 const allMapData = [];
 function self_compile_map_file(mapFile) {
 
@@ -73,6 +56,33 @@ function self_compile_map_file(mapFile) {
     const jsonData = xmlParser.parse(xmlData,XML_PARSE_OPTIONS);
 
     const rawMap = {};
+
+    const tileSets = jsonData.map.tileset;
+    if(!Array.isArray(tileSets)) {
+        return;
+    }
+    let lightingTileset = null, collisionTileset = null, baseTileset = null;
+    tileSets.forEach(tileset => {
+        const offset = tileset.attr.firstgid;
+        const tilesetName = tileset.attr.source;
+        if(tilesetName.endsWith("world-tileset.tsx")) {
+            baseTileset = offset;
+        } else if(tilesetName.endsWith("collision-tileset.tsx")) {
+            collisionTileset = offset;
+        } else if(tilesetName.endsWith("light-tileset.tsx")) {
+            lightingTileset = offset;
+        }
+    });
+    if(baseTileset !== null) {
+        rawMap.normalOffset = baseTileset;
+    }
+    if(collisionTileset !== null) {
+        rawMap.collisionOffset = collisionTileset;
+    }
+    if(lightingTileset !== null) {
+        rawMap.lightingOffset = lightingTileset;
+    }
+
     const map = jsonData.map;
     const backgroundLayer = map.layer[0];
     const foregroundLayer = map.layer[1];
@@ -102,26 +112,7 @@ function self_compile_map_file(mapFile) {
     console.log("Fast compiled: " + mapFile.source);
     
 }
-function parse_tiled_output_folder() {
-    fs.readdirSync(INPUT_FOLDER).forEach(fileName => {
-        const file = `${INPUT_FOLDER}${fileName}`;
-        const fileResult = fs.readFileSync(file);
-        let fileDisplayName = fileName.split(".");
-        fileDisplayName.pop();
-        fileDisplayName = fileDisplayName.join(".");
-        allMapData.push({
-            name: fileDisplayName,
-            data: JSON.parse(fileResult.toString())
-        });
-    });
-}
-if(TILED_COMPILE) {
-    devMapFiles.forEach(route_map_file_through_tiled);
-    parse_tiled_output_folder();
-} else {
-    devMapFiles.forEach(self_compile_map_file);
-}
-
+devMapFiles.forEach(self_compile_map_file);
 const encodeLayer = layer => {
     layer.forEach((value,index)=>{
         layer[index] = INVERSE_CIPHER_LOOKUP[value];
@@ -153,14 +144,14 @@ function processMapData(rawMap,name) {
     map.rows = rawMap.height;
 
     for(let i = 0;i<map.background.length;i++) {
-        map.background[i] = (map.background[i] || 1) + MAP_VALUE_OFFSET;
-        map.foreground[i] = (map.foreground[i] || 1) + MAP_VALUE_OFFSET;
+        map.background[i] = (map.background[i] || 1) - rawMap.normalOffset;
+        map.foreground[i] = (map.foreground[i] || 1) - rawMap.normalOffset;
         if(map.collision[i] !== 0) {
-            map.collision[i] = map.collision[i] + MAP_COLLISION_OFFSET;
+            map.collision[i] = map.collision[i] - rawMap.collisionOffset;
         }
         if(map.lighting) {
             if(map.lighting[i] !== 0) {
-                map.lighting[i] = map.lighting[i] + MAP_LIGHTING_OFFSET;
+                map.lighting[i] = map.lighting[i] - rawMap.lightingOffset;
             }
         }
     }

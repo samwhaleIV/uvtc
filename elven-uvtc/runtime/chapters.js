@@ -36,7 +36,7 @@ const Chapters = [
         title: "New World",
         unlockableMoves: [
         ],
-        startMap: "bedroom_1_oop",
+        startMap: "bad_dream",
         chapterState: Chapter3State
     },
     {

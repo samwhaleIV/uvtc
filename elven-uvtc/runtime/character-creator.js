@@ -33,7 +33,8 @@ const CharacterColors = {
     "wizard-elf":       "blueviolet",
     "tiny-arm-elf":     "cyan",
     "wimpy-green-elf":  "green",
-    "rock-elf-spy":     "red"
+    "rock-elf-spy":     "red",
+    "enigma":           "red"
 };
 const CharacterDisplayNames = {
     "jim":              "Jim",
@@ -57,7 +58,8 @@ const CharacterDisplayNames = {
     "wizard-elf":       "Wizard Elf",
     "tiny-arm-elf":     "Tiny Arm Elf",
     "wimpy-green-elf":  "Wimpy Green Elf",
-    "rock-elf-spy":     "Rock Elf Spy"
+    "rock-elf-spy":     "Rock Elf Spy",
+    "enigma":           "Enigma"
 };
 const ColorLookup = {};
 Object.entries(textColorLookup).forEach(entry => {

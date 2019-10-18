@@ -47,13 +47,17 @@ function loadCallback() {
     }
     setRendererState(firstRendererState);
     if(rendererState.customLoader) {
+        rendererState.updateSize();
+        startRenderer();
+        pauseRenderer();
+        drawLoadingText();
         rendererState.customLoader(()=>{
-            startRenderer();
+            resumeRenderer();
             if(rendererState.faderCompleted) {
                 rendererState.faderCompleted();
             }
+            rendererState.updateSize();
         });
-        rendererState.updateSize();
     } else {
         const loadCallback = () => {
             startRenderer();

@@ -1153,6 +1153,7 @@ function WorldRenderer() {
         this.playerObject = null;
         this.followObject = null;
         this.cameraFrozen = false;
+        tileRenderingEnabled = true;
         this.clearCustomRendererStack();
         this.map = newMap.WorldState ? new newMap.WorldState(this,data):{};
         if(newMap.cameraStart) {

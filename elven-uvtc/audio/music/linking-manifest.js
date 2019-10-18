@@ -35,7 +35,8 @@ const SongsWithIntros = [
     "elf_march",
     "elf_intro_theme",
     "wimpy",
-	"training_room"
+    "training_room",
+    "Dark_TumbleTown"
 ];
 const BattleMusicLinkingManifest = {
     "tutorial-burr": "training_room",
@@ -48,6 +49,9 @@ const ScriptedSongLinkingManifest = {
     "lights-off-meet-elves": null
 }
 const MusicLinkingManifest = {
+    "bad_dream": {
+        song: "Dark_TumbleTown"
+    },
     "tumble_showdown": {
         song: ScriptedSongLinkingManifest["lights-off-meet-elves"]
     },
