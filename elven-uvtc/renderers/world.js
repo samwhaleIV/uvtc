@@ -122,6 +122,7 @@ function WorldRenderer() {
     }
 
     this.managedFaderTransition = (...parameters) => {
+        this.postProcessor.terminate();
         if(this.map.unload) {
             this.map.unload(this);
         }
@@ -1465,6 +1466,8 @@ function WorldRenderer() {
         }
     }
 
+    this.postProcessor = new PostProcessor(0.25);
+
     this.render = function(timestamp) {
         this.processThreads(timestamp);
 
@@ -1661,6 +1664,7 @@ function WorldRenderer() {
                 alert = null;
             }
         }
+        this.postProcessor.render();
     }
 }
 export default WorldRenderer;
