@@ -23,6 +23,12 @@ import ApplyTimeoutManager from "./components/inline-timeout.js";
 import FistBattleRenderer from "./fist-battle.js";
 import Gradient from "./components/gradient.js";
 import MultiLayer from "./components/multi-layer.js";
+import FastStaticWrapper from "./components/fast-static-wrapper.js";
+
+const filmGrainEffect = new FastStaticWrapper(1,()=>{
+    const shade = Math.floor(256 * Math.random());
+    return `rgba(${shade},${shade},${shade},0.1)`;
+},maxHorizontalResolution*2,4,100);
 
 const CHAPTER_NAME_LOOKUP = [
     "an impossible chapter that cannot exist",
@@ -58,6 +64,8 @@ function WorldRenderer() {
             unload: null
         };
     }
+
+    this.filmGrainEffect = filmGrainEffect;
 
     Object.defineProperty(this,"activeChapter",{
         get: function() {
