@@ -59,8 +59,10 @@ addMap({
             world.camera.x = 8;
             world.camera.y = 7;
             world.camera.xOffset = 0.5;
-            world.addPlayer(8,10,"up");
+            world.addPlayer(8,9,"up");
+            world.playerObject.offscreenRendering = true;
             world.playerObject.xOffset = 0.5;
+            world.playerObject.yOffset = 0.5;
             world.playerObject.forcedStartPosition = true;
             this.start = async () => {
                 await delay(1000);

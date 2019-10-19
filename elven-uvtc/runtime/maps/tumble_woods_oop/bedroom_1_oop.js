@@ -4,7 +4,8 @@ addMap({
             if(data.fromDoorWay) {
                 world.addPlayer(5,2,"down");
             } else {
-                world.addPlayer(3,4,"up");
+                world.addPlayer(2,4,"up");
+                world.playerObject.xOffset = 0.5;
             }
 
         }
