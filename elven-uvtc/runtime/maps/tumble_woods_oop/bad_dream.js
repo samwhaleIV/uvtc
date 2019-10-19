@@ -54,6 +54,7 @@ addMap({
             }
         }
         this.load = world => {
+            world.addCustomRenderer(world.filmGrainEffect);
             world.autoCameraOff();
             world.camera.x = 8;
             world.camera.y = 7;

@@ -4,6 +4,13 @@ function delay(time) {
 function getRandomPolarity() {
     return Math.round(Math.random()) * 2 - 1;
 }
+function debug_offscreen_canvas(canvas) {
+    canvas.convertToBlob({
+        type: "image/png"
+    }).then(function(blob) {
+        window.open(URL.createObjectURL(blob));
+    });
+}
 const scripts = {
     popupFormatTest: async () => {
         let popup = rendererState.showPopup;
