@@ -41,8 +41,8 @@ const SongsWithIntros = [
 ];
 const BattleMusicLinkingManifest = {
     "tutorial-burr": "training_room",
-    "wimpy-red-elf": null,
-    "wimpy-green-elf": null,
+    "wimpy-red-elf": "misc_fight_song",
+    "wimpy-green-elf": "misc_fight_song",
     "debug-battle": "misc_fight_song"
 };
 const ScriptedSongLinkingManifest = {

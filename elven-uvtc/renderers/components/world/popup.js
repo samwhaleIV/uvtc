@@ -28,7 +28,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world,autoCallback) {
     let pageComplete = false;
 
     let terminated = false;
-    let readyToTerminate = false;
+    this.readyToTerminate = false;
 
     for(let i = 0;i<pages.length;i++) {
         let page = pages[i];
@@ -140,7 +140,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world,autoCallback) {
             }
         } else {
             if(pageIndex + 1 >= pageCount) {
-                readyToTerminate = true;
+                this.readyToTerminate = true;
                 if(autoCallback) {
                     autoCallback();
                 }
@@ -152,7 +152,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world,autoCallback) {
     timeoutMethod();
     this.progress = () => {
         clearTimeout(timeout);
-        if(readyToTerminate) {
+        if(this.readyToTerminate) {
             if(terminated) {
                 return;
             }
@@ -166,18 +166,18 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world,autoCallback) {
             pageIndex++;
             characterIndex = 0;
             if(pageIndex >= pageCount) {
-                readyToTerminate = true;
+                this.readyToTerminate = true;
             } else {
                 pageComplete = false;
                 timeoutMethod();
             }
         } else {
+            playAutoCompleteTextSound();
             const page = pages[pageIndex];
             this.textFeed = page[page.length-1].textFeed;
             pageComplete = true;
-            playAutoCompleteTextSound();
             if(pageIndex + 1 >= pageCount) {
-                readyToTerminate = true;
+                this.readyToTerminate = true;
             }
         }
     }

@@ -42,6 +42,8 @@ const ALERT_TIME = 1000;
 const ANIMATION_TILE_COUNT = 5;
 const ANIMATION_CYCLE_DURATION = 400;
 const ANIMATION_FRAME_TIME = ANIMATION_CYCLE_DURATION / ANIMATION_TILE_COUNT;
+const POPUP_TIMEOUT = 300;
+const NEGATIVE_INFINITY_BUT_NOT_REALLY = -1000000;
 
 const FINAL_CHAPTER_NUMBER = 12;
 const CHAPTER_COMPLETE_SOUND_SOUND_BY_DEFAULT = false;
@@ -476,8 +478,10 @@ function WorldRenderer() {
     let escapeMenuShown = false;
     this.escapeMenuDisabled = false;
 
+    let popupActive = false;
+
     const playerInteractionLocked = () => {
-        return playerMovementLocked || escapeMenuShown || this.popup || this.prompt ? true : false;
+        return playerMovementLocked || escapeMenuShown || popupActive || this.prompt ? true : false;
     }
 
     this.playerInteractionLocked = playerInteractionLocked;
@@ -635,18 +639,35 @@ function WorldRenderer() {
             return;
         }
     }
-    this.clearTextPopup = () => {
-        this.popup = null;
-    }
+
     this.allowKeysDuringPause = true;
 
+    let lastPopupCleared = NEGATIVE_INFINITY_BUT_NOT_REALLY;
+    this.clearTextPopup = () => {
+        this.popup = null;
+        lastPopupCleared = performance.now();
+    }
     const showPopup = (pages,name=null,instant=false) => {
-        return new Promise(resolve=>{
+        popupActive = true;
+        if(Array.isArray(pages)) {
+            return new Promise(async resolve => {
+                for(let i = 0;i<pages.length;i++) {
+                    await showPopup(pages[i],name,instant);
+                }
+                resolve();
+            });
+        }
+        const page = pages;
+        return new Promise(async resolve => {
+            if(performance.now() < lastPopupCleared + POPUP_TIMEOUT) {
+                await delay(POPUP_TIMEOUT);
+            }
             this.popup = new WorldPopup(
-                pages,
+                [page],
                 () => {
                     this.clearTextPopup();
                     resolve();
+                    popupActive = false;
                 },name,instant,this
             );
         });

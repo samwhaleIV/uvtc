@@ -118,7 +118,7 @@ function HealthController(maxHealth,heartRenderID,damageCallback,fatalCallback) 
 
 function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
 
-    this.disableAdaptiveFill = false;
+    this.disableAdaptiveFill = true;
     this.noPixelScale = true;
 
     ApplyTimeoutManager(this);
@@ -444,7 +444,11 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
 
     this.tryPopVisibleMessage = () => {
         if(this.showingMessage) {
-            this.showingMessage.progress();
+            if(this.showingMessage.readyToTerminate) {
+                this.showingMessage.progress();
+                playSound("text-sound");
+                return false;
+            }
             return true;
         } else {
             return false;
