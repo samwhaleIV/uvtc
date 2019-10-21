@@ -41,7 +41,8 @@ addMap({
                     await world.showInstantPopup("Ooh. A present just for you? I wonder what's inside!");
                     clearPresent();
                     world.globalState.unlockedReturnToSender = true;
-                    world.unlockMove("Return to Sender");
+                    await world.unlockSlot("Disappointment");
+                    await world.showPopup("Oh. Well that's not very exciting.");
                     break;
                 case 14:
                     if(world.globalState.sentSealedLetter) {

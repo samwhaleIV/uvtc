@@ -66,7 +66,7 @@ addMap({
                                 "You.. You've made me happier than you'll ever realize.",
                                 "Please. I may just be a lamp and don't have much to offer you, but please. Take this. You earned it."
                             ]);
-                            await world.unlockMove("Bright Idea");
+                            await world.unlockSlot("Bright Idea");
                         }
                         world.unlockPlayerMovement();
                     } else {

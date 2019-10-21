@@ -448,7 +448,7 @@ addMap({
                                 await world.showPopup("Yep! That's right. A present can only be opened in the present!");
                                 await world.showPopup("Open me carefully. Please be gentle.");
                                 clearPresentMove();
-                                world.unlockMove("Jingle Bells");
+                                world.unlockSlot("Jingle Bells");
                             } else {
                                 this.gotWrongPresentAnswer = true;
                                 await world.showPopup("Hmm. Nope. A present can only be opened in the present.");

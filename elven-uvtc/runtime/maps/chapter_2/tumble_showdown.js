@@ -146,11 +146,11 @@ addMap({
                     await delay(800);
                     await wimpyGreen.say("Anyways.. You haven't seen the last of us, and, we are still taking your friends.");
                     await delay(800);
-                    await wimpyGreen.say("What? Don't look at me like that. You really thought some light sparring would make wizard elf take down this barrier?");
+                    await wimpyGreen.say("What? Don't look at me like that. You really thought some light sparring would make Wizard Elf take down this barrier?");
                     await wimpyGreen.say("You haven't seen the last of us. Changes are coming.. Spread the word.");
                     await delay(600);
                     await wimpyGreen.say("And in case you forget about your friends, here's another reminder.");
-                    await world.unlockMove("Submission");
+                    await world.unlockSlot("Snowball");
                     await delay(300);
                     await world.moveCamera(...wimpyRed.location,400);
                     await delay(1000);

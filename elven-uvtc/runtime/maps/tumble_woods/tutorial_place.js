@@ -19,7 +19,7 @@ addMap({
             await iceman.say("Likewise, there are also defense slots and even special slots you may someday come across to aid you in your battles.");
             await iceman.say("Oh! You don't know about slots yet?");
 
-            await world.unlockMove("Wimpy Punch");
+            await world.unlockSlot("Wimpy");
             await iceman.say("Here, I just gave you an attack slot called Wimpy! Now you can fight!");
             await iceman.say("But before you can fight, you will need to select your attack slot first.");
             await informSlotting();

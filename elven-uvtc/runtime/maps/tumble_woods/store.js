@@ -34,7 +34,7 @@ addMap({
                 await louis.say("You did it! You won the game!");
                 await louis.say("Thank you so much for your interest in Tree-Co.");
                 await louis.say("Now, as promised, your reward.");
-                await world.unlockMove("Red Apple");
+                await world.unlockSlot("Red Apple");
                 world.globalState.beatTreeCoGame = true;
             } else {
                 await louis.say("Ah, man. You were so close. You can try again another time for my sweet, sweet reward.");

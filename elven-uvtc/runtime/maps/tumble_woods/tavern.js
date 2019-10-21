@@ -23,7 +23,7 @@ addMap({
                         world.globalState.shiverGaveGift = true;
                         world.globalState.shiverWantsToGiveAGift = false;
                         await shiver.say("You've helped us poor helpless ice cream cones get our booze fix, so consider this a token of our gratitude.");
-                        await world.unlockMove("Iced Whiskey");
+                        await world.unlockSlot("Iced Whiskey");
                     }
 
                     if(world.globalState.burrGotBeer && world.globalState.shiverGotBeer) {

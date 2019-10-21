@@ -396,7 +396,7 @@ function WorldRenderer() {
             const alreadyHasMove = this.movesManager.hasMove(moveName);
             const move = Moves[moveName];
             if(!alreadyHasMove) {
-                this.movesManager.unlockMove(moveName);
+                this.movesManager.unlockSlot(moveName);
             }
             const movePreviewID = this.addCustomRenderer(
                 new MovePreview(moveName,this.getItemPreviewBounds,false)

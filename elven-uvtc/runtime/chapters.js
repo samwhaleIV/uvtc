@@ -18,7 +18,7 @@ const Chapters = [
             "Iced Whiskey",
             "Wimpy",
             "Red Apple",
-            "Return to Sender"
+            "Disappointment"
         ],
         startMap: "bedroom_1",
         chapterState: Chapter1State
@@ -27,7 +27,7 @@ const Chapters = [
         title: "Christmas Is Cancelled",
         unlockableMoves: [
             "Jingle Bells",
-            "Submission"
+            "Snowball"
         ],
         startMap: "north_pole_preview",
         chapterState: Chapter2State
@@ -35,6 +35,7 @@ const Chapters = [
     {
         title: "New World",
         unlockableMoves: [
+            "Bright Idea"
         ],
         startMap: "bad_dream",
         chapterState: Chapter3State
