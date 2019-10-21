@@ -124,10 +124,16 @@ function Snowball(outgoing,doesImpact,callback,terminationCallback) {
         }
         const halfSnowballSize = snowballSize / 2;
         if(thrownDelta >= 1) {
-            if(callback) {
-                callback();
+            let shouldImpact;
+            if(typeof doesImpact === "function") {
+                shouldImpact = doesImpact();
+            } else {
+                shouldImpact = doesImpact;
             }
-            if(doesImpact) {
+            if(shouldImpact) {
+                if(callback) {
+                    callback();
+                }
                 snowballImpact = new SnowballImpact(timestamp,()=>{
                     if(terminationCallback) {
                         terminationCallback();

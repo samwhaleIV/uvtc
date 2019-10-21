@@ -10,6 +10,5 @@ EssentialSounds.push(
     getFile("battle-fade-in.mp3",FileTypes.Sound),
     getFile("battle-fade-out.mp3",FileTypes.Sound),
     getFile("magic.mp3",FileTypes.Sound),
-    getFile("snow.mp3",FileTypes.Sound),
     getFile(MAIN_MENU_SONG,FileTypes.Music)
 );

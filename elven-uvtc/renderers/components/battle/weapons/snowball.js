@@ -2,11 +2,12 @@ import WeaponBase from "../weapon-base.js";
 import { OutgoingSnowball } from "../snowball.js";
 import MultiLayer from "../../multi-layer.js";
 
-const SOUND_NAME = "snow";
+const SOUND_NAME = "damage";
+const SOUND_DURATION = 0.15;
 const SNOWBALL_DAMAGE = 1;
 
 function snowballSound() {
-    playSound(SOUND_NAME);
+    playSound(SOUND_NAME,SOUND_DURATION);
 }
 function SnowballWeapon(rendererState) {
     const battle = rendererState;
@@ -15,18 +16,21 @@ function SnowballWeapon(rendererState) {
     const isAttacking = () => {
         return snowball !== null;
     }
+    const rangeCheck = () => {
+        return battle.getPlayerOpponentDistance().xInRange;
+    }
     const throwSnowball = attacked => {
-        this.throwingBall = true;
-        const inRange = battle.getPlayerOpponentDistance().xInRange;
         let currentSnowball = new OutgoingSnowball(
-            inRange,()=>{
-                this.throwingBall = false;
+            rangeCheck,()=>{
                 snowball = null;
-                if(inRange && attacked) {
+                if(rangeCheck && attacked) {
                     attacked();
                 }
             }
         ,()=>{
+            if(currentSnowball === snowball) {
+                snowball = null;
+            }
             snowballRenderLayer.removeLayer(currentSnowball.renderID);
         });
         snowball = currentSnowball;
