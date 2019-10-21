@@ -3,7 +3,6 @@ import WorldPopup from "../world/popup.js";
 const opponentXVelocity = 0.01;
 const opponentYVelocity = 0.01;
 const opponentSpriteKnockbackAmount = -7;
-const spriteScale = 120;
 
 const TEXT_BOX_MARGIN = 12;
 const TEXT_BOX_WIDTH = 600;

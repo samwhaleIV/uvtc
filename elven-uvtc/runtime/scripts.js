@@ -11,6 +11,9 @@ function debug_offscreen_canvas(canvas) {
         window.open(URL.createObjectURL(blob));
     });
 }
+function for_the_end_of_the_universe() {
+    return new Promise(()=>void 0);
+}
 const scripts = {
     popupFormatTest: async () => {
         let popup = rendererState.showPopup;

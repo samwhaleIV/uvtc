@@ -52,9 +52,7 @@ function WeaponBase(customLayer) {
         }
         sway = swayNormal;
     }
-    this.attack = (attacked,didNotAttack) => {
-        return this.customLayer.attack(attacked,didNotAttack);
-    }
+    this.attack = () => this.customLayer.attack();
     this.playerInput = key => {
         if(this.customLayer.playerInput) {
             this.customLayer.playerInput(key);

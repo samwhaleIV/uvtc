@@ -21,6 +21,7 @@ ImagePaths.push(
     getFile("battle/love.png",FileTypes.Image),
     getFile("battle/moves.png",FileTypes.Image),
     getFile("battle/round-splash.png",FileTypes.Image),
+    getFile("battle/snowball.png",FileTypes.Image),
     getFile("battle/statuses.png",FileTypes.Image),
     getFile("battle/tumble-showdown.png",FileTypes.Image),
     getFile("battle/tutorial-place.png",FileTypes.Image),

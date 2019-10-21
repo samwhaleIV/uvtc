@@ -68,7 +68,7 @@ function FistsWeapon(rendererState) {
             return {x:0,y:0};
         }
     }
-    const punch = (attacked,didNotAttack) => {
+    const punch = attacked => {
         if(lastPunch === "right") {
             if(leftPunchStart === null) {
                 leftPunchStart = performance.now();
@@ -76,8 +76,6 @@ function FistsWeapon(rendererState) {
                 if(attacked) {
                     attacked();
                 }
-            } else if(didNotAttack) {
-                didNotAttack();
             }
         } else {
             if(rightPunchStart === null) {
@@ -86,40 +84,21 @@ function FistsWeapon(rendererState) {
                 if(attacked) {
                     attacked();
                 }
-            } else if(didNotAttack) {
-                didNotAttack();
             }
         }
     }
-    const getAttackCallbackResult = (wasMessage=false) => {
-        return {
-            poppedMessage: wasMessage
-        }
-    }
-    const getNoAttackCallbackResult = () => {
-        return {}
-    };
-    const attack = (attacked,didNotAttack) => {
+    const attack = () => {
         if(isAttacking()) {
-            if(didNotAttack) {
-                didNotAttack(getNoAttackCallbackResult());
-            }
             return;
         }
         if(battle.tryPopVisibleMessage()) {
             punch(()=>{
                 punchSound();
-                battle.noPunchEffect = true;
-                if(attacked) {
-                    attacked(getAttackCallbackResult());
-                }
+
             });
             return;
         }
         if(battle.isMovementLocked()) {
-            if(didNotAttack) {
-                didNotAttack(getNoAttackCallbackResult());
-            }
             return;
         }
         if(battle.getPlayerOpponentDistance().inRange) {
@@ -129,18 +108,10 @@ function FistsWeapon(rendererState) {
                 );
                 punchSound();
                 battle.damageOpponent(PUNCH_DAMAGE);
-                battle.noPunchEffect = false;
-                if(attacked) {
-                    attacked(getAttackCallbackResult());
-                }
-            },didNotAttack);
-        } else {
-            punch(()=>{
-                battle.noPunchEffect = true;
-                if(attacked) {
-                    attacked(getAttackCallbackResult());
-                }
+                battle.punchEffect();
             });
+        } else {
+            punch();
         }
     }
     const render = timestamp => {
@@ -172,8 +143,7 @@ function FistsWeapon(rendererState) {
     WeaponBase.call(this,{
         isAttacking: isAttacking,
         attack: attack,
-        render: render,
-        playerInput: key => console.log(`Key: ${key}`)
+        render: render
     });
 }
 export default FistsWeapon;

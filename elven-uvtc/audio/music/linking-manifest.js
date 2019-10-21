@@ -36,12 +36,14 @@ const SongsWithIntros = [
     "elf_intro_theme",
     "wimpy",
     "training_room",
-    "Dark_TumbleTown"
+    "Dark_TumbleTown",
+    "misc_fight_song"
 ];
 const BattleMusicLinkingManifest = {
     "tutorial-burr": "training_room",
     "wimpy-red-elf": null,
-    "wimpy-green-elf": null
+    "wimpy-green-elf": null,
+    "debug-battle": "misc_fight_song"
 };
 const ScriptedSongLinkingManifest = {
     "oops-wrong-song": "hero",

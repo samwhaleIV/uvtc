@@ -3,9 +3,11 @@ import Fists from "./components/battle/weapons/fists.js";
 import HeartDisplay from "./components/battle/heart-display.js";
 import GetOpponent from "./components/battle/opponent.js";
 import ApplyTimeoutManager from "./components/inline-timeout.js";
-import FistBattleApplicator from "../runtime/battle/battle-applicator.js";
+import BattleApplicator from "../runtime/battle/battle-applicator.js";
 import RoundSplashEffect from "./components/battle/round-splash.js";
 import SpriteForeground from "./components/battle/sprite-foreground.js";
+import MovesManager from "../runtime/moves-manager.js";
+import SnowballWeapon from "./components/battle/weapons/snowball.js";
 
 const textureSize = 16;
 const halftextureSize = textureSize / 2;
@@ -55,11 +57,28 @@ const HEAL_RATE_FACTOR = 100;
 const headconIconSize = 90;
 const headconMargin = 5;
 
+const PUNCH_EFFECT_DURATION = 100;
+
+function GetPlayerWeapon(battle) {
+    let weaponName;
+    if(ENV_FLAGS.WEAPON_OVERRIDE) {
+        weaponName = ENV_FLAGS.WEAPON_OVERRIDE;
+    } else {
+        weaponName = MovesManager.getSlot("attack").name
+    }
+    switch(weaponName) {
+        default:
+        case "Wimpy":
+            return new Fists(battle);
+        case "Snowball":
+            return new SnowballWeapon(battle);
+    }
+}
+
 function HealthController(maxHealth,heartRenderID,damageCallback,fatalCallback) {
     if(!maxHealth) {
         maxHealth = DEFAULT_MAX_HEALTH;
     }
-
     let health = maxHealth;
     this.getValue = () => health;
     this.getNormal = () => health / maxHealth;
@@ -83,7 +102,9 @@ function HealthController(maxHealth,heartRenderID,damageCallback,fatalCallback) 
     this.restore = () => health = maxHealth;
 
     const heartDisplay = new HeartDisplay(heartRenderID);
-    this.render = (timestamp,x,y,size) => heartDisplay.render(timestamp,x,y,size,health / maxHealth);
+    this.render = (timestamp,x,y,size) => {
+        heartDisplay.render(timestamp,x,y,size,health / maxHealth);
+    }
     this.healCycle = delta => {
         const healDelta = maxHealth / HEAL_RATE_FACTOR * delta;
         if(health < maxHealth) {
@@ -123,12 +144,17 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
 
     this.isMovementLocked = () => movementLocked;
 
+    let punchEffectStart = -10000;
+
     this.movementLockedOrAttacking = () => movementLocked || this.weapon.attacking;
-    const showPunchEffect = () => this.weapon.attacking && !this.noPunchEffect;
+    this.punchEffect = () => {
+        punchEffectStart = performance.now();
+    }
+    const showPunchEffect = timestamp => {
+        return timestamp - punchEffectStart < PUNCH_EFFECT_DURATION;
+    }
 
     this.fogColor = defaultFogColor;
-
-    this.noPunchEffect = true;
 
     this.opponent = GetOpponent.call(this);
 
@@ -137,7 +163,7 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
     this.foregroundEffects = new MultiLayer();
     this.globalEffects = new MultiLayer();
 
-    this.weapon = new Fists(this);//todo change retrieval method
+    this.weapon = GetPlayerWeapon(this);
 
     this.tileset = null;
     const worldTileset = imageDictionary["world-tileset"];
@@ -260,7 +286,7 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
     }
 
     opponentSequencer.call(this,specification=>{
-        FistBattleApplicator.call(this,
+        BattleApplicator.call(this,
             [foregroundLayer1,foregroundLayer2,foregroundLayer3],
             specification
         );
@@ -345,9 +371,15 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
         yPixelOffset -= fullHeight / groundHeightFactor;
 
         const baseVerticalShift = 50;
-        const layer1 = getLayerTransformMatrix(Math.pow(depthNormal / 8,0.9),xNormal,xPixelOffset,yPixelOffset,baseVerticalShift);
-        const layer2 = getLayerTransformMatrix(Math.pow(depthNormal / 4,0.7),xNormal,xPixelOffset,yPixelOffset,baseVerticalShift);
-        const layer3 = getLayerTransformMatrix(Math.pow(depthNormal / 2,0.5),xNormal,xPixelOffset,yPixelOffset,baseVerticalShift);
+        const layer1 = getLayerTransformMatrix(
+            Math.pow(depthNormal / 8,0.9),xNormal,xPixelOffset,yPixelOffset,baseVerticalShift
+        );
+        const layer2 = getLayerTransformMatrix(
+            Math.pow(depthNormal / 4,0.7),xNormal,xPixelOffset,yPixelOffset,baseVerticalShift
+        );
+        const layer3 = getLayerTransformMatrix(
+            Math.pow(depthNormal / 2,0.5),xNormal,xPixelOffset,yPixelOffset,baseVerticalShift
+        );
 
         const layer4Scale = layer4[0];
         this.lastOpponentCenterX = layer4[4] + (fullWidth * layer4Scale / 2);
@@ -361,7 +393,7 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
         if(this.backgroundEffects) {
             this.backgroundEffects.render(timestamp,layer4Scale)
         }
-        this.opponent.render(timestamp,showPunchEffect());
+        this.opponent.render(timestamp,showPunchEffect(timestamp));
         if(this.foregroundEffects) {
             this.foregroundEffects.render(timestamp,layer4Scale);
         }
@@ -628,7 +660,7 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
         this.staticBackgroundEffects.render(timestamp);
         renderGround(x,renderY);
 
-        if(showPunchEffect()) {
+        if(showPunchEffect(timestamp)) {
             foregroundXOffset += Math.round(Math.random()*2);
             foregroundYOffset += Math.round(Math.random()*2);
         }

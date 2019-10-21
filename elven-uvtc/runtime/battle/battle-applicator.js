@@ -41,7 +41,7 @@ const bindEndPoints = (target,endPointSpecification) => {
     }
 }
 
-function FistBattleApplicator(layers,specification) {
+function BattleApplicator(layers,specification) {
     function ApplyEffectsList(list,target) {
         if(!list.length) {
             list = [list];
@@ -117,4 +117,4 @@ function FistBattleApplicator(layers,specification) {
     }
     bindEndPoints(this,specification.endPoints);
 }
-export default FistBattleApplicator;
+export default BattleApplicator;

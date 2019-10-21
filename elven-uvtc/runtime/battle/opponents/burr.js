@@ -17,15 +17,6 @@ addOpponent("tutorial-burr",function(applicator,...battleParameters) {
         return message;
     }
 
-    const attack = async damage => {
-        this.opponent.sprite.setSpecialFrame(0);
-        await delay(200);
-        this.opponent.sprite.setSpecialFrame(1);
-        this.damagePlayer(damage);
-        await delay(100);
-        this.opponent.sprite.setSpecialFrame(-1);
-    }
-
     applicator({
         effects: {
             staticBackground: new RotatingBackground("tutorial-place")
@@ -86,7 +77,7 @@ addOpponent("tutorial-burr",function(applicator,...battleParameters) {
                         await this.opponent.say("Man, I'm gonna be feeling this tomorrow.");
                         break;
                 }
-            },
+            }
         }
     });
 });
