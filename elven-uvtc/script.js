@@ -5,6 +5,7 @@ import DragTestRenderer from "./renderers/drag-test.js";
 import FistBattleRenderer from "./renderers/fist-battle.js";
 import WorldRenderer from "./renderers/world.js";
 import "./runtime/battle/opponents/manifest.js";
+import SwapTestRenderer from "./renderers/swap-test.js";
 
 drawLoadingText();
 establishMapLinks();
@@ -20,6 +21,10 @@ function loadCallback() {
         }
     }
     switch(ENV_FLAGS.TEST) {
+        case "swap":
+            firstRendererState = new SwapTestRenderer();
+            break;
+        case "drag":
         case "drag-test":
             firstRendererState = new DragTestRenderer();
             break;

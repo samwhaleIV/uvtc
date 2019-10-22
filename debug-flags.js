@@ -13,8 +13,8 @@ const ENV_FLAGS = {
     STATIC_BACKGROUND: true,
     ENABLE_F_BUTTONS: true,
     //Map test
-    TEST: "battle",
+    TEST: "world",
     DEBUG_BATTLE: "wimpy-red-elf",
     WEAPON_OVERRIDE: "Wimpy",
-    DEBUG_MAP: "bad_dream"
+    DEBUG_MAP: "bedroom_1_oop"
 }
