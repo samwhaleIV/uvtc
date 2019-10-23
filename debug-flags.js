@@ -12,7 +12,7 @@ const ENV_FLAGS = {
     NO_CONTEXT_MENU: false,
     STATIC_BACKGROUND: true,
     ENABLE_F_BUTTONS: true,
-    GLOBAL_CONTEXT_ALPHA: true,
+    GLOBAL_CONTEXT_ALPHA: false,
     //Map test
     TEST: "world",
     DEBUG_BATTLE: "wimpy-red-elf",

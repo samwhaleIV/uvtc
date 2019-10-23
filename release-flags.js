@@ -6,5 +6,5 @@ const ENV_FLAGS = {
     STATIC_BACKGROUND: true,
     NO_CONTEXT_MENU: false,
     ENABLE_F_BUTTONS: true,
-    GLOBAL_CONTEXT_ALPHA: true
+    GLOBAL_CONTEXT_ALPHA: false
 }
