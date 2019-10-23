@@ -24,6 +24,7 @@ import FistBattleRenderer from "./fist-battle.js";
 import Gradient from "./components/gradient.js";
 import MultiLayer from "./components/multi-layer.js";
 import FastStaticWrapper from "./components/fast-static-wrapper.js";
+import CompositeProcessor from "../../../elven-engine/renderers/components/composite-processor.js";
 
 const filmGrainEffect = new FastStaticWrapper(1,()=>{
     const shade = Math.floor(256 * Math.random());
@@ -42,7 +43,7 @@ const ALERT_TIME = 1000;
 const ANIMATION_TILE_COUNT = 5;
 const ANIMATION_CYCLE_DURATION = 400;
 const ANIMATION_FRAME_TIME = ANIMATION_CYCLE_DURATION / ANIMATION_TILE_COUNT;
-const POPUP_TIMEOUT = 300;
+const POPUP_TIMEOUT = 150;
 const NEGATIVE_INFINITY_BUT_NOT_REALLY = -1000000;
 
 const FINAL_CHAPTER_NUMBER = 12;
@@ -1496,6 +1497,7 @@ function WorldRenderer() {
     }
 
     this.postProcessor = new PostProcessor(0.25);
+    this.compositeProcessor = new CompositeProcessor();
 
     this.render = function(timestamp) {
         this.processThreads(timestamp);
@@ -1694,6 +1696,7 @@ function WorldRenderer() {
             }
         }
         this.postProcessor.render();
+        this.compositeProcessor.render();
     }
 }
 export default WorldRenderer;
