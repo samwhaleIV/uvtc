@@ -1,5 +1,3 @@
-import RotatingBackground from "../../../renderers/components/rotating-background.js";
-
 addMap({
     WorldState: function(world) {
         this.load = () => {

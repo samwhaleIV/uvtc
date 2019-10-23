@@ -5,5 +5,6 @@ const ENV_FLAGS = {
     DO_STEAM_SETUP: false,
     STATIC_BACKGROUND: true,
     NO_CONTEXT_MENU: false,
-    ENABLE_F_BUTTONS: true
+    ENABLE_F_BUTTONS: true,
+    GLOBAL_CONTEXT_ALPHA: true
 }

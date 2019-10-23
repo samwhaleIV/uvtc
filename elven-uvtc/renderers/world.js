@@ -24,7 +24,6 @@ import FistBattleRenderer from "./fist-battle.js";
 import Gradient from "./components/gradient.js";
 import MultiLayer from "./components/multi-layer.js";
 import FastStaticWrapper from "./components/fast-static-wrapper.js";
-import CompositeProcessor from "../../../elven-engine/renderers/components/composite-processor.js";
 
 const filmGrainEffect = new FastStaticWrapper(1,()=>{
     const shade = Math.floor(256 * Math.random());
@@ -1159,6 +1158,9 @@ function WorldRenderer() {
         this.playSong(roomSong);
     }
 
+    let cameraXFollowEnabled = true;
+    let cameraYFollowEnabled = true;
+
     let backgroundRenderer = null;
     this.updateMap = function(newMapName,data={}) {
         console.log(`World: Loading '${newMapName}'`);
@@ -1186,6 +1188,8 @@ function WorldRenderer() {
         offscreenObjectCount = 0;
         this.playerObject = null;
         this.followObject = null;
+        cameraXFollowEnabled = true;
+        cameraYFollowEnabled = true;
         this.cameraFrozen = false;
         tileRenderingEnabled = true;
         this.clearCustomRendererStack();
@@ -1232,11 +1236,8 @@ function WorldRenderer() {
 
     let horizontalTiles,     verticalTiles,
         horizontalOffset,    verticalOffset,
-        horizontalTileSize,  verticalTileSize, 
-        halfHorizontalTiles, halfVerticalTiles,
-        halfHorizontalTileSize, halfVerticalTileSize;
-
-    const gradientManifest = {};
+        tileSize,
+        halfHorizontalTiles, halfVerticalTiles;
 
     const maxIntensity = 100;
     
@@ -1256,23 +1257,33 @@ function WorldRenderer() {
         return getColoredStops(0,0,0,intensity);
     }
 
+    const gradientManifest = [
+        getBlackStops(100),
+        getWhiteStops(100),
+        getBlackStops(50),
+        getWhiteStops(50),
+        getBlackStops(25),
+        getWhiteStops(10),
+        getBlackStops(75),
+        getWhiteStops(75),
+        getColoredStops(147,255,255,75),
+        getColoredStops(255,0,0,75),
+        getColoredStops(0,255,0,75),
+        getColoredStops(219,166,105,75),
+        getColoredStops(255,233,0,75),
+        getColoredStops(124,55,255,75),
+        getColoredStops(198,0,151,75),
+        getWhiteStops(10)
+    ];
+    gradientManifest.forEach((stops,index) => {
+        gradientManifest[index] = new Gradient(stops);
+    });
+
     const updateHighDPIGradients = () => {
-        const size = horizontalTileSize * 2;
-        gradientManifest[0] =  new Gradient(getBlackStops(100),size);
-        gradientManifest[1] =  new Gradient(getWhiteStops(100),size);
-        gradientManifest[2] =  new Gradient(getBlackStops(50),size);
-        gradientManifest[3] =  new Gradient(getWhiteStops(50),size);
-        gradientManifest[4] =  new Gradient(getBlackStops(25),size);
-        gradientManifest[5] =  new Gradient(getWhiteStops(25),size);
-        gradientManifest[6] =  new Gradient(getBlackStops(75),size);
-        gradientManifest[7] =  new Gradient(getWhiteStops(75),size);
-        gradientManifest[8] =  new Gradient(getColoredStops(147,255,255,75),size);
-        gradientManifest[9] =  new Gradient(getColoredStops(255,0,0,75),size);
-        gradientManifest[10] = new Gradient(getColoredStops(0,255,0,75),size);
-        gradientManifest[11] = new Gradient(getColoredStops(219,166,105,75),size);
-        gradientManifest[12] = new Gradient(getColoredStops(255,233,0,75),size);
-        gradientManifest[13] = new Gradient(getColoredStops(124,55,255,75),size);
-        gradientManifest[14] = new Gradient(getColoredStops(198,0,151,75),size);
+        const size = tileSize * 2;
+        gradientManifest.forEach(gradient => {
+            gradient.updateSize(size);
+        });
     }
 
     this.refreshWorldTileset = () => {
@@ -1335,12 +1346,19 @@ function WorldRenderer() {
         this.managedFaderTransition(FistBattleRenderer,win,lose,opponent);
     }
 
+    this.getTileSize = () => {
+        return tileSize;
+    }
+
     this.updateSize = function() {
         if(!didStartRenderer) {
             return;
         }
         if(backgroundRenderer && backgroundRenderer.updateSize) {
             backgroundRenderer.updateSize();
+        }
+        if(this.compositeProcessor) {
+            this.compositeProcessor.updateSize();
         }
         let adjustedTileSize = WorldTileSize * this.renderMap.renderScale;
         if(fullWidth < smallScaleSnapPoint) {
@@ -1351,13 +1369,10 @@ function WorldRenderer() {
             adjustedTileSize *= 2.5;
         }
 
-        adjustedTileSize = Math.ceil(adjustedTileSize/16)*16;
+        tileSize = Math.ceil(adjustedTileSize/16)*16;
 
-        horizontalTileSize = adjustedTileSize;
-        verticalTileSize = adjustedTileSize;
-
-        horizontalTiles =  Math.ceil(fullWidth / horizontalTileSize);
-        verticalTiles = Math.ceil(fullHeight / verticalTileSize);
+        horizontalTiles =  Math.ceil(fullWidth / tileSize);
+        verticalTiles = Math.ceil(fullHeight / tileSize);
 
         if(horizontalTiles % 2 === 0) {
             horizontalTiles++;
@@ -1366,14 +1381,11 @@ function WorldRenderer() {
             verticalTiles++;
         }
 
-        horizontalOffset = Math.round(halfWidth - horizontalTiles * horizontalTileSize / 2);
-        verticalOffset = Math.round(halfHeight - verticalTiles * verticalTileSize / 2);
+        horizontalOffset = Math.round(halfWidth - horizontalTiles * tileSize / 2);
+        verticalOffset = Math.round(halfHeight - verticalTiles * tileSize / 2);
         
         halfHorizontalTiles = Math.floor(horizontalTiles / 2);
         halfVerticalTiles = Math.floor(verticalTiles / 2);
-
-        halfHorizontalTileSize = horizontalTileSize / 2;
-        halfVerticalTileSize = verticalTileSize / 2;
 
         if(this.renderMap.fixedCamera) {
             if(verticalTiles < this.renderMap.rows || horizontalTiles < this.renderMap.columns) {
@@ -1450,6 +1462,19 @@ function WorldRenderer() {
     this.fixedCameraOverride = false;
     this.followObject = null;
 
+    this.enableCameraXFollow = () => {
+        cameraXFollowEnabled = true;
+    }
+    this.enableCameraYFollow = () => {
+        cameraYFollowEnabled = true;
+    }
+    this.disableCameraXFollow = () => {
+        cameraXFollowEnabled = false;
+    }
+    this.disableCameraYFollow = () => {
+        cameraYFollowEnabled = false;
+    }
+
     this.updateCamera = function(timestamp,movementLocked) {
         if(this.cameraController) {
             this.cameraController(timestamp);
@@ -1465,10 +1490,14 @@ function WorldRenderer() {
                     followObject.skipRenderLogic = true;
                     followObject.renderLogic(timestamp);
                 }
-                this.camera.x = followObject.x;
-                this.camera.y = followObject.y;
-                this.camera.xOffset = followObject.xOffset;
-                this.camera.yOffset = followObject.yOffset;
+                if(cameraXFollowEnabled) {
+                    this.camera.x = followObject.x;
+                    this.camera.xOffset = followObject.xOffset;
+                }
+                if(cameraYFollowEnabled) {
+                    this.camera.y = followObject.y;
+                    this.camera.yOffset = followObject.yOffset;
+                }
                 if(followObject.isPlayer) {
                     followObject.walkingOverride = movementLocked;
                 }
@@ -1497,7 +1526,7 @@ function WorldRenderer() {
     }
 
     this.postProcessor = new PostProcessor(0.25);
-    this.compositeProcessor = new CompositeProcessor();
+    this.compositeProcessor = null;
 
     this.render = function(timestamp) {
         this.processThreads(timestamp);
@@ -1547,8 +1576,8 @@ function WorldRenderer() {
                 verticalTileCount++;
             }
 
-            const xOffset = horizontalOffset - Math.round(this.camera.xOffset * horizontalTileSize);
-            const yOffset = verticalOffset - Math.round(this.camera.yOffset * verticalTileSize);
+            const xOffset = horizontalOffset - Math.round(this.camera.xOffset * tileSize);
+            const yOffset = verticalOffset - Math.round(this.camera.yOffset * tileSize);
 
             const decalBuffer = [];
             const objectBuffer = [];
@@ -1570,8 +1599,8 @@ function WorldRenderer() {
                         let backgroundValue = this.renderMap.background[mapIndex];
                         let foregroundValue = this.renderMap.foreground[mapIndex];
         
-                        const xDestination = xOffset + x * horizontalTileSize;
-                        const yDestination = yOffset + y * verticalTileSize;
+                        const xDestination = xOffset + x * tileSize;
+                        const yDestination = yOffset + y * tileSize;
 
                         if(backgroundValue >= WorldTextureAnimationStart) {
                             backgroundValue += animationTileOffset;
@@ -1586,7 +1615,7 @@ function WorldRenderer() {
                             context.drawImage(
                                 tileset,
                                 textureX,textureY,WorldTextureSize,WorldTextureSize,
-                                xDestination,yDestination,horizontalTileSize,verticalTileSize
+                                xDestination,yDestination,tileSize,tileSize
                             );
                         }
                         if(foregroundValue > 0) {
@@ -1595,7 +1624,7 @@ function WorldRenderer() {
                             context.drawImage(
                                 tileset,
                                 textureX,textureY,WorldTextureSize,WorldTextureSize,
-                                xDestination,yDestination,horizontalTileSize,verticalTileSize
+                                xDestination,yDestination,tileSize,tileSize
                             );
                         }
 
@@ -1627,8 +1656,8 @@ function WorldRenderer() {
             let i = 0;
             while(i < offscreenObjectCount) {
                 const object = offscreenObjects[i];
-                const xDestination = (object.x - adjustedXPos) * horizontalTileSize + xOffset;
-                const yDestination = (object.y - adjustedYPos) * verticalTileSize + yOffset;
+                const xDestination = (object.x - adjustedXPos) * tileSize + xOffset;
+                const yDestination = (object.y - adjustedYPos) * tileSize + yOffset;
                 objectBuffer.push(
                     object,xDestination,yDestination,
                 );
@@ -1640,8 +1669,8 @@ function WorldRenderer() {
                     timestamp,
                     decalBuffer[i+1],
                     decalBuffer[i+2],
-                    horizontalTileSize,
-                    verticalTileSize
+                    tileSize,
+                    tileSize
                 );
                 i += 3;
             }
@@ -1651,8 +1680,8 @@ function WorldRenderer() {
                     timestamp,
                     objectBuffer[i+1],
                     objectBuffer[i+2],
-                    horizontalTileSize,
-                    verticalTileSize
+                    tileSize,
+                    tileSize
                 );
                 i += 3;
             }
@@ -1666,7 +1695,6 @@ function WorldRenderer() {
                     i += 3;
                 }
             }
-
         } else {
             if(backgroundRenderer) {
                 backgroundRenderer.render(timestamp);
@@ -1674,6 +1702,10 @@ function WorldRenderer() {
                 context.fillStyle = "black";
                 context.fillRect(0,0,fullWidth,fullHeight);
             }
+        }
+        this.postProcessor.render();
+        if(this.compositeProcessor) {
+            this.compositeProcessor.render();
         }
         if(objectiveHUD) {
             objectiveHUD.render(timestamp);
@@ -1695,8 +1727,6 @@ function WorldRenderer() {
                 alert = null;
             }
         }
-        this.postProcessor.render();
-        this.compositeProcessor.render();
     }
 }
 export default WorldRenderer;
