@@ -1190,6 +1190,7 @@ function WorldRenderer() {
         cameraXFollowEnabled = true;
         cameraYFollowEnabled = true;
         this.cameraFrozen = false;
+        this.compositeProcessor = null;
         tileRenderingEnabled = true;
         this.clearCustomRendererStack();
         this.map = newMap.WorldState ? new newMap.WorldState(this,data):{};

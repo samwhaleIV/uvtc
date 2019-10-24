@@ -3,9 +3,7 @@ import {GetSwampReflector, SwampBackgroundFX } from "../../../renderers/componen
 addMap({
     WorldState: function(world) {
         this.load = () => {
-            world.addPlayer(24,11,"up");
-            world.disableCameraYFollow();
-            world.camera.y = 8;
+            world.addPlayer(72,43,"left");
             world.playerObject.forcedStartPosition = true;
             world.playerObject.offscreenRendering = true;
             world.compositeProcessor = GetSwampReflector(
@@ -17,5 +15,5 @@ addMap({
     fxBackground: SwampBackgroundFX,
     useCameraPadding: true,
     renderScale: 0.75,
-    name: "bear_burrow"
+    name: "my_swamp"
 });

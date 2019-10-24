@@ -2,6 +2,7 @@ import "./chapter_2/chili_house.js";
 import "./chapter_2/north_pole_preview.js";
 import "./chapter_2/tumble_showdown.js";
 import "./chapter_4/bear_burrow.js";
+import "./chapter_4/my_swamp.js";
 import "./other/missing_map.js";
 import "./other/other_world.js";
 import "./tumble_woods/house_1.js";
