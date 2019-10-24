@@ -21,7 +21,6 @@ import ObjectiveHUD from "./components/world/objective-hud.js";
 import BoxFaderEffect from "./components/box-fader-effect.js";
 import ApplyTimeoutManager from "./components/inline-timeout.js";
 import FistBattleRenderer from "./fist-battle.js";
-import Gradient from "./components/gradient.js";
 import MultiLayer from "./components/multi-layer.js";
 import FastStaticWrapper from "./components/fast-static-wrapper.js";
 
@@ -1257,6 +1256,23 @@ function WorldRenderer() {
         return getColoredStops(0,0,0,intensity);
     }
 
+    const gradientBufferCanvas = new OffscreenCanvas(0,0);
+    const gradientBufferContext = gradientBufferCanvas.getContext(
+        "2d",{alpha:true}
+    );
+
+    let gradientSize = null;
+    let gradientQuarterSize = null;
+    const renderGradient = function(x,y) {
+        context.drawImage(
+            this.image,0,0,
+            gradientSize,gradientSize,
+            x-gradientQuarterSize,
+            y-gradientQuarterSize,
+            gradientSize,gradientSize
+        );
+    }
+
     const gradientManifest = [
         getBlackStops(100),
         getWhiteStops(100),
@@ -1276,14 +1292,42 @@ function WorldRenderer() {
         getWhiteStops(10)
     ];
     gradientManifest.forEach((stops,index) => {
-        gradientManifest[index] = new Gradient(stops);
+        gradientManifest[index] = {
+            stops: stops,
+            image: null,
+            render: null
+        }
     });
 
     const updateHighDPIGradients = () => {
         const size = tileSize * 2;
+        const halfSize = tileSize;
+
+        gradientBufferCanvas.width = size;
+        gradientBufferCanvas.height = size;
+
         gradientManifest.forEach(gradient => {
-            gradient.updateSize(size);
+            if(gradient.image) {
+                gradient.image.close();
+            }
+            gradientBufferContext.clearRect(
+                0,0,size,size
+            );
+            const radialGradient = gradientBufferContext.createRadialGradient(
+                halfSize,halfSize,0,halfSize,halfSize,halfSize
+            );
+            gradient.stops.forEach(stop=>{
+                radialGradient.addColorStop(stop[1],stop[0]);
+            });
+            gradientBufferContext.fillStyle = radialGradient;
+            gradientBufferContext.fillRect(0,0,size,size);
+
+            gradient.image = gradientBufferCanvas.transferToImageBitmap();
+            gradient.render = renderGradient.bind(gradient);
         });
+
+        gradientSize = size;
+        gradientQuarterSize = gradientSize / 4;
     }
 
     this.refreshWorldTileset = () => {
