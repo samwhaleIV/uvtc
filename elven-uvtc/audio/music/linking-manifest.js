@@ -32,7 +32,6 @@ const SongsWithIntros = [
 	"tumble_town",
 	"tavern",
     "TreeCo",
-    "elf_march",
     "elf_intro_theme",
     "wimpy",
     "training_room",
