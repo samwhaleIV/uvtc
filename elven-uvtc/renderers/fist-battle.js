@@ -206,7 +206,9 @@ function FistBattleRenderer(winCallback,loseCallback,opponentSequencer) {
 
     const updateLives = isPlayer => {
         let l1 = true, l2 = true, l3 = true;
-        switch(opponentLives) {
+        switch(
+            isPlayer ? playerLives : opponentLives
+        ) {
             default:
             case 3: l3 = false;
             case 2: l2 = false;

@@ -331,9 +331,16 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
     }
 
     let specialRow = null;
-    let lastSpecialFrame
+    let lastSpecialFrame;
 
     this.setSpecialFrame = function(frameID) {
+        if(frameID < 0) {
+            this.updateDirection(
+                this.direction
+            );
+            specialRow = null;
+            return;
+        }
         currentColumn = 4 * columnWidth + Math.floor(frameID / 4);
         specialRow = (frameID % 4) * rowHeight;
         lastSpecialFrame = frameID;

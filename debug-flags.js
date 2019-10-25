@@ -14,8 +14,8 @@ const ENV_FLAGS = {
     ENABLE_F_BUTTONS: true,
     GLOBAL_CONTEXT_ALPHA: false,
     //Map test
-    TEST: "world",
-    DEBUG_BATTLE: "wimpy-red-elf",
+    TEST: "battle",
+    DEBUG_BATTLE: "wimpy-green-elf",
     WEAPON_OVERRIDE: "Wimpy",
     DEBUG_MAP: "bear_burrow"
 }
