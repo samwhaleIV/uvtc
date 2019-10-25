@@ -1,4 +1,4 @@
-import {GetSwampReflector, SwampBackgroundFX } from "../../../renderers/components/world/swamp-reflection.js";
+import {GetScrollableSwampReflector, SwampBackgroundFX } from "../../../renderers/components/world/swamp-reflection.js";
 
 addMap({
     WorldState: function(world) {
@@ -6,8 +6,8 @@ addMap({
             world.addPlayer(72,43,"left");
             world.playerObject.forcedStartPosition = true;
             world.playerObject.offscreenRendering = true;
-            world.compositeProcessor = GetSwampReflector(
-                world,null,null,3
+            world.compositeProcessor = GetScrollableSwampReflector(
+                world,null,null,-0.5
             );
             world.compositeProcessor.enable();
         }

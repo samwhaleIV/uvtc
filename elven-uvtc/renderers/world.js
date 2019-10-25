@@ -1300,6 +1300,15 @@ function WorldRenderer() {
         }
     });
 
+    gradientManifest.push({
+        custom: true,
+        render: (x,y) => {
+            if(this.compositeProcessor && this.compositeProcessor.queueRegion) {
+                this.compositeProcessor.addReflection(x,y,tileSize);
+            }
+        }
+    });
+
     const updateHighDPIGradients = () => {
         const size = tileSize * 2;
         const halfSize = tileSize;
@@ -1308,6 +1317,9 @@ function WorldRenderer() {
         gradientBufferCanvas.height = size;
 
         gradientManifest.forEach(gradient => {
+            if(gradient.custom) {
+                return;
+            }
             if(gradient.image) {
                 gradient.image.close();
             }
