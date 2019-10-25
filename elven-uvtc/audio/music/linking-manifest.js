@@ -38,6 +38,13 @@ const SongsWithIntros = [
     "Dark_TumbleTown",
     "misc_fight_song"
 ];
+//If the song uses 'fancy' intro encoding, don't put it in the songsWithIntros list
+const SongsWithTheNewFancyIntroEncoding = {
+    "an-example-song": {
+        loopLength: 10000,
+        switchZoneLength: 20000
+    }
+};
 const BattleMusicLinkingManifest = {
     "tutorial-burr": "training_room",
     "wimpy-red-elf": "wimpy_wimpy",
@@ -112,4 +119,7 @@ const MusicLinkingManifest = {
 const SONG_INTRO_LOOKUP = {};
 SongsWithIntros.forEach(song => {
     SONG_INTRO_LOOKUP[song] = song + MUSIC_INTRO_SUFFIX;
+});
+Object.entries(SongsWithTheNewFancyIntroEncoding).forEach(entry => {
+    entry[1].introName = entry[0] + MUSIC_INTRO_SUFFIX;
 });

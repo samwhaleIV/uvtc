@@ -1134,7 +1134,18 @@ function WorldRenderer() {
                         songIntro = intro;
                         playMusicWithIntro(songName,intro);
                     } else {
-                        playMusic(songName);
+                        const fancyEncodingData = SongsWithTheNewFancyIntroEncoding[songName];
+                        if(fancyEncodingData) {
+                            const introName = songName + MUSIC_INTRO_SUFFIX;
+                            generateIntroFromBuffer(
+                                songName,fancyEncodingData.introName,
+                                fancyEncodingData.loopLength,
+                                fancyEncodingData.switchZoneLength
+                            );
+                            playMusicWithIntro(songName,introName);
+                        } else {
+                            playMusic(songName);
+                        }
                     }
                     fadeIn();
                 }

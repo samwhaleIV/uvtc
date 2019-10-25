@@ -13,7 +13,7 @@ establishMapLinks();
 
 function loadCallback() {
     BitmapText.verifyBitmap();
-    let firstRendererState;
+    let firstRendererState, parameters = [];
     if(ENV_FLAGS.TEST === "auto") {
         if(ENV_FLAGS.DEBUG_MAP) {
             ENV_FLAGS.TEST = "world";
@@ -23,14 +23,14 @@ function loadCallback() {
     }
     switch(ENV_FLAGS.TEST) {
         case "grade":
-            firstRendererState = new GradeTestRenderer()
+            firstRendererState = GradeTestRenderer;
             break;
         case "swap":
-            firstRendererState = new SwapTestRenderer();
+            firstRendererState = SwapTestRenderer;
             break;
         case "drag":
         case "drag-test":
-            firstRendererState = new DragTestRenderer();
+            firstRendererState = DragTestRenderer;
             break;
         case "fisting":
         case "battle":
@@ -39,77 +39,51 @@ function loadCallback() {
             if(!testBattle) {
                 testBattle = "wimpy-red-elf";
             }
-            firstRendererState = new FistBattleRenderer(
-                ()=>alert("Player won!"),()=>alert("Opponent won!"),getOpponent(testBattle)
-            );
+            firstRendererState = FistBattleRenderer;
+            parameters.push(()=>alert("Player won!"),()=>alert("Opponent won!"),getOpponent(testBattle));
             break;
         case "world":
             if(!ENV_FLAGS.DEBUG_MAP) {
                 ENV_FLAGS.DEBUG_MAP = FALLBACK_MAP_ID;
             }
-            firstRendererState = new WorldRenderer();
+            firstRendererState = WorldRenderer;
             break;
         case "none":
         default:
-            firstRendererState = new MainMenuRenderer();
+            firstRendererState = MainMenuRenderer;
             break;
     }
-    setRendererState(firstRendererState);
-    if(rendererState.customLoader) {
-        rendererState.updateSize();
-        startRenderer();
-        pauseRenderer();
-        drawLoadingText();
-        rendererState.customLoader(()=>{
-            resumeRenderer();
-            if(rendererState.faderCompleted) {
-                rendererState.faderCompleted();
-            }
-            rendererState.updateSize();
-        });
-    } else {
-        const loadCallback = () => {
-            startRenderer();
-            if(rendererState.faderCompleted) {
-                rendererState.faderCompleted();
-            }
-            if(rendererState.song) {
-                if(rendererState.songIntro) {
-                    playMusicWithIntro(rendererState.song,rendererState.songIntro)
-                } else {
-                    playMusic(rendererState.song);
-                }
+    setRendererState({render:function(){drawLoadingText()}});
+    startRenderer();
+    setFaderEffectsRenderer({render:function(){}});
+    rendererState.fader.fadeOut(firstRendererState,...parameters);
+    rendererState.fader.didSetRendererState = () => {
+        if(rendererState.song && !rendererState.songIntro) {
+            const fancyEncodingData = SongsWithTheNewFancyIntroEncoding[
+                rendererState.song
+            ];
+            if(fancyEncodingData) {
+                rendererState.fancyEncodingData = fancyEncodingData;
             }
         }
-        let loadedSong = true;
-        let loadedIntro = true;
-        if(rendererState.song) {
-            if(!audioBuffers[rendererState.song] && !failedBuffers[rendererState.song]) {
-                loadSongOnDemand(rendererState.song);
-                loadedSong = false;
-            }
+        let oldFaderComplete = null;
+        if(rendererState.faderCompleted) {
+            oldFaderComplete = rendererState.faderCompleted.bind(rendererState);
         }
-        if(rendererState.songIntro) {
-            if(!audioBuffers[rendererState.songIntro] && !failedBuffers[rendererState.songIntro]) {
-                loadSongOnDemand(rendererState.songIntro);
-                loadedIntro = false;
+        rendererState.faderCompleted = () => {
+            if(oldFaderComplete) {
+                oldFaderComplete();
             }
-        }
-        if(loadedSong && loadedIntro) {
-            loadCallback();
-        } else {
-            audioBufferAddedCallback = function(name) {
-                if(name === rendererState.song) {
-                    loadedSong = true;
-                }
-                if(name === rendererState.songIntro) {
-                    loadedIntro = true;
-                }
-                if(loadedSong && loadedIntro) {
-                    audioBufferAddedCallback = null;
-                    loadCallback();
-                }
+            if(ENV_FLAGS.FAST_AS_FUCK_TRANSITIONS) {
+                setFaderDelay(60);
+                setFaderDuration(60);
+                setMusicFadeDuration(60);
+            } else {
+                setFaderDelay(600);
+                setFaderDuration(1700);
+                setMusicFadeDuration(1000);
             }
+            setFaderEffectsRenderer(new BoxFaderEffect());
         }
     }
 }
@@ -133,14 +107,7 @@ SoundManager.loadNonEssentialSounds();
     }
 })();
 restoreVolumeChanges();
-setFaderEffectsRenderer(new BoxFaderEffect());
 
-if(ENV_FLAGS.FAST_AS_FUCK_TRANSITIONS) {
-    setFaderDelay(60);
-    setFaderDuration(60);
-    setMusicFadeDuration(60);
-} else {
-    setFaderDelay(600);
-    setFaderDuration(1700);
-    setMusicFadeDuration(1000);
-}
+setFaderDelay(0);
+setFaderDuration(musicFaderSafetyBuffer);
+setMusicFadeDuration(0);
