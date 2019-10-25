@@ -41,15 +41,15 @@ const SongsWithIntros = [
 //If the song uses 'fancy' intro encoding, don't put it in the songsWithIntros list
 const SongsWithTheNewFancyIntroEncoding = {
     "an-example-song": {
-        loopLength: 10000,
-        switchZoneLength: 20000
+        introLength: 309760,
+        switchZoneLength: 201728
     }
 };
 const BattleMusicLinkingManifest = {
     "tutorial-burr": "training_room",
     "wimpy-red-elf": "wimpy_wimpy",
     "wimpy-green-elf": "wimpy_wimpy",
-    "debug-battle": "misc_fight_song"
+    "debug-battle": "an-example-song"
 };
 const ScriptedSongLinkingManifest = {
     "oops-wrong-song": "hero",

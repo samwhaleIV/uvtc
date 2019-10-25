@@ -1139,7 +1139,7 @@ function WorldRenderer() {
                             const introName = songName + MUSIC_INTRO_SUFFIX;
                             generateIntroFromBuffer(
                                 songName,fancyEncodingData.introName,
-                                fancyEncodingData.loopLength,
+                                fancyEncodingData.introLength,
                                 fancyEncodingData.switchZoneLength
                             );
                             playMusicWithIntro(songName,introName);

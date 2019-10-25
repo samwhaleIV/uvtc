@@ -15,7 +15,7 @@ const ENV_FLAGS = {
     GLOBAL_CONTEXT_ALPHA: false,
     //Map test
     TEST: "battle",
-    DEBUG_BATTLE: "wimpy-green-elf",
+    DEBUG_BATTLE: "debug-battle",
     WEAPON_OVERRIDE: "Wimpy",
     DEBUG_MAP: "bear_burrow"
 }
