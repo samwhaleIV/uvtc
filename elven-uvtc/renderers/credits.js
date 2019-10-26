@@ -17,6 +17,7 @@ function CreditsRenderer() {
 
     this.song = "pos_loop";
     this.noPixelScale = true;
+    this.disableAdaptiveFill = true;
 
     let reachedEnd = false;
 

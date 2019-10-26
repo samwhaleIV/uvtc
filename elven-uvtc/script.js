@@ -53,7 +53,13 @@ function loadCallback() {
             firstRendererState = MainMenuRenderer;
             break;
     }
-    setRendererState({render:function(){drawLoadingText()}});
+    setRendererState({
+        noPixelScale: true,
+        disableAdaptiveFill: true,
+        render: function(){
+            drawLoadingText()
+        }
+    });
     startRenderer();
     setFaderEffectsRenderer({render:function(){}});
     rendererState.fader.fadeOut(firstRendererState,...parameters);
