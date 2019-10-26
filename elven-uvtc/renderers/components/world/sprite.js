@@ -14,6 +14,9 @@ const CONVOY_ALIGNMENT = 1;
 
 const SPRITE_ALERT_TIMEOUT = 500;
 
+const STAIR_HEIGHT = 0.75;
+const ELEVATION_TILE = 28;
+
 function convoyRenderSort(a,b) {
     return a.y - b.y;
 }
@@ -264,6 +267,63 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
     }
 
     this.firstPosition = true;
+
+    function lerp(v0, v1, t) {
+        return v0*(1-t)+v1*t
+    }
+    const getStairVerticalOffset = () => {
+        //This code is x and y redundant. For the love of god refactor it when you get a chance.
+        const trueX = this.x + this.xOffset;
+        const trueY = this.y + this.yOffset;
+
+        const lerpXStart = Math.floor(trueX);
+        const lerpXEnd = Math.ceil(trueX);
+        const lerpYStart = Math.floor(trueY);
+        const lerpYEnd = Math.ceil(trueY);
+
+        let leftOffsetValue = this.world.getCollisionTile(lerpXStart,this.y);
+        let rightOffsetValue = this.world.getCollisionTile(lerpXEnd,this.y);
+        let upOffsetValue = this.world.getCollisionTile(this.x,lerpYStart);
+        let downOffsetValue = this.world.getCollisionTile(this.x,lerpYEnd);
+
+        if(leftOffsetValue !== ELEVATION_TILE) {
+            leftOffsetValue = 0;
+        } else {
+            leftOffsetValue = -STAIR_HEIGHT;
+        }
+        if(rightOffsetValue !== ELEVATION_TILE) {
+            rightOffsetValue = 0;
+        } else {
+            rightOffsetValue = -STAIR_HEIGHT;
+        }
+        if(upOffsetValue !== ELEVATION_TILE) {
+            upOffsetValue = 0;
+        } else {
+            upOffsetValue = -STAIR_HEIGHT;
+        }
+        if(downOffsetValue !== ELEVATION_TILE) {
+            downOffsetValue = 0;
+        } else {
+            downOffsetValue = -STAIR_HEIGHT;
+        }
+        let offset = 0;
+
+        if(this.xOffset >= 0) {
+            offset = lerp(leftOffsetValue,rightOffsetValue,this.xOffset);
+        } else {
+            offset = lerp(rightOffsetValue,leftOffsetValue,-this.xOffset);
+        }
+        
+        if(downOffsetValue !== upOffsetValue) {
+            if(this.yOffset > 0) {
+                offset = lerp(upOffsetValue,downOffsetValue,this.yOffset);
+            } else {
+                offset = lerp(downOffsetValue,upOffsetValue,-this.yOffset);
+            }
+        }
+        return offset;
+    }
+
     this.worldPositionUpdated = function(oldX,oldY,newX,newY,world,initial) {
         if(!initial) {
             const decalSourceX = this.direction === "up" || this.direction === "down" ? 0 : footstepWidth;
@@ -486,6 +546,7 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         if(this.hidden) {
             return;
         }
+        y += height * getStairVerticalOffset();
         if(convoyCount) {
             renderConvoy(timestamp,x,y,width,height);
         } else {

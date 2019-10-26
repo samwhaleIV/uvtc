@@ -49,6 +49,8 @@ const CHAPTER_COMPLETE_SOUND_SOUND_BY_DEFAULT = false;
 
 const TILESET_NAME = "world-tileset";
 
+const SPECIAL_COLLISION_START = 28;
+
 function WorldRenderer() {
 
     const activeChapter = GlobalState.data.activeChapter;
@@ -741,7 +743,9 @@ function WorldRenderer() {
                 collisionState.object = null;
             }
         }
-        return collisionState.map >= 1 || collisionState.object ? true : false;
+        const collidesWithTile = collisionState.map >= 1 && collisionState.map < SPECIAL_COLLISION_START;
+        const hasObject = collisionState.object ? true : false;
+        return collidesWithTile || hasObject;
     }
 
     let tileset = imageDictionary[TILESET_NAME];
@@ -1037,11 +1041,13 @@ function WorldRenderer() {
         this.decals[decal.x][decal.y] = null;
     }
 
-    const getIdx = (x,y) => x + y * this.renderMap.columns;
-
-    const getLayer = (layer,x,y) => {
-        return layer[getIdx[x,y]];
+    const getIdx = (x,y) => {
+        return x + y * this.renderMap.columns;
     }
+    const getLayer = (layer,x,y) => {
+        return layer[getIdx(x,y)];
+    }
+
     const changeLayer = (layer,value,x,y) => {
         layer[getIdx(x,y)] = value;
     }
@@ -1063,10 +1069,18 @@ function WorldRenderer() {
         }
     }
 
-    this.getCollisionTile = (x,y) =>  getLayer(this.renderMap.collision,x,y);
-    this.getForegroundTile = (x,y) => getLayer(this.renderMap.foreground,x,y);
-    this.getBackgroundTile = (x,y) => getLayer(this.renderMap.background,x,y);
-    this.getLightingTile = (x,y) =>   getLayer(lightingLayerFilter(),x,y);
+    this.getCollisionTile = (x,y) => {
+        return getLayer(this.renderMap.collision,x,y);
+    }
+    this.getForegroundTile = (x,y) => {
+        return getLayer(this.renderMap.foreground,x,y);
+    }
+    this.getBackgroundTile = (x,y) => {
+        return getLayer(this.renderMap.background,x,y);
+    }
+    this.getLightingTile = (x,y) => {
+        return getLayer(lightingLayerFilter(),x,y);
+    }
 
     this.setCollisionTile =  (value,x,y) => changeLayer(this.renderMap.collision,value,x,y);
     this.setForegroundTile = (value,x,y) => changeLayer(this.renderMap.foreground,value,x,y);
