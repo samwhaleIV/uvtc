@@ -17,9 +17,9 @@ const SPRITE_ALERT_TIMEOUT = 500;
 const STAIR_HEIGHT = 0.75;
 const ELEVATION_TILE = 28;
 
-function convoyRenderSort(a,b) {
+const CONVOY_RENDER_SORT = (a,b) => {
     return a.y - b.y;
-}
+};
 
 function ElfRenderer(startDirection,spriteName) {
     SpriteRenderer.call(this,startDirection,spriteName,ELF_WIDTH,ELF_HEIGHT);
@@ -98,6 +98,11 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
 
     const convoy = [];
     let convoyCount = 0;
+
+    let lastX = null;
+    let lastY = null;
+    this.firstPosition = true;
+
     const convoyAdd = object => {
         convoy.push(object);
         object.x = 0;
@@ -106,6 +111,10 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         object.yOffset = 0;
         object.lastRenderX = -100;
         object.lastRenderY = -100;
+        object.convoyMember = true;
+        if(this.world) {
+            this.object.world = this.world;
+        }
         convoyCount++;
     }
     this.convoyAdd = (...objects) => objects.forEach(convoyAdd);
@@ -117,11 +126,13 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
             convoyPath.splice(0,convoyPathCount);
             convoyPathCount = 0;
         }
+        removed.convoyMember = false;
         return removed;
     }
 
     this.convoyRemoveFirst = () => modifyConvoy("shift");
     this.convoyRemoveLast = () => modifyConvoy("pop");
+
     Object.defineProperty(this,"convoyLength",{
         get: function() {
             return convoy.length;
@@ -172,9 +183,6 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         const finalPath = convoyPath[convoyPath.length-1];
         return finalPath;
     }
-    
-    let lastX = null;
-    let lastY = null;
     const renderConvoy = (timestamp,x,y,width,height) => {
         const calculatedX = this.x + this.xOffset;
         const calculatedY = this.y + this.yOffset;
@@ -244,7 +252,7 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
             convoyIndex++;
         }
         const renderStackSize = renderStack.length;
-        renderStack.sort(convoyRenderSort);
+        renderStack.sort(CONVOY_RENDER_SORT);
         let i = 0;
         let renderedSelf = false;
         const renderY = Math.round(y+this.yOffset*height);
@@ -265,16 +273,8 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
             this.renderSelf(x,y,width,height);
         }
     }
-
-    this.firstPosition = true;
-
-    function lerp(v0, v1, t) {
-        return v0*(1-t)+v1*t
-    }
-    const getStairVerticalOffset = () => {
+    const getStairVerticalOffset = (trueX,trueY) => {
         //This code is x and y redundant. For the love of god refactor it when you get a chance.
-        const trueX = this.x + this.xOffset;
-        const trueY = this.y + this.yOffset;
 
         const lerpXStart = Math.floor(trueX);
         const lerpXEnd = Math.ceil(trueX);
@@ -491,6 +491,7 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
     let startX, startY, recentTimestamp;
     if(customSize) {
         this.renderSelf = function(x,y,width,height) {
+
             let renderWidth = width * worldScaleTranslation;
             let renderHeight = customWidthRatio * renderWidth;
 
@@ -546,10 +547,18 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         if(this.hidden) {
             return;
         }
-        y += height * getStairVerticalOffset();
         if(convoyCount) {
             renderConvoy(timestamp,x,y,width,height);
         } else {
+            const trueX = this.x + this.xOffset;
+            const trueY = this.y + this.yOffset;
+            if(this.world && !this.convoyMember && !this.world.outOfBounds(
+                trueX,trueY
+            )) {
+                y += height * getStairVerticalOffset(
+                    trueX,trueY
+                );
+            }
             this.renderSelf(x,y,width,height);
         }
     }

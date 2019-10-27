@@ -53,6 +53,7 @@ function loadCallback() {
             firstRendererState = MainMenuRenderer;
             break;
     }
+    const boxFaderEffect = new BoxFaderEffect();
     setRendererState({
         noPixelScale: true,
         disableAdaptiveFill: true,
@@ -89,7 +90,7 @@ function loadCallback() {
                 setFaderDuration(1700);
                 setMusicFadeDuration(1000);
             }
-            setFaderEffectsRenderer(new BoxFaderEffect());
+            setFaderEffectsRenderer(boxFaderEffect);
         }
     }
 }
