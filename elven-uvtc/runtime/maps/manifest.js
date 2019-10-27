@@ -4,6 +4,7 @@ import "./chapter_2/tumble_showdown.js";
 import "./chapter_4/bear_burrow.js";
 import "./chapter_4/my_swamp.js";
 import "./chapter_4/swamp_manor.js";
+import "./other/bad_dream_2.js";
 import "./other/missing_map.js";
 import "./other/other_world.js";
 import "./other/stair_test.js";

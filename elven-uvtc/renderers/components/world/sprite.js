@@ -24,11 +24,13 @@ const CONVOY_RENDER_SORT = (a,b) => {
 function ElfRenderer(startDirection,spriteName) {
     SpriteRenderer.call(this,startDirection,spriteName,ELF_WIDTH,ELF_HEIGHT);
 }
-function PlayerRenderer(startDirection,isFakePlayer=false) {
+function PlayerRenderer(startDirection,isFakePlayer=false,customSprite) {
     if(ENV_FLAGS.ELF_PLAYER_HACK) {
         ElfRenderer.call(this,startDirection,ELF_HACK_SPRITE);
     } else {
-        SpriteRenderer.call(this,startDirection,PLAYER_SPRITE_NAME);
+        SpriteRenderer.call(
+            this,startDirection,customSprite ? customSprite : PLAYER_SPRITE_NAME
+        );
     }
     if(!isFakePlayer && ENV_FLAGS.DEBUG_PLAYER_CONVOY) {
         this.convoyAdd(
@@ -38,6 +40,7 @@ function PlayerRenderer(startDirection,isFakePlayer=false) {
         );
     }
     this.isPlayer = isFakePlayer ? false : true;
+    this.tilesPerSecond = 5;
 }
 function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumnHeight) {
     const sprite = imageDictionary[`sprites/${spriteName}`];

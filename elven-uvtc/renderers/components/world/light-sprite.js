@@ -1,9 +1,8 @@
 function LightSprite(lightID,lightTable) {
-    let currentLightID = lightID;
+    let currentLightID = lightID - 1;
     this.setLightID = lightID => {
-        currentLightID = lightID;
+        currentLightID = lightID - 1;
     }
-    setTextureCoordinates();
     Object.defineProperty(this,"lightID",{get:function(){
         return currentLightID;
     }});

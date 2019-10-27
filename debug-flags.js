@@ -17,5 +17,5 @@ const ENV_FLAGS = {
     TEST: "world",
     DEBUG_BATTLE: "debug-battle",
     WEAPON_OVERRIDE: "Wimpy",
-    DEBUG_MAP: "swamp_manor"
+    DEBUG_MAP: "bad_dream_2"
 }

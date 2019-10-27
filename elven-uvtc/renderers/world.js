@@ -1008,7 +1008,7 @@ function WorldRenderer() {
             }
         }
 
-        if(lightingLayerActive) {
+        if(lightingLayerActive || this.renderMap.usesLightSprites) {
             refreshLightTable(tileSize);
         }
     }

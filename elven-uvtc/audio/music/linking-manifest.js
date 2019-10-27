@@ -60,6 +60,9 @@ const MusicLinkingManifest = {
     "bad_dream": {
         song: "Dark_TumbleTown"
     },
+    "bad_dream_2": {
+        song: "Dark_TumbleTown"
+    },
     "tumble_showdown": {
         song: ScriptedSongLinkingManifest["lights-off-meet-elves"]
     },
