@@ -207,13 +207,21 @@ function ControlsPaneRenderer(callback,parent) {
         context.fillText(bottomText,buttonCenterX,buttonCenterY+2);
     }
 
+    const couldNotExit = reason => {
+        prompt = new UIPrompt(reason,{
+            text: "Okay",
+            callback: () => prompt = null
+        });
+        prompt.show();
+    }
+
     const exit = () => {
         if(!backButton.keyName) {
-            prompt = new UIPrompt("You must have a configured back button!",{
-                text: "Okay",
-                callback: () => prompt = null
-            });
-            prompt.show();
+            couldNotExit("You must have a configured back button!");
+            return;
+        }
+        if(!acceptButton.keyName) {
+            couldNotExit("You must have a configured accept button!");
             return;
         }
         if(callback) {
