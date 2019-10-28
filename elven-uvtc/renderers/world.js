@@ -312,12 +312,12 @@ function WorldRenderer() {
             x:x,y:y,width:width,height:height
         }
     }
-    this.unlockMove = moveName => {
+    this.unlockSlot = moveName => {
         return new Promise(async resolve => {
             const alreadyHasMove = this.movesManager.hasMove(moveName);
             const move = Moves[moveName];
             if(!alreadyHasMove) {
-                this.movesManager.unlockSlot(moveName);
+                this.movesManager.unlockMove(moveName);
             }
             const movePreviewID = this.addCustomRenderer(
                 new MovePreview(moveName,this.getItemPreviewBounds,false)
