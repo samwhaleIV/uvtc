@@ -59,7 +59,7 @@ addMap({
                         await world.showNamedPopup("Yeah, it's kind of weird.","ȹOther Tree:ȹ ");
                         await world.showNamedPopup("Hey, don't judge the dude, I like the company.","ȹOther Other Tree:ȹ ");
                         await world.showNamedPopup(applesMessage,"ȹOther Other Other Tree:ȹ ");
-                        await world.showNamedPopup("This is why we don't invite you place, ȹOther Other Other Tree...ȹ","ȹTree:ȹ ");
+                        await world.showNamedPopup("This is why we don't invite you places, ȹOther Other Other Tree...ȹ","ȹTree:ȹ ");
                         world.globalState.talkedToStoreTrees = true;
                     } else {
                         await world.showNamedPopup(applesMessage,"ȹOther Other Other Tree:ȹ ");

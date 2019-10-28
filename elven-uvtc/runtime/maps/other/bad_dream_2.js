@@ -36,6 +36,7 @@ addMap({
             world.playerObject.offscreenRendering = true;
             world.playerObject.forcedStartPosition = true;
             world.playerObject.tilesPerSecond = 1;
+            world.playerObject.animationFrameTime *= 2;
 
             player = world.playerObject;
 

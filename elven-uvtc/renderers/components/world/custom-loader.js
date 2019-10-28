@@ -35,9 +35,9 @@ function CustomWorldLoader() {
             }
             if(lp) {
                 return () => {
-                    if(internalPlayerObject && !internalPlayerObject.forcedStartPosition) {
-                        this.moveObject(internalPlayerObject.ID,lp.x,lp.y,true);
-                        internalPlayerObject.updateDirection(lp.d);
+                    if(this.internalPlayerObject && !this.internalPlayerObject.forcedStartPosition) {
+                        this.moveObject(this.internalPlayerObject.ID,lp.x,lp.y,true);
+                        this.internalPlayerObject.updateDirection(lp.d);
                     }
                 }
             }

@@ -29,6 +29,7 @@ import PsuedoSpriteWrapper from "./components/world/psuedo-sprite-wrapper.js";
 import WorldSongController from "./components/world/song-controller.js";
 import MoveSprite from "./components/world/sprite-mover.js";
 import CustomWorldLoader from "./components/world/custom-loader.js";
+import LetterUI from "./components/world/letter-ui.js";
 
 const FILM_GRAIN_EFFECT = new FastStaticWrapper(1,()=>{
     const shade = Math.floor(256 * Math.random());
@@ -190,6 +191,11 @@ function WorldRenderer() {
         set: function(value) {
             internalPlayerObject = value;
             this.playerController.player = value;
+        }
+    });
+    Object.defineProperty(this,"internalPlayerObject",{
+        get: function() {
+            return internalPlayerObject;
         }
     });
 
@@ -523,6 +529,11 @@ function WorldRenderer() {
             );
         });
     }
+
+    this.say = text => showPopup([text]);
+    this.speech = pages => showPopup(pages);
+    this.ask = (question,...options) => this.showPrompt(question,...options);
+
     this.showPopup =         page =>        showPopup([page]);
     this.showPopups =        pages =>       showPopup(pages);
     this.showInstantPopup =  page =>        showPopup([page],null,true);
@@ -541,6 +552,16 @@ function WorldRenderer() {
             this.prompt = new WorldPrompt(question,options,selectionIndex => {
                 this.clearPrompt();
                 resolve(selectionIndex);
+            });
+        });
+    }
+    this.showLetter = message => {
+        return new Promise(resolve => {
+            popupActive = true;
+            this.popup = new LetterUI(message,()=>{
+                popupActive = false;
+                this.popup = null;
+                resolve();
             });
         });
     }
