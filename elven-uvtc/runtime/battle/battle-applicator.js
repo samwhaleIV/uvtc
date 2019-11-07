@@ -1,5 +1,3 @@
-import SpriteForeground from "../../renderers/components/battle/sprite-foreground.js";
-
 const endPoints = [
     "opponentInjured",
     "roundEnd",

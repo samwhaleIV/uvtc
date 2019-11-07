@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="2017.10.31" orientation="orthogonal" renderorder="right-down" width="34" height="31" tilewidth="16" tileheight="16" infinite="0" nextobjectid="1">
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="34" height="31" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="1">
  <tileset firstgid="1" source="../tilesets/world-tileset.tsx"/>
  <tileset firstgid="4097" source="../tilesets/collision-tileset.tsx"/>
- <layer name="Tile Layer 1" width="34" height="31">
+ <layer id="1" name="Tile Layer 1" width="34" height="31">
   <data encoding="csv">
 1681,1617,1745,1617,1553,1553,1681,1617,1681,1553,1681,1745,1681,1745,1553,110,283,283,283,111,1553,1745,1745,1745,1681,1617,1745,1553,1681,1745,1681,1617,1681,1745,
 1745,1681,1617,1681,1745,1553,1617,1681,1681,1681,1617,1745,1617,1617,1681,110,283,283,283,111,1745,1617,1681,1553,1745,1681,1745,1617,1617,1745,1745,1553,1745,1745,
@@ -37,7 +37,7 @@
 1681,1617,1617,1681,1553,1681,1553,1617,1617,1681,1681,1617,1745,1681,1617,1553,1681,1681,1617,1745,1681,1617,1745,1617,1553,1681,1617,1617,1681,1617,1681,1617,1681,1617
 </data>
  </layer>
- <layer name="Tile Layer 2" width="34" height="31">
+ <layer id="2" name="Tile Layer 2" width="34" height="31">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,165,0,0,0,165,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,37,0,0,0,37,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -72,7 +72,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer name="Tile Layer 3" width="34" height="31">
+ <layer id="3" name="Tile Layer 3" width="34" height="31" visible="0">
   <data encoding="csv">
 4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,4100,4100,4100,4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,4098,
 4098,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4098,4100,4100,4100,4098,0,0,0,0,0,0,0,0,0,0,0,0,0,4098,

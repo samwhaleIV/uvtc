@@ -25,6 +25,9 @@ addMap({
                         "Bless elves."
                     ]);
                     break;
+                case 12:
+                    await world.showPopup("Plates.. or bowls? Doesn't matter! You can candy cane meat anywhere.");
+                    break;
             }
         }
     },

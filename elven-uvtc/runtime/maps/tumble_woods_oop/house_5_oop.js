@@ -25,6 +25,7 @@ addMap({
                     ]);
                     break;
                 case 9:
+                    await world.showPopup("What's your game? You just expect all the furniture to talk to you because decide so? Typical.");
                     break;
                 case 10:
                     await world.showPopup('If you put your ear close to the couch, you can hear it humming "Painting the Roses Red."');

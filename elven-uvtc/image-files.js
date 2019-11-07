@@ -45,6 +45,7 @@ ImagePaths.push(
     getFile("sprites/jam.png",FileTypes.Image),
     getFile("sprites/jim.png",FileTypes.Image),
     getFile("sprites/other.png",FileTypes.Image),
+    getFile("sprites/player-dark.png",FileTypes.Image),
     getFile("sprites/player.png",FileTypes.Image),
     getFile("sprites/spy/christmas-hat.png",FileTypes.Image),
     getFile("sprites/spy/default.png",FileTypes.Image),

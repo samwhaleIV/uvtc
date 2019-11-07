@@ -1,4 +1,3 @@
-
 addMap({
     WorldState: function(world) {
         this.load = () => {

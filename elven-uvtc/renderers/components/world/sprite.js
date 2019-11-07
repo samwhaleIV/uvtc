@@ -14,18 +14,23 @@ const CONVOY_ALIGNMENT = 1;
 
 const SPRITE_ALERT_TIMEOUT = 500;
 
-function convoyRenderSort(a,b) {
+const STAIR_HEIGHT = 0.75;
+const ELEVATION_TILE = 28;
+
+const CONVOY_RENDER_SORT = (a,b) => {
     return a.y - b.y;
-}
+};
 
 function ElfRenderer(startDirection,spriteName) {
     SpriteRenderer.call(this,startDirection,spriteName,ELF_WIDTH,ELF_HEIGHT);
 }
-function PlayerRenderer(startDirection,isFakePlayer=false) {
+function PlayerRenderer(startDirection,isFakePlayer=false,customSprite) {
     if(ENV_FLAGS.ELF_PLAYER_HACK) {
         ElfRenderer.call(this,startDirection,ELF_HACK_SPRITE);
     } else {
-        SpriteRenderer.call(this,startDirection,PLAYER_SPRITE_NAME);
+        SpriteRenderer.call(
+            this,startDirection,customSprite ? customSprite : PLAYER_SPRITE_NAME
+        );
     }
     if(!isFakePlayer && ENV_FLAGS.DEBUG_PLAYER_CONVOY) {
         this.convoyAdd(
@@ -35,6 +40,7 @@ function PlayerRenderer(startDirection,isFakePlayer=false) {
         );
     }
     this.isPlayer = isFakePlayer ? false : true;
+    this.tilesPerSecond = 5;
 }
 function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumnHeight) {
     const sprite = imageDictionary[`sprites/${spriteName}`];
@@ -95,6 +101,11 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
 
     const convoy = [];
     let convoyCount = 0;
+
+    let lastX = null;
+    let lastY = null;
+    this.firstPosition = true;
+
     const convoyAdd = object => {
         convoy.push(object);
         object.x = 0;
@@ -103,6 +114,10 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         object.yOffset = 0;
         object.lastRenderX = -100;
         object.lastRenderY = -100;
+        object.convoyMember = true;
+        if(this.world) {
+            this.object.world = this.world;
+        }
         convoyCount++;
     }
     this.convoyAdd = (...objects) => objects.forEach(convoyAdd);
@@ -114,11 +129,13 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
             convoyPath.splice(0,convoyPathCount);
             convoyPathCount = 0;
         }
+        removed.convoyMember = false;
         return removed;
     }
 
     this.convoyRemoveFirst = () => modifyConvoy("shift");
     this.convoyRemoveLast = () => modifyConvoy("pop");
+
     Object.defineProperty(this,"convoyLength",{
         get: function() {
             return convoy.length;
@@ -169,9 +186,6 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         const finalPath = convoyPath[convoyPath.length-1];
         return finalPath;
     }
-    
-    let lastX = null;
-    let lastY = null;
     const renderConvoy = (timestamp,x,y,width,height) => {
         const calculatedX = this.x + this.xOffset;
         const calculatedY = this.y + this.yOffset;
@@ -241,7 +255,7 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
             convoyIndex++;
         }
         const renderStackSize = renderStack.length;
-        renderStack.sort(convoyRenderSort);
+        renderStack.sort(CONVOY_RENDER_SORT);
         let i = 0;
         let renderedSelf = false;
         const renderY = Math.round(y+this.yOffset*height);
@@ -262,8 +276,57 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
             this.renderSelf(x,y,width,height);
         }
     }
+    const getStairVerticalOffset = (trueX,trueY) => {
+        //This code is x and y redundant. For the love of god refactor it when you get a chance.
 
-    this.firstPosition = true;
+        const lerpXStart = Math.floor(trueX);
+        const lerpXEnd = Math.ceil(trueX);
+        const lerpYStart = Math.floor(trueY);
+        const lerpYEnd = Math.ceil(trueY);
+
+        let leftOffsetValue = this.world.getCollisionTile(lerpXStart,this.y);
+        let rightOffsetValue = this.world.getCollisionTile(lerpXEnd,this.y);
+        let upOffsetValue = this.world.getCollisionTile(this.x,lerpYStart);
+        let downOffsetValue = this.world.getCollisionTile(this.x,lerpYEnd);
+
+        if(leftOffsetValue !== ELEVATION_TILE) {
+            leftOffsetValue = 0;
+        } else {
+            leftOffsetValue = -STAIR_HEIGHT;
+        }
+        if(rightOffsetValue !== ELEVATION_TILE) {
+            rightOffsetValue = 0;
+        } else {
+            rightOffsetValue = -STAIR_HEIGHT;
+        }
+        if(upOffsetValue !== ELEVATION_TILE) {
+            upOffsetValue = 0;
+        } else {
+            upOffsetValue = -STAIR_HEIGHT;
+        }
+        if(downOffsetValue !== ELEVATION_TILE) {
+            downOffsetValue = 0;
+        } else {
+            downOffsetValue = -STAIR_HEIGHT;
+        }
+        let offset = 0;
+
+        if(this.xOffset >= 0) {
+            offset = lerp(leftOffsetValue,rightOffsetValue,this.xOffset);
+        } else {
+            offset = lerp(rightOffsetValue,leftOffsetValue,-this.xOffset);
+        }
+        
+        if(downOffsetValue !== upOffsetValue) {
+            if(this.yOffset > 0) {
+                offset = lerp(upOffsetValue,downOffsetValue,this.yOffset);
+            } else {
+                offset = lerp(downOffsetValue,upOffsetValue,-this.yOffset);
+            }
+        }
+        return offset;
+    }
+
     this.worldPositionUpdated = function(oldX,oldY,newX,newY,world,initial) {
         if(!initial) {
             const decalSourceX = this.direction === "up" || this.direction === "down" ? 0 : footstepWidth;
@@ -331,9 +394,16 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
     }
 
     let specialRow = null;
-    let lastSpecialFrame
+    let lastSpecialFrame;
 
     this.setSpecialFrame = function(frameID) {
+        if(frameID < 0) {
+            this.updateDirection(
+                this.direction
+            );
+            specialRow = null;
+            return;
+        }
         currentColumn = 4 * columnWidth + Math.floor(frameID / 4);
         specialRow = (frameID % 4) * rowHeight;
         lastSpecialFrame = frameID;
@@ -424,6 +494,7 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
     let startX, startY, recentTimestamp;
     if(customSize) {
         this.renderSelf = function(x,y,width,height) {
+
             let renderWidth = width * worldScaleTranslation;
             let renderHeight = customWidthRatio * renderWidth;
 
@@ -482,6 +553,15 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         if(convoyCount) {
             renderConvoy(timestamp,x,y,width,height);
         } else {
+            const trueX = this.x + this.xOffset;
+            const trueY = this.y + this.yOffset;
+            if(this.world && !this.convoyMember && !this.world.outOfBounds(
+                trueX,trueY
+            )) {
+                y += height * getStairVerticalOffset(
+                    trueX,trueY
+                );
+            }
             this.renderSelf(x,y,width,height);
         }
     }

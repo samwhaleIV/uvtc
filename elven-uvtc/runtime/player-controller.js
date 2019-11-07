@@ -118,7 +118,6 @@ function PlayerController(world) {
         }
     }
 
-    const tilesPerSecond = 5;
     const maxDelta = 50;
 
     this.horizontalVelocity = 0;
@@ -315,7 +314,7 @@ function PlayerController(world) {
             }
             return;
         }
-        const movementDistance = delta / 1000 * tilesPerSecond;
+        const movementDistance = delta / 1000 * player.tilesPerSecond;
 
         let walking = false;
         if(this.horizontalVelocity > 0) {

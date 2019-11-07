@@ -11,6 +11,9 @@ function debug_offscreen_canvas(canvas) {
         window.open(URL.createObjectURL(blob));
     });
 }
+function lerp(v0,v1,t) {
+    return v0*(1-t)+v1*t
+}
 function for_the_end_of_the_universe() {
     return new Promise(()=>void 0);
 }

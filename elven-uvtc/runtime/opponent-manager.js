@@ -17,7 +17,10 @@ const getOpponent = (battleID,...battleParameters) => {
         if(song) {
             this.song = song;
             const songIntro = SONG_INTRO_LOOKUP[song];
-            if(songIntro) {
+            const fancyEncodingData = SongsWithTheNewFancyIntroEncoding[song];
+            if(fancyEncodingData) {
+                this.fancyEncodingData = fancyEncodingData;
+            } else if(songIntro) {
                 this.songIntro = songIntro;
             }
         }

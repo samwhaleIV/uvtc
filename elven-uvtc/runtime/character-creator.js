@@ -61,17 +61,29 @@ const CharacterDisplayNames = {
     "rock-elf-spy":     "Rock Elf Spy",
     "enigma":           "Enigma"
 };
+const CharacterSpriteLookup = {
+    "elf-guard-1": "elf-guard",
+    "elf-guard-2": "elf-guard",
+};
 const ColorLookup = {};
 Object.entries(textColorLookup).forEach(entry => {
     ColorLookup[entry[1]] = entry[0];
 });
 delete ColorLookup[0];
+function getSpriteName(characterName) {
+    if(characterName in CharacterSpriteLookup) {
+        return CharacterSpriteLookup[characterName];
+    } else {
+        return characterName;
+    }
+}
 function applyPopupAttributes(character,characterName) {
     character.prefix = getPrefix(characterName);
     character.characterName = characterName;
 }
 function defaultCharacterMaker(world,characterName,direction,isElf=false) {
-    const character = new (isElf ? world.elfSprite:world.sprite)(direction,characterName);
+    const spriteName = getSpriteName(characterName);
+    const character = new (isElf ? world.elfSprite:world.sprite)(direction,spriteName);
     applyPopupAttributes(character,characterName);
     return character;
 };
@@ -79,7 +91,8 @@ function elfCharacterMaker(world,characterName,direction,isElf=false) {
     return defaultCharacterMaker(world,characterName,direction,true);
 };
 function customSizeCharacterMaker(world,characterName,direction,width,height) {
-    const character = new world.sprite(direction,characterName,width,height);
+    const spriteName = getSpriteName(characterName);
+    const character = new world.sprite(direction,spriteName,width,height);
     applyPopupAttributes(character,characterName);
     return character;
 };
