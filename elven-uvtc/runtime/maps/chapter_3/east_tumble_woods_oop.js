@@ -1,4 +1,5 @@
-import { RockMoveStartSound, RockMoveEndSound, IceSmashSound, AlertSound } from "../../tones.js";
+import { RockMoveStartSound, RockMoveEndSound, IceSmashSound } from "../../../runtime/tones.js";
+import { AlertSound } from "../../../../../elven-engine/runtime/tones.js";
 
 addMap({
     WorldState: function(world,data) {

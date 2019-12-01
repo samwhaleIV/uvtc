@@ -1,4 +1,4 @@
-import { SpriteRenderer, ElfRenderer } from "../world/sprite.js";
+import { SpriteRenderer, ElfRenderer } from "../../../../../elven-engine/renderers/components/world/sprite.js";
 
 const ELVES_ARE_NOT_FAT = "Cannot create an elf sprite with custom width or height dimensions";
 

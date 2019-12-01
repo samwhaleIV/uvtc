@@ -3,7 +3,6 @@ import ElvesFillIn from "./components/elves-fill-in.js";
 import WorldSettingsRenderer from "./world-settings.js";
 import MovesPaneRenderer from "./moves-pane.js";
 import BoxFaderEffect from "./components/box-fader-effect.js";
-//import { OpenSound, CloseSound } from "../runtime/tones.js";
 
 const ICON_PART_1_WIDTH = 64;
 const ICON_PART_2_WIDTH = 58;
@@ -44,7 +43,6 @@ function WorldUIRenderer(world) {
         leaveStart = performance.now();
         leaving = true;
         playSound("reverse-click");
-        //CloseSound();
     }
     const clearPanel = noSound => {
         panel = null;
@@ -363,7 +361,6 @@ function WorldUIRenderer(world) {
             const progress = (timestamp - loadStart) / transitionTime;
             if(progress >= 1) {
                 playSound("click");
-                //OpenSound();
                 loading = false;
                 transitioning = false;
             }

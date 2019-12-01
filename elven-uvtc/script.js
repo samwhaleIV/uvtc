@@ -1,12 +1,12 @@
 "use strict";
 import MainMenuRenderer from "./renderers/main-menu.js";
 import BoxFaderEffect from "./renderers/components/box-fader-effect.js";
-import DragTestRenderer from "./renderers/drag-test.js";
 import FistBattleRenderer from "./renderers/fist-battle.js";
 import WorldRenderer from "./renderers/world.js";
+import SwapTestRenderer from "../../elven-engine/renderers/swap-test.js";
+import GradeTestRenderer from "../../elven-engine/renderers/grade-test.js";
+import DragTestRenderer from "../../elven-engine/renderers/drag-test.js";
 import "./runtime/battle/opponents/manifest.js";
-import SwapTestRenderer from "./renderers/swap-test.js";
-import GradeTestRenderer from "./renderers/grade-test.js";
 
 drawLoadingText();
 establishMapLinks();

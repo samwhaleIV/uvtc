@@ -1,6 +1,6 @@
 import WeaponBase from "../weapon-base.js";
 import { OutgoingSnowball } from "../snowball.js";
-import MultiLayer from "../../multi-layer.js";
+import MultiLayer from "../../../../../../elven-engine/renderers/components/multi-layer.js";
 
 const SNOWBALL_TEXTURE = "battle/snowball";
 const SNOWBALL_TEXTURE_SIZE = 16;

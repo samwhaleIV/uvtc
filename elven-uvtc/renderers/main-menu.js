@@ -4,7 +4,7 @@ import RotatingBackground from "./components/rotating-background.js";
 import ChapterPane from "./chapter-pane.js";
 import AudioPane from "./audio-pane.js";
 import CreditsRenderer from "./credits.js";
-import GlobalState from "../runtime/global-state.js";
+import GlobalState from "../../../elven-engine/runtime/global-state.js";
 import ChapterManager from "../runtime/chapter-manager.js";
 import Chapters from "../runtime/chapters.js";
 import BoxFaderEffect from "./components/box-fader-effect.js";

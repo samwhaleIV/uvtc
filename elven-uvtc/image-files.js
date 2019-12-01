@@ -67,7 +67,6 @@ ImagePaths.push(
     getFile("ui/draw.png",FileTypes.Image),
     getFile("ui/elfmart.png",FileTypes.Image),
     getFile("ui/energy.png",FileTypes.Image),
-    getFile("ui/error.png",FileTypes.Image),
     getFile("ui/escape-blur.png",FileTypes.Image),
     getFile("ui/escape-menu-fx.png",FileTypes.Image),
     getFile("ui/escape-menu.png",FileTypes.Image),

@@ -1,4 +1,4 @@
-import WorldPopup from "../world/popup.js";
+import WorldPopup from "../../../../../elven-engine/renderers/components/world/popup.js";
 
 const opponentXVelocity = 0.01;
 const opponentYVelocity = 0.01;

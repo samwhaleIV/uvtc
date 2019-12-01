@@ -1,4 +1,4 @@
-import GlobalState from "./global-state.js";
+import GlobalState from "../../../elven-engine/runtime/global-state.js";
 import { Moves, MovesList } from "./battle/moves.js";
 import Chapters from "./chapters.js";
 import RenderMove from "../renderers/components/battle/move.js";

@@ -1,4 +1,5 @@
 "use strict";
+const GLOBAL_STATE_KEY =   "uv_save_data";
 const KEY_BINDS_KEY =      "KEY_BINDS_UVTC";
 const VOLUME_STORAGE_KEY = "VOLUME_UVTC";
 const SIZE_MODE_KEY =      "SIZE_MODE_KEY_UVTC";

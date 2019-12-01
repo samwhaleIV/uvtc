@@ -1,4 +1,4 @@
-import GlobalState from "./global-state.js";
+import GlobalState from "../../../elven-engine/runtime/global-state.js";
 import { AllChapterKeys } from "./chapter-keys-manifest.js";
 
 const ClearAllChapterKeys = () => {

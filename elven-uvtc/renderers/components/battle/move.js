@@ -41,7 +41,7 @@ function RenderMove(move,x,y,size,hover,textless) {
 
     let image = imageDictionary["battle/moves"];
     if(!image || move.sourceX > image.width) {
-        image = imageDictionary["ui/error"];
+        image = imageDictionary[ERROR_IMAGE];
         context.drawImage(
             image,0,0,image.width,image.height,
             x,y,size,size

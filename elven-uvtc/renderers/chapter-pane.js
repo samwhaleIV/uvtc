@@ -1,5 +1,5 @@
 import WorldRenderer from "../renderers/world.js";
-import GlobalState from "../runtime/global-state.js";
+import GlobalState from "../../../elven-engine/runtime/global-state.js";
 import Chapters from "../runtime/chapters.js";
 import UIPrompt from "./components/ui-prompt.js";
 import ChapterManager from "../runtime/chapter-manager.js";
@@ -264,7 +264,7 @@ function ChapterPane(callback,parent,instant=false) {
         }
         let chapterImage = imageDictionary[`ui/chapters/${chapterNumber}`];
         if(!chapterImage) {
-            chapterImage = imageDictionary["ui/error"];
+            chapterImage = imageDictionary[ERROR_IMAGE];
         }
         const finalChapter = chapterNumber === Chapters.length;
         this.currentImage = chapterImage;
