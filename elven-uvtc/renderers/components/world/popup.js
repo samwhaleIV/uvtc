@@ -9,7 +9,7 @@ function applySonographToPopupFeed(popupFeed) {
     return popupFeed;
 }
 
-function WorldPopup(pages,callback,prefix,isInstant=false,world,autoCallback) {
+function WorldPopup(pages,callback,prefix,isInstant=false,instantSound=true,autoCallback) {
 
     prefix = prefix ? prefix : "";
 
@@ -39,7 +39,7 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world,autoCallback) {
             newPage.push({
                 textFeed:processTextForWrappingLookAhead(page,processedFullText),
                 newCharacter:null,
-                noSound:true,
+                noSound:false,
                 instant:true,
                 speed:0,
                 delay:0
@@ -139,6 +139,9 @@ function WorldPopup(pages,callback,prefix,isInstant=false,world,autoCallback) {
                 timeout = setTimeout(timeoutMethod,pageValue.noSound ? pageValue.speed / 2 : pageValue.speed);
             }
         } else {
+            if(isInstant && instantSound) {
+                playTextSound();
+            }
             if(pageIndex + 1 >= pageCount) {
                 this.readyToTerminate = true;
                 if(autoCallback) {

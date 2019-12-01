@@ -75,7 +75,8 @@ const ChapterKeysManifest = {
         "paintedLamp",
         "hasWaterBottle",
         "hasFilledWaterBottle",
-        "openedLetter"
+        "openedLetter",
+        "goneToTreeLees"
     ],
     4: [
 

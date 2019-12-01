@@ -24,6 +24,7 @@ addMap({
         }
         const enigma = world.getStaticCharacter("enigma");
         let backgroundRemovalDone = false;
+        let filmGrainID;
         const removeBackground = async () => {
             for(let y = 0;y<world.renderMap.rows;y++) {
                 for(let x = 0;x<world.renderMap.columns;x++) {
@@ -46,6 +47,7 @@ addMap({
             if(ID === 8) {
                 await enigma.say("The journey is long.");
                 await delay(500);
+                world.removeCustomRenderer(filmGrainID);
                 world.disableTileRendering();
                 await delay(500);
                 await enigma.say("The road is longer.");
@@ -54,7 +56,7 @@ addMap({
             }
         }
         this.load = world => {
-            world.addCustomRenderer(world.filmGrainEffect);
+            filmGrainID = world.addCustomRenderer(world.filmGrainEffect);
             world.autoCameraOff();
             world.camera.x = 8;
             world.camera.y = 7;

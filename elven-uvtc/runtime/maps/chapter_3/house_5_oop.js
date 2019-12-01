@@ -2,9 +2,23 @@ addMap({
     //Tree Lee House
     WorldState: function(world,data) {
 
+        let jim;
+        let iceman;
+        let frogert;
+        let spy;
+
         const paintLamp = () => {
             world.setForegroundTile(1690,14,3);
             world.setForegroundTile(1754,14,4);
+        }
+
+        const interactionBase = (target,callback) => {
+            target.interacted = (x,y,direction) => {
+                target.updateDirection(direction);
+                if(callback) {
+                    callback(x,y);
+                }
+            }
         }
 
         this.load = world => {
@@ -12,6 +26,31 @@ addMap({
                 paintLamp();
             }
             world.addPlayer(8,2,"down");
+
+            jim = world.getCharacter("jim","down");
+            world.addObject(jim,8,4);
+
+            iceman = world.getCharacter("ice-man","right");
+            world.addObject(iceman,7,5);
+
+            frogert = world.getCharacter("frogert","left");
+            world.addObject(frogert,13,6);
+
+            spy = world.getCharacter("concealed-spy","down");
+            world.addObject(spy,6,7);
+
+            interactionBase(jim,()=>{
+
+            });
+            interactionBase(iceman,()=>{
+
+            });
+            interactionBase(frogert,()=>{
+
+            });
+            interactionBase(spy,()=>{
+
+            });
         }
         this.doorClicked = ID => {
             world.updateMap("tumble_woods_oop",{fromDoorWay:true});

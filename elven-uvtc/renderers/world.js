@@ -505,7 +505,7 @@ function WorldRenderer() {
         lastPopupCleared = performance.now();
     }
     this.popupActive = false;
-    const showPopup = (pages,name=null,instant=false) => {
+    const showPopup = (pages,name=null,instant=false,instantSound=true) => {
         popupActive = true;
         if(Array.isArray(pages)) {
             return new Promise(async resolve => {
@@ -525,7 +525,7 @@ function WorldRenderer() {
                 () => {
                     this.clearTextPopup();
                     resolve();
-                },name,instant,this
+                },name,instant,instantSound
             );
         });
     }
@@ -542,7 +542,7 @@ function WorldRenderer() {
     this.showNamedPopups =  (pages,name) => showPopup(pages,name);
     this.showInstantPopupSound = page => {
         playSound("energy");
-        return showPopup([page],null,true);
+        return showPopup([page],null,true,false);
     }
     this.clearPrompt = () => {
         this.prompt = null;

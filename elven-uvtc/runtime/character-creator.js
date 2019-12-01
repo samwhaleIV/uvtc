@@ -9,7 +9,8 @@ const CharacterMakers = {
     "jam":              defaultCharacterMaker,
     "wizard-elf":       elfCharacterMaker,
     "tiny-arm-elf":     elfCharacterMaker,
-    "wimpy-green-elf":  elfCharacterMaker
+    "wimpy-green-elf":  elfCharacterMaker,
+    "concealed-spy":    elfCharacterMaker
 };
 const CharacterColors = {
     "jim":              "blue",
@@ -34,7 +35,8 @@ const CharacterColors = {
     "tiny-arm-elf":     "cyan",
     "wimpy-green-elf":  "green",
     "rock-elf-spy":     "red",
-    "enigma":           "red"
+    "enigma":           "red",
+    "concealed-spy":    "black"
 };
 const CharacterDisplayNames = {
     "jim":              "Jim",
@@ -59,11 +61,13 @@ const CharacterDisplayNames = {
     "tiny-arm-elf":     "Tiny Arm Elf",
     "wimpy-green-elf":  "Wimpy Green Elf",
     "rock-elf-spy":     "Rock Elf Spy",
-    "enigma":           "Enigma"
+    "enigma":           "Enigma",
+    "concealed-spy":    "Bob"
 };
 const CharacterSpriteLookup = {
     "elf-guard-1": "elf-guard",
     "elf-guard-2": "elf-guard",
+    "concealed-spy": "spy/default"
 };
 const ColorLookup = {};
 Object.entries(textColorLookup).forEach(entry => {

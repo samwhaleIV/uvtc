@@ -32,5 +32,6 @@ addMap({
     name: "bedroom_2_oop",
     doors: [
         "to_house_1_oop"
-    ]
+    ],
+    songParent: "house_1_oop"
 });

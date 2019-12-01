@@ -38,9 +38,9 @@ addMap({
                         await world.showLetter([
                             "Hey. I didn't want to wake you.. You looked like you were having a really intense dream.",
                             "",
-                            "It's been a year since.. You know. The town..",
+                            "It's been a year since.. You know. The town.",
                             "",
-                            "Some of us.. We're getting together at Tree Lee's house. I hope you can make it. We need to talk more in person.",
+                            "Some of us are getting together at Tree Lee's house. I hope you can make it. We need to talk more in person.",
                             "",
                             "-Jim",
                             "",

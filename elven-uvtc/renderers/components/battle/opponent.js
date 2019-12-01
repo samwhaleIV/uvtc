@@ -50,20 +50,19 @@ function GetOpponent() {
         lastSpecialFrame: null,
         say: text => {
             return new Promise(callback=>{
-                if(this.showingMessage) {
-                    if(this.showingMessage.callback) {
-                        this.showingMessage.callback();
+                const clearMessage = () => {
+                    if(this.showingMessage) {
+                        if(this.showingMessage.callback) {
+                            this.showingMessage.callback();
+                        }
+                        this.showingMessage.terminate();
+                        this.showingMessage = null;
                     }
-                    this.showingMessage.terminate();
-                    this.showingMessage = null;
                 }
-                const effect = new WorldPopup([text],()=>{
-                    if(this.showingMessage.callback) {
-                        this.showingMessage.callback();
-                    }
-                    this.showingMessage.terminate();
-                    this.showingMessage = null;
-                },null,false,this);
+                clearMessage();
+                const effect = new WorldPopup(
+                    [text],clearMessage,null,false
+                );
                 effect.callback = callback;
                 effect.render = CustomTextRenderer;
                 this.showingMessage = effect;

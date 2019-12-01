@@ -36,7 +36,9 @@ const SongsWithIntros = [
     "wimpy",
     "training_room",
     "Dark_TumbleTown",
-    "misc_fight_song"
+    "misc_fight_song",
+    "elven_tumble_town",
+    "elf_theme"
 ];
 //If the song uses 'fancy' intro encoding, don't put it in the songsWithIntros list
 const SongsWithTheNewFancyIntroEncoding = {
@@ -49,14 +51,24 @@ const BattleMusicLinkingManifest = {
     "tutorial-burr": "training_room",
     "wimpy-red-elf": "wimpy_wimpy",
     "wimpy-green-elf": "wimpy_wimpy",
-    "debug-battle": "an-example-song"
+    "debug-battle": "an-example-song",
+    
 };
 const ScriptedSongLinkingManifest = {
     "oops-wrong-song": "hero",
     "party-song": "cabin",
-    "lights-off-meet-elves": null
+    "lights-off-meet-elves": "elf_theme"
 }
 const MusicLinkingManifest = {
+    "east_tumble_woods_oop": {
+        linkTo: "tumble_woods_oop"
+    },
+    "east_tumble_woods_oop_grotto": {
+        linkTo: "tumble_woods_oop"
+    },
+    "tumble_woods_oop": {
+        song: "elven_tumble_town"
+    },
     "bad_dream": {
         song: "Dark_TumbleTown"
     },

@@ -1,6 +1,21 @@
 addMap({
     WorldState: function(world,data) {
-
+        const tryForceTreeLee = customMessage => {
+            if(world.globalState.goneToTreeLees) {
+                return false;
+            } else {
+                (async () => {
+                    let message;
+                    if(customMessage) {
+                        message = customMessage;
+                    } else {
+                        message = "Aren't you supposed to be going to Tree Lee's house?"
+                    }
+                    await world.say(message);
+                })();
+                return true;
+            }
+        }
         this.load = world => {
             if(data.fromDoorWay) {
                 switch(data.sourceRoom) {
@@ -37,7 +52,7 @@ addMap({
                 }
             }
         }
-        this.doorClicked = doorID => {
+        this.doorClicked = async doorID => {
             switch(doorID) {
                 case "to_house_1_oop":
                     world.updateMap("house_1_oop",{fromDoorWay:true});
@@ -55,7 +70,9 @@ addMap({
                     world.updateMap("house_6_oop",{fromDoorWay:true});
                     break;
                 case "to_house_7_oop":
-                    world.updateMap("house_7_oop",{fromDoorWay:true});
+                    if(!tryForceTreeLee()) {
+                        world.updateMap("house_7_oop",{fromDoorWay:true});
+                    }
                     break;
                 case "to_house_8_oop":
                     world.updateMap("house_8_oop",{fromDoorWay:true});
@@ -70,7 +87,9 @@ addMap({
             switch(ID) {
                 case 2:
                     if(direction === "right") {
-                        world.updateMap("east_tumble_woods_oop");
+                        if(!tryForceTreeLee()) {
+                            world.updateMap("east_tumble_woods_oop");
+                        }
                         return TRIGGER_ACTIVATED;
                     }
                     break;
