@@ -96,11 +96,7 @@ function UVTCWorldRenderer(...parameters) {
             let startMap = this.chapter.startMap ? this.chapter.startMap : null;
             if(!startMap) {
                 startMap = FALLBACK_MAP_ID;
-                if(this.activeChapter) {
-                    console.warn(`World: Using a fallback map because chapter ${this.activeChapter} is missing a start map`);
-                } else {
-                    console.warn("World: Using a fallback map because");
-                }
+                console.warn(`World: Using a fallback map because chapter ${this.activeChapter} is missing a start map`);
             }
             this.updateMap(startMap);
         }
