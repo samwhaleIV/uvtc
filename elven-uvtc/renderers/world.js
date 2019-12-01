@@ -52,6 +52,61 @@ function UVTCWorldRenderer(...parameters) {
         chapterState = getDefaultChapterState();
     }
 
+    this.firstTimeLoad = () => {
+        this.chapterState.load(this);
+    }
+    this.mapChanged = () => {
+        this.chapterState.mapChanged(this.map);
+    }
+    this.loadLastMapOrDefault = () => {
+        let lastMap, lp, debugPosition;
+        if(ENV_FLAGS.DEBUG_MAP) {
+            if(typeof ENV_FLAGS.DEBUG_MAP === "string") {
+                lastMap = ENV_FLAGS.DEBUG_MAP;
+                if(GlobalState.data["last_map"] !== lastMap) {
+                    debugPosition = true;
+                }
+            } else {
+                lastMap = ENV_FLAGS.DEBUG_MAP.name;
+                if(ENV_FLAGS.DEBUG_MAP.position) {
+                    lp = ENV_FLAGS.DEBUG_MAP.position;
+                    if(isNaN(lp.x)) lp.x = 0;
+                    if(isNaN(lp.y)) lp.y = 0;
+                    if(!lp.d) lp.d = "down";
+                    debugPosition = true;
+                }
+            }
+        } else {
+            lastMap = GlobalState.data["last_map"]; 
+        }
+        if(lastMap) {
+            this.updateMap(lastMap);
+            if(!debugPosition) {
+                lp = GlobalState.data["last_player_pos"];
+            }
+            if(lp) {
+                return () => {
+                    if(this.internalPlayerObject && !this.internalPlayerObject.forcedStartPosition) {
+                        this.moveObject(this.internalPlayerObject.ID,lp.x,lp.y,true);
+                        this.internalPlayerObject.updateDirection(lp.d);
+                    }
+                }
+            }
+        } else {
+            let startMap = this.chapter.startMap ? this.chapter.startMap : null;
+            if(!startMap) {
+                startMap = FALLBACK_MAP_ID;
+                if(this.activeChapter) {
+                    console.warn(`World: Using a fallback map because chapter ${this.activeChapter} is missing a start map`);
+                } else {
+                    console.warn("World: Using a fallback map because");
+                }
+            }
+            this.updateMap(startMap);
+        }
+        return null;
+    }
+
     this.escapeMenu = new WorldUIRenderer(this);
 
     Object.defineProperty(this,"filmGrainEffect",{

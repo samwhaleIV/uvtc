@@ -12,6 +12,9 @@ drawLoadingText();
 establishMapLinks();
 
 function loadCallback() {
+    if(!SoundManager.soundsLoaded || !ImageManager.imagesLoaded) {
+        return;
+    }
     BitmapText.verifyBitmap();
     let firstRendererState, parameters = [];
     if(ENV_FLAGS.TEST === "auto") {
