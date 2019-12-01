@@ -53,17 +53,21 @@ function UVTCWorldRenderer(...parameters) {
     }
 
     this.firstTimeLoad = () => {
-        this.chapterState.load(this);
+        if(this.chapterState.load) {
+            this.chapterState.load(this);
+        }
     }
     this.mapChanged = () => {
-        this.chapterState.mapChanged(this.map);
+        if(this.chapterState.mapChanged) {
+            this.chapterState.mapChanged(this.map);
+        }
     }
     this.loadLastMapOrDefault = () => {
         let lastMap, lp, debugPosition;
         if(ENV_FLAGS.DEBUG_MAP) {
             if(typeof ENV_FLAGS.DEBUG_MAP === "string") {
                 lastMap = ENV_FLAGS.DEBUG_MAP;
-                if(GlobalState.data["last_map"] !== lastMap) {
+                if(this.globalState["last_map"] !== lastMap) {
                     debugPosition = true;
                 }
             } else {
@@ -77,12 +81,12 @@ function UVTCWorldRenderer(...parameters) {
                 }
             }
         } else {
-            lastMap = GlobalState.data["last_map"]; 
+            lastMap = this.globalState["last_map"]; 
         }
         if(lastMap) {
             this.updateMap(lastMap);
             if(!debugPosition) {
-                lp = GlobalState.data["last_player_pos"];
+                lp = this.globalState["last_player_pos"];
             }
             if(lp) {
                 return () => {
@@ -93,7 +97,7 @@ function UVTCWorldRenderer(...parameters) {
                 }
             }
         } else {
-            let startMap = this.chapter.startMap ? this.chapter.startMap : null;
+            let startMap = this.chapter && this.chapter.startMap ? this.chapter.startMap : null;
             if(!startMap) {
                 startMap = FALLBACK_MAP_ID;
                 console.warn(`World: Using a fallback map because chapter ${this.activeChapter} is missing a start map`);

@@ -34,12 +34,16 @@ const WorldTextureSize = 16;
 const WorldTextureScale = 3;
 const WorldTileSize = WorldTextureSize * WorldTextureScale;
 const WorldTextureColumns = 64;
-
+const ANIMATION_TILE_COUNT = 5;
+const ANIMATION_CYCLE_DURATION = 400;
+const SPECIAL_COLLISION_START = 28;
+const COLLISION_TRIGGER_OFFSET = -2;
+const COLLISTION_TRIGGERS = {
+    3:true,4:true,5:true,6:true,7:true
+};
 const LogicLayerInteractStart = 8;
-
 const WorldTextureAnimationRows = 4;
 const WorldTextureAnimationStart = Math.pow(WorldTextureColumns,2) - WorldTextureColumns * WorldTextureAnimationRows;
-
 const FootPrintTiles = {
     21: true,
     37: true,
@@ -49,9 +53,8 @@ const FootPrintTiles = {
     1744: true
 };
 const FALLBACK_MAP_ID = "missing_map";
-
 const OVERWORLD_MUSIC_FADE_TIME = 100;
 const FAKE_OVERWORLD_LOAD_TIME = 500;
+
 const VERSION_STRING = "you versus earth, v0.3.1";
 
-const TRIGGER_ACTIVATED = Symbol("TRIGGER_ACTIVATED");
