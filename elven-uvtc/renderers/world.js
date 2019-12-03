@@ -39,6 +39,7 @@ function UVTCWorldRenderer(...parameters) {
     WorldRenderer.apply(this,parameters);
     this.chapterManager = ChapterManager;
     this.movesManager = MovesManager;
+    this.defaultBackgroundColor = "black";
 
     this.setTilesetImage("world-tileset");
 
