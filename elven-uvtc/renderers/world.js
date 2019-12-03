@@ -89,10 +89,10 @@ function UVTCWorldRenderer(...parameters) {
                 lp = this.globalState["last_player_pos"];
             }
             if(lp) {
-                return () => {
-                    if(this.internalPlayerObject && !this.internalPlayerObject.forcedStartPosition) {
-                        this.moveObject(this.internalPlayerObject.ID,lp.x,lp.y,true);
-                        this.internalPlayerObject.updateDirection(lp.d);
+                return pendingPlayer => {
+                    if(pendingPlayer && !pendingPlayer.forcedStartPosition) {
+                        this.moveObject(pendingPlayer.ID,lp.x,lp.y,true);
+                        pendingPlayer.updateDirection(lp.d);
                     }
                 }
             }
@@ -112,7 +112,6 @@ function UVTCWorldRenderer(...parameters) {
     Object.defineProperty(this,"filmGrainEffect",{
         get: function(){return FILM_GRAIN_EFFECT}
     });
-
     Object.defineProperty(this,"activeChapter",{
         get: function() {return activeChapter}
     });
@@ -144,16 +143,21 @@ function UVTCWorldRenderer(...parameters) {
         faderEffectsRenderer.fillInLayer = new ElvesFillIn();
         this.managedFaderTransition(WorldRenderer);
     }
+    function returnToWorld() {
+        setFaderInSound("battle-fade-in",true);
+        setFaderOutSound("battle-fade-out",true);
+        rendererState.fader.fadeOut(WorldRenderer);
+    }
+    this.unload = () => {
+        if(this.chapterState.unload) {
+            chapterState.unload(this);
+        }
+    }
     this.startBattle = (battleID,winCallback,loseCallback,...battleParameters) => {
         this.saveState(true,false);
         setFaderEffectsRenderer(new BattleFaderEffect());
         setFaderInSound("battle-fade-in",true);
         setFaderOutSound("battle-fade-out",true);
-        function returnToWorld() {
-            setFaderInSound("battle-fade-in",true);
-            setFaderOutSound("battle-fade-out",true);
-            rendererState.fader.fadeOut(WorldRenderer);
-        }
         function win(battleOutput) {
             if(winCallback) {
                 winCallback(battleOutput);
