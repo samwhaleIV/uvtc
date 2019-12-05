@@ -1,19 +1,3 @@
-function delay(time) {
-    return new Promise(resolve=>setTimeout(resolve,time));
-}
-function getRandomPolarity() {
-    return Math.round(Math.random()) * 2 - 1;
-}
-function debug_offscreen_canvas(canvas) {
-    canvas.convertToBlob({
-        type: "image/png"
-    }).then(function(blob) {
-        window.open(URL.createObjectURL(blob));
-    });
-}
-function for_the_end_of_the_universe() {
-    return new Promise(()=>void 0);
-}
 const scripts = {
     popupFormatTest: async () => {
         let popup = rendererState.showPopup;
