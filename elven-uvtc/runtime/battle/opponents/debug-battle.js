@@ -1,6 +1,10 @@
 import RotatingBackground from "../../../renderers/components/rotating-background.js";
 import { IncomingSnowball } from "../../../renderers/components/battle/snowball.js";
 
+function for_the_end_of_the_universe() {
+    return new Promise(()=>void 0);
+}
+
 addOpponent("debug-battle",function(applicator) {
     applicator({
         effects: {
