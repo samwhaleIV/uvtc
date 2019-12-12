@@ -1,6 +1,5 @@
 "use strict";
 EssentialSounds.push(
-    getFile("energy.mp3",FileTypes.Sound),
     getFile("energy-reverse.mp3",FileTypes.Sound),
     getFile("reverse-click.mp3",FileTypes.Sound),
     getFile("damage.mp3",FileTypes.Sound),
