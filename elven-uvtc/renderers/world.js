@@ -138,7 +138,7 @@ function UVTCWorldRenderer(...parameters) {
         if(!noDelay) {
             await delay(500);
         }
-        this.addCustomRenderer(new FadeOut(2000));
+        this.fadeToBlack(2000);
         await delay(5000);
         setFaderEffectsRenderer(new BoxFaderEffect());
         faderEffectsRenderer.fillInLayer = new ElvesFillIn();
@@ -177,10 +177,10 @@ function UVTCWorldRenderer(...parameters) {
 
     this.chapterComplete = async (noSound=!CHAPTER_COMPLETE_SOUND_SOUND_BY_DEFAULT) => {
         const method = noSound ? this.showInstantPopup : this.showInstantPopupSound;
-        this.addCustomRenderer(new FadeOut(2000));
+        this.fadeToBlack(2000);
         this.addCustomRenderer(new this.ImagePreview(
-            `ui/chapters/${chapterID}`,this.getItemPreviewBounds)
-        );
+            `ui/chapters/${activeChapter}`,this.getItemPreviewBounds
+        ));
         ChapterManager.setActiveChapterCompleted();
         let message = null;
         if(activeChapter === FINAL_CHAPTER_NUMBER) {
@@ -198,7 +198,10 @@ function UVTCWorldRenderer(...parameters) {
     this.unlockSlot = moveName => {
         return new Promise(async resolve => {
             const alreadyHasMove = this.movesManager.hasMove(moveName);
-            const move = Moves[moveName];
+            let move = Moves[moveName];
+            if(!move) {
+                move = Moves.Nothing;
+            }
             if(!alreadyHasMove) {
                 this.movesManager.unlockMove(moveName);
             }
