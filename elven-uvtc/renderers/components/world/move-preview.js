@@ -15,13 +15,11 @@ function MovePreview(moveName,getArea,withName=false) {
             moveSize = area.height;
         }
         const halfMoveSize = moveSize / 2;
-        RenderMove(
-            move,
-            Math.round(area.x+area.width/2-halfMoveSize) + 3,
-            Math.round(area.y+area.height/2-halfMoveSize) + 3,
-            moveSize - 6,
-            "white",!withName
-        );
+
+        const x = Math.round(area.x+area.width/2-halfMoveSize);
+        const y = Math.round(area.y+area.height/2-halfMoveSize);
+
+        RenderMove(move,x,y,moveSize,false,!withName);
     }
 }
 export default MovePreview;
