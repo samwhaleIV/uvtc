@@ -41,7 +41,7 @@ const SongsWithIntros = [
     "elf_theme"
 ];
 //If the song uses 'fancy' intro encoding, don't put it in the songsWithIntros list
-const SongsWithTheNewFancyIntroEncoding = {
+const FANCY_INTRO_SONGS = {
     "an-example-song": {
         introLength: 309760,
         switchZoneLength: 201728
@@ -133,8 +133,5 @@ const MusicLinkingManifest = {
 }
 const SONG_INTRO_LOOKUP = {};
 SongsWithIntros.forEach(song => {
-    SONG_INTRO_LOOKUP[song] = song + MUSIC_INTRO_SUFFIX;
-});
-Object.entries(SongsWithTheNewFancyIntroEncoding).forEach(entry => {
-    entry[1].introName = entry[0] + MUSIC_INTRO_SUFFIX;
+    SONG_INTRO_LOOKUP[song] = true;
 });

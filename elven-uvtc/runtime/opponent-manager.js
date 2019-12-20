@@ -16,12 +16,11 @@ const getOpponent = (battleID,...battleParameters) => {
         const song = BattleMusicLinkingManifest[battleID]
         if(song) {
             this.song = song;
-            const songIntro = SONG_INTRO_LOOKUP[song];
-            const fancyEncodingData = SongsWithTheNewFancyIntroEncoding[song];
+            const fancyEncodingData = FANCY_INTRO_SONGS[song];
             if(fancyEncodingData) {
                 this.fancyEncodingData = fancyEncodingData;
-            } else if(songIntro) {
-                this.songIntro = songIntro;
+            } else if(song in SONG_INTRO_LOOKUP) {
+                this.songIntro = song + MUSIC_INTRO_SUFFIX;
             }
         }
         opponentGenerator.call(this,applicator,...parameters);

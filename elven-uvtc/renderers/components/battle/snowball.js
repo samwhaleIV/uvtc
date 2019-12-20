@@ -23,7 +23,7 @@ const GET_RANDOM_OFFSET = () => {
     return Math.random() * OFFSET_RANGE - OFFSET_RANGE / 2;
 }
 const GET_SNOWBALL_SUB_PARTICLE_OFFSET_NORMAL = () => {
-    return Math.random() * getRandomPolarity() / 1.5;
+    return Math.random() * Math.randomPolarity() / 1.5;
 }
 function SnowballSubParticleGroup(color,count) {
     const angles = new Array(count);

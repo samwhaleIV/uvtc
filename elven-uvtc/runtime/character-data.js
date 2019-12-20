@@ -1,4 +1,4 @@
-const GameCharacterData = {
+const CHARACTER_DATA = {
     Makers: {
         "jim":              "default",
         "frogert":          "default",

@@ -56,7 +56,7 @@ addMap({
                     await scripts.table_etch(world);
                     break;
                 case 16:
-                    const red = inverseTextColorLookup["red"];
+                    const red = TextColors["red"];
                     await world.showNamedPopup(
                         "It's been a challenge accepting my new identity, but I like the new me.",`${red}Red Couch:${red} `
                     );

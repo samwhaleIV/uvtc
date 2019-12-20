@@ -3,7 +3,7 @@ function GetPunchImpactEffect() {
         startTime: performance.now(),
         size: 20 + Math.random() * 20,
         angleOffset: PI2 * Math.random(),
-        rotationPolarity: getRandomPolarity(),
+        rotationPolarity: Math.randomPolarity(),
         xOffset: (Math.random() * 50) - 25,
         yOffset: (Math.random() * 20) - 10,
         render: function(timestamp) {
