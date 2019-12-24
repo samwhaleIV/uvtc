@@ -17,6 +17,7 @@ addMap({
         this.doorClicked = async () => {
             if(!world.globalState.openedLetter) {
                 await world.say("You should probably read that letter someone left before you go.");
+                return;
             }
             world.updateMap("house_1_oop");
         }
